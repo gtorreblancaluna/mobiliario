@@ -1,0 +1,52 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package dao;
+
+import java.sql.Timestamp;
+import java.util.List;
+import model.Cuenta;
+import model.DatosGenerales;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.log4j.Logger;
+
+/**
+ *
+ * @author Gerardo Torreblanca
+ */
+public class SystemDAO {
+    
+    private static Logger log = Logger.getLogger(SystemDAO.class.getName());
+    private SqlSessionFactory sqlSessionFactory;
+   
+ 
+    public SystemDAO() {
+        sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();
+    }
+    
+    
+        
+    @SuppressWarnings("unchecked")
+    public DatosGenerales getGeneralData() {
+        SqlSession session = sqlSessionFactory.openSession();
+        try {
+            DatosGenerales datosGenerales = (DatosGenerales) session.selectOne("MapperDatosGenerales.getGeneralData");
+            if(datosGenerales == null)
+                return null; 
+            return datosGenerales;
+        }catch(Exception ex){
+            log.error(ex);
+            return null;
+        } finally {
+            session.close();
+        }
+    }
+    
+   
+    
+    
+    
+}

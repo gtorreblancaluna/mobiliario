@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperPagosProveedor">
+  
+    <resultMap id="resultProviderPayments" type="model.providers.PagosProveedor">        
+        
+        <result property="id" column="id"/>
+        <result property="cantidad" column="cantidad"/>
+        <result property="comentario" column="comentario"/>
+        <result property="fgActivo" column="fg_activo"/>        
+        <result property="creado" column="creado"/>
+        <result property="actualizado" column="actualizado"/> 
+        
+        <!-- datos de la orden proveedor -->
+        <result property="ordenProveedor.id" column="orden_proveedor_id"/> 
+        <result property="ordenProveedor.comentario" column="orden_proveedor_comentario"/> 
+        
+        <result property="tipoAbono.tipoAbonoId" column="tipo_abono_id"/> 
+        <result property="tipoAbono.descripcion" column="tipo_abono_descripcion"/> 
+        
+        <result property="usuario.nombre" column="nombre_usuario"/> 
+        <result property="usuario.apellidos" column="apellidos_usuario"/> 
+         
+    </resultMap>
+  
+    <select id="getAllProviderPayments" resultMap="resultProviderPayments" parameterType = "java.lang.Long" >
+        SELECT p.*,
+            o.id AS orden_proveedor_id,
+            o.comentario AS orden_proveedor_comentario,
+            t.id_tipo_abono AS tipo_abono_id,
+            t.descripcion AS tipo_abono_descripcion,
+            u.nombre AS nombre_usuario,
+            u.apellidos AS apellidos_usuario
+        FROM pagos_proveedor p
+            INNER JOIN orden_proveedor o ON (o.id = p.id_orden_proveedor)
+            INNER JOIN tipo_abono t ON (t.id_tipo_abono = p.id_tipo_abono)
+            INNER JOIN usuarios u ON (u.id_usuarios = p.id_usuario)
+        WHERE p.fg_activo = '1'
+        AND o.id = #{orderId}
+        
+    </select>  
+    <insert id="addPayment" parameterType="model.providers.PagosProveedor" >
+        
+         INSERT INTO pagos_proveedor
+        (   
+            id_orden_proveedor,
+            id_usuario,
+            id_tipo_abono,
+            cantidad,
+            comentario,
+            creado,
+            actualizado
+        )
+        VALUES
+        (
+            #{ordenProveedor.id},
+            #{usuario.usuarioId},
+            #{tipoAbono.tipoAbonoId},
+            #{cantidad},
+            #{comentario},
+            #{creado},
+            #{actualizado}
+        )
+    
+    </insert>
+  
+</mapper>

@@ -1,0 +1,108 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package dao;
+
+import java.util.List;
+import model.CategoriaContabilidad;
+import model.Contabilidad;
+import model.SubCategoriaContabilidad;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.log4j.Logger;
+
+/**
+ *
+ * @author jerry
+ */
+public class ContabilidadDAO {
+    
+    private static Logger log = Logger.getLogger(ContabilidadDAO.class.getName());
+    private SqlSessionFactory sqlSessionFactory;
+    
+    public ContabilidadDAO() {
+        sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();
+    }
+ 
+    public List<Contabilidad> getAllContabilidad(){
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+            List<Contabilidad> listContabilidad;
+                listContabilidad = (List<Contabilidad>) session.selectList("MapperContabilidad.getAllContabilidad");
+            return listContabilidad;
+         }catch(Exception ex){
+            log.error(ex);
+            return null;
+        } finally {
+            session.close();
+        }
+    }
+    
+    public List<SubCategoriaContabilidad> getAllSubCategoriasContabilidadByCategoriaId(Integer categoriaId){
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+            List<SubCategoriaContabilidad> listSubCategoriaContabilidad;
+                listSubCategoriaContabilidad = (List<SubCategoriaContabilidad>) session.selectList("MapperContabilidad.getAllSubCategoriasContabilidadByCategoriaId",categoriaId);
+            return listSubCategoriaContabilidad;
+         }catch(Exception ex){
+            log.error(ex);
+            return null;
+        } finally {
+            session.close();
+        }
+    }
+    
+    public List<CategoriaContabilidad> getAllCategoriasContabilidad(){
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+            List<CategoriaContabilidad> listCategoriaContabilidad;
+                listCategoriaContabilidad = (List<CategoriaContabilidad>) session.selectList("MapperContabilidad.getAllCategoriasContabilidad");
+            return listCategoriaContabilidad;
+         }catch(Exception ex){
+            log.error(ex);
+            return null;
+        } finally {
+            session.close();
+        }
+    }
+    
+    public CategoriaContabilidad getCategoryByName(String category){
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+            return (CategoriaContabilidad) session.selectOne("getCategoryByName",category);
+         }catch(Exception ex){
+            log.error(ex);
+            return null;
+        } finally {
+            session.close();
+        }
+    }
+    
+     public SubCategoriaContabilidad getSubCategoryByName(String subCategory){
+        SqlSession session = sqlSessionFactory.openSession();
+         try {
+            return (SubCategoriaContabilidad) session.selectOne("getSubCategoryByName",subCategory);
+        }catch(Exception ex){
+            log.error(ex);
+            return null;
+        } finally {
+            session.close();
+        }
+         
+     }
+    
+     @SuppressWarnings("unchecked")
+    public void save (Contabilidad contabilidad){
+        SqlSession session = sqlSessionFactory.openSession();
+        try {
+            session.insert("save",contabilidad);
+            session.commit();
+        }catch(Exception ex){
+            log.error(ex);            
+        } finally {
+            session.close();
+        }
+    }
+}

@@ -1,0 +1,54 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package dao;
+
+import java.util.List;
+import model.CategoriaContabilidad;
+import model.Contabilidad;
+import model.SubCategoriaContabilidad;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.log4j.Logger;
+
+/**
+ *
+ * @author jerry
+ */
+public class ContabilidadDAO {
+    
+    private static Logger log = Logger.getLogger(CategoryDAO.class.getName());
+    private SqlSessionFactory sqlSessionFactory;
+    
+    public ContabilidadDAO() {
+        sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();
+    }
+ 
+    public List<Contabilidad> getAllContabilidad(){
+        SqlSession session = sqlSessionFactory.openSession();
+        List<Contabilidad> listContabilidad;
+            listContabilidad = (List<Contabilidad>) session.selectList("MapperContabilidad.getAllContabilidad");
+        return listContabilidad;
+    }
+    
+    public List<SubCategoriaContabilidad> getAllSubCategoriasContabilidadByCategoriaId(Integer categoriaId){
+        SqlSession session = sqlSessionFactory.openSession();
+        List<SubCategoriaContabilidad> listSubCategoriaContabilidad;
+            listSubCategoriaContabilidad = (List<SubCategoriaContabilidad>) session.selectList("MapperContabilidad.getAllSubCategoriasContabilidadByCategoriaId",categoriaId);
+        return listSubCategoriaContabilidad;
+    }
+    
+    public List<CategoriaContabilidad> getAllCategoriasContabilidad(){
+        SqlSession session = sqlSessionFactory.openSession();
+        List<CategoriaContabilidad> listCategoriaContabilidad;
+            listCategoriaContabilidad = (List<CategoriaContabilidad>) session.selectList("MapperContabilidad.getAllCategoriasContabilidad");
+        return listCategoriaContabilidad;
+    }
+    
+    public CategoriaContabilidad getCategoryByName(String category){
+        SqlSession session = sqlSessionFactory.openSession();
+        return (CategoriaContabilidad) session.selectOne("getCategoryByName",category);
+    }
+}

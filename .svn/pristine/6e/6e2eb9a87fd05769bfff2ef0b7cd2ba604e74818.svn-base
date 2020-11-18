@@ -1,0 +1,78 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package mobiliario;
+
+/**
+ *
+ * @author jerry
+ */
+public interface ApplicationConstants {
+    
+    /** Catalogo estados de renta */
+    public static final String ESTADO_APARTADO = "1";
+    public static final String ESTADO_EN_RENTA = "2";
+    public static final String ESTADO_PENDIENTE = "3";
+    public static final String ESTADO_CANCELADO = "4";
+    public static final String ESTADO_FINALIZADO = "5";
+    
+    public static final int PUESTO_CHOFER = 1;
+    public static final int PUESTO_REPARTIDOR = 2;
+    public static final int PUESTO_ADMINISTRADOR = 3;
+    public static final int PUESTO_MOSTRADOR = 4;
+    
+    /** Catalogo tipo de evento */
+    public static final String TIPO_PEDIDO = "1";
+    public static final String TIPO_COTIZACION = "2";
+    
+    public static final String LOGO_EMPRESA = "/casa-gaby.jpg";
+    
+    // Descripcion para la columna de cobranza en CONSULTAR RENTA
+    
+    public static final String COBRANZA_PAGADO = "Pagado";
+    public static final String COBRANZA_PARCIAL_PAGADO = "Parcialmente pagado";
+    public static final String COBRANZA_NO_PAGADO = "No pagado";
+    
+    /* Descripcion para mostrar en la tabla de faltantes */
+    public static final String DS_FALTANTES_FALTANTE = "Faltante";
+    public static final String DS_FALTANTES_DEVOLUCION = "Devoluci\u00F3n";
+    public static final String DS_FALTANTES_REPARACION = "Reparaci\u00F3n";
+    public static final String DS_FALTANTES_ACCIDENTE = "Accidente de trabajo";
+    
+    /* dato inicial para un combo box */
+    public static final String CMB_SELECCIONE = "-seleccione-";
+    
+    /* mensajes para mostrar en los popus */
+    public static final String MESSAGE_SAVE_SUCCESSFUL = "Se ha registrado con \u00E9xito";
+    
+    // ****************************************************************************************
+    // rutas de impresion para los reportes en PDF
+    public static final String RUTA_REPORTE_ENTREGAS = "C:/reportes_mobiliario/reporteEntrega.jasper";
+    public static final String NOMBRE_REPORTE_ENTREGAS = "C:/reportes_mobiliario/reporteEntrega.pdf";
+    public static final String RUTA_REPORTE_CONSULTA = "C:/reportes_mobiliario/renta_consulta.jasper";
+    public static final String NOMBRE_REPORTE_CONSULTA = "C:/reportes_mobiliario/reporte_consulta.pdf";
+    public static final String RUTA_REPORTE_CATEGORIAS = "C:/reportes_mobiliario/reporte_por_categorias.jasper";
+    public static final String NOMBRE_REPORTE_CATEGORIAS = "C:/reportes_mobiliario/reporte_por_categorias.pdf";
+    public static final String RUTA_REPORTE_NUEVO_PEDIDO = "C:/reportes_mobiliario/renta.jasper";
+    public static final String NOMBRE_REPORTE_NUEVO_PEDIDO = "C:/reportes_mobiliario/reporte.pdf";
+    public static final String RUTA_LOGO_EMPRESA = "C:/dist";
+    public static final String URL_SUB_REPORT_CONSULTA = "C:/reportes_mobiliario/subReport_faltantes.jasper";
+    
+    
+    // estas rutas es para MAC
+    
+//    public static final String RUTA_LOGO_EMPRESA = "/dist";
+//    public static final String RUTA_REPORTE_ENTREGAS = "/reportes_mobiliario/reporteEntrega.jasper";
+//    public static final String NOMBRE_REPORTE_ENTREGAS = "/reportes_mobiliario/reporteEntrega.pdf";
+//    public static final String RUTA_REPORTE_CONSULTA = "/reportes_mobiliario/renta_consulta.jasper";
+//    public static final String NOMBRE_REPORTE_CONSULTA = "/reportes_mobiliario/reporte_consulta.pdf";
+//    public static final String RUTA_REPORTE_NUEVO_PEDIDO = "/reportes_mobiliario/renta.jasper";
+//    public static final String NOMBRE_REPORTE_NUEVO_PEDIDO = "/reportes_mobiliario/reporte.pdf";
+//    public static final String RUTA_REPORTE_CATEGORIAS = "/reportes_mobiliario/reporte_por_categorias.jasper";
+//    public static final String NOMBRE_REPORTE_CATEGORIAS = "/reportes_mobiliario/reporte_por_categorias.pdf";
+//    public static final String URL_SUB_REPORT_CONSULTA = "/reportes_mobiliario/subReport_faltantes.jasper";
+    
+    
+}

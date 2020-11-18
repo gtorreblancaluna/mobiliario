@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperTipoAbonos">
+  
+    <resultMap id="resultMapTipoAbonos" type="model.TipoAbono">        
+        <result property="tipoAbonoId" column="id_tipo_abono"/>
+        <result property="descripcion" column="descripcion"/>    
+        <result property="fgActivo" column="fg_activo"/>
+        <result property="fechaRegistro" column="fecha_Registro"/>
+        
+        <result property="cuenta.id" column="cuenta_id"/>
+        <result property="cuenta.descripcion" column="cuenta_descripcion"/>    
+        <result property="cuenta.createdAt" column="cuenta_created_at"/>
+        <result property="cuenta.updatedAt" column="cuenta_updated_at"/> 
+        <result property="cuenta.fgActivo" column="cuenta_fg_activo"/>    
+       
+
+    </resultMap>   
+  
+    <select id="obtenerTipoAbonos" resultMap="resultMapTipoAbonos" >
+        SELECT t.*,
+        c.id AS cuenta_id,
+        c.descripcion AS cuenta_descripcion,
+        c.created_at AS cuenta_created_at,
+        c.updated_at AS cuenta_updated_at,
+        c.fg_activo AS cuenta_fg_activo
+        FROM tipo_abono t
+        INNER JOIN cuenta c ON (t.cuenta_id = c.id)     
+    </select>   
+    
+    <select id="obtenerTipoAbonosLike" resultMap="resultMapTipoAbonos" parameterType="java.lang.String">
+        SELECT t.*,
+        c.id AS cuenta_id,
+        c.descripcion AS cuenta_descripcion,
+        c.created_at AS cuenta_created_at,
+        c.updated_at AS cuenta_updated_at,
+        c.fg_activo AS cuenta_fg_activo
+        FROM tipo_abono t
+        INNER JOIN cuenta c ON (t.cuenta_id = c.id)  
+        WHERE t.descripcion LIKE CONCAT('%',#{search},'%')   
+    </select> 
+    
+     <select id="getTipoAbonoByDescription" resultMap="resultMapTipoAbonos" parameterType="java.lang.String">
+        SELECT t.*,
+        c.id AS cuenta_id,
+        c.descripcion AS cuenta_descripcion,
+        c.created_at AS cuenta_created_at,
+        c.updated_at AS cuenta_updated_at,
+        c.fg_activo AS cuenta_fg_activo
+        FROM tipo_abono t
+        INNER JOIN cuenta c ON (t.cuenta_id = c.id)  
+        WHERE t.descripcion = #{description}   
+    </select> 
+    
+    <insert id="insertTipoAbono" parameterType="model.TipoAbono">
+        INSERT INTO tipo_abono
+        (
+            descripcion,
+            cuenta_id
+        )
+        VALUES
+        (
+            #{descripcion},
+            #{cuenta.id}
+        )
+        
+    </insert>     
+    
+    
+  
+</mapper>

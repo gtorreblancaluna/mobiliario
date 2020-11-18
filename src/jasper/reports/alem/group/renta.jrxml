@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="renta" language="groovy" pageWidth="695" pageHeight="900" columnWidth="655" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="af0ab36d-faf5-45a3-a784-d9f82f7a9acc">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="938"/>
+	<parameter name="id_renta" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\Carlos Alberto\\Documents\\NetBeansProjects\\mobiliario\\reportes\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="abonos" class="java.lang.String"/>
+	<parameter name="subTotal" class="java.lang.String"/>
+	<parameter name="chofer" class="java.lang.String"/>
+	<parameter name="descuento" class="java.lang.String"/>
+	<parameter name="iva" class="java.lang.String"/>
+	<parameter name="URL_IMAGEN" class="java.lang.String"/>
+	<parameter name="NOMBRE_EMPRESA" class="java.lang.String"/>
+	<parameter name="DIRECCION_1" class="java.lang.String"/>
+	<parameter name="DIRECCION_2" class="java.lang.String"/>
+	<parameter name="DIRECCION_3" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT IF(d.porcentaje_descuento > 0 , (d.cantidad * d.p_unitario) * (d.porcentaje_descuento / 100) , 0 ) AS totalDescuento,
+     CONCAT(u.`nombre`," ",u.`apellidos`) AS Usuario,
+     IF(d.porcentaje_descuento > 0 , (d.cantidad * d.p_unitario) - ((d.cantidad * d.p_unitario) * (d.porcentaje_descuento / 100)  ) , (d.cantidad * d.p_unitario) ) AS Importe,
+     CONCAT(a.`descripcion`," ",co.`color`) AS Articulo,
+     CONCAT(c.`nombre`," ",c.`apellidos`) AS Cliente,
+     r.`fecha_pedido`,
+     r.`fecha_entrega`,
+     r.`hora_entrega`,
+     r.`fecha_devolucion`,
+     r.`descripcion`,
+     d.`cantidad` ,
+     d.`p_unitario`,
+     c.`direccion`,
+     r.`comentario`,
+     r.`folio`,
+     ti.`tipo`,
+     r.hora_devolucion,
+     c.tel_movil,
+     c.tel_fijo,
+     r.fecha_evento,
+r.envio_recoleccion,
+r.deposito_garantia,
+r.mostrar_precios_pdf
+
+FROM
+     `renta` r INNER JOIN `usuarios` u ON r.`id_usuarios` = u.`id_usuarios`
+     INNER JOIN `detalle_renta` d ON r.`id_renta` = d.`id_renta`
+     INNER JOIN `clientes` c ON r.`id_clientes` = c.`id_clientes`
+     INNER JOIN `articulo` a ON d.`id_articulo` = a.`id_articulo`
+     INNER JOIN `color` co ON a.`id_color` = co.`id_color`
+     INNER JOIN `tipo` ti ON r.`id_tipo` = ti.`id_tipo`
+WHERE
+     r.`id_renta` = $P{id_renta}]]>
+	</queryString>
+	<field name="Usuario" class="java.lang.String"/>
+	<field name="Importe" class="java.lang.Double"/>
+	<field name="Articulo" class="java.lang.String"/>
+	<field name="Cliente" class="java.lang.String"/>
+	<field name="fecha_pedido" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="fecha_entrega" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="hora_entrega" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="fecha_devolucion" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="descripcion" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="cantidad" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="p_unitario" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="direccion" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="comentario" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="folio" class="java.lang.Long">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tipo" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="hora_devolucion" class="java.lang.String"/>
+	<field name="tel_movil" class="java.lang.String"/>
+	<field name="tel_fijo" class="java.lang.String"/>
+	<field name="fecha_evento" class="java.lang.String"/>
+	<field name="envio_recoleccion" class="java.lang.String"/>
+	<field name="deposito_garantia" class="java.lang.String"/>
+	<field name="totalDescuento" class="java.lang.String"/>
+	<field name="mostrar_precios_pdf" class="java.lang.String"/>
+	<variable name="Total" class="java.lang.String">
+		<variableExpression><![CDATA[new Float(String.valueOf($P{subTotal}))-new Float(String.valueOf($P{abonos}))]]></variableExpression>
+	</variable>
+	<pageHeader>
+		<band height="252">
+			<textField>
+				<reportElement uuid="cf2b42e2-14fc-43af-8594-74545538abc8" x="6" y="136" width="633" height="24"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Cliente: "+$F{Cliente}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="bf7a0c42-eb64-4a72-bb77-f1cdd17ecddd" x="6" y="179" width="633" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Fecha registro: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_pedido}))]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d85f5de2-799f-45cb-a9b7-acaa123e12f1" x="493" y="29" width="149" height="24"/>
+				<textElement>
+					<font fontName="Arial" size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Folio: "+$F{folio}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a982fdfa-53b0-4123-992d-7be097147e24" x="493" y="62" width="149" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Tipo: "+$F{tipo}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement uuid="6302a48b-2236-4f02-8a2c-917794354ba6" x="0" y="0" width="133" height="133"/>
+				<imageExpression><![CDATA[$P{URL_IMAGEN}]]></imageExpression>
+			</image>
+			<line>
+				<reportElement uuid="51ca89ab-746c-499f-be85-30db44a3be47" x="9" y="250" width="633" height="1" forecolor="#999999"/>
+			</line>
+			<line>
+				<reportElement uuid="32a3134f-2294-4da1-bb8e-2b6383ab3d8c" x="9" y="133" width="633" height="1" forecolor="#999999"/>
+			</line>
+			<textField>
+				<reportElement uuid="ab5d4bfc-9add-4993-a96d-658012bebf85" x="5" y="200" width="647" height="48"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f0f66957-f02a-4930-8dcb-bcdb866a562a" x="6" y="160" width="633" height="19"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Telefono(s) cliente: "+$F{tel_movil}+", "+$F{tel_fijo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d2e24028-0846-4cc4-a908-5e39cd1e234d" x="163" y="29" width="311" height="24"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="false" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DIRECCION_1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="651b1c7c-3ad1-481b-8010-1f008ba52a26" x="163" y="53" width="311" height="24"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="false" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DIRECCION_2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="63f3a516-11ef-4dbb-adb6-a57746e5579a" x="186" y="5" width="267" height="24"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14" isBold="false" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOMBRE_EMPRESA}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="25">
+			<staticText>
+				<reportElement uuid="118e2cd5-1ab9-439d-a3ff-8178e8878fa2" x="18" y="2" width="59" height="19"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fad16d66-40b8-4bf0-814e-3bd69238fb85" x="89" y="2" width="59" height="19"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<text><![CDATA[Articulo]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="b7c4dc89-02cd-42b2-bb0a-340fc285c285" x="9" y="21" width="633" height="1" forecolor="#999999"/>
+			</line>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="efe7e33c-1c62-4d2c-9f01-328e04599d42" x="358" y="2" width="105" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : "Precio unitario"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="d0ba680f-42e4-40dc-a260-54760b0530fb" x="463" y="1" width="105" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : "Descuento"]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="cbfcf471-ec61-4476-97b6-0a13cf727ede" x="569" y="1" width="74" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : "Importe"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<textField>
+				<reportElement uuid="acbde3cb-1664-4020-bbee-637fbb28294e" x="77" y="0" width="281" height="15"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Articulo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="cd0dc678-302e-4d48-aa9d-4788290ceeb4" x="9" y="0" width="68" height="16"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="264e5627-4980-45b0-80ac-5d111ce0ac62" x="358" y="0" width="78" height="15"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("1") ? new Float(String.valueOf($F{p_unitario})) : ""]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="d10adc81-14d0-43a2-a939-04235e436e6b" x="569" y="0" width="73" height="14"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("1") ? new Float(String.valueOf($F{Importe})) : ""]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="768c0afe-f3d5-4b57-bdf8-2c49a63267b2" x="0" y="16" width="643" height="1" forecolor="#CCCCCC"/>
+			</line>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="a6f45e55-9c4f-4d2b-8353-af90a1b72fdc" x="463" y="0" width="74" height="15"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : (($F{totalDescuento}).equals("0") ? "" : new Float(String.valueOf($F{totalDescuento})))]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="229">
+			<rectangle>
+				<reportElement uuid="964d78a5-8876-447c-a499-fbab26d127bf" mode="Opaque" x="474" y="63" width="181" height="119" forecolor="#999999"/>
+			</rectangle>
+			<textField>
+				<reportElement uuid="27536c0b-ff9f-4a6b-b9dc-f106ad6c9edb" x="10" y="77" width="446" height="105"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{comentario}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="5f36e1f3-ce07-4290-a4b0-6f383aa8036a" x="9" y="9" width="633" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Entrega: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_entrega}))+" Hora: "+$F{hora_entrega}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4817bd89-272d-44fc-8f00-5d8a61f2eb5f" x="10" y="209" width="387" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Atendió: "+$F{Usuario}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement uuid="60881411-e324-4b2c-9ddb-9b7ea12c0ee2" x="10" y="189" width="387" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Chofer: "+$P{chofer}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7004e105-71f0-4fd8-8a95-8fa865a42f0e" x="10" y="29" width="632" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Devolución: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_devolucion}))+" Hora: "+$F{hora_devolucion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8b7d09a3-74c1-48e5-bf22-f82467f51d00" x="10" y="49" width="446" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Fecha evento: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_evento}))]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="36772927-c467-41a9-90fe-fce8288b8510" x="581" y="163" width="72" height="16"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($P{subTotal}))-new Float(String.valueOf($P{abonos}))-new Float(String.valueOf($P{descuento}))+ new Float(String.valueOf($P{iva})) + new Float(String.valueOf($F{envio_recoleccion})) + + new Float(String.valueOf($F{deposito_garantia}))]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="b679da62-74d8-4a22-a5d8-2065ea1216db" x="477" y="163" width="102" height="16"/>
+				<textElement>
+					<font fontName="Consolas" size="9"/>
+				</textElement>
+				<text><![CDATA[Total:]]></text>
+			</staticText>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="615ea71c-ec01-4aa6-8ad3-b0202ccde139" x="579" y="109" width="74" height="16"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($F{deposito_garantia})) <= 0 ? "" : new Float(String.valueOf($F{deposito_garantia}))]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="808ad874-1282-4e68-a6d8-52f211198e30" x="579" y="78" width="73" height="16"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($P{descuento})) <= 0 ? "" : new Float(String.valueOf($P{descuento}))]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="defc38cd-f06e-4f19-a05e-13e75a78ce62" x="579" y="93" width="74" height="16"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($F{envio_recoleccion})) <= 0 ? "" : new Float(String.valueOf($F{envio_recoleccion}))]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="e8ac2a14-7138-4a61-81fe-ce33b28f5d52" x="579" y="125" width="74" height="16"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($P{iva})) <= 0 ? "" : new Float(String.valueOf($P{iva}))]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="129469c8-c2f4-44bf-bc28-64942e92e0a5" x="579" y="63" width="73" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($P{subTotal}))]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="0e623895-5165-40e6-aa2c-2481a1ff9913" x="579" y="141" width="74" height="16"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($P{abonos})) <= 0 ? "" : new Float(String.valueOf($P{abonos}))]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="a4fa2b1b-879a-4ae3-abaa-b21f348c34c0" x="474" y="160" width="181" height="1" forecolor="#999999"/>
+			</line>
+			<staticText>
+				<reportElement uuid="7206bddd-269b-4a48-bdce-939257ac0d12" x="477" y="63" width="100" height="15"/>
+				<textElement>
+					<font fontName="Consolas" size="9"/>
+				</textElement>
+				<text><![CDATA[Subtotal:]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="45758abb-02b2-4547-a544-384189adbaeb" x="477" y="77" width="100" height="16"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($P{descuento})) <= 0 ? "" : "Descuento:"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="04d214e6-d9b5-4f9e-97f8-0286cdfe6e20" x="476" y="93" width="101" height="16"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($F{envio_recoleccion})) <= 0 ? "" : "Envio y recolecciòn:"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="7d8eedb1-0641-46fb-93bc-8e5338939ef4" x="477" y="109" width="100" height="16"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($F{deposito_garantia})) <= 0 ? "" : "Depòsito en garantìa:"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="40c98f5f-9267-45a5-a529-f18c77361149" x="476" y="125" width="101" height="16"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($P{iva})) <= 0 ? "" : "IVA:"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="39ac4ad1-5206-4f04-92c9-2d67ac4fc0f4" x="476" y="141" width="101" height="16"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($P{abonos})) <= 0 ? "" : "Pagos:"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="22">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="d967c547-70ac-48d2-a896-4b20e7511f2b" x="0" y="0" width="358" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Fecha de impresión: "+new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="1d327f29-875f-4b27-a5ca-b52382e4ca81" x="503" y="0" width="97" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="45d27ca4-9d7d-4cdf-a413-f68ec96b101b" x="603" y="0" width="52" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="860">
+			<staticText>
+				<reportElement uuid="f4098a0f-98c7-41e5-8a1a-e76cb8306408" x="6" y="0" width="646" height="824"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[POLÍTICAS Y NORMAS DE RENTA
+
+Gracias por su confianza.
+Para asegurar que “Grupo ALEM” pueda brindar el mejor servicio a nuestros clientes, te pedimos leas las siguientes indicaciones y condiciones con la finalidad de evitar malentendidos, cuidar nuestra calidad de servicio y garantizar su evento.
+
+CONTRATACIÓN
+
+Para apartar el evento, se tiene que hacer vía telefónica para asegurar que el día que solicitan el servicio se encuentre disponible.
+Las cotizaciones contienen fecha de vigencia, aclarando que ésta misma quedará como cotización y no se hará pedido sin antes haber depósito con el apartado del evento o liquidación de este. Si el evento es dentro de los próximos 30 días, el depósito debe ser del 50% del total de la cotización. Si el evento es en meses posteriores, el depósito debe ser mínimo del 20% del total de la cotización. Deberá hacernos llegar el pago realizado anexando Nombre y número de cotización o nota, de lo contrario, no se dará por enterado el apartado del evento/ mobiliario/ vajilla/ cristalería/ banquete y/o
+mantelería, por lo que la empresa “Grupo ALEM” no se hará responsable. Esto es únicamente para apartar su evento. Una vez realizado el apartado, no se aceptarán cambios, cancelaciones ni devoluciones. El monto restante deberá ser liquidado en su totalidad 4 días antes de la fecha de entrega que solicito, de lo contrario no se programará la entrega de este y se perderá el dinero del apartado.
+
+FACTURACIÓN
+NUESTROS PRECIOS NO INCLUYEN IVA
+
+En caso de requerir factura, deberá de estar liquidada la nota al 100% (dentro de los días
+correspondientes al mes en curso), posteriormente deberá solicitarlo directamente con su vendedor
+y proporcionarle los siguientes datos:
+
+Razón Social
+RFC
+Dirección (Calle, Número, Colonia, Ciudad, Municipio o Delegación y Código Postal)
+Teléfono
+Correo Electrónico
+El número de nota Pagada
+
+De hacer caso omiso al limite del tiempo estipulado, la empresa “Grupo ALEM” no se hace responsable sobre facturas solicitadas fuera de tiempo.
+
+DEPOSITOS EN GARANTIA Y/O REPOSICIONES
+
+Se cobrará un depósito en garantía por el producto rentado, mismo que se regresará en su totalidad únicamente si el producto se regresa en óptimas condiciones y completo (mantelería, mobiliario, vajilla y/o cristalería). El deposito se reintegra mediante un formato de devolución, el cual deberá solicitar con su vendedor y otorgar los siguientes datos:
+
+Titular de la cuenta
+RFC
+Razón social
+Nombre del contacto
+Teléfono
+Cuenta bancaria / Clabe interbancaria
+Banco
+Correo electrónico
+
+Para devolución en efectivo deberá acudir a las instalaciones de “Grupo ALEM”; el tiempo para el retorno de su depósito en garantía será de 5 días hábiles a partir
+de enviar el formato y/o el producto rentado. La persona que este encargado de recibir el producto deberá de revisarlo junto con la persona que le
+hace entrega, misma que será la responsable de retornar el producto rentado esta deberá firmar de enterado para evitar malentendidos. La reclamación del retorno del depósito en garantía tiene una vigencia de 30 días hábiles que corren a partir de la fecha de su evento. Cristalería y Vajilla rota, estrellada, despostillada o faltante se cobrará como nueva. Mantelería quemada, rota, rasgada o faltante se cobrará como nueva.
+
+ENTREGAS, FLETES Y/O MONTAJES
+
+Para la entrega del producto rentado deberá estar la persona encargada presente en el día y hora acordado, de lo contrario el personal no estará obligado de dejarlo y se retirará del lugar perdiendo así su turno de entrega y sin posibilidad de volver a programarlo. Favor de revisar todo lo que reciba, ya que de lo contrario la empresa no se hará responsable y el cliente asumirá los cargos correspondientes al costo de reposición por producto dañado o faltante. Al momento de contratar deberá de especificar el lugar donde requiere el producto, de lo contrario, si se requiere una maniobra adicional (montaje, desmontaje y/o recorrer una distancia mayor a 8 metros o subir/bajar pisos adicionales) tendrá un cargo extra que se cobrará en el momento, de lo contrario el personal no estará obligado en dejar el producto. Si el servicio que solicitó no está registrado en la cotización y/o nota, no será responsabilidad de la empresa otorgarlo. En pedidos menores a $3,600.00 (Tres Mil Seiscientos pesos 00/100 M.N.) en área limitada se cobrará
+Flete (envío y recolección). Horarios, fechas, de entrega, servicios adicionales, montajes etc. deberán estar marcados dentro de
+la nota, de lo contrario la empresa “Grupo ALEM” no se hará responsable. Si el producto lo solicitan el mismo día, la empresa no se hace responsable en horarios de entrega debido a que se programa con proveedores de Fletes externos y que tendrá costo extra, mismo que
+deberá de pagar el cliente. La empresa NO labora los domingos y días festivos, si necesitara de nuestros servicios, esto tendrá cargo extra. Tendrá costo extra retirar el producto solicitado el mismo día del evento posterior a la jornada laboral de la empresa, siendo esta de lunes a viernes de 9:00 hrs. a 17:00 hrs. y sábados de 9:00 hrs. a 13:00 hrs. Tendrá la responsabilidad de salvaguardar el producto rentado hasta que la empresa recoja el
+mismo. No nos hacemos responsables por cambios climatológicos.
+
+RENTA DE TOLDOS
+
+Dentro del costo de la renta del Toldo ya incluye montaje y desmontaje. La empresa no se hace responsable en cuanto errores de medidas del lugar del evento. Una vez instalado el toldo no podrá moverse por personas ajenas a la empresa, en caso de ser removido, se cobrará un cargo adicional dependiendo del tipo de toldo, sin excepción de que tenga o no daño.
+
+NOS COMPROMETEMOS
+
+A la puntualidad de la entrega del servicio solicitado. A la entrega del servicio completo que se solicitó con anterioridad, entregándolo con la máxima
+calidad de cada uno de los productos. A brindarle siempre una atención personalizada y asesorarle con los detalles del servicio. A la seguridad y garantía de un servicio impecable en la entrega del producto, ya que contamos con transporte de ultimo modelo y personal capacitado para trasladar el mobiliario.
+
+PAGOS
+
+Al realizar el pago del apartado o total, consta este documento que usted esta de acuerdo con los términos y condiciones de nuestras políticas de renta sin necesidad de firma alguna. Puede realizar sus pagos a través de OXXO, 7ELEVEN, EFECTIVO, TRANSFERENCIA, TAJETA DE CREDITO, TARJETA DE DEBITO, CHEQUE.
+
+Gracias por su preferencia.
+
+
+Gracias por su preferencia.
+Póngase en contacto con nosotros para más información sobre las opciones de pago.]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement uuid="0db2621c-7735-4849-8818-dcc48b32dedc" x="603" y="840" width="52" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="db0365a0-682f-4cc2-bbfa-0785c6a539d0" x="503" y="840" width="97" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="df0e4014-2d47-4d92-bb45-20c16d836439" x="0" y="840" width="358" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Fecha de impresión: "+new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

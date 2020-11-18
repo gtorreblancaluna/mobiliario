@@ -1,0 +1,54 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package services;
+
+import dao.ContabilidadDAO;
+import java.util.List;
+import model.CategoriaContabilidad;
+import model.Contabilidad;
+import model.SubCategoriaContabilidad;
+
+/**
+ *
+ * @author idscomercial
+ */
+public class ContabilidadServices {
+    
+    private ContabilidadDAO contabilidadDAO = new ContabilidadDAO();
+    
+    public List<Contabilidad> getAllContabilidad(){
+        List<Contabilidad> listContabilidad;
+            listContabilidad = contabilidadDAO.getAllContabilidad();
+        return listContabilidad;
+    }
+    public List<SubCategoriaContabilidad> getAllSubCategoriasContabilidadByCategoriaId(Integer categoriaId){
+        
+        List<SubCategoriaContabilidad> listSubCategoriaContabilidad;
+            listSubCategoriaContabilidad = contabilidadDAO.getAllSubCategoriasContabilidadByCategoriaId(categoriaId);
+        return listSubCategoriaContabilidad;
+    }
+    
+    public List<CategoriaContabilidad> getAllCategoriasContabilidad(){
+       
+        List<CategoriaContabilidad> listCategoriaContabilidad;
+            listCategoriaContabilidad = contabilidadDAO.getAllCategoriasContabilidad();
+        return listCategoriaContabilidad;
+    }
+    
+    public CategoriaContabilidad getCategoryByName(String category){
+        return contabilidadDAO.getCategoryByName(category);
+    }
+    
+     public SubCategoriaContabilidad getSubCategoryByName(String subCategory){
+        return contabilidadDAO.getSubCategoryByName(subCategory);
+    }
+    
+    public void save(Contabilidad contabilidad){
+        contabilidadDAO.save(contabilidad);
+    }
+    
+    
+}

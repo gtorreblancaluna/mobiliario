@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperProveedores">
+  
+    <resultMap id="resultProvider" type="model.providers.Proveedor">
+        <result property="id" column="id"/>
+        <result property="nombre" column="nombre"/>
+        <result property="apellidos" column="apellidos"/>
+        <result property="direccion" column="direccion"/>        
+        <result property="telefonos" column="telefonos"/>
+        <result property="email" column="email"/>
+        <result property="fgActivo" column="fg_activo"/>        
+        <result property="creado" column="creado"/>
+        <result property="actualizado" column="actualizado"/>        
+    </resultMap>
+  
+    <select id="getAllProvider" resultMap="resultProvider" >
+        SELECT * FROM proveedores WHERE fg_activo = '1'  ORDER BY nombre
+    </select>  
+  
+</mapper>
