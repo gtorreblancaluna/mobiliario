@@ -37,7 +37,7 @@ public class VerFaltantes extends java.awt.Dialog {
     Object[][] dtconduc;      
     SaleService saleService = new SaleService();
     private final SystemService systemService = SystemService.getInstance();
-    ItemService itemService = new ItemService();
+    ItemService itemService = ItemService.getInstance();
     public static String g_articuloId;
     public static String g_rentaId;
     public static String g_cantidadEnPedido;

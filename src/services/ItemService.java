@@ -34,6 +34,14 @@ import services.providers.OrderProviderService;
  */
 public class ItemService {
 //    sqlclass funcion = new sqlclass();
+    // singlenton instance
+    private static final ItemService SINGLE_INSTANCE = new ItemService();
+    private ItemService(){}
+    public static ItemService getInstance() {
+      return SINGLE_INSTANCE;
+    }
+    
+  
     private ItemDAO itemDao = new ItemDAO();
     private ComprasService comprasService = new ComprasService();
     private OrderProviderService orderProviderService = OrderProviderService.getInstance();
@@ -195,7 +203,14 @@ public class ItemService {
         
     }
     
-    
+    public Articulo getItemAvailable (Integer id) {
+     Articulo item;
+     
+     item = itemDao.getItemAvailable(id);
+     setUtiles(item);
+     
+     return item;
+    }
     
     public List<Articulo> obtenerArticulosBusquedaInventario(sqlclass sql, String stringSql){
 //        Servicio para obtener un articulos por query armado desde la vista    
@@ -250,8 +265,7 @@ public class ItemService {
        
        if(dtconduc[i][9] != null)
            articulo.setPrecioRenta(new Float(dtconduc[i][9]+""));
-        
-            articulos.add(articulo);
+           articulos.add(articulo);
         
         }// end for
 
@@ -262,80 +276,82 @@ public class ItemService {
         List<Articulo> articulos = itemDao.obtenerArticulosBusquedaInventario(map);
         
         if(articulos != null){
-            for(Articulo articulo : articulos){
-                
-                List<Compra> compras = comprasService.obtenerComprasPorArticuloId(false, articulo.getArticuloId(), null);
-                 float totalCompras = 0f;
-                 
-                 
-                    if(compras != null && compras.size()>0){
-                        for(Compra compra : compras){
-                            totalCompras += compra.getCantidad();
-                        } // end for compras
-                    }
-                    
-                    // get all shop from provider
-                    float totalShopFromProvider = 0f;
-                    Map<String,Object> parameters = new HashMap<>();
-                    parameters.put("articuloId", articulo.getArticuloId());
-                    parameters.put("statusOrderFinish", ApplicationConstants.STATUS_ORDER_PROVIDER_FINISH);
-                    parameters.put("statusOrder", ApplicationConstants.STATUS_ORDER_PROVIDER_ORDER);
-                    parameters.put("typeOrderDetail", ApplicationConstants.TYPE_DETAIL_ORDER_SHOPPING);
-                    
-                    try{
-                        List<DetalleOrdenProveedor> detalleOrdenProveedor =
-                                orderProviderService.getDetailProvider(parameters);
-                        
-                        if(detalleOrdenProveedor != null && detalleOrdenProveedor.size()>0){
-                            for(DetalleOrdenProveedor detalle : detalleOrdenProveedor){
-                                totalShopFromProvider += detalle.getCantidad();
-                            }
-                        }
-                    }catch(BusinessException e){
-                        LOGGER.error(e);
-                    }
-                    
-                    float enRenta = 0f;
-                    float faltantes = 0f;
-                    float reparacion = 0f;
-                    float accidenteTrabajo = 0f;
-                    float devolucion = 0f;
-                    
-                    try{
-                        enRenta = articulo.getEnRenta();
-                    }catch (Exception e){
-                        System.out.println(e);
-                    }
-                    try{
-                        faltantes = new Float(articulo.getFaltantes());
-                    }catch (Exception e){
-                        System.out.println(e);
-                    }
-                    try{
-                        reparacion = new Float(articulo.getReparacion());
-                    }catch (Exception e){
-                        System.out.println(e);
-                    }
-                    try{
-                        accidenteTrabajo = new Float(articulo.getAccidenteTrabajo());
-                    }catch (Exception e){
-                        System.out.println(e);
-                    }
-                    try{
-                        devolucion = new Float(articulo.getDevolucion());
-                    }catch (Exception e){
-                        System.out.println(e);
-                    }
-                    
-                    articulo.setUtiles( (articulo.getCantidad() - faltantes - reparacion - accidenteTrabajo ) + devolucion + totalCompras + totalShopFromProvider);
-//                    if(totalCompras > 0){
-                        articulo.setTotalCompras(totalCompras+totalShopFromProvider);
-//                    }
-                    
+            for(Articulo articulo : articulos){    
+              setUtiles(articulo);     
             } // end for articulos
         }
          
         return articulos;
+    }
+    
+    private void setUtiles (Articulo item) {
+        
+        List<Compra> compras = comprasService.obtenerComprasPorArticuloId(false, item.getArticuloId(), null);
+        float totalCompras = 0f;
+
+
+       if(compras != null && compras.size()>0){
+           for(Compra compra : compras){
+               totalCompras += compra.getCantidad();
+           } // end for compras
+       }
+
+       // get all shop from provider
+       float totalShopFromProvider = 0f;
+       Map<String,Object> parameters = new HashMap<>();
+       parameters.put("articuloId", item.getArticuloId());
+       parameters.put("statusOrderFinish", ApplicationConstants.STATUS_ORDER_PROVIDER_FINISH);
+       parameters.put("statusOrder", ApplicationConstants.STATUS_ORDER_PROVIDER_ORDER);
+       parameters.put("typeOrderDetail", ApplicationConstants.TYPE_DETAIL_ORDER_SHOPPING);
+
+       try{
+           List<DetalleOrdenProveedor> detalleOrdenProveedor =
+                   orderProviderService.getDetailProvider(parameters);
+
+           if(detalleOrdenProveedor != null && detalleOrdenProveedor.size()>0){
+               for(DetalleOrdenProveedor detalle : detalleOrdenProveedor){
+                   totalShopFromProvider += detalle.getCantidad();
+               }
+           }
+       }catch(BusinessException e){
+           LOGGER.error(e);
+       }
+    
+        float enRenta = 0f;
+        float faltantes = 0f;
+        float reparacion = 0f;
+        float accidenteTrabajo = 0f;
+        float devolucion = 0f;
+
+        try{
+            enRenta = item.getEnRenta();
+        }catch (Exception e){
+            System.out.println(e);
+        }
+        try{
+            faltantes = new Float(item.getFaltantes());
+        }catch (Exception e){
+            System.out.println(e);
+        }
+        try{
+            reparacion = new Float(item.getReparacion());
+        }catch (Exception e){
+            System.out.println(e);
+        }
+        try{
+            accidenteTrabajo = new Float(item.getAccidenteTrabajo());
+        }catch (Exception e){
+            System.out.println(e);
+        }
+        try{
+            devolucion = new Float(item.getDevolucion());
+        }catch (Exception e){
+            System.out.println(e);
+        }
+
+        item.setUtiles( (item.getCantidad() - faltantes - reparacion - accidenteTrabajo ) + devolucion + totalCompras + totalShopFromProvider);
+        item.setTotalCompras(totalCompras+totalShopFromProvider);
+
     }
     
     public List<Faltante> obtenerFaltantesPorRentaId(sqlclass sql, int rentaId){

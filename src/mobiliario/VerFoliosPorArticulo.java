@@ -38,7 +38,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
     float cant = 0; 
     SaleService saleService = new SaleService();
     private final SystemService systemService = SystemService.getInstance();
-    ItemService itemService = new ItemService();
+    ItemService itemService = ItemService.getInstance();
     public static String g_rentaId;
     public static int g_articuloId;
    

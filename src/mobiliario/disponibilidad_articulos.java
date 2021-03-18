@@ -7,14 +7,11 @@ package mobiliario;
 
 import services.SaleService;
 import clases.sqlclass;
-import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import static mobiliario.agregar_renta.tabla_detalle;
 import model.Articulo;
 import model.DetalleRenta;
 import model.Renta;
@@ -28,7 +25,7 @@ public class disponibilidad_articulos extends java.awt.Dialog {
 
     sqlclass funcion = new sqlclass();
     SaleService saleService = new SaleService();
-    ItemService itemService = new ItemService();
+    ItemService itemService = ItemService.getInstance();
     Object[][] dtconduc;
     String fecha_inicial, fecha_final, id_renta;
     boolean es_consultar = false, es_agregar = false;
@@ -111,31 +108,6 @@ public class disponibilidad_articulos extends java.awt.Dialog {
         //String fecha, fecha2;
         funcion.conectate();
         tabla_disponibilidad.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);      
-//        String[] columNames = {"Id", "id_art","codigo", "Cliente", "Fecha entrega", "Fecha devolucion", "Articulo", "Cantidad pedido", "Cantidad inventario","Descripcion","Tipo"};
-        
-//        String[] colName = {"id_renta", "id_articulo","codigo", "cliente", "fecha_entrega", "fecha_devolucion", "articulo", "cantidad_pedido", "cantidad_inventario", "descripcion","tipo"};
-        //nombre de columnas, tabla, instruccion sql        
-        
-        
-//        dtconduc = funcion.GetTabla(colName, "renta", "SELECT r.id_renta,a.id_articulo,a.codigo,"
-//                + "CONCAT(cl.nombre,\" \", cl.apellidos)AS cliente,r.fecha_entrega, r.fecha_devolucion,"
-//                + "CONCAT(a.descripcion,\" \", c.color) AS articulo, d.cantidad AS cantidad_pedido, a.cantidad AS cantidad_inventario, "
-//                + "r.descripcion,tipo.tipo "
-//                + "FROM renta r, detalle_renta d, articulo a, color c, clientes cl, tipo tipo "
-//                + "WHERE d.id_renta=r.id_renta AND d.id_articulo=a.id_articulo "
-//                + "AND (STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') >= STR_TO_DATE('" + fecha_inicial + "','%d/%m/%Y') "                
-//                + "AND STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') <= STR_TO_DATE('" + fecha_final + "','%d/%m/%Y')) "   
-//                 // se agrega la fecha de devolucion
-//                + "OR "
-//               + "(STR_TO_DATE(r.fecha_devolucion,'%d/%m/%Y') >= STR_TO_DATE('" + fecha_inicial + "','%d/%m/%Y') "                
-//                + "AND STR_TO_DATE(r.fecha_devolucion,'%d/%m/%Y') <= STR_TO_DATE('" + fecha_final + "','%d/%m/%Y')) "   
-//                + "AND tipo.id_tipo = r.id_tipo "
-//                + "AND a.id_color=c.id_color AND r.id_clientes=cl.id_clientes "
-//                + "AND r.id_tipo ="+ ApplicationConstants.TIPO_PEDIDO +" "    
-//                + "ORDER BY r.fecha_entrega,a.descripcion"        
-//        );
-
-        
 
         if (es_consultar == true) {
             System.out.println("Cantidad filas: " + cant_filas);
@@ -170,31 +142,26 @@ public class disponibilidad_articulos extends java.awt.Dialog {
         } else { //es en agregar renta
             System.out.println("Cantidad filas: " + cant_filas);
             List<Renta> rentas = saleService.obtenerDisponibilidadRenta(fecha_inicial, fecha_final, funcion);
-            
-            
-//            if(rentas==null || rentas.size()<=0){
-//                JOptionPane.showMessageDialog( null,"No se obtuvieron registros en la fecha indicada ");
-//                return;
-//            }
-               
-            
+             
             System.out.println("Agregando el pedido actual");
             // AGREGAMOS EL PEDIDO ACTUAL EN LA TABLA DE DETALLE
             for (int z = 0; z < agregar_renta.tabla_detalle.getRowCount(); z ++ ){
-                Articulo articulo = itemService.obtenerArticuloPorId(funcion, new Integer(agregar_renta.tabla_detalle.getValueAt(z,1).toString()) );
-                if(articulo == null)
+                Integer id = new Integer(agregar_renta.tabla_detalle.getValueAt(z,1).toString());
+                Articulo availabeItem = itemService.getItemAvailable(id);
+                if(availabeItem == null)
                     continue;
-                System.out.println("ID AGREGADO: "+articulo.getArticuloId());
+                System.out.println("ID AGREGADO: "+availabeItem.getArticuloId());
                 DefaultTableModel temp2 = (DefaultTableModel) tabla_disponibilidad.getModel();
                 Object nuevo2[] = {
-                            articulo.getArticuloId()+"",
+                            availabeItem.getArticuloId()+"",
                             agregar_renta.tabla_detalle.getValueAt(z, 0).toString(),
-                            articulo.getCantidad()+"",
-                            articulo.getDescripcion()+" "+articulo.getColor().getColor(),
+                            availabeItem.getUtiles(),
+                            availabeItem.getDescripcion()+" "+availabeItem.getColor().getColor(),
                             fecha_inicial,
                             fecha_final,
                             "Pedido actual",
-                            agregar_renta.txt_descripcion.getText()
+                            agregar_renta.txt_descripcion.getText(),
+                            ""
                         };
                 temp2.addRow(nuevo2);
                 
@@ -204,14 +171,11 @@ public class disponibilidad_articulos extends java.awt.Dialog {
                             
                 DefaultTableModel tablaUnicosModel = (DefaultTableModel) tabla_comparativa.getModel();
                 Object unico[] = {
-                    articulo.getArticuloId()+"", // 0
+                    availabeItem.getArticuloId()+"", // 0
                     agregar_renta.tabla_detalle.getValueAt(z, 0).toString(), // 1
-                    articulo.getCantidad()+"", // 2
-                    articulo.getCantidad() - Float.parseFloat( agregar_renta.tabla_detalle.getValueAt(z, 0).toString() ) , // 3                           
-                    articulo.getDescripcion()+" "+articulo.getColor().getColor(), //4
-                    fecha_inicial,
-                    fecha_final,
-
+                    availabeItem.getUtiles()+"", // 2
+                    availabeItem.getUtiles()- Float.parseFloat( agregar_renta.tabla_detalle.getValueAt(z, 0).toString() ) , // 3                           
+                    availabeItem.getDescripcion()+" "+availabeItem.getColor().getColor() //4
                 };
                 tablaUnicosModel.addRow(unico);
                 
@@ -229,13 +193,13 @@ public class disponibilidad_articulos extends java.awt.Dialog {
                   String id = detalle.getArticulo().getArticuloId()+"";
                   if (!id.equals(agregar_renta.tabla_detalle.getValueAt(i, 1).toString()))
                       continue;
-                    
+                    Articulo availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
                     // vamos agregar el articulo encontrado en la tabla detalle
                     DefaultTableModel temp = (DefaultTableModel) tabla_disponibilidad.getModel();
                      Object nuevo[] = {
                             detalle.getArticulo().getArticuloId()+"",
                             detalle.getCantidad()+"",
-                            detalle.getArticulo().getCantidad()+"",
+                            availabeItem.getUtiles(),
                             detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor(),
                             renta.getFechaEntrega(),
                             renta.getFechaDevolucion(),
@@ -253,10 +217,10 @@ public class disponibilidad_articulos extends java.awt.Dialog {
                                 if(tabla_comparativa.getValueAt(j, 0).toString().equals(detalle.getArticulo().getArticuloId()+"") ){
                                     // articulo encontrado :)                       
                                     float cantidadPedido = new Float(tabla_comparativa.getValueAt(j, 1).toString());
-                                    float cantidadInventario = new Float(tabla_comparativa.getValueAt(j, 2).toString());
                                     
+                               
                                     tabla_comparativa.setValueAt((cantidadPedido + detalle.getCantidad()), j, 1);
-                                    tabla_comparativa.setValueAt((cantidadInventario - (cantidadPedido+detalle.getCantidad())), j, 3);
+                                    tabla_comparativa.setValueAt((availabeItem.getUtiles() - (cantidadPedido+detalle.getCantidad())), j, 3);
                                     encontrado = true;
                                 }
                             } // end for tablaArticulosUnicos, para realizar la busqueda
@@ -267,11 +231,9 @@ public class disponibilidad_articulos extends java.awt.Dialog {
                                     Object unico1[] = {
                                         detalle.getArticulo().getArticuloId()+"",
                                         detalle.getCantidad()+"",
-                                        detalle.getArticulo().getCantidad()+"",
-                                        detalle.getArticulo().getCantidad() - detalle.getCantidad(), // 3                                   
-                                        detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor(),
-                                        renta.getFechaEntrega(),
-                                        renta.getFechaDevolucion(),
+                                        availabeItem.getUtiles(),
+                                        availabeItem.getUtiles() - detalle.getCantidad(), // 3                                   
+                                        detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor()                                       
                                     };
                                     tablaUnicosModel.addRow(unico1);
                              } // fin if, encontrado!                                 
@@ -288,12 +250,12 @@ public class disponibilidad_articulos extends java.awt.Dialog {
     }
 
     public void formato_tabla() {
-        Object[][] data = {{"", "", "", "", "", "", "",""}};
-        String[] columnNames = {"id_articulo", "cantidad_pedido", "cantidad_inventario", "articulo", "fecha_entrega", "fecha_devolucion", "cliente","descripcion evento","tipo"};
+        Object[][] data = {{"", "", "", "", "", "", "","",""}};
+        String[] columnNames = {"id_articulo", "Cantidad Pedido", "Útiles", "Articulo", "Fecha entrega","Fecha Devolución", "Cliente","Descripción evento","Tipo"};
         DefaultTableModel TableModel = new DefaultTableModel(data, columnNames);
         tabla_disponibilidad.setModel(TableModel);
 
-        int[] anchos = {20, 100, 100, 180, 120, 120, 240,240,100};
+        int[] anchos = {20, 100, 100, 180, 100, 120,120,100,100};
 
         for (int inn = 0; inn < tabla_disponibilidad.getColumnCount(); inn++) {
             tabla_disponibilidad.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -318,12 +280,12 @@ public class disponibilidad_articulos extends java.awt.Dialog {
     }
 
     public void formato_tabla_comparativa() {
-        Object[][] data = {{"", "", "", "", "", "", ""}};
-        String[] columnNames = {"id_articulo", "cantidad_pedido", "cantidad_inventario", "disponible", "articulo", "fecha_entrega", "fecha_devolucion"};
+        Object[][] data = {{"", "", "", "", ""}};
+        String[] columnNames = {"id_articulo", "Cantidad Pedido", "Utiles", "Disponible", "Articulo"};
         DefaultTableModel TableModel = new DefaultTableModel(data, columnNames);
         tabla_comparativa.setModel(TableModel);
 
-        int[] anchos = {20, 60, 60, 60, 120, 120, 120};
+        int[] anchos = {20, 60, 60, 60, 120};
 
         for (int inn = 0; inn < tabla_comparativa.getColumnCount(); inn++) {
             tabla_comparativa.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);

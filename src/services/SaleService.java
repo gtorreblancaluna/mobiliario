@@ -556,7 +556,7 @@ public class SaleService {
          if(dtconduc == null || dtconduc.length <= 0)
             return null;
          
-        ItemService itemService = new ItemService();
+        ItemService itemService = ItemService.getInstance();
         
          for (int i = 0; i < dtconduc.length; i++) {
              DetalleRenta detalle = new DetalleRenta();

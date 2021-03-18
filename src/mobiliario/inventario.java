@@ -8,7 +8,6 @@ package mobiliario;
 import services.SystemService;
 import forms.compras.AgregarCompraFormDialog;
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
@@ -21,11 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
-import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -46,7 +42,7 @@ public class inventario extends javax.swing.JInternalFrame {
     public static int g_articuloId;
     public static int g_rentaId;
     public static String g_descripcionArticulo;
-    private String TITLE = "Inventario";
+    private final String TITLE = "Inventario";
 //    static sqlclass funcion = new sqlclass();    
 //    conectate conexion = new conectate();
     static Object[][] dtconduc;
@@ -55,7 +51,7 @@ public class inventario extends javax.swing.JInternalFrame {
     String fecha_sistema;
     public static boolean validar_colores, validar_categorias;
     private final SystemService systemService = SystemService.getInstance();
-    private static final ItemService itemService = new ItemService();   
+    private static final ItemService itemService = ItemService.getInstance();
     private static final CategoryService categoryService = new CategoryService();
 
     /**
@@ -261,7 +257,7 @@ public class inventario extends javax.swing.JInternalFrame {
 //         query.append("ORDER BY articulo.descripcion ");
         
 //        List<Articulo> articulos = itemService.obtenerArticulosBusquedaInventario(funcion, query+"");
-         map.put("estado_renta", ApplicationConstants.ESTADO_EN_RENTA);
+        map.put("estado_renta", ApplicationConstants.ESTADO_EN_RENTA);
         map.put("tipo_pedido", ApplicationConstants.TIPO_PEDIDO);
         List<Articulo> articulos = itemService.obtenerArticulosBusquedaInventario( map);
 

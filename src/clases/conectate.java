@@ -6,10 +6,10 @@ import java.sql.*;
 public class conectate {
     
     // ambiente de desarrollo localhost    
-    public String bd = "mobiliario";
-    public String login = "root"; 
-    public String password = "root";
-    public String url = "jdbc:mysql://localhost/"+bd;
+//    public String bd = "mobiliario";
+//    public String login = "root"; 
+//    public String password = "root";
+//    public String url = "jdbc:mysql://localhost/"+bd;
     
     /** 2018.11.15 para conectarnos a la bd que esta en un servidor virtual, este es para el negocio GABY */
 //    public String bd = "sql9269415";
@@ -24,10 +24,10 @@ public class conectate {
     
     
     // GOOGLE CASA GABY
-//    public String bd = "mobiliario";
-//    public String login = "usr-gaby-mobiliario"; 
-//    public String password = "gaby1932&%cloud";
-//    public String url = "jdbc:mysql://35.202.6.26/mobiliario";
+    public String bd = "mobiliario";
+    public String login = "usr-gaby-mobiliario"; 
+    public String password = "gaby1932&%cloud";
+    public String url = "jdbc:mysql://35.202.6.26/mobiliario";
 //    
     // >>> GRUPO ALEM
 //    public String bd = "sql9302069";

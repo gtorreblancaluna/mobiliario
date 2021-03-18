@@ -30,7 +30,7 @@ import services.ItemService;
 public class AgregarArticuloDisponibilidad extends java.awt.Dialog {
 
     sqlclass funcion = new sqlclass();   
-    ItemService itemService = new ItemService();
+    ItemService itemService = ItemService.getInstance();
 //    conectate conexion = new conectate();
     Object[][] dtconduc;
     boolean existe, editar = false;

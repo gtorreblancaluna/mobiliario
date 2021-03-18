@@ -26,7 +26,7 @@ public class AsignarFaltante extends java.awt.Dialog {
     Object[][] dtconduc;      
     SaleService saleService = new SaleService();
     private final SystemService systemService = SystemService.getInstance();
-    ItemService itemService = new ItemService();
+    ItemService itemService = ItemService.getInstance();
     public static int g_articuloId;
     public static int g_rentaId;
     public static String g_descripcionArticulo;

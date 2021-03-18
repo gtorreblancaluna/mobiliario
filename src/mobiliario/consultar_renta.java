@@ -83,7 +83,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     String fecha_sistema, sql, id_articulo, id_abonos, id_cliente, cant_abono = "0", subTotal = "0", chofer, id_tipo = "1", descuento, desc_rep, iva_rep, id_estado;
     public static String fecha_inicial, fecha_final, validar_consultar = "0", id_renta;
     sqlclass funcion = new sqlclass();    
-    ItemService itemService = new ItemService();
+    ItemService itemService = ItemService.getInstance();
     SaleService saleService = new SaleService();
     UserService userService = new UserService();
     private final SystemService systemService = SystemService.getInstance();

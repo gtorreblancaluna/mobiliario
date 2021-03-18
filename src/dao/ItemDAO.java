@@ -57,6 +57,34 @@ public class ItemDAO {
     }
     
     @SuppressWarnings("unchecked")
+    public Articulo getItemAvailable( Integer id) {
+        SqlSession session = sqlSessionFactory.openSession();
+        try {
+            Articulo item = (Articulo) session.selectOne("MapperArticulos.obtenerArticuloPorId",id);
+            if(item == null){
+                return null; 
+            }
+            Map<String, Object> map = new HashMap<>();
+            map.put("articuloId", id);
+            map.put("estado_renta", ApplicationConstants.ESTADO_EN_RENTA);
+            map.put("tipo_pedido", ApplicationConstants.TIPO_PEDIDO);
+            
+            item.setRentados( (String) session.selectOne("MapperArticulos.obtenerEnRenta",map));
+            item.setFaltantes((String) session.selectOne("MapperArticulos.obtenerFaltantes",map));
+            item.setReparacion((String) session.selectOne("MapperArticulos.obtenerReparacion",map));
+            item.setAccidenteTrabajo((String) session.selectOne("MapperArticulos.obtenerAccidenteTrabajo",map));
+            item.setDevolucion((String) session.selectOne("MapperArticulos.obtenerDevolucion",map));
+         
+            return item;
+        }catch(Exception ex){
+            log.error(ex);
+            return null;
+        } finally {
+            session.close();
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
     public CategoriaDTO obtenerCategoriaPorDescripcion( String descripcion) {
         SqlSession session = sqlSessionFactory.openSession();
         try {

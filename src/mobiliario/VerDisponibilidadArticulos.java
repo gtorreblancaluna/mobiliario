@@ -18,9 +18,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import model.Articulo;
 //import static mobiliario.inventario.funcion;
 import model.DetalleRenta;
 import model.Renta;
+import services.ItemService;
 import services.SystemService;
 
 /**
@@ -37,7 +39,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
     float cant = 0; 
     SaleService saleService = new SaleService();
     private final SystemService systemService = SystemService.getInstance();
-   
+    private final ItemService itemService = ItemService.getInstance();
     
     public String conviertemoneda(String valor) {
 
@@ -159,17 +161,15 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         mensaje.append("Total de folios "+rentas.size()+" - ");
           for(Renta renta : rentas){        
             for(DetalleRenta detalle : renta.getDetalleRenta()){     
-                 String faltante = null;
-                 String devolucion = null;
-                 float fFaltante = 0f;
-                 float fDevolucion = 0f;
                  
+                 Articulo availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
                       // vamos agregar el articulo encontrado en la tabla detalle
                     DefaultTableModel temp = (DefaultTableModel) tablaArticulos.getModel();
                      Object nuevo[] = {
                             detalle.getArticulo().getArticuloId()+"",
                             detalle.getCantidad()+"",
-                            detalle.getArticulo().getCantidad()+"",
+                            // mostrar utiles
+                            availabeItem.getUtiles(),
                             detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor(),
                             renta.getFechaEvento(),
                             renta.getFechaEntrega(),
@@ -182,60 +182,19 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                             renta.getTipo().getTipo(),
                             renta.getEstado().getDescripcion()
                         };
-                        temp.addRow(nuevo);
-                        
-                        
-                            faltante = funcion.GetData("cantidad", "SELECT SUM(faltante.cantidad)AS cantidad "
-                                + "FROM faltantes faltante "                   
-                                + "WHERE faltante.id_articulo = " + detalle.getArticulo().getArticuloId() + " "                               
-                                + "AND faltante.fg_devolucion = '0' "        
-                                + "AND faltante.fg_activo = '1' "
-                            );
-           
-                            devolucion = funcion.GetData("cantidad", "SELECT SUM(faltante.cantidad)AS cantidad "
-                                    + "FROM faltantes faltante "                   
-                                    + "WHERE faltante.id_articulo = " + detalle.getArticulo().getArticuloId() + " "
-                                    + "AND faltante.fg_devolucion = '1' "
-                                    + "AND faltante.fg_faltante = '0' "
-                                    + "AND faltante.fg_activo = '1' "
-                            );
-                            
-                            if(faltante == null || faltante.equals(""))
-                                        faltante = "0";
-                            if(devolucion == null || devolucion.equals(""))
-                                devolucion = "0";
-                            
-                            try {
-                                fFaltante = new Float(faltante);
-                                fDevolucion = new Float(devolucion);
-                            }catch (NumberFormatException e) {                                
-                                JOptionPane.showMessageDialog(null, "Ocurrrio un error al calcular faltantes\n"+e, "Error", JOptionPane.INFORMATION_MESSAGE);            
-                                Toolkit.getDefaultToolkit().beep();
-                                return;
-                            } catch (Exception e) {
-                                JOptionPane.showMessageDialog(null, "Ocurrrio un error al calcular faltantes\n"+e, "Error", JOptionPane.INFORMATION_MESSAGE);                        
-                                Toolkit.getDefaultToolkit().beep();
-                                return;                                
-                            }
-                       
-                        
+                        temp.addRow(nuevo);                        
                         
                         if(this.tablaArticulosUnicos.getRowCount() == 0){                            
                             
                             // es la primer agregado, procedemos a agregar
-//                              "id_articulo", "cantidad_pedido", "cantidad_inventario", "disponible", "articulo" 
                             DefaultTableModel tablaUnicosModel = (DefaultTableModel) tablaArticulosUnicos.getModel();
                             Object unico[] = {
-                                detalle.getArticulo().getArticuloId()+"", // 0 id articulo
-                                detalle.getCantidad()+"", // 1 cantidad pedido
-                                detalle.getArticulo().getCantidad()+"", // 2 cantidad inventario
-                                fFaltante+"",
-                                fDevolucion+"",
-                                "",
-//                                ( ( detalle.getArticulo().getCantidad() - detalle.getCantidad() - fFaltante )  + fDevolucion), // 3   disponible                        
-                                detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor() //4 articulo
-                              
-                            };                           
+                                detalle.getArticulo().getArticuloId()+"", // 0
+                                detalle.getCantidad()+"", // 1
+                                availabeItem.getUtiles(), // 2
+                                "", // 3
+                                detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor() //4
+                            };
                             tablaUnicosModel.addRow(unico);
                         }else{
                             // recorremos la tabla para encontrar algun articulo y sumar y calcular la disponibilidad
@@ -245,49 +204,36 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                                 
                                 if(tablaArticulosUnicos.getValueAt(j, 0).toString().equals(detalle.getArticulo().getArticuloId()+"") ){
                                                                         
+                                    if(tablaArticulosUnicos.getValueAt(j, 0).toString().equals(detalle.getArticulo().getArticuloId()+"") ){
                                     // articulo encontrado :)
                                     float cantidadPedido = new Float(tablaArticulosUnicos.getValueAt(j, 1).toString());
-//                                    float cantidadInventario = new Float(tablaArticulosUnicos.getValueAt(j, 2).toString());
-//                                    
-//                                    float faltantes = new Float(tablaArticulosUnicos.getValueAt(j, 3).toString());
-//                                    float devoluciones = new Float(tablaArticulosUnicos.getValueAt(j, 4).toString());
-                                                                        
                                     tablaArticulosUnicos.setValueAt((cantidadPedido + detalle.getCantidad()), j, 1);
-//                                    tablaArticulosUnicos.setValueAt((cantidadInventario - (cantidadPedido+detalle.getCantidad())), j, 3);
-//                                    tablaArticulosUnicos.setValueAt( ((cantidadInventario - cantidadPedido + detalle.getCantidad() - faltantes)  + devoluciones), j, 5);
                                     encontrado = true;
                                 }
+                                
                             } // end for tablaArticulosUnicos, para realizar la busqueda
                             
                             if(!encontrado){
                                 // si no se encontro en la tabla, procedemos a agregar el articulo
-                                
+                                // si no se encontro en la tabla, procedemos a agregar el articulo
                                 DefaultTableModel tablaUnicosModel = (DefaultTableModel) tablaArticulosUnicos.getModel();
                                 Object unico1[] = {
                                     detalle.getArticulo().getArticuloId()+"",
                                     detalle.getCantidad()+"",
-                                    detalle.getArticulo().getCantidad()+"",
-                                    fFaltante+"",
-                                    fDevolucion+"",
-                                    "",
-//                                    detalle.getArticulo().getCantidad() - detalle.getCantidad(),         
-//                                    ( ( detalle.getArticulo().getCantidad() - detalle.getCantidad() ) - fFaltante + fDevolucion),
+                                    availabeItem.getUtiles(),
+                                    "",                           
                                     detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor()
-
                                 };
                                 tablaUnicosModel.addRow(unico1);
                              } // fin if, encontrado!
                         }
                   } // end if, comparativa ids articulos           
-              } 
-          
+              } // end for detalle rentas
           
           for(int j=0 ; j < tablaArticulosUnicos.getRowCount() ; j++){
-                float cantidadInventario = new Float(tablaArticulosUnicos.getValueAt(j, 2).toString());
-                float faltantes = new Float(tablaArticulosUnicos.getValueAt(j, 3).toString());
-                float devoluciones = new Float(tablaArticulosUnicos.getValueAt(j, 4).toString());
-                float pedido = new Float(tablaArticulosUnicos.getValueAt(j, 1).toString());
-                tablaArticulosUnicos.setValueAt( ( cantidadInventario - pedido - faltantes + devoluciones ), j, 5);
+                float pedidos = new Float(tablaArticulosUnicos.getValueAt(j, 1).toString());
+                float utiles = new Float(tablaArticulosUnicos.getValueAt(j, 2).toString());
+                tablaArticulosUnicos.setValueAt( ( utiles - pedidos ), j, 3);
                 
            }
           
@@ -298,7 +244,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                
            this.lblEncontrados.setText(mensaje.toString());
               
-         
+          } // end for rentas
     } // en funcion mostrarDisponibilidadTodos
     
     public void mostrarSoloNegativosTablaUnicos(){
@@ -394,23 +340,20 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
          mensaje.append("Total de folios "+rentas.size()+" - ");
           for(Renta renta : rentas){        
             for(DetalleRenta detalle : renta.getDetalleRenta()){
-                
-                String faltante = null;
-                 String devolucion = null;
-                 float fFaltante = 0f;
-                 float fDevolucion = 0f;
                  
               for (int i = 0; i < inventario.tablaDisponibilidadArticulos.getRowCount(); i++) { 
                   // recorremos la tabla para identificar los articulos 
                   String id = detalle.getArticulo().getArticuloId()+"";
                   if (id.equals(inventario.tablaDisponibilidadArticulos.getValueAt(i, 0).toString())) {
+                    Articulo availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
                       // vamos agregar el articulo encontrado en la tabla detalle
                     DefaultTableModel temp = (DefaultTableModel) tablaArticulos.getModel();
                      Object nuevo[] = {
                          
-                          detalle.getArticulo().getArticuloId()+"",
+                            detalle.getArticulo().getArticuloId()+"",
                             detalle.getCantidad()+"",
-                            detalle.getArticulo().getCantidad()+"",
+                            // mostrar utiles
+                            availabeItem.getUtiles(),
                             detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor(),
                             renta.getFechaEvento(),
                             renta.getFechaEntrega(),
@@ -424,57 +367,17 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                             renta.getEstado().getDescripcion()
                         };
                         temp.addRow(nuevo);
-                        
-                        faltante = funcion.GetData("cantidad", "SELECT SUM(faltante.cantidad)AS cantidad "
-                                + "FROM faltantes faltante "                   
-                                + "WHERE faltante.id_articulo = " + detalle.getArticulo().getArticuloId() + " "                               
-                                + "AND faltante.fg_devolucion = '0' "        
-                                + "AND faltante.fg_activo = '1' "
-                            );
-           
-                            devolucion = funcion.GetData("cantidad", "SELECT SUM(faltante.cantidad)AS cantidad "
-                                    + "FROM faltantes faltante "                   
-                                    + "WHERE faltante.id_articulo = " + detalle.getArticulo().getArticuloId() + " "
-                                    + "AND faltante.fg_devolucion = '1' "
-                                    + "AND faltante.fg_faltante = '0' "
-                                    + "AND faltante.fg_activo = '1' "
-                            );
-                            
-                            if(faltante == null || faltante.equals(""))
-                                        faltante = "0";
-                            if(devolucion == null || devolucion.equals(""))
-                                devolucion = "0";
-                            
-                            try {
-                                fFaltante = new Float(faltante);
-                                fDevolucion = new Float(devolucion);
-                            }catch (NumberFormatException e) {                                
-                                JOptionPane.showMessageDialog(null, "Ocurrrio un error al calcular faltantes\n"+e, "Error", JOptionPane.INFORMATION_MESSAGE);            
-                                Toolkit.getDefaultToolkit().beep();
-                                return;
-                            } catch (Exception e) {
-                                JOptionPane.showMessageDialog(null, "Ocurrrio un error al calcular faltantes\n"+e, "Error", JOptionPane.INFORMATION_MESSAGE);                        
-                                Toolkit.getDefaultToolkit().beep();
-                                return;                                
-                            }
-                        
-                        
-                        
+
                         if(this.tablaArticulosUnicos.getRowCount() == 0){
                             // es la primer agregado, procedemos a agregar
-//                              "id_articulo", "cantidad_pedido", "cantidad_inventario", "disponible", "articulo" 
+                            
                             DefaultTableModel tablaUnicosModel = (DefaultTableModel) tablaArticulosUnicos.getModel();
                             Object unico[] = {
                                 detalle.getArticulo().getArticuloId()+"", // 0
                                 detalle.getCantidad()+"", // 1
-                                detalle.getArticulo().getCantidad()+"", // 2
-                                fFaltante,
-                                fDevolucion,   
-                                "",
-//                                detalle.getArticulo().getCantidad() - detalle.getCantidad(), // 3 
-//                                ( (detalle.getArticulo().getCantidad() - detalle.getCantidad() - fFaltante) + fDevolucion ), // 5
+                                availabeItem.getUtiles(), // 2
+                                "", // 3
                                 detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor() //4
-                              
                             };
                             tablaUnicosModel.addRow(unico);
                         }else{
@@ -485,33 +388,20 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                                 if(tablaArticulosUnicos.getValueAt(j, 0).toString().equals(detalle.getArticulo().getArticuloId()+"") ){
                                     // articulo encontrado :)
                                     float cantidadPedido = new Float(tablaArticulosUnicos.getValueAt(j, 1).toString());
-//                                    float cantidadInventario = new Float(tablaArticulosUnicos.getValueAt(j, 2).toString());
-                                    
-//                                    float faltantes = new Float(tablaArticulosUnicos.getValueAt(j, 3).toString());
-//                                    float devoluciones = new Float(tablaArticulosUnicos.getValueAt(j, 4).toString());
-                                    
                                     tablaArticulosUnicos.setValueAt((cantidadPedido + detalle.getCantidad()), j, 1);
-//                                    tablaArticulosUnicos.setValueAt((cantidadInventario - (cantidadPedido+detalle.getCantidad())), j, 3);
-//                                    tablaArticulosUnicos.setValueAt( ( (cantidadInventario - cantidadPedido + detalle.getCantidad() - faltantes) + devoluciones), j, 5);
                                     encontrado = true;
                                 }
                             } // end for tablaArticulosUnicos, para realizar la busqueda
                             
                             if(!encontrado){
                                 // si no se encontro en la tabla, procedemos a agregar el articulo
-                                
                                 DefaultTableModel tablaUnicosModel = (DefaultTableModel) tablaArticulosUnicos.getModel();
                                 Object unico1[] = {
                                     detalle.getArticulo().getArticuloId()+"",
                                     detalle.getCantidad()+"",
-                                    detalle.getArticulo().getCantidad()+"",
-                                    fFaltante,
-                                    fDevolucion, 
-                                    "",
-//                                    ( (detalle.getArticulo().getCantidad() - detalle.getCantidad() - fFaltante) + fDevolucion ), // 5
-//                                    detalle.getArticulo().getCantidad() - detalle.getCantidad(), // 3                                   
+                                    availabeItem.getUtiles(),
+                                    "",                           
                                     detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor()
-
                                 };
                                 tablaUnicosModel.addRow(unico1);
                              } // fin if, encontrado!
@@ -522,13 +412,11 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         }    // en for renta  
           
            
-          // calculando la disponibilidad
+          // calculando la disponibilidad para la tabla unicos
           for(int j=0 ; j < tablaArticulosUnicos.getRowCount() ; j++){
-                float cantidadInventario = new Float(tablaArticulosUnicos.getValueAt(j, 2).toString());
-                float faltantes = new Float(tablaArticulosUnicos.getValueAt(j, 3).toString());
-                float devoluciones = new Float(tablaArticulosUnicos.getValueAt(j, 4).toString());
-                float pedido = new Float(tablaArticulosUnicos.getValueAt(j, 1).toString());
-                tablaArticulosUnicos.setValueAt( ( cantidadInventario - pedido - faltantes + devoluciones ), j, 5);
+                float pedidos = new Float(tablaArticulosUnicos.getValueAt(j, 1).toString());
+                float utiles = new Float(tablaArticulosUnicos.getValueAt(j, 2).toString());
+                tablaArticulosUnicos.setValueAt( ( utiles - pedidos ), j, 3);
                 
            }
           
@@ -542,7 +430,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
     }// en funcion mostrarDisponibilidad
      public void formato_tabla() {
         Object[][] data = {{"","","", "", "", "", "", "", "","","","",""}};
-        String[] columnNames = {"id_articulo", "cantidad pedido", "cantidad inventario", "articulo", "fecha evento","fecha entrega","hora entrega", "fecha_devolucion","hora devoluci\u00F3n" ,"cliente","folio","descripci\u00F3n evento","tipo","estado"};
+        String[] columnNames = {"id_articulo", "cantidad pedido", "Utiles", "articulo", "fecha evento","fecha entrega","hora entrega", "fecha_devolucion","hora devoluci\u00F3n" ,"cliente","folio","descripci\u00F3n evento","tipo","estado"};
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
         tablaArticulos.setModel(tableModel);
         
@@ -574,8 +462,8 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
     }
      
      public void formato_tabla_unicos() {
-        Object[][] data = {{"", "", "", "", "","",""}};
-        String[] columnNames = {"id_articulo", "cantidad_pedido", "cantidad_inventario","faltantes","devoluci\u00F3n","disponible", "articulo"};
+        Object[][] data = {{"", "", "", "", ""}};
+        String[] columnNames = {"id_articulo", "Cantidad pedido", "Utiles","disponible", "articulo"};
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
         tablaArticulosUnicos.setModel(tableModel);
         
@@ -583,7 +471,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
         tablaArticulosUnicos.setRowSorter(ordenarTabla);
 
-        int[] anchos = {20, 60, 60, 60,40,40, 120};
+        int[] anchos = {20, 60, 60, 60,120};
 
         for (int inn = 0; inn < tablaArticulosUnicos.getColumnCount(); inn++) {
             tablaArticulosUnicos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -606,7 +494,6 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         tablaArticulosUnicos.getColumnModel().getColumn(2).setCellRenderer(centrar);
         tablaArticulosUnicos.getColumnModel().getColumn(3).setCellRenderer(centrar);
         tablaArticulosUnicos.getColumnModel().getColumn(4).setCellRenderer(centrar);
-        tablaArticulosUnicos.getColumnModel().getColumn(5).setCellRenderer(centrar);
 
     }
     
