@@ -569,7 +569,8 @@ public class SaleService {
                 detalle.setCantidad(new Float(dtconduc[i][2].toString()));
              
              if(dtconduc[i][3] != null)
-                detalle.setArticulo(itemService.obtenerArticuloPorId(sql, new Integer(dtconduc[i][3].toString())));
+                //detalle.setArticulo(itemService.obtenerArticuloPorId(sql, new Integer(dtconduc[i][3].toString())));
+                 detalle.setArticulo(itemService.getItemAvailable(new Integer(dtconduc[i][3].toString())));
              
              if(dtconduc[i][4] != null)
                 detalle.setPrecioUnitario(new Float(dtconduc[i][4].toString()));

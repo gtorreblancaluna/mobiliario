@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
 import forms.tipo.abonos.cuentas.TiposAbonosForm;
@@ -15,11 +10,8 @@ import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
-import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -30,7 +22,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -49,14 +40,8 @@ import services.SaleService;
 import services.SystemService;
 import utilities.Utility;
 
-/**
- *
- * @author 
- */
 public class agregar_renta extends javax.swing.JInternalFrame {
     
-   
-
     sqlclass funcion = new sqlclass();
     conectate conexion = new conectate();
     Object[][] dtconduc;
@@ -68,24 +53,19 @@ public class agregar_renta extends javax.swing.JInternalFrame {
     Integer xemail = 0;
     String fecha_sistema;
     int seleccion;
-    float cant = 0, cant_abono = 0, subTotal = 0;
+    float cant_abono = 0, subTotal = 0;
     public static String chofer = "", cuenta_emisor, pass_emisor, servidor_email, puerto_email, conexion_TLS, autenticacion, rutaPDF_email;
     String fecha_entrega, fecha_devolucion, hora_entrega,fecha_evento, hora_devolucion;
     public static boolean utiliza_conexion_TLS = false, utiliza_autenticacion = false, status,validad_tipo_abonos;
     private UserService userService = new UserService();
     private SaleService saleService = new SaleService();
     private final SystemService systemService = SystemService.getInstance();
-    
-  
-    /**
-     * Creates new form agregar_renta
-     */
-    
+
     public agregar_renta() {
+        
         funcion.conectate();
         initComponents();
         tabla_clientes();
-
         llenar_combo_estado();
         llenar_combo_tipo();
         llenar_chofer();
@@ -103,25 +83,10 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         jbtn_disponible.setEnabled(false);
         check_mostrar_precios.setSelected(true);
         check_generar_reporte.setSelected(true);
-       
         xemail = funcion.existe_email();
-       
-        System.out.println("Email confg?? " + xemail);
-//        // funcion.desconecta();
-        /*if (xemail == true) {
-         check_enviar_email.setSelected(true);
-         check_adjuntarPDF.setSelected(true);
-         } else {
-         check_enviar_email.setSelected(false);
-         check_adjuntarPDF.setSelected(false);
-         }*/
-
         jbtn_nuevo_evento.setEnabled(false);
         panel_articulos.setVisible(true);
         panel_conceptos.setVisible(false);
-
-        // funcion.setEnableContainer(jTabbedPane2, false);
-        // funcion.setEnableContainer(panel_datos_generales, false);
         jTabbedPane1.setEnabledAt(1, false);
         lbl_atiende.setText("Atiende: " + iniciar_sesion.nombre_usuario_global.toString() + " " + iniciar_sesion.apellidos_usuario_global.toString());
         jTabbedPane1.setSelectedIndex(0);
@@ -129,8 +94,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
     }
 
     public void conectar() {
-        // conexion.setIp(IpServer);
-          try {        
+        try {        
             conexion.conectate();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog( rootPane,"No se puede establecer la comunicacion con la bd:\n"+e);
@@ -145,53 +109,8 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         ventana_disp.setLocationRelativeTo(null);
     }
 
-    /*public boolean isEmail(String correo) { //validar correo electronico
-     Pattern pat = null;
-     Matcher mat = null;
-     pat = Pattern.compile("^([0-9a-zA-Z]([_.w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-w]*[0-9a-zA-Z].)+([a-zA-Z]{2,9}.)+[a-zA-Z]{2,3})$");
-     mat = pat.matcher(correo);
-     if (mat.find()) {
-     System.out.println("[" + mat.group() + "]");
-     return true;
-     } else {
-     return false;
-     }
-     }*/
-//    public void traer_datos_email() {
-//       
-//        conectar();
-//        try {
-//
-//            Connection con = conexion.getConnection();
-//            Statement s = con.createStatement();
-//            ResultSet res = s.executeQuery("SELECT * FROM email");
-//
-//            res.next();
-//            cuenta_emisor = (res.getString("cuenta_correo"));
-//            pass_emisor = (res.getString("contrasenia"));
-//            System.out.println("Pass: " + pass_emisor);
-//
-//            servidor_email = (res.getString("servidor"));
-//            puerto_email = (res.getString("puerto"));
-//            conexion_TLS = (res.getString("utiliza_conexion_TLS"));
-//            autenticacion = (res.getString("utiliza_autenticacion"));
-//
-//            if (conexion_TLS.equals("1")) {
-//                utiliza_conexion_TLS = true;
-//            }
-//            if (autenticacion.equals("1")) {
-//                utiliza_autenticacion = true;
-//            }
-//            res.close();
-//
-//        } catch (SQLException ex) {
-//            System.out.println(ex);
-//        }
-//    }
-
     public void enviar_email() {
         String email = this.txtEmailToSend.getText();
-        
         try{
             Utility.isEmail(email);
         }catch(MessagingException e){
@@ -419,55 +338,13 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         
                 mensaje.append("</div>");
         
-//        mensaje = "<div id='container-message' style='width:700px; margin:16px;'>"
-//                + "<font color='black'>Estimad@ "+this.lbl_cliente.getText()+ ","
-//                + generalData.getCompanyName()+" le notifica que el alta de su pedido a nuestros sistemas ha quedado guardado exitosamente, "
-//                + "le recordamos que verifique todos los datos contenidos en el folio tanto datos personales y de env&iacute;o "
-//                + "as&iacute; como los servicios contratados para su entera satisfacci&oacute;n </font>"
-//                + "<br/>"
-//                + "<br/>"
-//                + "<font color='black'><span style='font-weight:900;'>LOS DATOS SON: </span></font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Folio:  </span>" + globalFolio + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Fecha y hora de entrega:  </span>" + fecha_entrega + " " + hora_entrega + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Fecha y hora devolucion:  </span>" + fecha_devolucion +" "+ hora_devolucion+ " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Fecha del evento:  </span>" + fecha_evento + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Nombre del chofer:  </span>" + chofer + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Direcci&oacute;n del evento:  </span>" + txt_descripcion.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Tipo registro: </span>" + cmb_tipo.getSelectedItem().toString() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Atendi&oacute;:  </span>" + iniciar_sesion.usuarioGlobal.getNombre() + " " + iniciar_sesion.usuarioGlobal.getApellidos() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Registrado a nombre de:  </span>" + this.lbl_cliente.getText() + " </font><br>"
-//                + "<br/>"
-//                + "<br/>"
-//                + detalles
-//                + "<br/>"
-//                + "<br/>"
-//                + "<font color='black'><span style='font-weight:900;'>Subtotal: </span>" + txt_subtotal.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Descuento: </span>" + txt_descuento.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Envio y recolecci&oacute;n: </span>" + this.txt_envioRecoleccion.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Dep&oacute;sito en garant&iacute;a: </span>" + this.txt_depositoGarantia.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>IVA: </span>" + txt_total_iva.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Pagos: </span>" + txt_abonos.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Total: </span>" + txt_total.getText() + " </font><br>"
-//                + "<br/>"
-//                + "<br/>"
-//                + "<font color='black'>Agradecemos su preferencia... </font>"
-//                + "</div>";
 
         System.out.println("MENSAJE: " + mensaje);
 
         Mail mail = new Mail();
-//        mail.setFrom(cuenta_emisor); //cuenta emisor
-//        mail.setPassword(pass_emisor); //cuenta contraseña
         mail.setTo(email);
         mail.setSubject(asunto);
         mail.setMessage(mensaje+"");
-        
-//        if (check_adjuntarPDF.isSelected() && check_generar_reporte.isSelected()) {
-//            rutaPDF_email = "C:/reportes_mobiliario/reporte.pdf";
-//            mail.setArchive(rutaPDF_email);
-//        }
-
-        // mail.setArchive(principal.rutaXML_email.toString());
         mail.SEND();
     }
 
@@ -579,7 +456,6 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
             }
 
-            //jbtn_agregar.setEnabled(false);
         }
         return res;
 
@@ -669,15 +545,10 @@ public class agregar_renta extends javax.swing.JInternalFrame {
             return;
         }
         
-        
-
-        
-
     }
 
     public void llenar_combo_estado() {
         int i = 0;
-        // funcion.conectate();
         datos_combo = funcion.GetColumna("estado", "descripcion", "Select descripcion from estado");
         cmb_estado.removeAllItems();
 
@@ -686,7 +557,6 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         }
         cmb_estado.addItem("-sel-");
         cmb_estado.setSelectedItem("Apartado");
-        // funcion.desconecta();
 
     }
 
@@ -702,20 +572,13 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         }
         cmb_tipo.addItem("-sel-");
         cmb_tipo.setSelectedItem("Pedido");
-        // funcion.desconecta();
 
     }
 
     public void llenar_chofer() {
 
-        // funcion.conectate();
-//        datos_combo = funcion.GetColumna("usuarios", "nombre", "SELECT CONCAT(u.nombre,\" \", u.apellidos)AS nombre FROM usuarios u");
-//        datos_combo = funcion.GetColumna("usuarios", "nombre", "SELECT CONCAT(u.nombre,\" \", u.apellidos)AS nombre FROM usuarios u WHERE u.id_puesto ="+ApplicationConstants.PUESTO_CHOFER);
         List<Usuario> usuarios =  userService.obtenerUsuarios(funcion);
         cmb_chofer.removeAllItems();
-
-//        for (int i = 0; i < datos_combo.length -1 ; i++)
-//            cmb_chofer.addItem(datos_combo[i].toString());
 
         if(usuarios != null && usuarios.size()>0){
             for(Usuario usuario : usuarios){
@@ -726,7 +589,6 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         
         cmb_chofer.addItem("-sel-");
         cmb_chofer.setSelectedItem("-sel-");
-        // funcion.desconecta();
 
     }
     
@@ -749,8 +611,6 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         Character caracter = null;
         boolean valido = true;
 
-        /* Va recorriendo la cadena s_cadena y copia a la cadena que va a regresar,
-         sólo los caracteres que no estén en la cadena s_caracteres */
         for (int i = 0; i < s_cadena.length(); i++) {
             valido = true;
             for (int j = 0; j < s_caracteres.length(); j++) {
@@ -936,34 +796,6 @@ public class agregar_renta extends javax.swing.JInternalFrame {
             String datos_detalle[] = {id_ultima_renta, tabla_detalle.getValueAt(i, 0).toString(), tabla_detalle.getValueAt(i, 1).toString(), p_unitario, "0",porcentajeDescuento};
             funcion.InsertarRegistro(datos_detalle, "INSERT INTO detalle_renta (id_renta,cantidad,id_articulo,p_unitario,se_desconto,porcentaje_descuento) VALUES (?,?,?,?,?,?)");
 
-//            if (id_estado.equals(ApplicationConstants.ESTADO_EN_RENTA)) { //para descontar del inventario
-//                String cant = tabla_detalle.getValueAt(i, 0).toString();
-//                String id_art = tabla_detalle.getValueAt(i, 1).toString();
-//                String cant_inv = funcion.GetData("cantidad", "Select cantidad from articulo where id_articulo=" + id_art + "");
-//                float resta = Float.parseFloat(cant_inv) - Float.parseFloat(cant);
-//                String[] datos_inv = {String.valueOf(resta), id_art};
-//                String[] datos_det = {"1", funcion.ultimo_id("id_detalle_renta", "detalle_renta")};
-//                funcion.UpdateRegistro(datos_inv, "update articulo set cantidad=? where id_articulo=?");
-//                funcion.UpdateRegistro(datos_det, "update detalle_renta set se_desconto=? where id_detalle_renta=?");
-                
-                // 2018.11.14
-                // vamos a incrementar el campo "en renta" para no modificar el stock
-                
-//                String cant = tabla_detalle.getValueAt(i, 0).toString();
-//                String id_art = tabla_detalle.getValueAt(i, 1).toString();
-//                String cantEnRenta = funcion.GetData("en_renta", "SELECT en_renta FROM articulo WHERE id_articulo=" + id_art + "");
-//                System.out.println("EN RENTA: "+cantEnRenta);
-//                if(cantEnRenta == null || cantEnRenta.equals(""))
-//                    cantEnRenta = "0";
-//                
-//                float aumentar = Float.parseFloat(cantEnRenta) + Float.parseFloat(cant);
-//                System.out.println("AUMENTAR: "+aumentar);
-//                String[] datos_en_renta= {String.valueOf(aumentar), id_art};
-//                String[] datos_det = {"1", funcion.ultimo_id("id_detalle_renta", "detalle_renta")};
-//                funcion.UpdateRegistro(datos_en_renta, "UPDATE articulo SET en_renta=? WHERE id_articulo=?");
-//                funcion.UpdateRegistro(datos_det, "update detalle_renta set se_desconto=? where id_detalle_renta=?");
-                
-//            }
         }
         // ABONOS
         if (tabla_abonos.getRowCount() != 0) {
@@ -989,7 +821,6 @@ public class agregar_renta extends javax.swing.JInternalFrame {
             reporte();
 
         if (check_enviar_email.isSelected() == true){
-//            traer_datos_email();
             enviar_email();               
         }
         JOptionPane.showMessageDialog(null, "Pedido registrado con exito... =)");
@@ -1010,13 +841,8 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         } else { //presiono que no
 
             this.dispose();
-//            jbtn_reporte.setEnabled(true);
-//            jbtn_agregar_evento.setEnabled(false);
-//            jbtn_disponible.setEnabled(true);
-//            jbtn_nuevo_evento.setEnabled(true);
         }
 
-        //this.dispose();
     }
 
     public void limpiar() {
@@ -1039,8 +865,6 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         cmb_tipo.setSelectedItem("Pedido");
         cmb_hora.setSelectedItem("-sel-");
         cmb_hora_devolucion.setSelectedItem("-sel-");
-//        cmb_minutos.setSelectedItem("-sel-");
-//        cmb_meridiano.setSelectedItem("-sel-");
         cmb_fecha_entrega.setDate(null);
         cmb_fecha_devolucion.setDate(null);
         txt_descripcion.setText("");
@@ -1051,17 +875,13 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         txt_comentario.setText("");
         txt_cantidad.setText("");
         txt_precio_unitario.setText("");
-
         check_mostrar_precios.setSelected(true);
         check_generar_reporte.setSelected(true);
-        
-
         formato_tabla_detalles();
         formato_tabla_abonos();
         abonos();
         subTotal();
         total();
-
     }
 
     public void subTotal() {
@@ -1131,11 +951,10 @@ public class agregar_renta extends javax.swing.JInternalFrame {
     }
 
     public void tabla_clientes() {
-        // funcion.conectate();
         tabla_clientes.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         String[] columNames = {"Id", "Cliente ", "Apodo", "Tel Cel", "Tel Fijo", "Email ", "Direccion", "Localidad", "RFC"};
         String[] colName = {"id_clientes", "nombre", "apodo", "tel_movil", "tel_fijo", "email", "direccion", "localidad", "rfc"};
-        //nombre de columnas, tabla, instruccion sql        
+        
         try {       
            dtconduc = funcion.GetTabla(colName, "clientes", "SELECT c.id_clientes, CONCAT(c.nombre,\" \",c.apellidos)as nombre, c.apodo, c.tel_movil, c.tel_fijo, c.email, c.direccion, c.localidad, c.rfc FROM clientes c where c.activo = 1 ORDER BY c.nombre ;");
         } catch (SQLNonTransientConnectionException e) {
@@ -1159,15 +978,14 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         tabla_clientes.getColumnModel().getColumn(0).setMinWidth(0);
         tabla_clientes.getColumnModel().getColumn(0).setPreferredWidth(0);
 
-        // funcion.desconecta();
     }
 
     public void tabla_clientes_nombre() {
-        // funcion.conectate();
+
         tabla_clientes.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         String[] columNames = {"Id", "Cliente ", "Apodo", "Tel Cel", "Tel Fijo", "Email ", "Direccion", "Localidad", "RFC"};
         String[] colName = {"id_clientes", "nombre", "apodo", "tel_movil", "tel_fijo", "email", "direccion", "localidad", "rfc"};
-        //nombre de columnas, tabla, instruccion sql   
+  
         try {       
            dtconduc = funcion.GetTabla(colName, "clientes", "SELECT c.`id_clientes`, CONCAT(c.`nombre`,\" \",c.`apellidos`)as nombre, c.`apodo`, c.`tel_movil`, c.`tel_fijo`, c.`email`, c.`direccion`, c.`localidad`, c.`rfc` FROM clientes c where c.`activo` = 1 AND c.`nombre` LIKE '%"+ txt_nombre.getText() +"%' ORDER BY c.`nombre` ;");
         } catch (SQLNonTransientConnectionException e) {
@@ -1192,15 +1010,14 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         tabla_clientes.getColumnModel().getColumn(0).setMinWidth(0);
         tabla_clientes.getColumnModel().getColumn(0).setPreferredWidth(0);
 
-        // funcion.desconecta();
     }
 
     public void tabla_clientes_apellidos() {
-        // funcion.conectate();
+
         tabla_clientes.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         String[] columNames = {"Id", "Cliente ", "Apodo", "Tel Cel", "Tel Fijo", "Email ", "Direccion", "Localidad", "RFC"};
         String[] colName = {"id_clientes", "nombre", "apodo", "tel_movil", "tel_fijo", "email", "direccion", "localidad", "rfc"};
-        //nombre de columnas, tabla, instruccion sql     
+ 
         try {       
              dtconduc = funcion.GetTabla(colName, "clientes", "SELECT c.`id_clientes`, CONCAT(c.`nombre`,\" \",c.`apellidos`)as nombre, c.`apodo`, c.`tel_movil`, c.`tel_fijo`, c.`email`, c.`direccion`, c.`localidad`, c.`rfc` FROM clientes c where c.`activo` = 1 AND c.`apellidos` LIKE '%"+ txt_apellidos.getText() +"%' ORDER BY c.`apellidos` ;");
         } catch (SQLNonTransientConnectionException e) {
@@ -1225,7 +1042,6 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         tabla_clientes.getColumnModel().getColumn(0).setMinWidth(0);
         tabla_clientes.getColumnModel().getColumn(0).setPreferredWidth(0);
 
-        // funcion.desconecta();
     }
 
     public void formato_tabla_detalles() {
@@ -1255,9 +1071,6 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         tabla_detalle.getColumnModel().getColumn(1).setMaxWidth(0);
         tabla_detalle.getColumnModel().getColumn(1).setMinWidth(0);
         tabla_detalle.getColumnModel().getColumn(1).setPreferredWidth(0);
-
-        //tabla_detalle.getColumnModel().getColumn(3).setCellRenderer(TablaRenderer);
-        //tabla_detalle.getColumnModel().getColumn(4).setCellRenderer(TablaRenderer);
         tabla_detalle.getColumnModel().getColumn(0).setCellRenderer(centrar);
         tabla_detalle.getColumnModel().getColumn(3).setCellRenderer(centrar);
         tabla_detalle.getColumnModel().getColumn(4).setCellRenderer(centrar);
@@ -1292,8 +1105,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         }        
         tabla_abonos.getColumnModel().getColumn(3).setMaxWidth(0);
         tabla_abonos.getColumnModel().getColumn(3).setMinWidth(0);
-        tabla_abonos.getColumnModel().getColumn(3).setPreferredWidth(0);
-       
+        tabla_abonos.getColumnModel().getColumn(3).setPreferredWidth(0);  
         tabla_abonos.getColumnModel().getColumn(1).setCellRenderer(TablaRenderer);      
         tabla_abonos.getColumnModel().getColumn(0).setCellRenderer(centrar);
 
@@ -1304,7 +1116,6 @@ public class agregar_renta extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "Faltan parametros para agregar al pedido ", "Error", JOptionPane.INFORMATION_MESSAGE);
             Toolkit.getDefaultToolkit().beep();
         } else {
-            //jbtn_disponible.setEnabled(true);
             float porcentajeDescuento = 0f;
             if(!this.txt_porcentaje_descuento.getText().equals("") ){
                 try {
@@ -1408,14 +1219,12 @@ public class agregar_renta extends javax.swing.JInternalFrame {
     }
 
     public void tabla_articulos() {
-        // funcion.conectate();
-//        lbl_folio.setText("Folio: " + funcion.GetData("folio", "Select folio from datos_generales").toString());
+
         tabla_articulos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        String[] columNames = {"Id","Codigo", "Categoria", "Descripcion", "Color", "P.Unitario", "Stock"};
-        String[] colName = {"id_articulo","codigo", "categoria", "descripcion", "color", "precio_renta", "cantidad"};
-        //nombre de columnas, tabla, instruccion sql 
+        String[] columNames = {"Id","Código", "Categoría", "Descripción", "Color", "P. Unitario"};
+        String[] colName = {"id_articulo","codigo", "categoria", "descripcion", "color", "precio_renta"};
         try {       
-             dtconduc = funcion.GetTabla(colName, "articulo", "SELECT a.id_articulo,a.codigo, ca.descripcion as categoria, a.descripcion, c.color, a.precio_renta,a.cantidad "
+             dtconduc = funcion.GetTabla(colName, "articulo", "SELECT a.id_articulo,a.codigo, ca.descripcion as categoria, a.descripcion, c.color, a.precio_renta "
                 + "FROM articulo a, color c, categoria ca\n"
                 + "WHERE a.id_color=c.id_color and activo =1 AND a.id_categoria=ca.id_categoria;");
         } catch (SQLNonTransientConnectionException e) {
@@ -1444,7 +1253,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         tabla_articulos.setModel(datos);
 
-        int[] anchos = {10,40, 120, 250, 100, 90, 90};
+        int[] anchos = {10,40, 120, 250, 100, 90};
 
         for (int inn = 0; inn < tabla_articulos.getColumnCount(); inn++) {
             tabla_articulos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -1453,22 +1262,17 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         tabla_articulos.getColumnModel().getColumn(0).setMaxWidth(0);
         tabla_articulos.getColumnModel().getColumn(0).setMinWidth(0);
         tabla_articulos.getColumnModel().getColumn(0).setPreferredWidth(0);
-
-        //tabla_articulos.getColumnModel().getColumn(4).setCellRenderer(TablaRenderer);
-        tabla_articulos.getColumnModel().getColumn(6).setCellRenderer(centrar);
         tabla_articulos.getColumnModel().getColumn(5).setCellRenderer(centrar);
 
-        // funcion.desconecta();
     }
 
     public void tabla_articulos_like() {
-        // funcion.conectate();
+        
         tabla_articulos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        String[] columNames = {"Id", "Codigo","Categoria", "Descripcion", "Color", "P.Unitario", "Stock"};
-        String[] colName = {"id_articulo","codigo", "categoria", "descripcion", "color", "precio_renta", "cantidad"};
-        //nombre de columnas, tabla, instruccion sql        
+        String[] columNames = {"Id", "Código","Categoría", "Descripción", "Color", "P. Unitario"};
+        String[] colName = {"id_articulo","codigo", "categoria", "descripcion", "color", "precio_renta"};      
         try {       
-         dtconduc = funcion.GetTabla(colName, "articulo", "SELECT a.id_articulo,a.codigo, ca.descripcion as categoria, a.descripcion, c.color, a.precio_renta,a.cantidad "
+         dtconduc = funcion.GetTabla(colName, "articulo", "SELECT a.id_articulo,a.codigo, ca.descripcion as categoria, a.descripcion, c.color, a.precio_renta "
                 + "FROM articulo a, color c, categoria ca\n"
                 + "WHERE a.id_color=c.id_color and activo =1 AND a.id_categoria=ca.id_categoria AND a.descripcion like '%" + txt_buscar.getText().toString() + "%'");
 
@@ -1497,7 +1301,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         tabla_articulos.setModel(datos);
 
-        int[] anchos = {10,40, 120, 250, 100, 90, 90};
+        int[] anchos = {10,40, 120, 250, 100, 90};
 
         for (int inn = 0; inn < tabla_articulos.getColumnCount(); inn++) {
             tabla_articulos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -1506,13 +1310,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         tabla_articulos.getColumnModel().getColumn(0).setMaxWidth(0);
         tabla_articulos.getColumnModel().getColumn(0).setMinWidth(0);
         tabla_articulos.getColumnModel().getColumn(0).setPreferredWidth(0);
-
-        //tabla_articulos.getColumnModel().getColumn(4).setCellRenderer(TablaRenderer);
-        tabla_articulos.getColumnModel().getColumn(6).setCellRenderer(centrar);
-
         tabla_articulos.getColumnModel().getColumn(5).setCellRenderer(centrar);
-
-        // funcion.desconecta();
     }
 
     /**
@@ -2705,7 +2503,6 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         if (agregar_cliente() == true) {
             jTabbedPane1.setSelectedIndex(1);
             jTabbedPane1.setEnabledAt(1, true);
-            //lbl_aviso.setText("Se agrego el cliente a la bd con exito.. Continua con los datos del evento...");
             this.lbl_cliente.setText(this.txt_nombre.getText() + " " + this.txt_apellidos.getText());
             limpiar();
             tabla_articulos();
@@ -2715,10 +2512,8 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
             if (txt_email.getText().equals("")) {
                 check_enviar_email.setSelected(false);
-//                check_adjuntarPDF.setSelected(false);
             } else if (xemail != null && xemail > 0) {
                 check_enviar_email.setSelected(true);
-//                check_adjuntarPDF.setSelected(true);
 
             }
 
@@ -2762,7 +2557,6 @@ public class agregar_renta extends javax.swing.JInternalFrame {
     private void tabla_articulosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_articulosMouseClicked
         // TODO add your handling code here:
         if (evt.getClickCount() == 2) {
-            cant = Float.parseFloat(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 6).toString());
 
             lbl_eleccion.setText((String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 3).toString() + " " + (String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 4).toString());
             txt_precio_unitario.setText(EliminaCaracteres((String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 5).toString(), "$,"));

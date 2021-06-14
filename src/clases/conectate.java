@@ -2,7 +2,6 @@ package clases;
 
 import java.sql.*;
 
-
 public class conectate {
     
     // ambiente de desarrollo localhost    

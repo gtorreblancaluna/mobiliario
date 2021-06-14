@@ -7,12 +7,10 @@ package mobiliario;
 
 import services.SaleService;
 import clases.sqlclass;
-import java.awt.Toolkit;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -73,12 +71,16 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         formato_tabla();
         formato_tabla_unicos();
       
+        try {
         if(inventario.jcheckIncluirTodos.isSelected())
             mostrarDisponibilidadTodos();
         else
             mostrarDisponibilidad();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
         
-        
+        System.out.println("MOSTRAR DISPONIBILIDAD SUCCESS");
         
     }
    
@@ -159,17 +161,21 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
             return;
         }
         mensaje.append("Total de folios "+rentas.size()+" - ");
-          for(Renta renta : rentas){        
-            for(DetalleRenta detalle : renta.getDetalleRenta()){     
-                 
-                 Articulo availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
+        int rentasCount = 1;
+        int detalleRentasCount = 1;
+          for(Renta renta : rentas){
+              System.out.println("RENTAS COUNT "+ rentasCount++);
+            for(DetalleRenta detalle : renta.getDetalleRenta()){  
+                 System.out.println("DETALLE RENTAS COUNT "+ detalleRentasCount++);
+                 //Articulo availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
                       // vamos agregar el articulo encontrado en la tabla detalle
                     DefaultTableModel temp = (DefaultTableModel) tablaArticulos.getModel();
                      Object nuevo[] = {
                             detalle.getArticulo().getArticuloId()+"",
                             detalle.getCantidad()+"",
                             // mostrar utiles
-                            availabeItem.getUtiles(),
+                            //availabeItem.getUtiles(),
+                            detalle.getArticulo().getUtiles(),
                             detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor(),
                             renta.getFechaEvento(),
                             renta.getFechaEntrega(),
@@ -191,7 +197,8 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                             Object unico[] = {
                                 detalle.getArticulo().getArticuloId()+"", // 0
                                 detalle.getCantidad()+"", // 1
-                                availabeItem.getUtiles(), // 2
+                                detalle.getArticulo().getUtiles(), // 2
+                                //availabeItem.getUtiles(), // 2
                                 "", // 3
                                 detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor() //4
                             };
@@ -201,10 +208,8 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                                                                                     
                             boolean encontrado = false;
                             for(int j=0 ; j < tablaArticulosUnicos.getRowCount() ; j++){
-                                
+                                System.out.println("ART UNICOS "+ j);
                                 if(tablaArticulosUnicos.getValueAt(j, 0).toString().equals(detalle.getArticulo().getArticuloId()+"") ){
-                                                                        
-                                    if(tablaArticulosUnicos.getValueAt(j, 0).toString().equals(detalle.getArticulo().getArticuloId()+"") ){
                                     // articulo encontrado :)
                                     float cantidadPedido = new Float(tablaArticulosUnicos.getValueAt(j, 1).toString());
                                     tablaArticulosUnicos.setValueAt((cantidadPedido + detalle.getCantidad()), j, 1);
@@ -215,18 +220,16 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                             
                             if(!encontrado){
                                 // si no se encontro en la tabla, procedemos a agregar el articulo
-                                // si no se encontro en la tabla, procedemos a agregar el articulo
                                 DefaultTableModel tablaUnicosModel = (DefaultTableModel) tablaArticulosUnicos.getModel();
                                 Object unico1[] = {
                                     detalle.getArticulo().getArticuloId()+"",
                                     detalle.getCantidad()+"",
-                                    availabeItem.getUtiles(),
+                                    detalle.getArticulo().getUtiles(), // 2
                                     "",                           
                                     detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor()
                                 };
                                 tablaUnicosModel.addRow(unico1);
-                             } // fin if, encontrado!
-                        }
+                             } // fin if, encontrado!                        
                   } // end if, comparativa ids articulos           
               } // end for detalle rentas
           
@@ -245,6 +248,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
            this.lblEncontrados.setText(mensaje.toString());
               
           } // end for rentas
+          System.out.println("ACABO");
     } // en funcion mostrarDisponibilidadTodos
     
     public void mostrarSoloNegativosTablaUnicos(){

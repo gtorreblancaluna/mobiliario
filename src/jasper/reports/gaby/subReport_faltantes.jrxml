@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="subReport_faltantes" language="groovy" pageWidth="695" pageHeight="802" columnWidth="695" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="4418b4d8-899a-4e34-b012-73ce6df39cf9">
 	<property name="ireport.zoom" value="1.4641000000000093"/>
-	<property name="ireport.x" value="51"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="id_renta" class="java.lang.String"/>
 	<queryString>

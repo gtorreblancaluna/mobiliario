@@ -222,7 +222,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         }else{
             rentaId = id_renta;
         }
-            // funcion.conectate();
             
             Renta renta = saleService.obtenerRentaPorId(new Integer(rentaId), funcion);
             if(renta == null){
@@ -267,16 +266,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                  }
              }
              
-//             totalFaltantes = funcion.GetData("total",
-//                      "SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * a.precio_compra),0) )AS total "
-//                    + "FROM faltantes f "
-//                    + "INNER JOIN articulo a ON (f.id_articulo = a.id_articulo) "
-//                    + "WHERE f.id_renta=" + renta.getRentaId() + " "
-//                    + "AND f.fg_activo = '1' "
-//                    );
-             
-//            if(totalFaltantes == null || totalFaltantes.equals(""))
-//                totalFaltantes = "0";
             
             try {
                 fSubtTotalFaltantes = totalFaltantes;
@@ -3761,7 +3750,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
             cmb_tipo.setSelectedItem(renta.getTipo().getTipo());
             this.txtPorcentajeDescuento.setValue(renta.getDescuento());
-//            txt_descuento.setValue(renta.getCantidadDescuento());
             txt_descuento.setText(decimalFormat.format(renta.getCantidadDescuento()));
             txt_iva.setValue(renta.getIva());
             txt_iva.setValue(renta.getIva());
@@ -3777,15 +3765,11 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             
             lbl_atiende.setText("Atendio: " + renta.getUsuario().getNombre()+" "+renta.getUsuario().getApellidos());
             
-//            this.txt_envioRecoleccion.setValue(renta.getEnvioRecoleccion());
-//            this.txt_depositoGarantia.setValue(renta.getDepositoGarantia());
-            
             this.txt_envioRecoleccion.setText(decimalFormat.format(renta.getEnvioRecoleccion()));
             this.txt_depositoGarantia.setText(decimalFormat.format(renta.getDepositoGarantia()));
             
             // agregamos los articulos de esta renta
             DefaultTableModel tablaDetalle = (DefaultTableModel) tabla_detalle.getModel();
-//              String[] columnNames = {"id_detalle_renta", "cantidad", "id_articulo", "descripcion","precio u.", "importe","esNuevo"};
             for(DetalleRenta detalle : renta.getDetalleRenta()){
                 float descuento = 0f;
                 float importe = detalle.getCantidad()*detalle.getPrecioUnitario();
