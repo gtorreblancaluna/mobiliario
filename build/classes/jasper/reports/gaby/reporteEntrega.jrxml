@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="renta" language="groovy" pageWidth="695" pageHeight="900" columnWidth="655" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="af0ab36d-faf5-45a3-a784-d9f82f7a9acc">
 	<property name="ireport.zoom" value="0.9313819845887352"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="614"/>
+	<property name="ireport.y" value="657"/>
 	<parameter name="id_renta" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["C:\\Users\\Carlos Alberto\\Documents\\NetBeansProjects\\mobiliario\\reportes\\"]]></defaultValueExpression>
@@ -299,82 +299,74 @@ WHERE
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<text><![CDATA[POLÍTICAS Y NORMAS DE RENTA
-
 Gracias por su confianza.
 Para asegurar que “Servicio para Eventos Gabriela S de RL de CV” pueda brindar el mejor servicio a nuestros clientes, te pedimos leas las siguientes indicaciones y condiciones con la finalidad de evitar malentendidos, cuidar nuestra calidad de servicio y garantizar su evento.
 
 CONTRATACIÓN
+Para apartar el evento, se tiene que hacer vía telefónica, mensaje WhatsApp o correo electrónico, para asegurar que el día que solicitan el servicio se encuentre disponible.
 
-Para apartar el evento, se tiene que hacer vía telefónica, mensaje WhatsApp o correo electrónico, para asegurar que el día que solicitan el servicio se encuentre disponible. Las cotizaciones contienen fecha de vigencia, aclarando que ésta misma quedará como cotización y no se hará pedido sin antes haber un depósito con el apartado del 50% del evento o la liquidación de este. El monto restante deberá ser liquidado en su totalidad 4 días antes de la fecha de entrega que solicitó, de lo contrario no se programará la entrega de este y se perderá el dinero del apartado. Deberá hacernos llegar el pago realizado anexando Nombre y número de FOLIO o nota, de lo contrario, no se dará por enterado el apartado del evento/ mobiliario/ vajilla/cristalería/ banquete y/o mantelería, por lo que la empresa “Servicio para Eventos Gabriela S de RL de CV” no se hará responsable. Esto es únicamente para apartar su evento. Una vez realizado el apartado o liquidación del evento no se aceptarán cambios, cancelaciones ni devolución alguna.
+Las cotizaciones tienen una vigencia de 24 horas a partir de la fecha de creación y automáticamente se desbloquea el mueble al no tener registrado un pago de por lo menos el 50% . El pago lo puedes realizar a las cuentas bancarias descritas en la sección pagos. El monto restante deberá ser liquidado en su totalidad Máximo hasta 4 días antes de la fecha de entrega que solicitó, como fecha límite, de lo contrario no se programará la entrega de este y se perderá el dinero del apartado. Deberá hacernos llegar el pago realizado anexando Nombre y número de FOLIO de su nota, de lo contrario, no se dará por enterado el apartado del servicio, por lo que la empresa “Servicio para Eventos Gabriela S de RL de CV” no se hará responsable de programar su entrega. Una vez realizado el apartado o liquidación del evento no se aceptarán cambios, cancelaciones ni devoluciones.
 
 FACTURACIÓN
 NUESTROS PRECIOS NO INCLUYEN IVA
-
 En caso de requerir factura, deberá de estar liquidada la nota al 100% (dentro de los días correspondientes al mes en curso), posteriormente deberá solicitarlo directamente con su vendedor y proporcionarle los siguientes datos:
-- Razón Social
-- RFC
-- Dirección (Calle, Número, Colonia, Ciudad, Municipio o
-- Delegación y Código Postal)
-- Teléfono
-- Correo Electrónico
-- El número de nota Pagada
-- Uso de CFDI
+
+Razón Social
+RFC
+Dirección (Calle, Número, Colonia, Ciudad, Municipio o Delegación y Código Postal)
+
+Teléfono
+Correo Electrónico
+El número de nota Pagada
+Uso de CFDI
 
 De hacer caso omiso al límite del tiempo estipulado, la empresa “Servicio para Eventos Gabriela S de RL de CV” no se hace responsable sobre facturas solicitadas fuera de tiempo.
 
 DEPOSITOS EN GARANTIA Y/O REPOSICIONES
-
 Se cobrará un depósito en garantía por el producto rentado, mismo que se regresará en su totalidad únicamente si el producto se regresa en óptimas condiciones y completo (mantelería, mobiliario, vajilla y/o cristalería). El depósito se reintegra mediante un formato de devolución, el cual deberá solicitar con su vendedor y otorgar los siguientes datos:
-- Titular de la cuenta
-- RFC
-- Razón social
-- Nombre del contacto
-- Teléfono
-- Cuenta bancaria / Clabe interbancaria
-- Banco
-- Correo electrónico
 
-Para devolución en efectivo deberá acudir a las instalaciones de “Servicio para Eventos Gabriela S de RL de CV” en el domicilio de Ramon Corona #493 Colonia Santa Anita, San Pedro Tlaquepaque, Jalisco C.P. 45645; el tiempo para el retorno de su depósito en garantía será de 5 días hábiles a partir de enviar el formato y/o el producto rentado. La persona que esté encargado de recibir el producto deberá de revisarlo junto con la persona que le hace entrega, misma que será la responsable de retornar el producto rentado, esta deberá firmar de enterado para evitar malentendidos. La reclamación del retorno del depósito en garantía tiene una vigencia de 30 días hábiles que corren a partir de la fecha de su evento. Cristalería y Vajilla rota, estrellada, despostillada o faltante se cobrará como nueva. Mantelería quemada, rota, rasgada o faltante se cobrará como nueva.
+Titular de la cuenta
+RFC
+Razón social
+
+Nombre del contacto
+Teléfono
+Cuenta bancaria / Clabe interbancaria
+
+Banco
+Correo electrónico
+El tiempo para el retorno de su depósito en garantía será de 5 días hábiles a partir de que retorno el producto y de haber recibido el formato. La persona que esté encargado de recibir el producto deberá de revisarlo junto con la persona que le hace entrega, misma que será la responsable de retornar el producto rentado, esta deberá firmar de enterado para evitar malentendidos. La reclamación del retorno del depósito en garantía tiene una vigencia de 30 días hábiles que corren a partir de la fecha de su evento. Cristalería y Vajilla rota, estrellada, despostillada o faltante se cobrará como nueva. Mantelería quemada, rota, rasgada o faltante se cobrará como nueva. Mobiliario dañado se cobra el monto de reparación o en su caso reposición completa.
 
 ENTREGAS, FLETES Y/O MONTAJES
-
-Para la entrega del producto rentado deberá estar la persona encargada presente en el día y hora acordado, de lo contrario el personal no estará obligado de dejarlo y se retirará del lugar perdiendo así su turno de entrega y sin posibilidad de volver a programarlo. Favor de revisar
-todo lo que reciba, ya que de lo contrario la empresa no se hará responsable y el cliente asumirá los cargos correspondientes al costo de reposición por producto dañado o faltante. Al momento de contratar deberá de especificar el lugar donde requiere el producto, de lo contrario,
-si se requiere una maniobra adicional (montaje, desmontaje y/o recorrer una distancia mayor a 8 metros o subir/bajar pisos adicionales) tendrá un cargo extra que se cobrará en el momento, de lo contrario el personal no estará obligado en dejar el producto. Si el servicio que
-solicitó no está registrado en la cotización y/o nota, no será responsabilidad de la empresa otorgarlo. Horarios, fechas, de entrega, servicios adicionales, montajes etc. deberán estar marcados dentro de la nota, de lo contrario la empresa “Servicio para Eventos Gabriela S de RL de
-CV” no se hará responsable. Si el producto lo solicitan el mismo día, la empresa no se hace responsable en horarios de entrega debido a que se programa con proveedores de Fletes externos y que tendrá costo extra, mismo que deberá de pagar el cliente. La empresa NO labora los domingos y días festivos, si necesitara de nuestros servicios, esto tendrá cargo extra. Tendrá costo extra retirar el producto solicitado el mismo día del evento fuera de la jornada laboral de la empresa, siendo esta de lunes a viernes de 9:00 hrs. a 17:00 hrs. y sábados de 9:00
-hrs. a 13:00 hrs. Tendrá la responsabilidad de salvaguardar el producto rentado hasta que la empresa recoja el mismo. No nos hacemos responsables por cambios climatológicos.
+Para la entrega del producto rentado deberá estar la persona encargada presente en el día y hora acordado, de lo contrario el personal no estará obligado a dejarlo y se retirará del lugar perdiendo así su turno de entrega y sin posibilidad de volver a programarlo. Favor de revisar todo lo que reciba, ya que de lo contrario la empresa no se hará responsable y el cliente asumirá los cargos correspondientes al costo de reposición por producto dañado o faltante. Al momento de contratar deberá de especificar el lugar donde requiere el producto, de lo contrario, si se requiere una maniobra adicional (montaje, desmontaje y/o recorrer una distancia mayor a 8 metros o subir/bajar pisos adicionales) tendrá un cargo extra que se cobrará en el momento de la entrega, de lo contrario el personal no estará obligado en dejar el producto y/o ofrecer el servicio. Si el servicio o producto  que solicitó no está registrado en la cotización y/o nota, no será responsabilidad de la empresa otorgarlo. Horarios, fechas de entrega y/o recolección, servicios adicionales, montajes etc. deberán estar marcados dentro de la nota, de lo contrario la empresa “Servicio para Eventos Gabriela S de RL de CV” no sé hará responsable de realizarlo. Si el producto lo solicitan el mismo día se genera un costo extra obligatorio por envío y recolección ya que se realiza mediante empresa externa de flete, mismo que deberá de pagar el cliente. La empresa NO labora los domingos y días festivos, si requieren de nuestros servicios, esto tendrá cargo extra. Tendrá costo extra retirar el producto solicitado el mismo día del evento fuera de la jornada laboral de la empresa, siendo esta de lunes a viernes de 9:00 hrs. a 16:00 hrs. y sábados de 9:00 hrs. a 12:00 hrs. El cliente tendrá la responsabilidad de salvaguardar el producto rentado hasta que la empresa recoja el mismo.  No nos hacemos responsables por cambios climatológicos.
 
 RENTA DE TOLDOS
-
-Dentro del costo de la renta del Toldo ya incluye montaje y desmontaje. La empresa no se hace responsable en cuanto errores de medidas del lugar del evento. Una vez instalado el toldo no podrá moverse por personas ajenas a la empresa, en caso de ser removido, se cobrará un
-cargo adicional dependiendo del tipo de toldo, sin excepción de que tenga o no daño.
+Dentro del costo de la renta del Toldo ya incluye montaje y desmontaje. La empresa no se hace responsable en cuanto errores de medidas del lugar del evento. Una vez instalado el toldo no podrá moverse por personas ajenas a la empresa, en caso de ser removido, se cobrará un cargo adicional dependiendo del tipo de toldo, sin excepción de que tenga o no daño.
 
 NOS COMPROMETEMOS
-
-A la puntualidad de la entrega del servicio solicitado. A la entrega del servicio completo que se solicitó con anterioridad, entregándolo con la máxima calidad de cada uno de los productos. A brindarle siempre una atención personalizada y asesorarle con los detalles del servicio. A la
-seguridad y garantía de un servicio impecable en la entrega del producto, ya que contamos con transporte de modelo reciente y personal capacitado para trasladar el mobiliario.
+A la puntualidad de la entrega del servicio solicitado dentro del rango de horario marcado en tu nota. A la entrega del servicio completo que se solicitó dentro de tu nota, garantizando la funcionalidad de cada uno de los artículos con la limpieza adecuada. A brindarle siempre una atención personalizada. A la seguridad y garantía en la entrega del producto, ya que contamos con transporte de modelo reciente y personal capacitado para trasladar el mobiliario.
 
 PAGOS
+Al realizar el pago del apartado o total del evento que consta este documento queda en manifiesto que usted está de acuerdo con los términos y condiciones de nuestras políticas de renta sin necesidad de firma alguna.
+ Puede realizar sus pagos a través de TRANSFERENCIA, DEPOSITO, TAJETA DE CREDITO, TARJETA DE DEBITO.
 
-Al realizar el pago del apartado o total del evento que consta este documento queda en manifiesto que usted está de acuerdo con los términos y condiciones de nuestras políticas de renta sin necesidad de firma alguna. Puede realizar sus pagos a través de OXXO, 7ELEVEN,
-EFECTIVO, TRANSFERENCIA, TAJETA DE CREDITO, TARJETA DE DEBITO, CHEQUE.
 
-CUENTA BANORTE
-NOMBRE: “Servicio para Eventos Gabriela S de RL de CV”
-RFC: SEG1402107MA
-No. CUENTA: 0899472506
-CLABE INTERBANCARIA: 072320008994725062
-No. PLASTICO: 4189281045932580
-
-CUENTA BANCOMER
+CUENTA BBVA
 NOMBRE: “Servicio para Eventos Gabriela S de RL de CV”
 RFC: SEG1402107MA
 No. CUENTA: 0110690430
 CLABE INTERBANCARIA: 012320001106904308
-No. PLASTICO: 4555113005432846
+No. PLASTICO: 4555113008258255
 
-Gracias por su preferencia. Nuestro aviso de privacidad lo podrá encontrar en www.casagaby.com
+
+CUENTA BANAMEX
+NOMBRE: “Servicio para Eventos Gabriela S de RL de CV”
+RFC: SEG1402107MA
+No. CUENTA: 7013 2073102
+CLABE INTERBANCARIA: 002320701320731023
+
+Gracias por su preferencia.
+Nuestro aviso de privacidad lo podrá encontrar en www.casagaby.com
 Gracias por su preferencia.]]></text>
 			</staticText>
 		</band>

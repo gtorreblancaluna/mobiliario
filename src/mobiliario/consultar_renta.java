@@ -258,7 +258,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
              
              if(faltantes != null && faltantes.size() > 0){
                  for(Faltante faltante : faltantes){
-                     if(faltante.getPrecioCobrar() == null || faltante.getPrecioCobrar() <= 0){
+                     if(faltante.getPrecioCobrar() == null){
                          totalFaltantes += (faltante.getCantidad() * faltante.getArticulo().getPrecioCompra());
                      }else{
                         totalFaltantes += (faltante.getCantidad() * faltante.getPrecioCobrar());
@@ -2060,7 +2060,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         check_fechas_evento = new javax.swing.JCheckBox();
         dateFechaEventoInicial = new com.toedter.calendar.JDateChooser();
         dateFechaEventoFinal = new com.toedter.calendar.JDateChooser();
-        cmbUsuarios = new javax.swing.JComboBox<String>();
+        cmbUsuarios = new javax.swing.JComboBox<>();
         cmb_limit = new javax.swing.JComboBox();
         jLabel49 = new javax.swing.JLabel();
         lbl_aviso_resultados = new javax.swing.JLabel();
@@ -2238,7 +2238,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Proximas rentas", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 11))); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Proximas rentas", 0, 0, new java.awt.Font("Arial", 0, 11))); // NOI18N
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tabla_prox_rentas.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
@@ -2338,6 +2338,11 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jbtn_generar_reporte1.setFocusable(false);
         jbtn_generar_reporte1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_generar_reporte1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jbtn_generar_reporte1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jbtn_generar_reporte1MouseClicked(evt);
+            }
+        });
         jbtn_generar_reporte1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbtn_generar_reporte1ActionPerformed(evt);
@@ -2495,7 +2500,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jPanel3.add(dateFechaEventoFinal, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 80, 170, 21));
 
         cmbUsuarios.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmbUsuarios.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbUsuarios.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         cmbUsuarios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jPanel3.add(cmbUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 70, 170, -1));
 
@@ -2517,7 +2522,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        panel_datos_generales.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos generales", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        panel_datos_generales.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos generales", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
         panel_datos_generales.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lbl_cliente.setFont(new java.awt.Font("Microsoft Sans Serif", 1, 14)); // NOI18N
@@ -2827,7 +2832,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        panel_articulos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Elije un servicio", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        panel_articulos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Elije un servicio", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
         panel_articulos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         txt_cantidad.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -2913,7 +2918,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jPanel6.add(panel_articulos, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 11, 1080, 350));
 
-        panel_conceptos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Conceptos del evento", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        panel_conceptos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Conceptos del evento", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
         panel_conceptos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tabla_detalle.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -3095,7 +3100,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jTabbedPane2.addTab("Detalle conceptos", jPanel6);
 
-        panel_abonos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Pagos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        panel_abonos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Pagos", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
         tabla_abonos.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         tabla_abonos.setModel(new javax.swing.table.DefaultTableModel(
@@ -3134,7 +3139,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 .addGap(149, 149, 149))
         );
 
-        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ingresa el abono", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ingresa el abono", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
         jToolBar4.setFloatable(false);
         jToolBar4.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -3426,7 +3431,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         });
         jToolBar2.add(jbtn_editar_cliente);
 
-        panel_datos_cliente.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos cliente", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        panel_datos_cliente.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos cliente", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
         txt_nombre.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         txt_nombre.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -3563,7 +3568,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 .addContainerGap(188, Short.MAX_VALUE))
         );
 
-        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Clientes en la base de datos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Clientes en la base de datos", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
         tabla_clientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -5081,6 +5086,10 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         this.g_idRenta = id_renta;
         mostrar_agregar_orden_proveedor();
     }//GEN-LAST:event_jBtnAddOrderProviderActionPerformed
+
+    private void jbtn_generar_reporte1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jbtn_generar_reporte1MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jbtn_generar_reporte1MouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
