@@ -1,13 +1,3 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- * Author:  jerry
- * Created: 21/01/2019
- */
-
 CREATE TABLE tipo_abono (
   id_tipo_abono INT(11) NOT NULL AUTO_INCREMENT,
   descripcion VARCHAR(150) NULL,
@@ -262,3 +252,12 @@ NOT NULL;
 INSERT INTO configuracion (llave,valor) VALUES ("url_logo_empresa","https://storage.googleapis.com/windy-container-237418.appspot.com/mobiliario-gaby/72063929_2897909780233817_7146560142975172608_o.jpg");
 INSERT INTO configuracion (llave,valor) VALUES ("icon_check_ok","https://storage.googleapis.com/windy-container-237418.appspot.com/mobiliario-gaby/icon-check.png");
 INSERT INTO configuracion (llave,valor) VALUES ("sitio_empresa","https://www.casagaby.com");
+
+INSERT INTO tipo_evento (descripcion) VALUES ('Alquiler');
+INSERT INTO tipo_evento (descripcion) VALUES ('Compra');
+
+INSERT INTO material_area (description) VALUES ('Carpinteria');
+INSERT INTO material_area (description) VALUES ('Herrería');
+INSERT INTO measurement_units (description) VALUES ('Metro');
+INSERT INTO measurement_units (description) VALUES ('Kilo');
+INSERT INTO measurement_units (description) VALUES ('Tramo');

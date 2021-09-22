@@ -19,10 +19,6 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 import parametersVO.ParameterOrderProvider;
 
-/**
- *
- * @author torreblanca gerardo
- */
 public class OrderProviderDAO {
     
     private static Logger log = Logger.getLogger(OrderProviderDAO.class.getName());

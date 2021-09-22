@@ -6,6 +6,7 @@
 package mobiliario;
 
 import forms.contabilidad.ContabilidadForm;
+import forms.material.inventory.MaterialInventoryView;
 import forms.proveedores.OrderProviderForm;
 import forms.proveedores.ViewOrdersProviders;
 import java.beans.PropertyVetoException;
@@ -14,10 +15,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
-import model.Color;
 import model.DatosGenerales;
 import services.SystemService;
 import utilities.Utility;
@@ -30,6 +29,7 @@ public class principal extends javax.swing.JFrame {
 
     OrderProviderForm orderProviderForm;
     ViewOrdersProviders viewOrdersProviders;
+    MaterialInventoryView materialInventoryView;
     clientes ventana_clientes;
     iniciar_sesion v_iniciar_sesion;
     utilerias ventana_utilerias;
@@ -280,6 +280,22 @@ public class principal extends javax.swing.JFrame {
 
     }
     
+    public void openMaterialInventoryView() {
+        if (Utility.verifyIfInternalFormIsOpen(materialInventoryView)) {
+             if(!Utility.showWindowDataUpdateSession()){
+                return;
+            }
+            materialInventoryView = new MaterialInventoryView();
+            materialInventoryView.setLocation(this.getWidth() / 2 - materialInventoryView.getWidth() / 2, this.getHeight() / 2 - materialInventoryView.getHeight() / 2 - 20);
+            jDesktopPane1.add(materialInventoryView);
+            materialInventoryView.show();
+        } else {
+            JOptionPane.showMessageDialog(this, "Ahi ta la ventana =)");
+        }
+
+    }
+    
+       
     public void abrir_orden_proveedor() {
         if (Utility.verifyIfInternalFormIsOpen(viewOrdersProviders)) {
              if(!Utility.showWindowDataUpdateSession()){
@@ -445,6 +461,7 @@ public class principal extends javax.swing.JFrame {
         jSeparator5 = new javax.swing.JToolBar.Separator();
         jbtn_cerrar_sesion = new javax.swing.JButton();
         jBtnViewOrderProviders = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Casa Gaby Eventos");
@@ -497,9 +514,11 @@ public class principal extends javax.swing.JFrame {
         txtAreaNotifications.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txtAreaNotifications.setRows(5);
         txtAreaNotifications.setBorder(null);
-        txtAreaNotifications.setDragEnabled(false);
         txtAreaNotifications.setEnabled(false);
         jScrollPane1.setViewportView(txtAreaNotifications);
+
+        jDesktopPane1.setLayer(jPanel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jDesktopPane1.setLayer(jScrollPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout jDesktopPane1Layout = new javax.swing.GroupLayout(jDesktopPane1);
         jDesktopPane1.setLayout(jDesktopPane1Layout);
@@ -523,8 +542,6 @@ public class principal extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-        jDesktopPane1.setLayer(jPanel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jDesktopPane1.setLayer(jScrollPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jToolBar1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jToolBar1.setFloatable(false);
@@ -684,6 +701,17 @@ public class principal extends javax.swing.JFrame {
         });
         jToolBar1.add(jBtnViewOrderProviders);
 
+        jButton8.setText("Material");
+        jButton8.setFocusable(false);
+        jButton8.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton8.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton8);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -800,6 +828,10 @@ public class principal extends javax.swing.JFrame {
         abrir_orden_proveedor();
     }//GEN-LAST:event_jBtnViewOrderProvidersActionPerformed
 
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        openMaterialInventoryView();
+    }//GEN-LAST:event_jButton8ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -845,6 +877,7 @@ public class principal extends javax.swing.JFrame {
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
     public static javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

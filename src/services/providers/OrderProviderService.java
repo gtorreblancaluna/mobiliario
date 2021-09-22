@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package services.providers;
 
 import dao.providers.OrderProviderDAO;
@@ -17,10 +12,7 @@ import model.providers.OrdenProveedor;
 import model.providers.PagosProveedor;
 import parametersVO.ParameterOrderProvider;
 
-/**
- *
- * @author idscomercial
- */
+
 public class OrderProviderService {
     
     // singlenton instance
@@ -88,7 +80,7 @@ public class OrderProviderService {
         try{
             ordenProveedor =  orderProviderDAO.getOrderById(id);
             
-            if(ordenProveedor!= null){
+            if(ordenProveedor != null){
                 ordenProveedor.setPagosProveedor(
                         providersPaymentsDAO.getAllProviderPaymentsByOrderId(ordenProveedor.getId()));
             }

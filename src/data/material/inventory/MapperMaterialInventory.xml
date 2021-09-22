@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperMaterialInventory">
+  
+    <resultMap id="resultMapMapperMaterialInventory" type="model.material.inventory.MaterialInventory">        
+        <result property="id" column="id"/>
+        <result property="stock" column="stock"/>
+        <result property="unitMeasurement" column="unit_measurement"/>
+        <result property="description" column="description"/>
+        <result property="purchaseAmount" column="purchase_amount"/>
+        <result property="unitPurchase" column="unit_purchase"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        
+        <!-- material area -->
+        <result property="area.id" column="area_id"/>
+        <result property="area.description" column="area_descripcion"/>  
+        
+        <!-- unidad de medida -->
+        <result property="measurementUnit.id" column="measurement_unit_id"/>
+        <result property="measurementUnit.description" column="measurement_unit_descripcion"/>    
+        
+        <!-- unidad de medida compra -->
+        <result property="measurementUnitPurchase.description" column="measurement_unit_purchase_id"/>
+        <result property="measurementUnitPurchase.id" column="measurement_unit_purchase_description"/>                    
+        
+    </resultMap>
+    
+    <resultMap id="resultMapMeasurementUnit" type="model.material.inventory.MeasurementUnit">
+        <result property="id" column="measurement_unit_purchase_id"/>
+        <result property="description" column="description"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    
+    <resultMap id="resultMapMaterialArea" type="model.material.inventory.MaterialArea">
+        <result property="id" column="measurement_unit_purchase_id"/>
+        <result property="description" column="description"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+     
+     <select id="getAllMaterialInventory" resultMap="resultMapMapperMaterialInventory" parameterType="java.util.Map">
+        SELECT m.*,
+         a.id AS area_id,
+         a.description AS area_description,
+         mu.id AS measurement_unit_id,
+         mu.description AS measurement_unit_descripcion,
+         mp.id AS measurement_unit_purchase_id,
+         mp.description AS measurement_unit_purchase_description
+        FROM material_inventory m
+         INNER JOIN material_area a ON (a.id = m.material_area_id)
+         INNER JOIN measurement_units mu ON (mu.id = m.measurement_unit_id)
+         INNER JOIN measurement_units mp ON (mp.id = m.measurement_unit_purchase_id)
+         WHERE m.fg_active = '1'
+    </select>
+    
+    <update id="updateMaterialInventory" parameterType="model.material.inventory.MaterialInventory">
+        UPDATE material_inventory SET
+            material_area_id = #{area.id},
+            stock = #{stock},
+            unit_measurement_id = #{measurementUnit.id},
+            unit_measurement_purchase_id = #{measurementUnitPurchase.id},
+            description = #{description},
+            purchase_amount = #{purchaseAmount},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <insert id="insertMaterialInventory" parameterType="model.material.inventory.MaterialInventory">
+        INSERT INTO material_inventory
+        (
+            material_area_id,
+            measurement_unit_id,
+            measurement_unit_purchase_id,
+            stock,
+            description,
+            purchase_amount,
+            created_at,
+            updated_at
+        )
+        VALUES
+        (
+            #{area.id},
+            #{measurementUnit.id},
+            #{measurementUnitPurchase.id},
+            #{stock},
+            #{description},
+            #{purchaseAmount},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
+    <select id="getMeasurementUnits" resultMap="resultMapMeasurementUnit">
+       SELECT * FROM measurement_units
+    </select>
+    
+    <select id="getMaterialAreaList" resultMap="resultMapMeasurementUnit">
+       SELECT * FROM material_inventory
+    </select>
+      
+</mapper>

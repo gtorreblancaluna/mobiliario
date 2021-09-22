@@ -260,7 +260,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                  for(Faltante faltante : faltantes){
                      if(faltante.getPrecioCobrar() == null){
                          totalFaltantes += (faltante.getCantidad() * faltante.getArticulo().getPrecioCompra());
-                     }else{
+                     } else {
                         totalFaltantes += (faltante.getCantidad() * faltante.getPrecioCobrar());
                      }
                  }
@@ -351,17 +351,11 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_CONSULTA);
                 
             Desktop.getDesktop().open(file2);
-
-        } catch (IOException e) {
-            log.error(e);
-            JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());
-        } catch (JRException e) {
-            log.error(e);
-            JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());            
+            
         } catch (Exception e) {
             log.error(e);
             System.out.println("Mensaje de Error:" + e.toString());
-            JOptionPane.showMessageDialog(rootPane, "Mensaje de Error :" + e.toString() + "\n Existe un PDF abierto, cierralo e intenta generar el PDF nuevamente");
+            JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());
         }
         
     }

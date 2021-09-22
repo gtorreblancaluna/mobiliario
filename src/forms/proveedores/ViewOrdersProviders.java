@@ -7,7 +7,6 @@ import exceptions.BusinessException;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.io.File;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -20,12 +19,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import mobiliario.ApplicationConstants;
-import static mobiliario.consultar_renta.g_mensajeFaltantes;
-import static mobiliario.consultar_renta.g_totalFaltantes;
 import mobiliario.principal;
 import model.DatosGenerales;
 import model.providers.OrdenProveedor;
-import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -36,10 +32,6 @@ import services.SystemService;
 import services.providers.OrderProviderService;
 import utilities.Utility;
 
-/**
- *
- * @author Gerardo Torreblanca
- */
 public class ViewOrdersProviders extends javax.swing.JInternalFrame {
 
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(ViewOrdersProviders.class.getName());
@@ -120,17 +112,11 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
             JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
             File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
             Desktop.getDesktop().open(file2);
-
-        } catch (IOException e) {
-            LOGGER.error(e);
-            JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());
-        } catch (JRException e) {
-            LOGGER.error(e);
-            JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());            
+            
         } catch (Exception e) {
             LOGGER.error(e);
             System.out.println("Mensaje de Error:" + e.toString());
-            JOptionPane.showMessageDialog(rootPane, "Mensaje de Error :" + e.toString() + "\n Existe un PDF abierto, cierralo e intenta generar el PDF nuevamente");
+            JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage() + "\n" + e);
         }
      
      }
