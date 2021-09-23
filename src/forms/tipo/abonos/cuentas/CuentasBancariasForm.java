@@ -5,15 +5,9 @@
  */
 package forms.tipo.abonos.cuentas;
 
-import clases.conectate;
 import forms.contabilidad.ContabilidadForm;
-import forms.contabilidad.SubCategoriaContabilidadForm;
-
-import java.util.Date;
 import java.util.List;
 import javax.swing.JOptionPane;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import mobiliario.ApplicationConstants;
 import mobiliario.agregar_renta;

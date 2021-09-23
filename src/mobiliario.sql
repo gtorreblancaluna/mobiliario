@@ -417,6 +417,7 @@ CREATE TABLE material_area (
   description VARCHAR(455) NOT NULL,
   created_at TIMESTAMP NULL DEFAULT NULL,
   updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -425,6 +426,7 @@ CREATE TABLE measurement_units (
   description VARCHAR(455) NOT NULL,
   created_at TIMESTAMP NULL DEFAULT NULL,
   updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -436,7 +438,7 @@ CREATE TABLE material_inventory (
   measurement_unit_purchase_id INT(11) NOT NULL,
   description VARCHAR(455) NOT NULL,
   purchase_amount DECIMAL(10,2) NOT NULL,
-  created_at TIMESTAMP NULL DEFAULT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,   
   updated_at TIMESTAMP NULL DEFAULT NULL,
   fg_active ENUM('1','0') NOT NULL DEFAULT '1',
   PRIMARY KEY (id),

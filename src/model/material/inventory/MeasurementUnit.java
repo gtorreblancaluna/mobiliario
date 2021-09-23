@@ -9,6 +9,14 @@ public class MeasurementUnit {
     private Date createdAt;
     private Date updatedAt;
 
+    public MeasurementUnit() {
+    }
+
+    public MeasurementUnit(Long id, String description) {
+        this.id = id;
+        this.description = description;
+    }
+
     public Long getId() {
         return id;
     }
@@ -39,6 +47,11 @@ public class MeasurementUnit {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public String toString() {
+        return description;
     }
     
     

@@ -97,44 +97,6 @@ public abstract class Utility {
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
             
-//        JOptionPane pane = new JOptionPane("Espere porfavor...", JOptionPane.INFORMATION_MESSAGE);
-//        JDialog dialog = pane.createDialog(null, "Espere porfavor...");
-//        dialog.setModal(false);
-//        dialog.setVisible(true);
-
-               
-        
-//        final String IMAGE_URL = "src/img/loading.gif";
-
-//        JDialog dialog = new JDialog(new JFrame() , title, false);  
-//        dialog.setLayout( new BorderLayout()); 
-//        
-//        ImageIcon image = new ImageIcon(IMAGE_URL); //imports the image
-//
-//        dialog.add( new JLabel (image)); 
-////        dialog.setSize(300,200);    
-//        dialog.pack();
-//        dialog.setLocationRelativeTo(null);
-//        dialog.setVisible(true);  
- 
-        
-        /*
-        JLabel label = new JLabel(content, SwingConstants.CENTER);
-        label.setFont(label.getFont().deriveFont(Font.BOLD, 24f));
-        JDialog dialog = new JDialog();
-         dialog.setLayout( new FlowLayout() );     
-         dialog.setSize(300, 100);
-         dialog.setTitle(title);
-        
-         dialog.setLocationRelativeTo(null);
-//        dialog.setModal(true);
-//        dialog.setResizable(false);
-//        dialog.setUndecorated(true);
-//        dialog.pack();
-        dialog.setVisible(true);
-        
-        
-        */
         return dialog;
     }
     
@@ -242,30 +204,6 @@ public abstract class Utility {
         }else{
             return false;
         }
-
-//            JPanel panel = new JPanel();
-//            JLabel label = new JLabel("Introduce tu contrase\u00F1a:");
-//            JPasswordField pass = new JPasswordField(10);
-//            panel.add(label);
-//            panel.add(pass);
-//              
-//            String[] options = new String[]{"Ingresar", "Cancelar"};
-//            int option = JOptionPane.showOptionDialog(null, panel, "Actualizar sesi\u00F3n",
-//                                     JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-//                                     null, options, options[0]);
-//            
-//            if(option == 0){ // pressing ingresar
-//                char[] password = pass.getPassword();
-//                System.out.println("Your password is: " + new String(password));
-//                if(!iniciar_sesion.dataSessionUptade(new String(password))){
-//                    JOptionPane.showMessageDialog(null, ApplicationConstants.DS_MESSAGE_FAIL_LOGIN, ApplicationConstants.TITLE_MESSAGE_FAIL_LOGIN, JOptionPane.ERROR_MESSAGE);
-//                    return false;
-//                }else{
-//                  return true;
-//                }
-//            }else{
-//                return false;
-//            }
     }
     
      public static void isEmail(String email) throws MessagingException{ //validar correo electronico

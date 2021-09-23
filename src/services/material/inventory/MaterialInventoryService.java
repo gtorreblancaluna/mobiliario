@@ -41,6 +41,40 @@ public class MaterialInventoryService {
         }
     }
     
+    public void save (MeasurementUnit measurementUnit) throws BusinessException {
+        try {
+            measurementUnit.setDescription(measurementUnit.getDescription().trim().toUpperCase());
+            materialInventoryDAO.save(measurementUnit);
+        } catch (DataOriginException e) {
+            throw new BusinessException(e.getMessage(),e);
+        }
+    }
+    
+    public void delete (MeasurementUnit measurementUnit) throws BusinessException {
+        try {
+            materialInventoryDAO.delete(measurementUnit);
+        } catch (DataOriginException e) {
+            throw new BusinessException(e.getMessage(),e);
+        }
+    }
+    
+    public void save (MaterialArea materialArea) throws BusinessException {
+        try {
+            materialArea.setDescription(materialArea.getDescription().trim().toUpperCase());
+            materialInventoryDAO.save(materialArea);
+        } catch (DataOriginException e) {
+            throw new BusinessException(e.getMessage(),e);
+        }
+    }
+    
+    public void delete (MaterialArea materialArea) throws BusinessException {
+        try {
+            materialInventoryDAO.delete(materialArea);
+        } catch (DataOriginException e) {
+            throw new BusinessException(e.getMessage(),e);
+        }
+    }
+    
     public List<MeasurementUnit> getMeasurementUnits () throws BusinessException {
         try {
             return materialInventoryDAO.getMeasurementUnits();

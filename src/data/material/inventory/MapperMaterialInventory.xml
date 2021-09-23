@@ -8,36 +8,34 @@
     <resultMap id="resultMapMapperMaterialInventory" type="model.material.inventory.MaterialInventory">        
         <result property="id" column="id"/>
         <result property="stock" column="stock"/>
-        <result property="unitMeasurement" column="unit_measurement"/>
         <result property="description" column="description"/>
         <result property="purchaseAmount" column="purchase_amount"/>
-        <result property="unitPurchase" column="unit_purchase"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
         
         <!-- material area -->
         <result property="area.id" column="area_id"/>
-        <result property="area.description" column="area_descripcion"/>  
+        <result property="area.description" column="area_description"/>  
         
         <!-- unidad de medida -->
         <result property="measurementUnit.id" column="measurement_unit_id"/>
-        <result property="measurementUnit.description" column="measurement_unit_descripcion"/>    
+        <result property="measurementUnit.description" column="measurement_unit_description"/>    
         
         <!-- unidad de medida compra -->
-        <result property="measurementUnitPurchase.description" column="measurement_unit_purchase_id"/>
-        <result property="measurementUnitPurchase.id" column="measurement_unit_purchase_description"/>                    
+        <result property="measurementUnitPurchase.id" column="measurement_unit_purchase_id"/>
+        <result property="measurementUnitPurchase.description" column="measurement_unit_purchase_description"/>                    
         
     </resultMap>
     
     <resultMap id="resultMapMeasurementUnit" type="model.material.inventory.MeasurementUnit">
-        <result property="id" column="measurement_unit_purchase_id"/>
+        <result property="id" column="id"/>
         <result property="description" column="description"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
     
     <resultMap id="resultMapMaterialArea" type="model.material.inventory.MaterialArea">
-        <result property="id" column="measurement_unit_purchase_id"/>
+        <result property="id" column="id"/>
         <result property="description" column="description"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
@@ -48,7 +46,7 @@
          a.id AS area_id,
          a.description AS area_description,
          mu.id AS measurement_unit_id,
-         mu.description AS measurement_unit_descripcion,
+         mu.description AS measurement_unit_description,
          mp.id AS measurement_unit_purchase_id,
          mp.description AS measurement_unit_purchase_description
         FROM material_inventory m
@@ -56,6 +54,8 @@
          INNER JOIN measurement_units mu ON (mu.id = m.measurement_unit_id)
          INNER JOIN measurement_units mp ON (mp.id = m.measurement_unit_purchase_id)
          WHERE m.fg_active = '1'
+         
+         ORDER BY m.description
     </select>
     
     <update id="updateMaterialInventory" parameterType="model.material.inventory.MaterialInventory">
@@ -95,12 +95,70 @@
         )
     </insert>
     
+    <update id="updateMeasurementUnit" parameterType="model.material.inventory.MeasurementUnit">
+        UPDATE measurement_units SET
+            description = #{description},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="updateMaterialArea" parameterType="model.material.inventory.MaterialArea">
+        UPDATE material_area SET
+            description = #{description},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="deleteMeasurementUnit" parameterType="model.material.inventory.MeasurementUnit">
+        UPDATE measurement_units SET
+            fg_active = '0',
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <insert id="insertMeasurementUnit" parameterType="model.material.inventory.MeasurementUnit">
+        INSERT INTO measurement_units
+        (
+            description,
+            created_at,
+            updated_at
+        )
+        VALUES
+        (
+            #{description},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
+    <update id="deleteMaterialArea" parameterType="model.material.inventory.MaterialArea">
+        UPDATE material_area SET
+            fg_active = '0',
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <insert id="insertMaterialArea" parameterType="model.material.inventory.MaterialArea">
+        INSERT INTO material_area
+        (
+            description,
+            created_at,
+            updated_at
+        )
+        VALUES
+        (
+            #{description},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
     <select id="getMeasurementUnits" resultMap="resultMapMeasurementUnit">
-       SELECT * FROM measurement_units
+       SELECT * FROM measurement_units WHERE fg_active = '1' ORDER BY description
     </select>
     
-    <select id="getMaterialAreaList" resultMap="resultMapMeasurementUnit">
-       SELECT * FROM material_inventory
+    <select id="getMaterialAreaList" resultMap="resultMapMaterialArea">
+       SELECT * FROM material_area WHERE fg_active = '1' ORDER BY description
     </select>
       
 </mapper>

@@ -1,18 +1,215 @@
 
 package forms.material.inventory;
 
+import exceptions.BusinessException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import mobiliario.ApplicationConstants;
+import model.material.inventory.MaterialArea;
+import model.material.inventory.MaterialInventory;
+import model.material.inventory.MeasurementUnit;
+import org.apache.log4j.Priority;
 import services.material.inventory.MaterialInventoryService;
 
 
 public class MaterialInventoryView extends javax.swing.JInternalFrame {
 
-    private MaterialInventoryService materialInventoryService;
+    private static MaterialInventoryService materialInventoryService;
+     private static org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(MaterialInventoryView.class.getName());
+    
+    private void showAddMeasurementUnit () {
+        UnitMeasurementDialogForm dialog = new UnitMeasurementDialogForm(null, true);
+        dialog.setVisible(true);
+        dialog.setLocationRelativeTo(this);
+    }
+    
+    private void showAddMaterialArea () {
+        MaterialAreaDialogForm dialog = new MaterialAreaDialogForm(null, true);
+        dialog.setVisible(true);
+        dialog.setLocationRelativeTo(this);
+    }
 
     public MaterialInventoryView() {
         initComponents();
         super.setTitle("Inventario de material");
         materialInventoryService = MaterialInventoryService.getInstance();
         this.setClosable(true);
+        this.btnUpdate.setEnabled(false);
+        loadComboBoxs();
+        formatTable();
+        getItems();
+    }
+    
+    private void cleanForm () {
+        txtStock.setText("");
+        txtDescription.setText("");
+        txtPurchaseAmount.setText("");
+        loadComboBoxs();
+    }
+    
+    private void save () {
+        
+        String errorMessage = "";
+        String description = txtDescription.getText();
+        String stock = txtStock.getText();
+        String purchaseAmount = txtPurchaseAmount.getText();
+        MeasurementUnit measurementUnit = (MeasurementUnit) cmbMeasurementUnit.getSelectedItem();
+        MeasurementUnit measurementUnitPurchase = (MeasurementUnit) cmbMeasurementUnit.getSelectedItem();
+        MaterialArea materialArea = (MaterialArea) cmbMaterialArea.getSelectedItem();
+        
+        if (description == null || description.isEmpty()) {
+            errorMessage += "Descripción es requerido\n";
+        }
+        if (stock == null || stock.isEmpty()) {
+            errorMessage += "Stock es requerdio\n";
+        }
+        if (purchaseAmount == null || purchaseAmount.isEmpty()) {
+            errorMessage += "Cantidad de compra es requerido\n";
+        }
+        if (measurementUnit == null || measurementUnit.getId() == 0) {
+            errorMessage += "Unidad de medida es requerido\n";
+        }
+        if (measurementUnitPurchase == null || measurementUnitPurchase.getId() == 0) {
+            errorMessage += "Unidad de medida para compra es requerido\n";
+        }
+        if (materialArea == null || materialArea.getId() == 0) {
+            errorMessage += "Área es requerido\n";
+        }
+        
+        if (!errorMessage.isEmpty()) {
+            JOptionPane.showMessageDialog(this, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        MaterialInventory materialInventory = new MaterialInventory();
+        materialInventory.setDescription(description);
+        materialInventory.setPurchaseAmount(new Float(purchaseAmount));
+        materialInventory.setStock(new Float(stock));
+        materialInventory.setMeasurementUnit(measurementUnit);
+        materialInventory.setMeasurementUnitPurchase(measurementUnitPurchase);
+        materialInventory.setArea(materialArea);
+        
+        try {
+            materialInventoryService.save(materialInventory);
+            cleanForm();
+            formatTable();
+            getItems();
+        } catch (Exception e) {
+            LOGGER.log(Priority.ERROR,e);
+            JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_UNEXPECTED_ERROR + "\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void getItems () {
+        try {
+            
+            Map<String, Object> filter = new HashMap<>();
+            
+            String description = txtDescription.getText();
+            MeasurementUnit measurementUnit = (MeasurementUnit) cmbMeasurementUnit.getSelectedItem();
+            MeasurementUnit measurementUnitPurchase = (MeasurementUnit) cmbMeasurementUnit.getSelectedItem();
+            MaterialArea materialArea = (MaterialArea) cmbMaterialArea.getSelectedItem();
+            
+            if (description != null && !description.isEmpty()) {
+                filter.put("description", description);
+            }
+            
+            if (measurementUnit != null && measurementUnit.getId() != 0) {
+                filter.put("measurementUnitId", measurementUnit.getId());
+            }
+            
+            if (measurementUnitPurchase != null && measurementUnitPurchase.getId() != 0) {
+                filter.put("measurementUnitPurchaseId", measurementUnitPurchase.getId());
+            }
+            
+            if (materialArea != null && materialArea.getId() != 0) {
+                filter.put("materialAreaId", materialArea.getId());
+            }
+            
+            List<MaterialInventory> results = materialInventoryService.get(filter);
+            
+            for(MaterialInventory materialInventory : results){
+                DefaultTableModel temp = (DefaultTableModel) table.getModel();
+                Object row[] = {
+                    materialInventory.getId(),
+                    materialInventory.getStock(),
+                    materialInventory.getMeasurementUnit().getDescription(),
+                    materialInventory.getDescription(),
+                    materialInventory.getArea().getDescription(),
+                    materialInventory.getPurchaseAmount(),
+                    materialInventory.getMeasurementUnitPurchase().getDescription(),
+                    materialInventory.getCreatedAt(),
+                    materialInventory.getUpdatedAt()
+                };
+                temp.addRow(row); 
+            }
+            
+        } catch (Exception e) {
+            LOGGER.log(Priority.ERROR,e);
+            JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_UNEXPECTED_ERROR + "\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void formatTable () {
+        Object[][] data = {{"", "", "","","","","","",""}};
+        String[] columnNames = {"id", "Stock", "U. Medida","Descripción","Área","Cant Compra","U. Medida Compra","Creado","Actualizado"};
+        DefaultTableModel TableModel = new DefaultTableModel(data, columnNames);
+        table.setModel(TableModel);
+
+        int[] anchos = {20,80,120,300,120,80,120,120,120};
+
+        for (int inn = 0; inn < table.getColumnCount(); inn++) {
+            table.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
+        }
+
+        try {
+            DefaultTableModel temp = (DefaultTableModel) table.getModel();
+            temp.removeRow(temp.getRowCount() - 1);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            ;
+        }
+
+        table.getColumnModel().getColumn(0).setMaxWidth(0);
+        table.getColumnModel().getColumn(0).setMinWidth(0);
+        table.getColumnModel().getColumn(0).setPreferredWidth(0);
+    }
+    
+    public static void loadComboBoxs() {
+        cmbMaterialArea.removeAllItems();
+        cmbMeasurementUnit.removeAllItems();
+        cmbMeasurementPurchaseUnit.removeAllItems();
+        try {
+            List<MaterialArea> materialAreas = materialInventoryService.getMaterialAreas();
+                cmbMaterialArea.addItem(
+                        new MaterialArea(0l, ApplicationConstants.CMB_SELECCIONE)
+                );
+            for (MaterialArea area : materialAreas) {
+                cmbMaterialArea.addItem(area);
+            }
+            
+        } catch (BusinessException e) {
+            
+        }
+        
+        try {
+            List<MeasurementUnit> measurementUnits = materialInventoryService.getMeasurementUnits();
+                cmbMeasurementUnit.addItem(
+                        new MeasurementUnit(0l, ApplicationConstants.CMB_SELECCIONE)
+                );
+                cmbMeasurementPurchaseUnit.addItem(
+                        new MeasurementUnit(0l, ApplicationConstants.CMB_SELECCIONE)
+                );
+            for (MeasurementUnit measurementUnit : measurementUnits) {
+                cmbMeasurementUnit.addItem(measurementUnit);
+                cmbMeasurementPurchaseUnit.addItem(measurementUnit);
+            }
+        } catch (BusinessException e) {
+            
+        }
+        
     }
 
     /**
@@ -36,14 +233,18 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         jLabel5 = new javax.swing.JLabel();
         txtPurchaseAmount = new javax.swing.JTextField();
         cmbMeasurementPurchaseUnit = new javax.swing.JComboBox<>();
-        jLabel6 = new javax.swing.JLabel();
         btnAdd = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         btnUpdate = new javax.swing.JButton();
+        lblAddMeasurementUnit2 = new javax.swing.JLabel();
+        lblAddMeasurementUnit = new javax.swing.JLabel();
+        lblAddMeasurementUnit3 = new javax.swing.JLabel();
+        btnSearch = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        table = new javax.swing.JTable();
+        lblInfo = new javax.swing.JLabel();
 
         jLabel1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel1.setText("Stock");
@@ -54,7 +255,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         jLabel2.setText("Unidad de medida");
 
         cmbMeasurementUnit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmbMeasurementUnit.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbMeasurementUnit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         jLabel3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel3.setText("Descripción");
@@ -65,28 +266,33 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         jLabel4.setText("Área");
 
         cmbMaterialArea.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmbMaterialArea.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbMaterialArea.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         jLabel5.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel5.setText("Cantidad de compra");
+        jLabel5.setText("Cantidad y unidad de medida para compra");
         jLabel5.setToolTipText("Cantidad en unidad de medida que será igual a una unidad de medida de compra");
 
         txtPurchaseAmount.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
 
         cmbMeasurementPurchaseUnit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmbMeasurementPurchaseUnit.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jLabel6.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel6.setText("Unidad de medida para comprar");
+        cmbMeasurementPurchaseUnit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         btnAdd.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnAdd.setText("Agregar");
+        btnAdd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
 
         btnEdit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnEdit.setText("Editar");
+        btnEdit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         btnDelete.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnDelete.setText("Eliminar");
+        btnDelete.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDeleteActionPerformed(evt);
@@ -95,9 +301,58 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
 
         btnUpdate.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnUpdate.setText("Actualizar");
+        btnUpdate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnUpdateActionPerformed(evt);
+            }
+        });
+
+        lblAddMeasurementUnit2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Add-icon.png"))); // NOI18N
+        lblAddMeasurementUnit2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblAddMeasurementUnit2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblAddMeasurementUnit2MouseClicked(evt);
+            }
+        });
+        lblAddMeasurementUnit2.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                lblAddMeasurementUnit2KeyPressed(evt);
+            }
+        });
+
+        lblAddMeasurementUnit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Add-icon.png"))); // NOI18N
+        lblAddMeasurementUnit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblAddMeasurementUnit.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblAddMeasurementUnitMouseClicked(evt);
+            }
+        });
+        lblAddMeasurementUnit.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                lblAddMeasurementUnitKeyPressed(evt);
+            }
+        });
+
+        lblAddMeasurementUnit3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Add-icon.png"))); // NOI18N
+        lblAddMeasurementUnit3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblAddMeasurementUnit3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblAddMeasurementUnit3MouseClicked(evt);
+            }
+        });
+        lblAddMeasurementUnit3.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                lblAddMeasurementUnit3KeyPressed(evt);
+            }
+        });
+
+        btnSearch.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnSearch.setText("Buscar");
+        btnSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
             }
         });
 
@@ -108,52 +363,67 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(txtPurchaseAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cmbMeasurementPurchaseUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnSearch))
+                            .addComponent(jLabel5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnAdd)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnEdit)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnDelete)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnUpdate)
+                        .addContainerGap())
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtStock, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1))
-                        .addGap(8, 8, 8)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmbMeasurementUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(lblAddMeasurementUnit))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtStock, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel1))
+                                .addGap(8, 8, 8)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cmbMeasurementUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel2)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(lblAddMeasurementUnit2)))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel3))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cmbMaterialArea, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtPurchaseAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(56, 56, 56))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(cmbMaterialArea, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 76, Short.MAX_VALUE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(cmbMeasurementPurchaseUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(162, 162, 162)
-                                .addComponent(btnAdd)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnEdit)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnDelete)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnUpdate))
-                            .addComponent(jLabel6))))
-                .addGap(0, 71, Short.MAX_VALUE))
+                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblAddMeasurementUnit3)
+                                .addGap(84, 84, 84))))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4))
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel1)
+                        .addComponent(jLabel2)
+                        .addComponent(jLabel3)
+                        .addComponent(jLabel4))
+                    .addComponent(lblAddMeasurementUnit2)
+                    .addComponent(lblAddMeasurementUnit3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtStock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -161,9 +431,9 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
                     .addComponent(txtDescription, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cmbMaterialArea, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5)
-                    .addComponent(jLabel6))
+                    .addComponent(lblAddMeasurementUnit))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtPurchaseAmount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -171,12 +441,13 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
                     .addComponent(btnAdd)
                     .addComponent(btnEdit)
                     .addComponent(btnDelete)
-                    .addComponent(btnUpdate))
-                .addGap(0, 12, Short.MAX_VALUE))
+                    .addComponent(btnUpdate)
+                    .addComponent(btnSearch))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
-        jTable1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        table.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -187,7 +458,9 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(table);
+
+        lblInfo.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -195,15 +468,21 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 809, Short.MAX_VALUE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 670, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(lblInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 15, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -222,9 +501,9 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -238,25 +517,63 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnUpdateActionPerformed
 
+    private void lblAddMeasurementUnit2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblAddMeasurementUnit2MouseClicked
+        // TODO add your handling code here:
+        showAddMeasurementUnit();
+    }//GEN-LAST:event_lblAddMeasurementUnit2MouseClicked
+
+    private void lblAddMeasurementUnit2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lblAddMeasurementUnit2KeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblAddMeasurementUnit2KeyPressed
+
+    private void lblAddMeasurementUnitMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblAddMeasurementUnitMouseClicked
+        // TODO add your handling code here:
+        showAddMeasurementUnit();
+    }//GEN-LAST:event_lblAddMeasurementUnitMouseClicked
+
+    private void lblAddMeasurementUnitKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lblAddMeasurementUnitKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblAddMeasurementUnitKeyPressed
+
+    private void lblAddMeasurementUnit3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblAddMeasurementUnit3MouseClicked
+        showAddMaterialArea();
+    }//GEN-LAST:event_lblAddMeasurementUnit3MouseClicked
+
+    private void lblAddMeasurementUnit3KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lblAddMeasurementUnit3KeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblAddMeasurementUnit3KeyPressed
+
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        getItems();
+    }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        save();
+    }//GEN-LAST:event_btnAddActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnUpdate;
-    private javax.swing.JComboBox<String> cmbMaterialArea;
-    private javax.swing.JComboBox<String> cmbMeasurementPurchaseUnit;
-    private javax.swing.JComboBox<String> cmbMeasurementUnit;
+    public static javax.swing.JComboBox<MaterialArea> cmbMaterialArea;
+    public static javax.swing.JComboBox<MeasurementUnit> cmbMeasurementPurchaseUnit;
+    public static javax.swing.JComboBox<MeasurementUnit> cmbMeasurementUnit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JLabel lblAddMeasurementUnit;
+    private javax.swing.JLabel lblAddMeasurementUnit2;
+    private javax.swing.JLabel lblAddMeasurementUnit3;
+    private javax.swing.JLabel lblInfo;
+    private javax.swing.JTable table;
     private javax.swing.JTextField txtDescription;
     private javax.swing.JTextField txtPurchaseAmount;
     private javax.swing.JTextField txtStock;

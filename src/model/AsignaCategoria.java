@@ -1,7 +1,6 @@
 package model;
 
 import java.sql.Timestamp;
-import mobiliario.Categoria;
 
 public class AsignaCategoria {
     

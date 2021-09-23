@@ -235,7 +235,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         cmbSubCategoria = new javax.swing.JComboBox();
-        cmbCategoria = new javax.swing.JComboBox();
+        cmbCategoria = new javax.swing.JComboBox<>();
         txtComentario = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         btnRegistrar = new javax.swing.JButton();
@@ -293,7 +293,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         jPanel1.add(cmbSubCategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 40, 166, 20));
 
         cmbCategoria.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmbCategoria.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         cmbCategoria.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         cmbCategoria.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -1013,7 +1013,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnExportExcel;
     private javax.swing.JButton btnRegistrar;
-    public static javax.swing.JComboBox cmbCategoria;
+    public static javax.swing.JComboBox<String> cmbCategoria;
     public static javax.swing.JComboBox cmbCuenta;
     private javax.swing.JComboBox cmbSubCategoria;
     private javax.swing.JLabel jLabel1;

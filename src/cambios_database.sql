@@ -258,6 +258,6 @@ INSERT INTO tipo_evento (descripcion) VALUES ('Compra');
 
 INSERT INTO material_area (description) VALUES ('Carpinteria');
 INSERT INTO material_area (description) VALUES ('Herrería');
-INSERT INTO measurement_units (description) VALUES ('Metro');
-INSERT INTO measurement_units (description) VALUES ('Kilo');
-INSERT INTO measurement_units (description) VALUES ('Tramo');
+INSERT INTO measurement_units (description) VALUES ('METRO');
+INSERT INTO measurement_units (description) VALUES ('KILO');
+INSERT INTO measurement_units (description) VALUES ('TRAMO');

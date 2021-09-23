@@ -1,18 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model.providers;
 
 import java.sql.Timestamp;
 import model.TipoAbono;
 import model.Usuario;
 
-/**
- *
- * @author gerardo torreblanca
- */
 public class PagosProveedor {
     
     private Long id;

@@ -37,6 +37,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         <mapper resource="data/providers/MapperOrdenProveedor.xml"/>
         <mapper resource="data/providers/MapperDetalleOrdenProveedor.xml"/>
         <mapper resource="data/providers/MapperPagosProveedor.xml"/>
+        <mapper resource="data/material/inventory/MapperMaterialInventory.xml"/>
         
     </mappers>
     

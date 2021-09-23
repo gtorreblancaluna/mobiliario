@@ -1,15 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package forms.tipo.abonos.cuentas;
 
 import clases.conectate;
 import java.util.List;
 import javax.swing.JOptionPane;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import mobiliario.ApplicationConstants;
 import mobiliario.agregar_renta;
@@ -18,10 +11,6 @@ import model.TipoAbono;
 import services.TipoAbonosService;
 import services.AccountService;
 
-/**
- *
- * @author Carlos Alberto
- */
 public class TiposAbonosForm extends java.awt.Dialog {
 
     
