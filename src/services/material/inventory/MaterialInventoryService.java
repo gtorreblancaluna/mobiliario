@@ -25,6 +25,14 @@ public class MaterialInventoryService {
     
     private final MaterialInventoryDAO materialInventoryDAO = MaterialInventoryDAO.getInstance();
     
+    public MaterialInventory getById (Long id) throws BusinessException {
+        try {
+            return materialInventoryDAO.getById(id);
+        } catch (DataOriginException e) {
+            throw new BusinessException(e.getMessage(),e);
+        }
+    }
+    
     public List<MaterialInventory> get (Map<String,Object> filter) throws BusinessException{
         try {
             return materialInventoryDAO.get(filter);
@@ -53,6 +61,14 @@ public class MaterialInventoryService {
     public void delete (MeasurementUnit measurementUnit) throws BusinessException {
         try {
             materialInventoryDAO.delete(measurementUnit);
+        } catch (DataOriginException e) {
+            throw new BusinessException(e.getMessage(),e);
+        }
+    }
+    
+    public void delete (MaterialInventory materialInventory) throws BusinessException {
+        try {
+            materialInventoryDAO.delete(materialInventory);
         } catch (DataOriginException e) {
             throw new BusinessException(e.getMessage(),e);
         }

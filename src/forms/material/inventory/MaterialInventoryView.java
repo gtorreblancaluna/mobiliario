@@ -12,13 +12,69 @@ import model.material.inventory.MaterialArea;
 import model.material.inventory.MaterialInventory;
 import model.material.inventory.MeasurementUnit;
 import org.apache.log4j.Priority;
+import services.SystemService;
 import services.material.inventory.MaterialInventoryService;
 
 
 public class MaterialInventoryView extends javax.swing.JInternalFrame {
 
     private static MaterialInventoryService materialInventoryService;
-     private static org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(MaterialInventoryView.class.getName());
+    private final SystemService systemService = SystemService.getInstance();
+    private static org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(MaterialInventoryView.class.getName());
+    private String idToUpdate = "";
+    
+    private void delete () {
+        if (table.getSelectedRow() != -1) {
+            int opcion = JOptionPane.showConfirmDialog(this, "¿Deseas eliminar la unidad de medida "+ table.getValueAt(table.getSelectedRow(), 1) +"?", "Eliminar", JOptionPane.YES_NO_OPTION);
+            if (opcion == JOptionPane.YES_OPTION) {
+                String id = table.getValueAt(table.getSelectedRow(), 0).toString();
+                try {
+                    MaterialInventory materialInventory = new MaterialInventory();
+                    materialInventory.setId(new Long(id));
+                    materialInventoryService.delete(materialInventory);
+                    MaterialInventoryView.loadComboBoxs();
+                    formatTable();
+                    getItems();
+                } catch (Exception e) {
+                    LOGGER.log(Priority.ERROR,e);
+                    JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_UNEXPECTED_ERROR + "\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Selecciona una fila para editar", "Error", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+     
+    private void edit () {
+        if (table.getSelectedRow() != -1) {
+            
+            btnUpdate.setEnabled(true);
+            btnAdd.setEnabled(false);
+            
+            final String id = table.getValueAt(table.getSelectedRow(), 0).toString();
+            try {
+                MaterialInventory materialInventory = materialInventoryService.getById(new Long(id));
+                
+                if (materialInventory == null) {
+                    throw new Exception("No data found");
+                }
+                
+                txtStock.setText(materialInventory.getStock().toString());
+                txtPurchaseAmount.setText(materialInventory.getPurchaseAmount().toString());
+                txtDescription.setText(materialInventory.getDescription());
+                cmbMeasurementUnit.getModel().setSelectedItem(materialInventory.getMeasurementUnit());
+                cmbMeasurementPurchaseUnit.getModel().setSelectedItem(materialInventory.getMeasurementUnitPurchase());
+                cmbMaterialArea.getModel().setSelectedItem(materialInventory.getArea());         
+                idToUpdate = id;
+            } catch (Exception e) {
+                LOGGER.log(Priority.ERROR,e);
+                JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_UNEXPECTED_ERROR + "\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Selecciona una fila para editar", "Error", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
     
     private void showAddMeasurementUnit () {
         UnitMeasurementDialogForm dialog = new UnitMeasurementDialogForm(null, true);
@@ -93,6 +149,9 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         materialInventory.setArea(materialArea);
         
         try {
+            if (!idToUpdate.isEmpty()) {
+                materialInventory.setId(new Long(idToUpdate));
+            }
             materialInventoryService.save(materialInventory);
             cleanForm();
             formatTable();
@@ -100,6 +159,9 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         } catch (Exception e) {
             LOGGER.log(Priority.ERROR,e);
             JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_UNEXPECTED_ERROR + "\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            btnUpdate.setEnabled(false);
+            idToUpdate = "";
         }
     }
     
@@ -241,6 +303,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         lblAddMeasurementUnit = new javax.swing.JLabel();
         lblAddMeasurementUnit3 = new javax.swing.JLabel();
         btnSearch = new javax.swing.JButton();
+        btnPDF = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
@@ -289,6 +352,11 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         btnEdit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnEdit.setText("Editar");
         btnEdit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
+            }
+        });
 
         btnDelete.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnDelete.setText("Eliminar");
@@ -356,6 +424,15 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
             }
         });
 
+        btnPDF.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnPDF.setText("Exportar PDF");
+        btnPDF.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnPDF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPDFActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -370,6 +447,8 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(cmbMeasurementPurchaseUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnPDF)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnSearch))
                             .addComponent(jLabel5))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -442,7 +521,8 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
                     .addComponent(btnEdit)
                     .addComponent(btnDelete)
                     .addComponent(btnUpdate)
-                    .addComponent(btnSearch))
+                    .addComponent(btnSearch)
+                    .addComponent(btnPDF))
                 .addContainerGap(18, Short.MAX_VALUE))
         );
 
@@ -510,11 +590,11 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-        // TODO add your handling code here:
+        delete();
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
-        // TODO add your handling code here:
+        save();
     }//GEN-LAST:event_btnUpdateActionPerformed
 
     private void lblAddMeasurementUnit2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblAddMeasurementUnit2MouseClicked
@@ -544,6 +624,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_lblAddMeasurementUnit3KeyPressed
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        formatTable();
         getItems();
     }//GEN-LAST:event_btnSearchActionPerformed
 
@@ -551,11 +632,20 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         save();
     }//GEN-LAST:event_btnAddActionPerformed
 
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+        edit();
+    }//GEN-LAST:event_btnEditActionPerformed
+
+    private void btnPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPDFActionPerformed
+        systemService.exportarExcel(table);
+    }//GEN-LAST:event_btnPDFActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnPDF;
     private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnUpdate;
     public static javax.swing.JComboBox<MaterialArea> cmbMaterialArea;

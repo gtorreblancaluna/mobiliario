@@ -29,6 +29,22 @@ public class MaterialInventoryDAO {
         return SINGLE_INSTANCE;
     }
     
+    public MaterialInventory getById (Long id) throws DataOriginException{
+        MaterialInventory materialInventory;
+        SqlSession session = sqlSessionFactory.openSession();
+        
+        try{
+            materialInventory = (MaterialInventory) session.selectOne("MapperMaterialInventory.getByIdMaterialInventory",id);
+         }catch(Exception e){
+            log.error(e);
+            throw new DataOriginException(e.getMessage(),e.getCause());
+        } finally {
+            session.close();
+        }
+        
+        return materialInventory;
+    }
+    
     public List<MaterialInventory> get(Map<String,Object> filter) throws DataOriginException{
         List<MaterialInventory> list = null;
         SqlSession session = sqlSessionFactory.openSession();
@@ -107,6 +123,20 @@ public class MaterialInventoryDAO {
         try{
             measurementUnit.setUpdatedAt(new Date());
             session.update("MapperMaterialInventory.deleteMeasurementUnit",measurementUnit);     
+            session.commit();
+         }catch(Exception ex){
+            log.error(ex);
+            throw new DataOriginException(ex.getMessage(),ex.getCause());
+        } finally {
+            session.close();
+        }
+    }
+    
+    public void delete (MaterialInventory materialInventory) throws DataOriginException {
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+            materialInventory.setUpdatedAt(new Date());
+            session.update("MapperMaterialInventory.deleteMaterialInventory",materialInventory);     
             session.commit();
          }catch(Exception ex){
             log.error(ex);

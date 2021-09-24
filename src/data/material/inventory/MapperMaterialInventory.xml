@@ -40,6 +40,21 @@
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
+    
+    <select id="getByIdMaterialInventory" resultMap="resultMapMapperMaterialInventory" parameterType="java.lang.Long">
+        SELECT m.*,
+         a.id AS area_id,
+         a.description AS area_description,
+         mu.id AS measurement_unit_id,
+         mu.description AS measurement_unit_description,
+         mp.id AS measurement_unit_purchase_id,
+         mp.description AS measurement_unit_purchase_description
+        FROM material_inventory m
+         INNER JOIN material_area a ON (a.id = m.material_area_id)
+         INNER JOIN measurement_units mu ON (mu.id = m.measurement_unit_id)
+         INNER JOIN measurement_units mp ON (mp.id = m.measurement_unit_purchase_id)
+         WHERE m.id = #{id}
+    </select>
      
      <select id="getAllMaterialInventory" resultMap="resultMapMapperMaterialInventory" parameterType="java.util.Map">
         SELECT m.*,
@@ -54,7 +69,18 @@
          INNER JOIN measurement_units mu ON (mu.id = m.measurement_unit_id)
          INNER JOIN measurement_units mp ON (mp.id = m.measurement_unit_purchase_id)
          WHERE m.fg_active = '1'
-         
+        <if test="measurementUnitId != null and measurementUnitId != '' ">
+            AND m.measurement_unit_id = #{measurementUnitId}
+        </if> 
+        <if test="measurementUnitPurchaseId != null and measurementUnitPurchaseId != '' ">
+            AND m.measurement_unit_purchase_id = #{measurementUnitPurchaseId}
+        </if> 
+        <if test="description != null and description != '' ">
+            AND m.description LIKE CONCAT('%',#{description},'%')
+        </if>  
+        <if test="materialAreaId != null and materialAreaId != null ">
+            AND m.material_area_id = #{materialAreaId}
+        </if>         
          ORDER BY m.description
     </select>
     
@@ -62,8 +88,8 @@
         UPDATE material_inventory SET
             material_area_id = #{area.id},
             stock = #{stock},
-            unit_measurement_id = #{measurementUnit.id},
-            unit_measurement_purchase_id = #{measurementUnitPurchase.id},
+            measurement_unit_id = #{measurementUnit.id},
+            measurement_unit_purchase_id = #{measurementUnitPurchase.id},
             description = #{description},
             purchase_amount = #{purchaseAmount},
             updated_at = #{updatedAt}
@@ -111,6 +137,13 @@
     
     <update id="deleteMeasurementUnit" parameterType="model.material.inventory.MeasurementUnit">
         UPDATE measurement_units SET
+            fg_active = '0',
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="deleteMaterialInventory" parameterType="model.material.inventory.MaterialInventory">
+        UPDATE material_inventory SET
             fg_active = '0',
             updated_at = #{updatedAt}
         WHERE id = #{id}
