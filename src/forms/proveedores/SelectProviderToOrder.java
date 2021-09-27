@@ -1,12 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package forms.proveedores;
-
-
 import exceptions.BusinessException;
+import forms.material.inventory.MaterialSaleItemsView;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
@@ -17,23 +11,19 @@ import javax.swing.table.TableRowSorter;
 import model.providers.Proveedor;
 import services.providers.ProvidersService;
 
-/**
- *
- * @author Gerardo Torreblanca
- */
 public class SelectProviderToOrder extends javax.swing.JDialog {
 
-    /**
-     * Creates new form SelectProviderToOrder
-     */
+    private String INVOKED_FROM = "";
     
     private final ProvidersService providersService = ProvidersService.getInstance();
     
-    public SelectProviderToOrder(java.awt.Frame parent, boolean modal) {
+    public SelectProviderToOrder(java.awt.Frame parent, boolean modal, String invokedFrom) {
         super(parent, modal);
         initComponents();
         this.setTitle("Seleccionar proveedor");
+        INVOKED_FROM = invokedFrom;
         fillTable();
+        txtSearchProvider.requestFocus();
     }
     
     public void fillTableSearch(String data){
@@ -62,8 +52,6 @@ public class SelectProviderToOrder extends javax.swing.JDialog {
             };         
             tabla.addRow(fila);
         } // end for
-    
-    
     }
     
         
@@ -238,8 +226,19 @@ public class SelectProviderToOrder extends javax.swing.JDialog {
            String id = tableProviders.getValueAt(this.tableProviders.getSelectedRow(), 0).toString();
            String name = tableProviders.getValueAt(this.tableProviders.getSelectedRow(), 1).toString();
            String lastName = tableProviders.getValueAt(this.tableProviders.getSelectedRow(), 2).toString();
-           OrderProviderForm.g_provider_id = new Long(id);
-           OrderProviderForm.txtProviderName.setText(name + " " + lastName);
+           
+           switch (INVOKED_FROM) {
+               case "MATERIAL_SALE_ITEMS":
+                   MaterialSaleItemsView.gProviderId = id;
+                   MaterialSaleItemsView.txtProvider.setText(name + " " + lastName);
+                   MaterialSaleItemsView.txtAmount.requestFocus();
+                   break;
+               case "ORDER_PROVIDER":
+                    OrderProviderForm.g_provider_id = new Long(id);
+                    OrderProviderForm.txtProviderName.setText(name + " " + lastName);
+                   break;
+           }
+          
            this.dispose();
 
         }
@@ -290,7 +289,7 @@ public class SelectProviderToOrder extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                SelectProviderToOrder dialog = new SelectProviderToOrder(new javax.swing.JFrame(), true);
+                SelectProviderToOrder dialog = new SelectProviderToOrder(new javax.swing.JFrame(), true, "");
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

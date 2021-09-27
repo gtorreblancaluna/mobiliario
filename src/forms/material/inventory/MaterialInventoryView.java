@@ -19,9 +19,20 @@ import services.material.inventory.MaterialInventoryService;
 public class MaterialInventoryView extends javax.swing.JInternalFrame {
 
     private static MaterialInventoryService materialInventoryService;
-    private final SystemService systemService = SystemService.getInstance();
+    private final SystemService systemService;
     private static org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(MaterialInventoryView.class.getName());
     private String idToUpdate = "";
+    
+    public MaterialInventoryView() {
+        initComponents();
+        super.setTitle("Inventario de material");
+        materialInventoryService = MaterialInventoryService.getInstance();
+        systemService = SystemService.getInstance();
+        this.setClosable(true);
+        this.btnUpdate.setEnabled(false);
+        loadComboBoxs();
+        getItems();
+    }
     
     private void delete () {
         if (table.getSelectedRow() != -1) {
@@ -33,7 +44,6 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
                     materialInventory.setId(new Long(id));
                     materialInventoryService.delete(materialInventory);
                     MaterialInventoryView.loadComboBoxs();
-                    formatTable();
                     getItems();
                 } catch (Exception e) {
                     LOGGER.log(Priority.ERROR,e);
@@ -78,25 +88,16 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
     
     private void showAddMeasurementUnit () {
         UnitMeasurementDialogForm dialog = new UnitMeasurementDialogForm(null, true);
-        dialog.setVisible(true);
         dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+        
     }
     
     private void showAddMaterialArea () {
         MaterialAreaDialogForm dialog = new MaterialAreaDialogForm(null, true);
-        dialog.setVisible(true);
         dialog.setLocationRelativeTo(this);
-    }
-
-    public MaterialInventoryView() {
-        initComponents();
-        super.setTitle("Inventario de material");
-        materialInventoryService = MaterialInventoryService.getInstance();
-        this.setClosable(true);
-        this.btnUpdate.setEnabled(false);
-        loadComboBoxs();
-        formatTable();
-        getItems();
+        dialog.setVisible(true);
+        
     }
     
     private void cleanForm () {
@@ -113,7 +114,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         String stock = txtStock.getText();
         String purchaseAmount = txtPurchaseAmount.getText();
         MeasurementUnit measurementUnit = (MeasurementUnit) cmbMeasurementUnit.getSelectedItem();
-        MeasurementUnit measurementUnitPurchase = (MeasurementUnit) cmbMeasurementUnit.getSelectedItem();
+        MeasurementUnit measurementUnitPurchase = (MeasurementUnit) cmbMeasurementPurchaseUnit.getSelectedItem();
         MaterialArea materialArea = (MaterialArea) cmbMaterialArea.getSelectedItem();
         
         if (description == null || description.isEmpty()) {
@@ -154,8 +155,8 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
             }
             materialInventoryService.save(materialInventory);
             cleanForm();
-            formatTable();
             getItems();
+            
         } catch (Exception e) {
             LOGGER.log(Priority.ERROR,e);
             JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_UNEXPECTED_ERROR + "\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
@@ -166,6 +167,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
     }
     
     private void getItems () {
+        formatTable();
         try {
             
             Map<String, Object> filter = new HashMap<>();
@@ -624,7 +626,6 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_lblAddMeasurementUnit3KeyPressed
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        formatTable();
         getItems();
     }//GEN-LAST:event_btnSearchActionPerformed
 

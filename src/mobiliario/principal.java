@@ -11,7 +11,6 @@ import forms.proveedores.OrderProviderForm;
 import forms.proveedores.ViewOrdersProviders;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,8 +38,6 @@ public class principal extends javax.swing.JFrame {
     consultar_abonos ventana_abonos;
     agregar_renta ventana_agregar_renta;
     consultar_renta v_consultar_renta;
-//    sqlclass funcion = new sqlclass();
-//    sqlclass general = new sqlclass();
     Object[][] dtconduc, datos_cliente;
     Object[] datos_combo;
     String sql = "", fecha_sistema = "";
@@ -56,7 +53,7 @@ public class principal extends javax.swing.JFrame {
         
 //        funcion.conectate(); 
             initComponents();
-            fecha_sistema();
+            Utility.getSystemDate("/");
 //            Image icon = Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png"));
 //            setIconImage(icon);
             this.setExtendedState(this.MAXIMIZED_BOTH);
@@ -105,156 +102,6 @@ public class principal extends javax.swing.JFrame {
 //        }
     }
 
-    public void fecha_sistema() {
-        Calendar fecha = Calendar.getInstance();
-        String mes = Integer.toString(fecha.get(Calendar.MONTH) + 1);
-        String dia = Integer.toString(fecha.get(Calendar.DATE));
-        String auxMes = null, auxDia = null;
-
-        if (mes.length() == 1) {
-            auxMes = "0" + mes;
-            fecha_sistema = fecha.get(Calendar.DATE) + "/" + auxMes + "/" + fecha.get(Calendar.YEAR);
-
-            if (dia.length() == 1) {
-                auxDia = "0" + dia;
-                fecha_sistema = auxDia + "/" + auxMes + "/" + fecha.get(Calendar.YEAR);
-
-            }
-
-        } else {
-            fecha_sistema = fecha.get(Calendar.DATE) + "/" + (fecha.get(Calendar.MONTH) + 1) + "/" + fecha.get(Calendar.YEAR);
-        }
-    }
-
-    public String dia_semana(String fecha) {
-        //String fecha1[];  
-        String[] fecha1 = fecha.split("/");
-
-        if (fecha1.length != 3) {
-            return null;
-        }
-        //Vector para calcular día de la semana de un año regular.  
-        int[] regular = {0, 3, 3, 6, 1, 4, 6, 2, 5, 0, 3, 5};
-        //Vector para calcular día de la semana de un año bisiesto.  
-        int[] bisiesto = {0, 3, 4, 0, 2, 5, 0, 3, 6, 1, 4, 6};
-        //Vector para hacer la traducción de resultado en día de la semana.  
-        String[] semana = {"Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"};
-        String[] meses = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
-        //Día especificado en la fecha recibida por parametro.  
-        int d = Integer.parseInt(fecha1[0]);
-        //Módulo acumulado del mes especificado en la fecha recibida por parametro.  
-        int m = Integer.parseInt(fecha1[1]) - 1;
-        //Año especificado por la fecha recibida por parametros.  
-        int a = Integer.parseInt(fecha1[2]);
-        //Comparación para saber si el año recibido es bisiesto.  
-        int dia = (int) d;
-        int mes = (int) m;
-        int anno = (int) a;
-
-        if ((anno % 4 == 0) && !(anno % 100 == 0 && anno % 400 != 0)) {
-            mes = bisiesto[mes];
-        } else {
-            mes = regular[mes];
-        }
-        //Se retorna el resultado del calculo del día de la semana. 
-        int dd = (int) Math.ceil(Math.ceil(Math.ceil((anno - 1) % 7) + Math.ceil((Math.floor((anno - 1) / 4) - Math.floor((3 * (Math.floor((anno - 1) / 100) + 1)) / 4)) % 7) + mes + dia % 7) % 7);
-
-        String DD = semana[dd].toString();
-        String MM = meses[m].toString();
-        String fechafinal = DD + " " + d + " de " + MM + " " + a;
-        return fechafinal;
-    }
-
-    /*public void tabla_consultar_renta() {   // funcion para llenar al abrir la ventana  
-     funcion.conectate();
-     tabla_prox_rentas.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-     String[] columNames = {"Id ", "Folio", "Cliente", "Estado", "Fecha Entrega", "Hora Entrega", "Descripcion", "Chofer"};
-     String[] colName = {"id_renta", "Folio", "cliente", "estado", "fecha_entrega", "hora_entrega", "descripcion", "Chofer"};
-     //nombre de columnas, tabla, instruccion sql        
-
-     dtconduc = funcion.GetTabla(colName, "renta", sql);
-
-     int filas = dtconduc.length;
-     String fecha, fecha2;
-
-     for (int i = 0; i < filas; i++) {
-     fecha = dtconduc[i][4].toString();
-     System.out.println("fecha" + " " + fecha);
-     fecha2 = dia_semana(fecha);
-     dtconduc[i][4] = fecha2;
-     }
-
-     DefaultTableModel datos = new DefaultTableModel(dtconduc, columNames);
-     tabla_prox_rentas.setModel(datos);
-
-     DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
-     centrar.setHorizontalAlignment(SwingConstants.CENTER);
-
-     int[] anchos = {60, 60, 250, 120, 250, 100, 400, 100};
-
-     for (int inn = 0; inn < tabla_prox_rentas.getColumnCount(); inn++) {
-     tabla_prox_rentas.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
-     }
-
-     tabla_prox_rentas.getColumnModel().getColumn(0).setMaxWidth(0);
-     tabla_prox_rentas.getColumnModel().getColumn(0).setMinWidth(0);
-     tabla_prox_rentas.getColumnModel().getColumn(0).setPreferredWidth(0);
-
-     tabla_prox_rentas.getColumnModel().getColumn(1).setCellRenderer(centrar);
-     tabla_prox_rentas.getColumnModel().getColumn(2).setCellRenderer(centrar);
-     tabla_prox_rentas.getColumnModel().getColumn(3).setCellRenderer(centrar);
-     tabla_prox_rentas.getColumnModel().getColumn(4).setCellRenderer(centrar);
-     tabla_prox_rentas.getColumnModel().getColumn(0).setCellRenderer(centrar);
-
-     funcion.desconecta();
-
-     }*/
-
-    /*public void tabla_devoluciones() {   // funcion para llenar al abrir la ventana  
-     funcion.conectate();
-     tabla_devoluciones.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-     String[] columNames = {"Id ", "Folio", "Cliente", "Estado", "Fecha Entrega", "Hora Entrega", "Devolucion", "Descripcion", "Chofer"};
-     String[] colName = {"id_renta", "Folio", "cliente", "estado", "fecha_entrega", "hora_entrega", "fecha_devolucion", "descripcion", "Chofer"};
-     //nombre de columnas, tabla, instruccion sql        
-
-     dtconduc = funcion.GetTabla(colName, "renta", "SELECT r.`id_renta`,r.`folio`,CONCAT(c.`nombre`,\" \", c.`apellidos`)AS cliente,e.`descripcion` as estado, r.`fecha_entrega`, r.`hora_entrega`,r.`fecha_devolucion`, r.`descripcion`,CONCAT(u.`nombre`,\" \",u.`apellidos`)AS Chofer FROM renta r, estado e, clientes c,usuarios u\n"
-     + "WHERE r.id_estado=e.id_estado AND r.id_clientes=c.id_clientes AND STR_TO_DATE(r.`fecha_devolucion`, '%d/%m/%Y') >= STR_TO_DATE('" + fecha_sistema + "', '%d/%m/%Y') AND r.id_usuario_chofer=u.id_usuarios AND r.`id_tipo`='1' ORDER BY r.`folio`");
-
-     int filas = dtconduc.length;
-     String fecha, fecha2;
-
-     for (int i = 0; i < filas; i++) {
-     fecha = dtconduc[i][4].toString();
-     System.out.println("fecha" + " " + fecha);
-     fecha2 = dia_semana(fecha);
-     dtconduc[i][4] = fecha2;
-     }
-
-     DefaultTableModel datos = new DefaultTableModel(dtconduc, columNames);
-     tabla_devoluciones.setModel(datos);
-
-     DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
-     centrar.setHorizontalAlignment(SwingConstants.CENTER);
-
-     int[] anchos = {60, 60, 250, 120, 250, 100, 100, 400, 100};
-
-     for (int inn = 0; inn < tabla_devoluciones.getColumnCount(); inn++) {
-     tabla_devoluciones.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
-     }
-
-     tabla_devoluciones.getColumnModel().getColumn(0).setMaxWidth(0);
-     tabla_devoluciones.getColumnModel().getColumn(0).setMinWidth(0);
-     tabla_devoluciones.getColumnModel().getColumn(0).setPreferredWidth(0);
-
-     tabla_devoluciones.getColumnModel().getColumn(1).setCellRenderer(centrar);
-     tabla_devoluciones.getColumnModel().getColumn(2).setCellRenderer(centrar);
-     tabla_devoluciones.getColumnModel().getColumn(3).setCellRenderer(centrar);
-     tabla_devoluciones.getColumnModel().getColumn(4).setCellRenderer(centrar);
-     tabla_devoluciones.getColumnModel().getColumn(0).setCellRenderer(centrar);
-
-     funcion.desconecta();
-
-     }*/
     public void abrir_ventana(JInternalFrame internalFrame) {
         int x = (jDesktopPane1.getWidth() / 2) - internalFrame.getWidth() / 2;
         int y = (jDesktopPane1.getHeight() / 2) - internalFrame.getHeight() / 2;
@@ -701,7 +548,9 @@ public class principal extends javax.swing.JFrame {
         });
         jToolBar1.add(jBtnViewOrderProviders);
 
-        jButton8.setText("Material");
+        jButton8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/inventory-maintenance-icon.png"))); // NOI18N
+        jButton8.setToolTipText("Inventario de material");
+        jButton8.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton8.setFocusable(false);
         jButton8.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton8.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -726,7 +575,7 @@ public class principal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 717, Short.MAX_VALUE)
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jDesktopPane1)))

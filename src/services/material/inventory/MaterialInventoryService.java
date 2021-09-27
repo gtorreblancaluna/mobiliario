@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import model.material.inventory.MaterialArea;
 import model.material.inventory.MaterialInventory;
+import model.material.inventory.MaterialSaleItem;
 import model.material.inventory.MeasurementUnit;
 
 public class MaterialInventoryService {
@@ -25,9 +26,33 @@ public class MaterialInventoryService {
     
     private final MaterialInventoryDAO materialInventoryDAO = MaterialInventoryDAO.getInstance();
     
+    public void save (MaterialSaleItem materialSaleItem) throws BusinessException {
+        try {
+            materialInventoryDAO.save(materialSaleItem);
+        } catch (DataOriginException e) {
+            throw new BusinessException(e.getMessage(),e);
+        }
+    }
+    
     public MaterialInventory getById (Long id) throws BusinessException {
         try {
             return materialInventoryDAO.getById(id);
+        } catch (DataOriginException e) {
+            throw new BusinessException(e.getMessage(),e);
+        }
+    }
+    
+    public List<MaterialSaleItem> getMaterialSaleItemsByItemId (Long id) throws BusinessException{
+        try {
+            return materialInventoryDAO.getMaterialSaleItemsByItemId(id);
+        } catch (DataOriginException e) {
+            throw new BusinessException(e.getMessage(),e);
+        }
+    }
+    
+    public List<MaterialSaleItem> getMaterialSaleItemsByItemsId (String itemsId) throws BusinessException{
+        try {
+            return materialInventoryDAO.getMaterialSaleItemsByItemsId(itemsId);
         } catch (DataOriginException e) {
             throw new BusinessException(e.getMessage(),e);
         }
@@ -69,6 +94,14 @@ public class MaterialInventoryService {
     public void delete (MaterialInventory materialInventory) throws BusinessException {
         try {
             materialInventoryDAO.delete(materialInventory);
+        } catch (DataOriginException e) {
+            throw new BusinessException(e.getMessage(),e);
+        }
+    }
+    
+    public void delete (MaterialSaleItem materialSaleItem) throws BusinessException {
+        try {
+            materialInventoryDAO.delete(materialSaleItem);
         } catch (DataOriginException e) {
             throw new BusinessException(e.getMessage(),e);
         }

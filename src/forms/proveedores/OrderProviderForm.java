@@ -260,9 +260,9 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
    }
     
     public void showProviders() {
-        SelectProviderToOrder win = new SelectProviderToOrder(null, true);
-        win.setVisible(true);
+        SelectProviderToOrder win = new SelectProviderToOrder(null, true, "ORDER_PROVIDER");
         win.setLocationRelativeTo(null);
+        win.setVisible(true);
     }
     
      public void showPaymentsProvidersForm() {

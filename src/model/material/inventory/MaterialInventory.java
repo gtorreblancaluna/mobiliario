@@ -18,6 +18,15 @@ public class MaterialInventory {
     private Date updatedAt;
     private String fgActive;
 
+    public MaterialInventory(Long id) {
+        this.id = id;
+    }
+
+    public MaterialInventory() {
+    }
+    
+    
+
     public Long getId() {
         return id;
     }

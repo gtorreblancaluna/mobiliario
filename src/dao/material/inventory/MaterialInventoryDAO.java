@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import model.material.inventory.MaterialArea;
 import model.material.inventory.MaterialInventory;
+import model.material.inventory.MaterialSaleItem;
 import model.material.inventory.MeasurementUnit;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -27,6 +28,38 @@ public class MaterialInventoryDAO {
             return new MaterialInventoryDAO();
         }
         return SINGLE_INSTANCE;
+    }
+    
+    public List<MaterialSaleItem> getMaterialSaleItemsByItemId (Long id) throws DataOriginException{
+        List<MaterialSaleItem> list = null;
+        SqlSession session = sqlSessionFactory.openSession();
+        
+        try{
+            list = (List<MaterialSaleItem>) session.selectList("MapperMaterialInventory.getMaterialSaleItemsByItemId", id);
+         }catch(Exception e){
+            log.error(e);
+            throw new DataOriginException(e.getMessage(),e.getCause());
+        } finally {
+            session.close();
+        }
+        
+        return list;
+    }
+    
+    public List<MaterialSaleItem> getMaterialSaleItemsByItemsId (String itemsId) throws DataOriginException{
+        List<MaterialSaleItem> list = null;
+        SqlSession session = sqlSessionFactory.openSession();
+        
+        try{
+            list = (List<MaterialSaleItem>) session.selectList("MapperMaterialInventory.getMaterialSaleItemsByItemsId", itemsId);
+         }catch(Exception e){
+            log.error(e);
+            throw new DataOriginException(e.getMessage(),e.getCause());
+        } finally {
+            session.close();
+        }
+        
+        return list;
     }
     
     public MaterialInventory getById (Long id) throws DataOriginException{
@@ -80,6 +113,21 @@ public class MaterialInventoryDAO {
         }
     }
     
+    public void save (MaterialSaleItem materialSaleItem) throws DataOriginException {
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+           materialSaleItem.setCreatedAt(new Date());
+           materialSaleItem.setUpdatedAt(new Date());
+           session.insert("MapperMaterialInventory.insertMaterialSaleItem", materialSaleItem);     
+           session.commit();
+         }catch(Exception ex){
+            log.error(ex);
+            throw new DataOriginException(ex.getMessage(),ex.getCause());
+        } finally {
+            session.close();
+        }
+    }
+    
     public void save (MeasurementUnit measurementUnit) throws DataOriginException {
         SqlSession session = sqlSessionFactory.openSession();
         try{
@@ -123,6 +171,20 @@ public class MaterialInventoryDAO {
         try{
             measurementUnit.setUpdatedAt(new Date());
             session.update("MapperMaterialInventory.deleteMeasurementUnit",measurementUnit);     
+            session.commit();
+         }catch(Exception ex){
+            log.error(ex);
+            throw new DataOriginException(ex.getMessage(),ex.getCause());
+        } finally {
+            session.close();
+        }
+    }
+    
+    public void delete (MaterialSaleItem materialSaleItem) throws DataOriginException {
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+            materialSaleItem.setUpdatedAt(new Date());
+            session.update("MapperMaterialInventory.deleteMaterialSaleItem",materialSaleItem);     
             session.commit();
          }catch(Exception ex){
             log.error(ex);

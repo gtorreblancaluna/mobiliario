@@ -4,6 +4,25 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
 <mapper namespace="MapperMaterialInventory">
+    
+    <resultMap id="resultMapMapperMaterialSaleItem" type="model.material.inventory.MaterialSaleItem">
+        
+        <result property="id" column="id"/>
+        <result property="amount" column="amount"/>
+        <result property="fgActive" column="fg_active"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        
+        <!-- material inventory -->
+        <result property="materialInventory.description" column="mi_description"/>
+        <result property="materialInventory.measurementUnit.description" column="mi_mu_description"/>
+        
+        <!-- material provider -->
+        <result property="provider.nombre" column="p_name"/>
+        <result property="provider.apellidos" column="p_last_name"/>
+                
+        
+    </resultMap>
   
     <resultMap id="resultMapMapperMaterialInventory" type="model.material.inventory.MaterialInventory">        
         <result property="id" column="id"/>
@@ -40,6 +59,40 @@
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
+    
+    <insert id="insertMaterialSaleItem" parameterType="model.material.inventory.MaterialSaleItem" >
+        INSERT INTO material_sale_items
+        (
+            material_inventory_id,
+            provider_id,
+            item_id,
+            amount,
+            created_at,
+            updated_at
+        )
+        VALUES
+        (
+            #{materialInventory.id},
+            #{provider.id},
+            #{item.articuloId},
+            #{amount},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
+    <select id="getMaterialSaleItemsByItemId" resultMap="resultMapMapperMaterialSaleItem" parameterType="java.lang.Long">
+       SELECT m.*,
+        mi.description AS mi_description,
+        mu.description AS mi_mu_description,
+        p.nombre AS p_name,
+        p.apellidos AS p_last_name
+        FROM material_sale_items m
+        INNER JOIN material_inventory mi ON (mi.id = m.material_inventory_id)
+        INNER JOIN measurement_units mu ON (mu.id = mi.measurement_unit_id)
+        INNER JOIN proveedores p ON (p.id = m.provider_id)
+        WHERE m.fg_active = '1' AND m.item_id = #{id} ORDER BY mi.description
+    </select>
     
     <select id="getByIdMaterialInventory" resultMap="resultMapMapperMaterialInventory" parameterType="java.lang.Long">
         SELECT m.*,
@@ -137,6 +190,13 @@
     
     <update id="deleteMeasurementUnit" parameterType="model.material.inventory.MeasurementUnit">
         UPDATE measurement_units SET
+            fg_active = '0',
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="deleteMaterialSaleItem" parameterType="model.material.inventory.MaterialSaleItem">
+        UPDATE material_sale_items SET
             fg_active = '0',
             updated_at = #{updatedAt}
         WHERE id = #{id}

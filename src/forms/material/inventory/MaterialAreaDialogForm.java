@@ -5,16 +5,15 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import mobiliario.ApplicationConstants;
 import model.material.inventory.MaterialArea;
-import model.material.inventory.MeasurementUnit;
 import org.apache.log4j.Priority;
 import services.SystemService;
 import services.material.inventory.MaterialInventoryService;
 
 public class MaterialAreaDialogForm extends javax.swing.JDialog {
 
-    private MaterialInventoryService materialInventoryService;
+    private final MaterialInventoryService materialInventoryService;
     private String idToUpdate;
-    private static org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(MaterialAreaDialogForm.class.getName());
+    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(MaterialAreaDialogForm.class.getName());
     private final SystemService systemService = SystemService.getInstance();
     
     public MaterialAreaDialogForm(java.awt.Frame parent, boolean modal) {
@@ -92,7 +91,7 @@ public class MaterialAreaDialogForm extends javax.swing.JDialog {
        formatTable();
        try {
            List<MaterialArea> list = materialInventoryService.getMaterialAreas();
-           for(MaterialArea unit : list){
+           for ( MaterialArea unit : list ) {
             DefaultTableModel temp = (DefaultTableModel) table.getModel();
             Object row[] = {
                 unit.getId(),
@@ -124,7 +123,6 @@ public class MaterialAreaDialogForm extends javax.swing.JDialog {
             DefaultTableModel temp = (DefaultTableModel) table.getModel();
             temp.removeRow(temp.getRowCount() - 1);
         } catch (ArrayIndexOutOfBoundsException e) {
-            ;
         }
 
         table.getColumnModel().getColumn(0).setMaxWidth(0);

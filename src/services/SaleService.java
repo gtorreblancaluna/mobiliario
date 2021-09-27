@@ -28,10 +28,6 @@ import model.Tipo;
 import model.TipoAbono;
 import model.Usuario;
 
-/**
- *
- * @author jerry
- */
 public class SaleService {
     private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
     private static SalesDAO salesDao = new SalesDAO();

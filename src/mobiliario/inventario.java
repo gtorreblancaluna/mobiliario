@@ -7,6 +7,7 @@ package mobiliario;
 
 import services.SystemService;
 import forms.compras.AgregarCompraFormDialog;
+import forms.material.inventory.MaterialSaleItemsView;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.sql.Timestamp;
@@ -32,6 +33,7 @@ import model.Color;
 import services.CategoryService;
 import services.ItemService;
 import utilities.Utility;
+import static mobiliario.principal.jDesktopPane1;
 
 /**
  *
@@ -790,6 +792,7 @@ public class inventario extends javax.swing.JInternalFrame {
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         btnMostrarAgregarCompra = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtDisponibilidadFechaInicial = new com.toedter.calendar.JDateChooser();
@@ -985,7 +988,7 @@ public class inventario extends javax.swing.JInternalFrame {
                                 .addComponent(cmb_color2, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lbl_buscar)))
-                        .addGap(0, 472, Short.MAX_VALUE)))
+                        .addGap(0, 456, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -1128,6 +1131,18 @@ public class inventario extends javax.swing.JInternalFrame {
         });
         jToolBar1.add(btnMostrarAgregarCompra);
 
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/inventory-maintenance-icon.png"))); // NOI18N
+        jButton5.setToolTipText("Configurar material  para venta de articulo");
+        jButton5.setFocusable(false);
+        jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton5);
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -1146,12 +1161,12 @@ public class inventario extends javax.swing.JInternalFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 420, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1678,7 +1693,7 @@ public class inventario extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void btnMostrarAgregarCompraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarAgregarCompraActionPerformed
-         if (tabla_articulos.getSelectedRow() == - 1) {
+        if (tabla_articulos.getSelectedRow() == - 1) {
             JOptionPane.showMessageDialog(null, "Seleciona un articulo para continuar", "Error", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
@@ -1691,6 +1706,21 @@ public class inventario extends javax.swing.JInternalFrame {
         this.mostrar_agregar_compra();
          
     }//GEN-LAST:event_btnMostrarAgregarCompraActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        
+        if (tabla_articulos.getSelectedRow() == - 1) {
+            JOptionPane.showMessageDialog(null, "Seleciona un articulo para continuar", "Error", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+         
+        String id = (tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString());
+        
+        MaterialSaleItemsView win = new MaterialSaleItemsView(id);
+        win.setLocation(this.getWidth() / 2 - win.getWidth() / 2, this.getHeight() / 2 - win.getHeight() / 2 - 20);
+        jDesktopPane1.add(win);
+        win.show();
+    }//GEN-LAST:event_jButton5ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1708,6 +1738,7 @@ public class inventario extends javax.swing.JInternalFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

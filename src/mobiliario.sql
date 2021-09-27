@@ -458,3 +458,31 @@ CREATE TABLE material_inventory (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 2021-09-25 GTL .> configurar material para articulos de venta
+CREATE TABLE material_sale_items (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  material_inventory_id INT(11) NOT NULL,
+  provider_id INT(11) NOT NULL,
+  item_id INT(11) NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,  
+  created_at TIMESTAMP NULL DEFAULT NULL,   
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id),
+  CONSTRAINT FK_sale_items_material_inventory_id
+    FOREIGN KEY (material_inventory_id)
+    REFERENCES material_inventory (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT FK_sale_items_providers_id
+    FOREIGN KEY (provider_id)
+    REFERENCES proveedores (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT FK_sale_items_item_id
+    FOREIGN KEY (item_id)
+    REFERENCES articulo (id_articulo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

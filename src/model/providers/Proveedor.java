@@ -23,6 +23,15 @@ public class Proveedor {
     private Timestamp creado;
     private Timestamp actualizado;
 
+    public Proveedor() {
+    }
+
+    public Proveedor(Long id) {
+        this.id = id;
+    }
+    
+    
+
     public Long getId() {
         return id;
     }

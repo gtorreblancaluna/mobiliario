@@ -3,12 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/data/material/inventory/MapperMaterialInventory.xml</file>
-            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/forms/material/inventory/MaterialInventoryView.java</file>
-            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/mobiliario.sql</file>
-            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/forms/material/inventory/UnitMeasurementDialogForm.java</file>
-            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/services/material/inventory/MaterialInventoryService.java</file>
-            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/dao/material/inventory/MaterialInventoryDAO.java</file>
+            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/forms/material/inventory/GenerateReportMaterialSaleItemsView.java</file>
         </group>
     </open-files>
 </project-private>
