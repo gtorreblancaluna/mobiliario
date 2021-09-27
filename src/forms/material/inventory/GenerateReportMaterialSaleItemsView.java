@@ -3,8 +3,6 @@ package forms.material.inventory;
 import clases.sqlclass;
 import java.util.List;
 import java.util.stream.Collectors;
-import model.Articulo;
-import model.DetalleRenta;
 import model.Renta;
 import model.material.inventory.MaterialSaleItem;
 import services.SaleService;
