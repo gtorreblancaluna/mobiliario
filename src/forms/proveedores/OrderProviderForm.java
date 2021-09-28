@@ -56,7 +56,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     
     Object[][] dtconduc;      
     private final SaleService saleService = new SaleService();
-    private final SystemService systemService = SystemService.getInstance();
+    private final SystemService systemService;
 //    private final ItemService itemService = new ItemService();
     private final OrderProviderService orderProviderService = OrderProviderService.getInstance();
     public static String g_articuloId;
@@ -92,10 +92,16 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     public final static String UPDATE_ORDER = "update order";
     public final static String NEW_ORDER = "new order";
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(OrderProviderForm.class.getName());
+
+    public OrderProviderForm(SystemService systemService) {
+        this.systemService = systemService;
+    }
    
+    
    public OrderProviderForm() {
         initComponents();
         funcion.conectate();
+        systemService = SystemService.getInstance();
 //        this.setLocationRelativeTo(null);
         this.lblQuitarElemento.setText("");
         this.setTitle("Agregar orden al proveedor ");
@@ -112,13 +118,17 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
 
     }
    
-   public void reportPDF(){
+   public void reportPDF(String orderProviderId) throws Exception{
      
+        if (orderProviderId == null || orderProviderId.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No se obtuvo la orden del proveedor");
+            return;
+        }
+        JasperPrint jasperPrint;
        
-         JasperPrint jasperPrint;
-        try {
            
-            String archivo = ApplicationConstants.RUTA_REPORTE_ORDEN_PROVEEDOR;
+            String pathLocation = Utility.getPathLocation();
+            String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_ORDEN_PROVEEDOR;
             System.out.println("Cargando desde: " + archivo);
             if (archivo == null) {
                 JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
@@ -131,30 +141,18 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             DatosGenerales datosGenerales = systemService.getGeneralData();
             
             Map parametros = new HashMap<>();
-            parametros.put("ID_ORDEN",g_order_provider_id);
+            parametros.put("ID_ORDEN",orderProviderId);
             parametros.put("NOMBRE_EMPRESA",datosGenerales.getCompanyName());
             parametros.put("DIRECCION_EMPRESA",datosGenerales.getAddress1());
             parametros.put("TELEFONOS_EMPRESA",datosGenerales.getAddress2());
             parametros.put("EMAIL_EMPRESA",datosGenerales.getAddress3());
             //guardamos el parámetro
-            parametros.put("URL_IMAGEN",ApplicationConstants.RUTA_LOGO_EMPRESA+ApplicationConstants.LOGO_EMPRESA );
+            parametros.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
            
             jasperPrint = JasperFillManager.fillReport(masterReport, parametros, funcion.getConnection());
-            JasperExportManager.exportReportToPdfFile(jasperPrint, ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
-            File file2 = new File(ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
+            JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
+            File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
             Desktop.getDesktop().open(file2);
-
-        } catch (IOException e) {
-            LOGGER.error(e);
-            JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());
-        } catch (JRException e) {
-            LOGGER.error(e);
-            JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());            
-        } catch (Exception e) {
-            LOGGER.error(e);
-            System.out.println("Mensaje de Error:" + e.toString());
-            JOptionPane.showMessageDialog(rootPane, "Mensaje de Error :" + e.toString() + "\n Existe un PDF abierto, cierralo e intenta generar el PDF nuevamente");
-        }
      
      }
     
@@ -1233,7 +1231,13 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
 
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
         // TODO add your handling code here:
-        reportPDF();
+        try {
+            reportPDF(g_order_provider_id+"");
+        } catch (Exception e) {
+            LOGGER.error(e);
+            System.out.println("Mensaje de Error:" + e.toString());
+            JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage() + "\n" + e);
+        }
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
 
