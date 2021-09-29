@@ -11,7 +11,36 @@
         <result property="fgActivo" column="fg_activo"/>
         <result property="fechaRegistro" column="fecha_registro"/>
       
-    </resultMap>    
+    </resultMap> 
+    
+    <resultMap id="resultMapDetalleRenta" type="model.DetalleRenta">        
+        
+        <result property="detalleRentaId" column="id_detalle_renta"/>
+        <result property="rentaId" column="id_renta"/>
+        <result property="cantidad" column="cantidad"/>
+        <result property="precioUnitario" column="p_unitario"/>
+     
+        
+        <result property="articulo.articuloId" column="item_id"/>
+        <result property="articulo.descripcion" column="item_description"/>
+        <result property="articulo.color.color" column="item_color"/>
+        <result property="articulo.codigo" column="item_codigo"/>
+        <result property="articulo.precioCompra" column="item_purchase_amount"/>
+      
+    </resultMap> 
+    
+    <select id="getDetailByRentId" resultMap="resultMapDetalleRenta" parameterType="java.lang.String">
+        SELECT d.*,
+            a.id_articulo AS item_id,
+            a.descripcion AS item_description,
+            a.precio_compra AS item_purchase_amount,
+            c.color AS item_color,
+            a.codigo AS item_codigo
+        FROM detalle_renta d
+        INNER JOIN articulo a ON (a.id_articulo = d.id_articulo)
+        INNER JOIN color c ON (c.id_color = a.id_color)
+        WHERE d.id_renta = #{d.id}
+    </select>    
    
     
     <select id="obtenerTipoAbonoPorDescripcion" resultMap="resultMapTipoAbono" parameterType="java.lang.String">

@@ -65,7 +65,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         g_idOrder = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 0).toString();
          
         if (Utility.verifyIfInternalFormIsOpen(orderProviderForm)) {
-            orderProviderForm = new OrderProviderForm();
+            orderProviderForm = new OrderProviderForm(g_idRenta);
             principal.jDesktopPane1.add(orderProviderForm);
             orderProviderForm.show();
         } else {
@@ -195,7 +195,6 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
        
         if (Utility.verifyIfInternalFormIsOpen(paymentsProvidersForm)) {
             paymentsProvidersForm = new PaymentsProvidersForm();
-//            orderProviderForm.setLocation(this.getWidth() / 2 - orderProviderForm.getWidth() / 2, this.getHeight() / 2 - orderProviderForm.getHeight() / 2 - 20);
             principal.jDesktopPane1.add(paymentsProvidersForm);
             paymentsProvidersForm.show();
         } else {

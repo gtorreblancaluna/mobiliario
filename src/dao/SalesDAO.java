@@ -1,29 +1,43 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dao;
 
+import exceptions.DataOriginException;
+import java.util.List;
 import model.Abono;
-import model.CategoriaDTO;
+import model.DetalleRenta;
 import model.TipoAbono;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
-/**
- * Dao relacionado con los pedidos
- * 
- * @author jerry
- */
 public class SalesDAO {
     
-     private static Logger log = Logger.getLogger(SalesDAO.class.getName());
+    private static Logger log = Logger.getLogger(SalesDAO.class.getName());
     private SqlSessionFactory sqlSessionFactory;
  
-    public SalesDAO() {
+    private SalesDAO() {
         sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();
+    }
+    
+    private static final SalesDAO SINGLE_INSTANCE = null;
+    
+    public static SalesDAO getInstance(){
+        if (SINGLE_INSTANCE == null) {
+            return new SalesDAO();
+        }
+        return SINGLE_INSTANCE;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<DetalleRenta> getDetailByRentId( String rentId) throws DataOriginException{
+        SqlSession session = sqlSessionFactory.openSession();
+        try {
+           return (List<DetalleRenta>) session.selectList("MapperPedidos.getDetailByRentId",rentId);
+        }catch(Exception ex){
+            log.error(ex);
+            throw new DataOriginException(ex.getMessage(),ex);
+        } finally {
+            session.close();
+        }
     }
     
     @SuppressWarnings("unchecked")

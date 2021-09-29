@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
 import services.ItemService;
@@ -37,7 +32,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.MessagingException;
-import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -83,8 +77,8 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     String fecha_sistema, sql, id_articulo, id_abonos, id_cliente, cant_abono = "0", subTotal = "0", chofer, id_tipo = "1", descuento, desc_rep, iva_rep, id_estado;
     public static String fecha_inicial, fecha_final, validar_consultar = "0", id_renta;
     sqlclass funcion = new sqlclass();    
-    ItemService itemService = ItemService.getInstance();
-    SaleService saleService = new SaleService();
+    private final ItemService itemService;
+    private final SaleService saleService;
     UserService userService = new UserService();
     private final SystemService systemService = SystemService.getInstance();
     CategoryService categoryService = new CategoryService();
@@ -102,14 +96,26 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         funcion.conectate();
        
         initComponents();
+        saleService = SaleService.getInstance();
+        itemService = ItemService.getInstance();
         fecha_sistema();
-        buscar();
-        llenar_combo_estado();
-        llenar_combo_tipo();
-        llenar_abonos();
-        llenar_combo_chofer_buscar();
+        
+        new Thread(() -> {
+            llenar_combo_estado();
+        }).start();
+        new Thread(() -> {
+            llenar_combo_tipo();
+        }).start();
+        new Thread(() -> {
+            llenar_abonos();
+        }).start();
+        new Thread(() -> {
+            llenar_combo_chofer_buscar();
+        }).start();
         formato_tabla_detalles();
-        llenar_combo_limite();
+        new Thread(() -> {
+            llenar_combo_limite();
+        }).start();
         
 
         // lbl_aviso_resultados.setVisible(false);
@@ -125,7 +131,11 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         txt_total.setEditable(false);
         txt_calculo.setEditable(false);
         jbtn_guardar_cliente.setEnabled(false);
-        tabla_clientes();
+        new Thread(() -> {
+            tabla_clientes();
+        }).start();
+       
+            buscar();
         panel_articulos.setVisible(false);
         jbtn_disponible.setEnabled(false);
         txt_buscar_folio.requestFocus();
@@ -137,6 +147,38 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         this.txt_editar_porcentaje_descuento.setEnabled(false);
         
     }
+    
+    private void disableButtonsActions () {
+        
+        jbtn_buscar.setEnabled(false);
+        
+        jbtn_generar_reporte.setEnabled(false);
+        jbtn_generar_reporte1.setEnabled(false);
+        
+        jbtnGenerarReporteEntregas.setEnabled(false);
+        jtbtnGenerateExcel.setEnabled(false);
+        
+        jButton2.setEnabled(false);
+        jButton6.setEnabled(false);
+        jbtn_refrescar.setEnabled(false);
+    }
+    
+    private void enabledButtonsActions () {
+        
+        jbtn_buscar.setEnabled(true);
+        
+        jbtn_generar_reporte.setEnabled(true);
+        jbtn_generar_reporte1.setEnabled(true);
+        
+        jbtnGenerarReporteEntregas.setEnabled(true);
+        jtbtnGenerateExcel.setEnabled(true);
+        
+        jButton2.setEnabled(true);
+        jButton6.setEnabled(true);
+        
+        jbtn_refrescar.setEnabled(true);
+    }
+    
     
     public void limpiar() {
         txt_nombre.setText("");
@@ -164,9 +206,9 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         ventana_faltantes.setLocationRelativeTo(null);
     }
     
-     public void mostrar_agregar_orden_proveedor() {
+     public void mostrar_agregar_orden_proveedor(String orderId) {
        if (Utility.verifyIfInternalFormIsOpen(orderProviderForm)) {
-            orderProviderForm = new OrderProviderForm();
+            orderProviderForm = new OrderProviderForm(orderId);
             orderProviderForm.setLocation(this.getWidth() / 2 - orderProviderForm.getWidth() / 2, this.getHeight() / 2 - orderProviderForm.getHeight() / 2 - 20);
             principal.jDesktopPane1.add(orderProviderForm);
             orderProviderForm.show();
@@ -1590,7 +1632,12 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         if(this.check_pedido.isSelected() == true)
             tipoId = ApplicationConstants.TIPO_PEDIDO;
         
-        String limit = this.cmb_limit.getSelectedItem().toString();
+        String limit = "";
+        try {
+            limit = this.cmb_limit.getSelectedItem().toString();
+        } catch (Exception e) {
+        
+        }
         
         if (check_cliente.isSelected() == false && check_estado.isSelected() == false && 
                 check_fechas.isSelected() == false && check_chofer.isSelected() == false && 
@@ -1666,7 +1713,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 sql = sql + " AND r.id_usuario_chofer='" + id_chofer + "'  ";
                 
             }
-            if(limit.equals("todos")){
+            if(limit.isEmpty() || limit.equals("todos")){
                 sql = sql + " ORDER BY STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') ";
             }else{
                 sql = sql + " ORDER BY STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') LIMIT "+limit;
@@ -1799,9 +1846,19 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             ;
         }
 
-    List<Renta> rentas = saleService.obtenerPedidosPorConsultaSqlSinDetalle(sql, funcion);
+        this.lblInformation.setText("Obteniendo resultados, porfavor espere ... "); 
+        this.disableButtonsActions();
+        new Thread(() -> {
+            List<Renta> rentas = saleService.obtenerPedidosPorConsultaSqlSinDetalle(sql, funcion);
+            fillTable(rentas);
+            enabledButtonsActions();
+        }).start();
+        
+    }
     
-    if(rentas == null || rentas.size()<=0)
+    
+    private void fillTable (List<Renta> rentas) {
+        if(rentas == null || rentas.size()<=0)
     {
 //        JOptionPane.showMessageDialog(null, "no se obtuvieron resultados :( ", "Error", JOptionPane.ERROR_MESSAGE);
         this.lblInformation.setText("No se obtuvieron resultados :( ");
@@ -1829,6 +1886,8 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         }
         
     }
+        
+        DefaultTableModel tableModel = (DefaultTableModel) tabla_prox_rentas.getModel();
         for(Renta renta : rentas){
             float abonos = 0f;
             if(renta.getAbonos() != null && renta.getAbonos().size()>0){
@@ -1862,7 +1921,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 };
                 tableModel.addRow(fila);
         }
-        
     }
     
     public void tabla_articulos() {
@@ -2040,7 +2098,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jbtn_refrescar = new javax.swing.JButton();
         jbtn_generar_reporte1 = new javax.swing.JButton();
         jbtnGenerarReporteEntregas = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        jtbtnGenerateExcel = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jLabel30 = new javax.swing.JLabel();
@@ -2210,21 +2268,21 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         setResizable(true);
         setTitle("CONSULTAR RENTA O PEDIDO....");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-                formInternalFrameClosing(evt);
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 formInternalFrameClosed(evt);
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+                formInternalFrameClosing(evt);
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -2232,7 +2290,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Proximas rentas", 0, 0, new java.awt.Font("Arial", 0, 11))); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Proximas rentas", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 11))); // NOI18N
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tabla_prox_rentas.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
@@ -2354,18 +2412,18 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         });
         jToolBar1.add(jbtnGenerarReporteEntregas);
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/excel-icon.png"))); // NOI18N
-        jButton1.setToolTipText("Exportar a Excel");
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton1.setFocusable(false);
-        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jtbtnGenerateExcel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/excel-icon.png"))); // NOI18N
+        jtbtnGenerateExcel.setToolTipText("Exportar a Excel");
+        jtbtnGenerateExcel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jtbtnGenerateExcel.setFocusable(false);
+        jtbtnGenerateExcel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jtbtnGenerateExcel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jtbtnGenerateExcel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jtbtnGenerateExcelActionPerformed(evt);
             }
         });
-        jToolBar1.add(jButton1);
+        jToolBar1.add(jtbtnGenerateExcel);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/archive-icon.png"))); // NOI18N
         jButton2.setToolTipText("Reporte articulos por categoria");
@@ -2516,7 +2574,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        panel_datos_generales.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos generales", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        panel_datos_generales.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos generales", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
         panel_datos_generales.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lbl_cliente.setFont(new java.awt.Font("Microsoft Sans Serif", 1, 14)); // NOI18N
@@ -2826,7 +2884,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        panel_articulos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Elije un servicio", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        panel_articulos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Elije un servicio", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
         panel_articulos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         txt_cantidad.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -2912,7 +2970,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jPanel6.add(panel_articulos, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 11, 1080, 350));
 
-        panel_conceptos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Conceptos del evento", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        panel_conceptos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Conceptos del evento", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
         panel_conceptos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tabla_detalle.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -3094,7 +3152,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jTabbedPane2.addTab("Detalle conceptos", jPanel6);
 
-        panel_abonos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Pagos", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        panel_abonos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Pagos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
         tabla_abonos.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         tabla_abonos.setModel(new javax.swing.table.DefaultTableModel(
@@ -3133,7 +3191,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 .addGap(149, 149, 149))
         );
 
-        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ingresa el abono", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ingresa el abono", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
         jToolBar4.setFloatable(false);
         jToolBar4.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -3277,7 +3335,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(panel_abonos, javax.swing.GroupLayout.PREFERRED_SIZE, 297, Short.MAX_VALUE)
+                    .addComponent(panel_abonos, javax.swing.GroupLayout.PREFERRED_SIZE, 315, Short.MAX_VALUE)
                     .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(73, Short.MAX_VALUE))
         );
@@ -3425,7 +3483,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         });
         jToolBar2.add(jbtn_editar_cliente);
 
-        panel_datos_cliente.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos cliente", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        panel_datos_cliente.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos cliente", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
         txt_nombre.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         txt_nombre.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -3562,7 +3620,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 .addContainerGap(188, Short.MAX_VALUE))
         );
 
-        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Clientes en la base de datos", 0, 0, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Clientes en la base de datos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
         tabla_clientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -4347,9 +4405,9 @@ public class consultar_renta extends javax.swing.JInternalFrame {
          
     }//GEN-LAST:event_jbtnGenerarReporteEntregasActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jtbtnGenerateExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtbtnGenerateExcelActionPerformed
         systemService.exportarExcel(tabla_prox_rentas);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jtbtnGenerateExcelActionPerformed
 
     private void check_fechas_eventoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_check_fechas_eventoActionPerformed
         // TODO add your handling code here:
@@ -5078,7 +5136,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
              return;
         }
         this.g_idRenta = id_renta;
-        mostrar_agregar_orden_proveedor();
+        mostrar_agregar_orden_proveedor(id_renta);
     }//GEN-LAST:event_jBtnAddOrderProviderActionPerformed
 
     private void jbtn_generar_reporte1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jbtn_generar_reporte1MouseClicked
@@ -5121,7 +5179,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private com.toedter.calendar.JDateChooser dateFechaEventoFinal;
     private com.toedter.calendar.JDateChooser dateFechaEventoInicial;
     private javax.swing.JButton jBtnAddOrderProvider;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -5217,6 +5274,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.JButton jbtn_nuevo_cliente;
     private javax.swing.JButton jbtn_quitar_abono;
     private javax.swing.JButton jbtn_refrescar;
+    private javax.swing.JButton jtbtnGenerateExcel;
     private javax.swing.JLabel lblInformation;
     private javax.swing.JLabel lbl_atiende;
     private javax.swing.JLabel lbl_aviso_resultados;

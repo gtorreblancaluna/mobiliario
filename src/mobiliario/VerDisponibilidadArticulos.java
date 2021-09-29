@@ -35,7 +35,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
     boolean existe, editar = false;
     String id_color;
     float cant = 0; 
-    SaleService saleService = new SaleService();
+    private final SaleService saleService;
     private final SystemService systemService = SystemService.getInstance();
     private final ItemService itemService = ItemService.getInstance();
     
@@ -63,7 +63,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         super(parent, modal);
         
         initComponents();    
-      
+        saleService = SaleService.getInstance();
         funcion.conectate();
         this.setLocationRelativeTo(null);
         this.lblEncontrados.setText("");

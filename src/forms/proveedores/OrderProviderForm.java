@@ -1,16 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package forms.proveedores;
 
 import clases.sqlclass;
 import exceptions.BusinessException;
+import exceptions.DataOriginException;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.io.File;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +30,6 @@ import model.providers.DetalleOrdenProveedor;
 import model.providers.OrdenProveedor;
 import model.providers.PagosProveedor;
 import model.providers.Proveedor;
-import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -55,7 +49,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     sqlclass funcion = new sqlclass();
     
     Object[][] dtconduc;      
-    private final SaleService saleService = new SaleService();
+    private final SaleService saleService;
     private final SystemService systemService;
 //    private final ItemService itemService = new ItemService();
     private final OrderProviderService orderProviderService = OrderProviderService.getInstance();
@@ -91,17 +85,15 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     
     public final static String UPDATE_ORDER = "update order";
     public final static String NEW_ORDER = "new order";
+    private String folio = "";
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(OrderProviderForm.class.getName());
-
-    public OrderProviderForm(SystemService systemService) {
-        this.systemService = systemService;
-    }
-   
     
-   public OrderProviderForm() {
+   public OrderProviderForm(String folio) {
         initComponents();
+        this.folio = folio;
         funcion.conectate();
         systemService = SystemService.getInstance();
+        saleService = SaleService.getInstance();
 //        this.setLocationRelativeTo(null);
         this.lblQuitarElemento.setText("");
         this.setTitle("Agregar orden al proveedor ");
@@ -360,12 +352,18 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             
            
         }
-        
-         Renta renta = saleService.obtenerRentaPorId(new Integer(g_rentaId), funcion);
+        List<DetalleRenta> detail;
+        try {
+            detail = saleService.getDetailByRentId(g_rentaId);
+        } catch (DataOriginException e) {
+            JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.WARNING_MESSAGE);            
+            Toolkit.getDefaultToolkit().beep();
+            return;
+        }
          DefaultTableModel tablaDetalle = (DefaultTableModel) tablaArticulos.getModel();
-         this.lblInformacionInicial.setText(this.lblInformacionInicial.getText()+" FOLIO: "+renta.getFolio());
+         this.lblInformacionInicial.setText(this.lblInformacionInicial.getText()+" FOLIO: "+folio);
           
-            for(DetalleRenta detalle : renta.getDetalleRenta()){
+            for(DetalleRenta detalle : detail){
                     Object fila[] = {                                          
                         detalle.getArticulo().getArticuloId()+"",   
                         detalle.getCantidad()+"",

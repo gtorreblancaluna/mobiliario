@@ -58,13 +58,14 @@ public class agregar_renta extends javax.swing.JInternalFrame {
     String fecha_entrega, fecha_devolucion, hora_entrega,fecha_evento, hora_devolucion;
     public static boolean utiliza_conexion_TLS = false, utiliza_autenticacion = false, status,validad_tipo_abonos;
     private UserService userService = new UserService();
-    private SaleService saleService = new SaleService();
+    private SaleService saleService;
     private final SystemService systemService = SystemService.getInstance();
 
     public agregar_renta() {
         
         funcion.conectate();
         initComponents();
+        saleService = SaleService.getInstance();
         tabla_clientes();
         llenar_combo_estado();
         llenar_combo_tipo();

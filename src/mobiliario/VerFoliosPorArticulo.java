@@ -9,7 +9,6 @@ import services.SaleService;
 import clases.sqlclass;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
@@ -36,7 +35,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
     boolean existe, editar = false;
     String id_color;
     float cant = 0; 
-    SaleService saleService = new SaleService();
+    private final SaleService saleService;
     private final SystemService systemService = SystemService.getInstance();
     ItemService itemService = ItemService.getInstance();
     public static String g_rentaId;
@@ -71,7 +70,8 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
     public VerFoliosPorArticulo(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         
-        initComponents();      
+        initComponents();
+        saleService = SaleService.getInstance();
         funcion.conectate();
         this.setLocationRelativeTo(null);
         this.lblEncontrados.setText("");

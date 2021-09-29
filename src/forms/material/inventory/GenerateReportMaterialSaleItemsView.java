@@ -17,7 +17,7 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
     public GenerateReportMaterialSaleItemsView(String id) {
         initComponents();
         funcion.conectate();
-        saleService = new SaleService();
+        saleService = SaleService.getInstance();
         materialInventoryService = MaterialInventoryService.getInstance();
         init(id);
     }

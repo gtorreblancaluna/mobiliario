@@ -30,7 +30,7 @@ public class abonos extends java.awt.Dialog {
     sqlclass general = new sqlclass();
     Object[][] dtconduc;
     Object[] datos_combo;
-    SaleService saleService = new SaleService();
+    private final SaleService saleService;
     private final SystemService systemService = SystemService.getInstance();
 
     /**
@@ -39,6 +39,7 @@ public class abonos extends java.awt.Dialog {
     public abonos(java.awt.Frame parent, boolean modal) {        
         super(parent, modal);
          initComponents();
+         saleService = SaleService.getInstance();
         funcion.conectate();
         formato_tabla();       
         tabla_abonos();

@@ -26,16 +26,12 @@ import model.Renta;
 import services.ItemService;
 import services.SystemService;
 
-/**
- *
- * @author Gerardo Torreblanca
- */
 public class VerFaltantes extends java.awt.Dialog {
 
     sqlclass funcion = new sqlclass();
     
     Object[][] dtconduc;      
-    SaleService saleService = new SaleService();
+    private final SaleService saleService;
     private final SystemService systemService = SystemService.getInstance();
     ItemService itemService = ItemService.getInstance();
     public static String g_articuloId;
@@ -85,6 +81,7 @@ public class VerFaltantes extends java.awt.Dialog {
     public VerFaltantes(java.awt.Frame parent, boolean modal) {
         super(parent, modal);        
         initComponents();
+        saleService = SaleService.getInstance();
         funcion.conectate();
         this.setLocationRelativeTo(null);
         this.lblQuitarElemento.setText("");

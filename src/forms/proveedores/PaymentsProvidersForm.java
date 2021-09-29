@@ -37,7 +37,7 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
     private final SystemService systemService = SystemService.getInstance();
     private final OrderProviderService orderService = OrderProviderService.getInstance();
     private final ProvidersPaymentsService providersPaymentsService = ProvidersPaymentsService.getInstance();
-    private final SaleService saleService = new SaleService();
+    private final SaleService saleService;
     sqlclass funcion = new sqlclass(); 
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
     private OrdenProveedor ordenProveedorGlobal = new OrdenProveedor();
@@ -60,6 +60,7 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
     public PaymentsProvidersForm() {
         funcion.conectate();
         initComponents();
+        saleService = SaleService.getInstance();
         this.setTitle("Pagos al proveedor");
         tableFormat();
         fillPaymentsType();

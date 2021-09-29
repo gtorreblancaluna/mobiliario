@@ -24,7 +24,7 @@ import services.ItemService;
 public class disponibilidad_articulos extends java.awt.Dialog {
 
     sqlclass funcion = new sqlclass();
-    SaleService saleService = new SaleService();
+    private final SaleService saleService;
     ItemService itemService = ItemService.getInstance();
     Object[][] dtconduc;
     String fecha_inicial, fecha_final, id_renta;
@@ -37,6 +37,7 @@ public class disponibilidad_articulos extends java.awt.Dialog {
     public disponibilidad_articulos(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        saleService = SaleService.getInstance();
         this.setLocationRelativeTo(null);
 
         if (consultar_renta.validar_consultar.equals("1")) {

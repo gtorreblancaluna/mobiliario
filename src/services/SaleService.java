@@ -9,6 +9,7 @@ package services;
 
 import clases.sqlclass;
 import dao.SalesDAO;
+import exceptions.DataOriginException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.ArrayList;
@@ -30,7 +31,23 @@ import model.Usuario;
 
 public class SaleService {
     private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
-    private static SalesDAO salesDao = new SalesDAO();
+    private final SalesDAO salesDao;
+    
+    
+    private SaleService () {
+        salesDao = SalesDAO.getInstance();
+    }
+    
+    private static final SaleService SINGLE_INSTANCE = null;
+    
+    public static SaleService getInstance(){
+        if (SINGLE_INSTANCE == null) {
+            return new SaleService();
+        }
+        return SINGLE_INSTANCE;
+    }
+    
+    
     // inserta un detalle de renta y devuelve el ultimo id insertado
     public int insertarDetalleRenta(String[] datos, sqlclass sql){
         try {
@@ -42,6 +59,10 @@ public class SaleService {
             JOptionPane.showMessageDialog(null, "Error al insertar registro ", "Error", JOptionPane.ERROR);
             return 0;
         }
+    }
+    
+    public List<DetalleRenta> getDetailByRentId (String rentId) throws DataOriginException{
+        return salesDao.getDetailByRentId(rentId);
     }
     
     // obtener la disponibilidad de articulos en un rango de fechas

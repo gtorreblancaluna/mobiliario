@@ -24,7 +24,7 @@ public class AsignarFaltante extends java.awt.Dialog {
     sqlclass funcion = new sqlclass();
     
     Object[][] dtconduc;      
-    SaleService saleService = new SaleService();
+    SaleService saleService;
     private final SystemService systemService = SystemService.getInstance();
     ItemService itemService = ItemService.getInstance();
     public static int g_articuloId;
@@ -53,6 +53,7 @@ public class AsignarFaltante extends java.awt.Dialog {
     public AsignarFaltante(java.awt.Frame parent, boolean modal) {
         super(parent, modal);        
         initComponents();
+        saleService = SaleService.getInstance();
         funcion.conectate();
         this.setLocationRelativeTo(null);        
         this.setTitle("Asignar faltante ");   
