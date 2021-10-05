@@ -1131,7 +1131,7 @@ public class inventario extends javax.swing.JInternalFrame {
         });
         jToolBar1.add(btnMostrarAgregarCompra);
 
-        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/inventory-maintenance-icon.png"))); // NOI18N
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Inventory-maintenance-icon-32px.png"))); // NOI18N
         jButton5.setToolTipText("Configurar material  para venta de articulo");
         jButton5.setFocusable(false);
         jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);

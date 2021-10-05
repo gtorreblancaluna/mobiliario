@@ -709,7 +709,7 @@
                 <Component class="javax.swing.JButton" name="jButton5">
                   <Properties>
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                      <Image iconType="3" name="/img/inventory-maintenance-icon.png"/>
+                      <Image iconType="3" name="/img/Inventory-maintenance-icon-32px.png"/>
                     </Property>
                     <Property name="toolTipText" type="java.lang.String" value="Configurar material  para venta de articulo"/>
                     <Property name="focusable" type="boolean" value="false"/>

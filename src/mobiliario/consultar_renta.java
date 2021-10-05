@@ -9,6 +9,7 @@ import clases.Mail;
 import clases.sqlclass;
 import com.mysql.jdbc.MysqlDataTruncation;
 import exceptions.BusinessException;
+import forms.material.inventory.GenerateReportMaterialSaleItemsView;
 import forms.proveedores.OrderProviderForm;
 import java.awt.Desktop;
 import java.awt.Toolkit;
@@ -161,6 +162,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jButton2.setEnabled(false);
         jButton6.setEnabled(false);
         jbtn_refrescar.setEnabled(false);
+        btnInventoryMaterialReport.setEnabled(false);
     }
     
     private void enabledButtonsActions () {
@@ -177,6 +179,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jButton6.setEnabled(true);
         
         jbtn_refrescar.setEnabled(true);
+        btnInventoryMaterialReport.setEnabled(true);
     }
     
     
@@ -198,6 +201,14 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         disponibilidad_articulos ventana_disp = new disponibilidad_articulos(null, true);
         ventana_disp.setVisible(true);
         ventana_disp.setLocationRelativeTo(null);
+    }
+    
+    private void showMaterialSaleItemsWindow (String eventId) {
+        
+        GenerateReportMaterialSaleItemsView win = new GenerateReportMaterialSaleItemsView(eventId);
+        win.setLocation(this.getWidth() / 2 - win.getWidth() / 2, this.getHeight() / 2 - win.getHeight() / 2 - 20);
+        principal.jDesktopPane1.add(win);
+        win.show();
     }
     
     public void mostrar_faltantes() {
@@ -2101,6 +2112,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jtbtnGenerateExcel = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
+        btnInventoryMaterialReport = new javax.swing.JButton();
         jLabel30 = new javax.swing.JLabel();
         txt_buscar_folio = new javax.swing.JFormattedTextField();
         check_chofer = new javax.swing.JCheckBox();
@@ -2451,7 +2463,19 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         });
         jToolBar1.add(jButton6);
 
-        jPanel3.add(jToolBar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 20, 310, -1));
+        btnInventoryMaterialReport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Inventory-maintenance-icon-32px.png"))); // NOI18N
+        btnInventoryMaterialReport.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnInventoryMaterialReport.setFocusable(false);
+        btnInventoryMaterialReport.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnInventoryMaterialReport.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnInventoryMaterialReport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInventoryMaterialReportActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnInventoryMaterialReport);
+
+        jPanel3.add(jToolBar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 20, 340, -1));
 
         jLabel30.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel30.setText("Limitar los resultados a:");
@@ -5143,8 +5167,20 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jbtn_generar_reporte1MouseClicked
 
+    private void btnInventoryMaterialReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInventoryMaterialReportActionPerformed
+        
+        if (tabla_prox_rentas.getSelectedRow() == - 1) {
+           JOptionPane.showMessageDialog(null, "Selecciona una fila para continuar ", "ERROR", JOptionPane.INFORMATION_MESSAGE);
+           return;
+       }
+        String id = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
+        showMaterialSaleItemsWindow(id);
+        
+    }//GEN-LAST:event_btnInventoryMaterialReportActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnInventoryMaterialReport;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;

@@ -188,7 +188,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
         lblItem = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtProvider = new javax.swing.JTextField();
-        btnDelete1 = new javax.swing.JButton();
+        btnExportExcel = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
@@ -256,12 +256,12 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
 
         txtProvider.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
 
-        btnDelete1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        btnDelete1.setText("Exportar PDF");
-        btnDelete1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnDelete1.addActionListener(new java.awt.event.ActionListener() {
+        btnExportExcel.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnExportExcel.setText("Exportar Excel");
+        btnExportExcel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExportExcel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDelete1ActionPerformed(evt);
+                btnExportExcelActionPerformed(evt);
             }
         });
 
@@ -285,7 +285,6 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
                                         .addComponent(jLabel3)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 173, Short.MAX_VALUE))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(txtMaterial)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -307,7 +306,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnDelete)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnDelete1)
+                        .addComponent(btnExportExcel)
                         .addContainerGap())))
         );
         jPanel1Layout.setVerticalGroup(
@@ -339,7 +338,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
                     .addComponent(btnDelete)
                     .addComponent(btnProviders)
                     .addComponent(btnMaterial)
-                    .addComponent(btnDelete1))
+                    .addComponent(btnExportExcel))
                 .addContainerGap())
         );
 
@@ -420,9 +419,9 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
         save();
     }//GEN-LAST:event_btnAddActionPerformed
 
-    private void btnDelete1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelete1ActionPerformed
+    private void btnExportExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportExcelActionPerformed
         systemService.exportarExcel(table);
-    }//GEN-LAST:event_btnDelete1ActionPerformed
+    }//GEN-LAST:event_btnExportExcelActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         delete();
@@ -438,7 +437,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnDelete;
-    private javax.swing.JButton btnDelete1;
+    private javax.swing.JButton btnExportExcel;
     private javax.swing.JButton btnMaterial;
     private javax.swing.JButton btnProviders;
     private javax.swing.JLabel jLabel1;

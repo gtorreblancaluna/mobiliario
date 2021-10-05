@@ -3,11 +3,13 @@ package dao.material.inventory;
 import dao.MyBatisConnectionFactory;
 import exceptions.DataOriginException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import model.material.inventory.MaterialArea;
 import model.material.inventory.MaterialInventory;
 import model.material.inventory.MaterialSaleItem;
+import model.material.inventory.MaterialSaleItemReport;
 import model.material.inventory.MeasurementUnit;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -30,6 +32,21 @@ public class MaterialInventoryDAO {
         return SINGLE_INSTANCE;
     }
     
+    public List<MaterialSaleItemReport> getMaterialSaleItemsByItemsIdReport (String rentId) throws DataOriginException{
+        List<MaterialSaleItemReport> list = null;
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+            list = (List<MaterialSaleItemReport>) session.selectList("MapperMaterialInventory.getMaterialSaleItemsByItemsIdReport", rentId);
+         }catch(Exception e){
+            log.error(e);
+            throw new DataOriginException(e.getMessage(),e.getCause());
+        } finally {
+            session.close();
+        }
+        
+        return list;
+    }
+    
     public List<MaterialSaleItem> getMaterialSaleItemsByItemId (Long id) throws DataOriginException{
         List<MaterialSaleItem> list = null;
         SqlSession session = sqlSessionFactory.openSession();
@@ -45,6 +62,7 @@ public class MaterialInventoryDAO {
         
         return list;
     }
+    
     
     public List<MaterialSaleItem> getMaterialSaleItemsByItemsId (String itemsId) throws DataOriginException{
         List<MaterialSaleItem> list = null;

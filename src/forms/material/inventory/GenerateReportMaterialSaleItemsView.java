@@ -2,38 +2,112 @@ package forms.material.inventory;
 
 import clases.sqlclass;
 import java.util.List;
-import java.util.stream.Collectors;
-import model.Renta;
-import model.material.inventory.MaterialSaleItem;
+import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import model.material.inventory.MaterialSaleItemReport;
 import services.SaleService;
+import services.SystemService;
 import services.material.inventory.MaterialInventoryService;
 
 public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFrame {
 
     private final SaleService saleService;
+    private final SystemService systemService;
     private final MaterialInventoryService materialInventoryService;
-    private final sqlclass funcion = new sqlclass();  
+    private final sqlclass funcion = new sqlclass();
+    private String gRentId;
     
-    public GenerateReportMaterialSaleItemsView(String id) {
+    public GenerateReportMaterialSaleItemsView(String rentId) {
         initComponents();
         funcion.conectate();
         saleService = SaleService.getInstance();
+        systemService = SystemService.getInstance();
         materialInventoryService = MaterialInventoryService.getInstance();
-        init(id);
+        this.setClosable(true);
+        this.setTitle("Generar reporte RECOLECCIÓN DE MATERIAL");
+        radioAll.setSelected(true);
+        this.gRentId = rentId;
+        init();
     }
     
-    private void init (String id) {
-        Renta renta = saleService.obtenerRentaPorId(new Integer(id), funcion);
-        String itemsId = 
-                renta.getDetalleRenta()
-                .stream()
-                .map(t -> t.getArticulo().getArticuloId()+"")
-                .collect(Collectors.joining(","));
+    private void recharge () {
+        init();
+    }
+    
+    private void removeItems () {
+        if (table.getSelectedRow() != -1) {
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            int[] rows = table.getSelectedRows();
+            for(int i=0;i<rows.length;i++){
+              model.removeRow(rows[i]-i);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Selecciona una o varias filas para quitar del reporte", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void formatTable () {
+        Object[][] data = {{"", "", "","","","","","","","",""}};
+        String[] columnNames = {"Cantidad Pedido","Artículo", "Cantidad","U. Medida", "Material","Calculo","Calculo Redondeado","U. Medida","Proveedor","Dirección","Teléfonos"};
+        DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
+        table.setModel(tableModel);
+        
+        TableRowSorter<TableModel> order = new TableRowSorter<TableModel>(tableModel); 
+        table.setRowSorter(order);
+        
+        DefaultTableCellRenderer right = new DefaultTableCellRenderer();
+        right.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        int[] anchos = {70,180,80,120,180,70,70,120,120,120,120};
+
+        for (int inn = 0; inn < table.getColumnCount(); inn++) {
+            table.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
+        }
+
         try {
-            List<MaterialSaleItem> list = materialInventoryService.getMaterialSaleItemsByItemsId(itemsId);
+            DefaultTableModel temp = (DefaultTableModel) table.getModel();
+            temp.removeRow(temp.getRowCount() - 1);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            ;
+        }
+        
+        table.getColumnModel().getColumn(0).setCellRenderer(right);
+        table.getColumnModel().getColumn(2).setCellRenderer(right);
+        table.getColumnModel().getColumn(5).setCellRenderer(right);
+        table.getColumnModel().getColumn(6).setCellRenderer(right);
+    }
+    
+    private void init () {
+        
+        try {
+            List<MaterialSaleItemReport> list = materialInventoryService.getMaterialSaleItemsByItemsIdReport(this.gRentId);
+            formatTable();
+            
+            for (MaterialSaleItemReport material : list) {
+                DefaultTableModel temp = (DefaultTableModel) table.getModel();
+                Object row[] = {
+                    material.getAmountItem(),
+                    material.getDescriptionItem(),
+                    material.getAmount(),
+                    material.getMeasurementUnitDescription(),
+                    material.getMaterialInventoryDescription(),
+                    material.getPurchaseAmount(),
+                    material.getPurchaseAmountRound(),
+                    material.getPurchaseMeasurementUnitDescription(),
+                    material.getProviderName(),
+                    material.getProviderAddress(),
+                    material.getProviderPhoneNumber()
+                };
+                temp.addRow(row); 
+            }
             
         } catch (Exception e) {
-    
+            JOptionPane.showMessageDialog(this, e, "ERROR", JOptionPane.ERROR_MESSAGE);
+           return;
         }
     }
 
@@ -55,12 +129,14 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
         table = new javax.swing.JTable();
         btnPDF = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
+        radioProvider = new javax.swing.JRadioButton();
+        radioAll = new javax.swing.JRadioButton();
+        btnExcel = new javax.swing.JButton();
+        btnRecharge = new javax.swing.JButton();
 
         jScrollPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
-        table.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        table.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -76,47 +152,77 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
 
         btnPDF.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnPDF.setText("Generar PDF");
+        btnPDF.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         btnDelete.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        btnDelete.setText("Eliminar");
+        btnDelete.setText("Quitar del reporte");
+        btnDelete.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
 
-        buttonGroup1.add(jRadioButton3);
-        jRadioButton3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jRadioButton3.setText("Por proveedor");
-        jRadioButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        buttonGroup1.add(radioProvider);
+        radioProvider.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        radioProvider.setText("Por proveedor");
+        radioProvider.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
-        buttonGroup1.add(jRadioButton4);
-        jRadioButton4.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jRadioButton4.setText("Todo");
-        jRadioButton4.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        buttonGroup1.add(radioAll);
+        radioAll.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        radioAll.setText("Todo");
+        radioAll.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        btnExcel.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnExcel.setText("Generar Excel");
+        btnExcel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExcel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcelActionPerformed(evt);
+            }
+        });
+
+        btnRecharge.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnRecharge.setText("Recargar consulta");
+        btnRecharge.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnRecharge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRechargeActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap(395, Short.MAX_VALUE)
-                        .addComponent(jRadioButton3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jRadioButton4)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnDelete)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnPDF))
-                    .addComponent(jScrollPane1))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(radioProvider)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioAll)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnRecharge)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnDelete)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnPDF)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnExcel))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 980, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(7, Short.MAX_VALUE)
+                .addContainerGap(24, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnPDF)
                     .addComponent(btnDelete)
-                    .addComponent(jRadioButton3)
-                    .addComponent(jRadioButton4))
+                    .addComponent(radioProvider)
+                    .addComponent(btnExcel)
+                    .addComponent(btnRecharge)
+                    .addComponent(radioAll))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 349, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -125,18 +231,32 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcelActionPerformed
+        systemService.exportarExcel(table);
+    }//GEN-LAST:event_btnExcelActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        removeItems();
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnRechargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRechargeActionPerformed
+        recharge();
+    }//GEN-LAST:event_btnRechargeActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnExcel;
     private javax.swing.JButton btnPDF;
+    private javax.swing.JButton btnRecharge;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.ButtonGroup buttonGroup4;
     private javax.swing.ButtonGroup buttonGroup5;
-    private javax.swing.JRadioButton jRadioButton3;
-    private javax.swing.JRadioButton jRadioButton4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JRadioButton radioAll;
+    private javax.swing.JRadioButton radioProvider;
     private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
 }
