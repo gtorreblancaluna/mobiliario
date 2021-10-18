@@ -12,6 +12,7 @@
         <result property="purchaseAmount" column="purchase_amount"/>
         <result property="purchaseAmountRound" column="purchase_amount_round"/>
         <result property="purchaseMeasurementUnitDescription" column="purchase_measurement_unit_description"/>
+        <result property="providerId" column="provider_id"/>
         <result property="providerName" column="provider_name"/>
         <result property="providerAddress" column="provider_address"/>
         <result property="providerPhoneNumber" column="provider_phone_number"/>
@@ -90,6 +91,7 @@
         ) AS purchase_amount_round,
         measurement_units_purchase.description AS purchase_measurement_unit_description,
         CONCAT(proveedores.nombre," ",proveedores.apellidos) AS provider_name,
+        proveedores.id AS provider_id,
         proveedores.direccion AS provider_address,
         proveedores.telefonos AS provider_phone_number
         FROM renta renta 
@@ -109,7 +111,8 @@
             purchase_measurement_unit_description,
             provider_name,
             provider_address,
-            provider_phone_number
+            provider_phone_number,
+            provider_id
     </select>
     
     <insert id="insertMaterialSaleItem" parameterType="model.material.inventory.MaterialSaleItem" >

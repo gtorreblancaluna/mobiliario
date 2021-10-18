@@ -113,8 +113,9 @@ public interface ApplicationConstants {
     public static final String NOMBRE_REPORTE_NUEVO_PEDIDO = "/reporte.pdf";
     public static final String RUTA_LOGO_EMPRESA = "/";
     public static final String URL_SUB_REPORT_CONSULTA = "/";
-     public static final String RUTA_REPORTE_ORDEN_PROVEEDOR = "/reporte_proveedor.jasper";
+    public static final String RUTA_REPORTE_ORDEN_PROVEEDOR = "/reporte_proveedor.jasper";
     public static final String NOMBRE_REPORTE_ORDEN_PROVEEDOR = "/reporte_proveedor.pdf";
+    public static final String JASPER_REPORT_COLLECTION_MATERIAL = "/reporteRecoleccion.jasper";
     
 
 }

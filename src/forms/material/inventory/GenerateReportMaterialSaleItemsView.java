@@ -1,38 +1,154 @@
 package forms.material.inventory;
 
-import clases.sqlclass;
+import java.awt.Desktop;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import mobiliario.ApplicationConstants;
 import model.material.inventory.MaterialSaleItemReport;
-import services.SaleService;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
 import services.SystemService;
 import services.material.inventory.MaterialInventoryService;
+import utilities.Utility;
 
 public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFrame {
-
-    private final SaleService saleService;
+    
     private final SystemService systemService;
     private final MaterialInventoryService materialInventoryService;
-    private final sqlclass funcion = new sqlclass();
-    private String gRentId;
+    private final String gRentId;
     
     public GenerateReportMaterialSaleItemsView(String rentId) {
         initComponents();
-        funcion.conectate();
-        saleService = SaleService.getInstance();
         systemService = SystemService.getInstance();
         materialInventoryService = MaterialInventoryService.getInstance();
         this.setClosable(true);
         this.setTitle("Generar reporte RECOLECCIÓN DE MATERIAL");
-        radioAll.setSelected(true);
+        this.lblInfo.setText("FOLIO: "+rentId);
         this.gRentId = rentId;
         init();
     }
+    
+    private enum Header {
+        
+        ORDER_AMOUNT(0),
+        ITEM_DESCRIPTION(1),
+        AMOUNT(2),
+        MEASUREMENT_UNIT(3),
+        MATERIAL_DESCRIPTION(4),
+        PURCHASE_AMOUNT(5),
+        PURCHASE_AMOUNT_ROUND(6),
+        PURCHASE_MEASUREMENT_UNIT(7),
+        PROVIDER_NAME(8),
+        PROVIDER_ADDRESS(9),
+        PROVIDER_TEL(10),
+        PROVIDER_ID(11);
+        
+        private Header (Integer column) {
+            this.column = column;
+        }
+        
+        private Integer column;
+
+        public Integer getColumn() {
+            return column;
+        }
+        
+    }
+    
+    private void generatePDF () {
+        
+       if(table.getRowCount() == 0){
+           JOptionPane.showMessageDialog(this, "No hay elementos en la tabla para generar el reporte", "ERROR", JOptionPane.ERROR_MESSAGE);
+           return;
+       }
+        
+        List<String> providersId = new ArrayList<>();
+        for (int i = 0; i < table.getRowCount(); i++) {
+            if (providersId.isEmpty()) {
+                providersId.add(table.getValueAt(i, Header.PROVIDER_ID.getColumn()).toString());
+            } else {
+                if (!providersId.contains(table.getValueAt(i, Header.PROVIDER_ID.getColumn()).toString())) {
+                    providersId.add(table.getValueAt(i, Header.PROVIDER_ID.getColumn()).toString());
+                }
+            }
+        }
+        
+        for (String providerId : providersId) {
+            List<MaterialSaleItemReport> result = new ArrayList<>();
+            for (int i = 0; i < table.getRowCount(); i++) {
+                if ( table.getValueAt(i, Header.PROVIDER_ID.getColumn()).equals(providerId) ) {
+                    MaterialSaleItemReport materialSaleItemReport = new MaterialSaleItemReport();
+                    materialSaleItemReport.setDescriptionItem(table.getValueAt(i, Header.ITEM_DESCRIPTION.getColumn()).toString());
+                    materialSaleItemReport.setPurchaseAmountRound(new Float(table.getValueAt(i, Header.PURCHASE_AMOUNT_ROUND.getColumn()).toString()));
+                    materialSaleItemReport.setPurchaseMeasurementUnitDescription(table.getValueAt(i, Header.PURCHASE_MEASUREMENT_UNIT.getColumn()).toString());
+                    materialSaleItemReport.setMaterialInventoryDescription(table.getValueAt(i, Header.MATERIAL_DESCRIPTION.getColumn()).toString());
+                    materialSaleItemReport.setProviderId(
+                            table.getValueAt(i, Header.PROVIDER_ID.getColumn()).toString()
+                    );
+                    materialSaleItemReport.setProviderAddress(
+                            table.getValueAt(i, Header.PROVIDER_ADDRESS.getColumn()).toString()
+                    );
+                    materialSaleItemReport.setProviderPhoneNumber(
+                            table.getValueAt(i, Header.PROVIDER_TEL.getColumn()).toString()
+                    );
+                    materialSaleItemReport.setProviderName(
+                            table.getValueAt(i, Header.PROVIDER_NAME.getColumn()).toString()
+                    );
+                    result.add(materialSaleItemReport);
+                }
+            }
+            try {
+                reportPDF(result);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e, "ERROR", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+        
+        
+    }
+    
+    private void reportPDF(List<MaterialSaleItemReport> list) throws Exception{
+     
+        JasperPrint jasperPrint;
+        String pathLocation = Utility.getPathLocation();
+        String pathFile = pathLocation+ApplicationConstants.JASPER_REPORT_COLLECTION_MATERIAL;
+        System.out.println("Cargando desde: " + pathFile);
+        if (pathFile == null || pathFile.isEmpty()) {
+            JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper: "+pathFile);
+            return;
+        }
+        JasperReport masterReport;
+
+        masterReport = (JasperReport) JRLoader.loadObject(pathFile);            
+        Map params = new HashMap<>();
+        params.put("RENT_ID",this.gRentId);
+        params.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA);
+        params.put("LIST", list);
+        params.put("PROVIDER_NAME", list.get(0).getProviderName());
+        params.put("PROVIDER_PHONE_NUMBER", list.get(0).getProviderPhoneNumber());
+        params.put("PROVIDER_ADDRESS", list.get(0).getProviderAddress());
+        JRDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(list);
+        jasperPrint = JasperFillManager.fillReport(masterReport, params, beanCollectionDataSource);
+        JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+"collectionMaterialReport_"+list.get(0).getProviderId()+".pdf");
+        File fileReport = new File(pathLocation+"collectionMaterialReport_"+list.get(0).getProviderId()+".pdf");
+        Desktop.getDesktop().open(fileReport);
+     
+     }
     
     private void recharge () {
         init();
@@ -51,8 +167,8 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
     }
     
     private void formatTable () {
-        Object[][] data = {{"", "", "","","","","","","","",""}};
-        String[] columnNames = {"Cantidad Pedido","Artículo", "Cantidad","U. Medida", "Material","Calculo","Calculo Redondeado","U. Medida","Proveedor","Dirección","Teléfonos"};
+        Object[][] data = {{"", "", "","","","","","","","","",""}};
+        String[] columnNames = {"Cantidad Pedido","Artículo", "Cantidad","U. Medida", "Material","Calculo","Calculo Redondeado","U. Medida","Proveedor","Dirección","Teléfonos","provider_id"};
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
         table.setModel(tableModel);
         
@@ -62,7 +178,7 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
         DefaultTableCellRenderer right = new DefaultTableCellRenderer();
         right.setHorizontalAlignment(SwingConstants.RIGHT);
 
-        int[] anchos = {70,180,80,120,180,70,70,120,120,120,120};
+        int[] anchos = {70,180,80,120,180,70,70,120,120,120,120,70};
 
         for (int inn = 0; inn < table.getColumnCount(); inn++) {
             table.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -75,10 +191,14 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
             ;
         }
         
-        table.getColumnModel().getColumn(0).setCellRenderer(right);
-        table.getColumnModel().getColumn(2).setCellRenderer(right);
-        table.getColumnModel().getColumn(5).setCellRenderer(right);
-        table.getColumnModel().getColumn(6).setCellRenderer(right);
+        table.getColumnModel().getColumn(
+                Header.ORDER_AMOUNT.getColumn()
+        ).setCellRenderer(right);
+        table.getColumnModel().getColumn(Header.AMOUNT.getColumn()).setCellRenderer(right);
+        table.getColumnModel().getColumn(Header.PURCHASE_AMOUNT.getColumn()).setCellRenderer(right);
+        table.getColumnModel().getColumn(Header.PURCHASE_AMOUNT_ROUND.getColumn()).setCellRenderer(right);
+        table.getColumnModel().getColumn(Header.PROVIDER_ID.getColumn()).setMaxWidth(0);
+        table.getColumnModel().getColumn(Header.PROVIDER_ID.getColumn()).setMinWidth(0);
     }
     
     private void init () {
@@ -100,7 +220,8 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
                     material.getPurchaseMeasurementUnitDescription(),
                     material.getProviderName(),
                     material.getProviderAddress(),
-                    material.getProviderPhoneNumber()
+                    material.getProviderPhoneNumber(),
+                    material.getProviderId()
                 };
                 temp.addRow(row); 
             }
@@ -129,10 +250,9 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
         table = new javax.swing.JTable();
         btnPDF = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
-        radioProvider = new javax.swing.JRadioButton();
-        radioAll = new javax.swing.JRadioButton();
         btnExcel = new javax.swing.JButton();
         btnRecharge = new javax.swing.JButton();
+        lblInfo = new javax.swing.JLabel();
 
         jScrollPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
@@ -153,6 +273,11 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
         btnPDF.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnPDF.setText("Generar PDF");
         btnPDF.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnPDF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPDFActionPerformed(evt);
+            }
+        });
 
         btnDelete.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnDelete.setText("Quitar del reporte");
@@ -162,16 +287,6 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
                 btnDeleteActionPerformed(evt);
             }
         });
-
-        buttonGroup1.add(radioProvider);
-        radioProvider.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        radioProvider.setText("Por proveedor");
-        radioProvider.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        buttonGroup1.add(radioAll);
-        radioAll.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        radioAll.setText("Todo");
-        radioAll.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         btnExcel.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnExcel.setText("Generar Excel");
@@ -191,16 +306,15 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
             }
         });
 
+        lblInfo.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(radioProvider)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(radioAll)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnRecharge)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDelete)
@@ -215,15 +329,19 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(24, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnPDF)
-                    .addComponent(btnDelete)
-                    .addComponent(radioProvider)
-                    .addComponent(btnExcel)
-                    .addComponent(btnRecharge)
-                    .addComponent(radioAll))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap(27, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnPDF)
+                            .addComponent(btnDelete)
+                            .addComponent(btnExcel)
+                            .addComponent(btnRecharge))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 349, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -243,6 +361,10 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
         recharge();
     }//GEN-LAST:event_btnRechargeActionPerformed
 
+    private void btnPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPDFActionPerformed
+        generatePDF();
+    }//GEN-LAST:event_btnPDFActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDelete;
@@ -255,8 +377,7 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
     private javax.swing.ButtonGroup buttonGroup4;
     private javax.swing.ButtonGroup buttonGroup5;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JRadioButton radioAll;
-    private javax.swing.JRadioButton radioProvider;
+    private javax.swing.JLabel lblInfo;
     private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
 }
