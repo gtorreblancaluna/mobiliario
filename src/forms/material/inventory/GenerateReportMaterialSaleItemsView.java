@@ -142,6 +142,7 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
         params.put("PROVIDER_NAME", list.get(0).getProviderName());
         params.put("PROVIDER_PHONE_NUMBER", list.get(0).getProviderPhoneNumber());
         params.put("PROVIDER_ADDRESS", list.get(0).getProviderAddress());
+        params.put("SUBREPORT_DIR", pathLocation+"/");
         JRDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(list);
         jasperPrint = JasperFillManager.fillReport(masterReport, params, beanCollectionDataSource);
         JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+"collectionMaterialReport_"+list.get(0).getProviderId()+".pdf");

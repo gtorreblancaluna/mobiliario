@@ -3,9 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/data/material/inventory/MapperMaterialInventory.xml</file>
-            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/forms/material/inventory/MaterialInventoryView.java</file>
+            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/clases/Mail.java</file>
+            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/mobiliario/consultar_renta.java</file>
+            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/clases/conectate.java</file>
+            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/configuration.properties</file>
             <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/forms/material/inventory/GenerateReportMaterialSaleItemsView.java</file>
+            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/mobiliario/ApplicationConstants.java</file>
+            <file>file:/Users/idscomercial/Developer/projects/mobiliario/src/clases/JCMail_enviar_prueba.java</file>
         </group>
     </open-files>
 </project-private>

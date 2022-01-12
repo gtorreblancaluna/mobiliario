@@ -5,8 +5,8 @@ package clases;
  * and open the template in the editor.
  */
 
-import javax.activation.DataHandler;  //para enviar imagen adjunta
-import javax.activation.FileDataSource; //para enviar imagen adjunta
+//import javax.activation.DataHandler;  //para enviar imagen adjunta
+//import javax.activation.FileDataSource; //para enviar imagen adjunta
 import java.util.Date;
 import javax.mail.Message;
 import javax.mail.Session;
@@ -68,7 +68,7 @@ public class JCMail_enviar_prueba {
             String m="";
             BodyPart archivo = new MimeBodyPart();
             if(Adjunto!=""){
-                            archivo.setDataHandler(new DataHandler(new FileDataSource(Adjunto)));
+//                            archivo.setDataHandler(new DataHandler(new FileDataSource(Adjunto)));
                             String[] tmp =Adjunto.split("/");
                             int j=0;
                             while( j < tmp.length){
