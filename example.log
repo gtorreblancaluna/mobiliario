@@ -1,0 +1,13 @@
+2019-03-20 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - PooledDataSource forcefully closed/removed all connections.
+2019-03-20 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - PooledDataSource forcefully closed/removed all connections.
+2019-03-20 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - PooledDataSource forcefully closed/removed all connections.
+2019-03-20 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - PooledDataSource forcefully closed/removed all connections.
+2019-03-20 DEBUG [AWT-EventQueue-0] (iniciar_sesion.java:110) - iniciando sesion 
+2019-03-20 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - Created connection 1101024891.
+2019-03-20 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ooo Connection Opened
+2019-03-20 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT u.*, p.id_puesto, p.descripcion FROM usuarios u INNER JOIN puesto p ON (p.id_puesto = u.id_puesto) WHERE contraseña = ? 
+2019-03-20 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 0000(String)
+2019-03-20 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: id_usuarios, nombre, apellidos, tel_movil, tel_fijo, direccion, administrador, nivel1, nivel2, contraseña, activo, id_puesto, id_puesto, descripcion
+2019-03-20 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 20, Proveedor, Recoge, -, -, -, 0, 1, null, 0000, 1, 1, 1, Chofer
+2019-03-20 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - xxx Connection Closed
+2019-03-20 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - Returned connection 1101024891 to pool.

@@ -1,0 +1,95 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package services.providers;
+
+import dao.providers.OrderProviderDAO;
+import dao.providers.ProvidersPaymentsDAO;
+import exceptions.BusinessException;
+import exceptions.DataOriginException;
+import java.util.List;
+import model.providers.OrdenProveedor;
+import parametersVO.ParameterOrderProvider;
+
+/**
+ *
+ * @author idscomercial
+ */
+public class OrderProviderService {
+    
+    // singlenton instance
+    private static final OrderProviderService SINGLE_INSTANCE = new OrderProviderService();
+    
+    private OrderProviderService(){}
+    
+    public static OrderProviderService getInstance() {
+      return SINGLE_INSTANCE;
+    }
+    
+    private final OrderProviderDAO orderProviderDAO = OrderProviderDAO.getInstance();
+    private final ProvidersPaymentsDAO providersPaymentsDAO = ProvidersPaymentsDAO.getInstance();
+    
+    public void saveOrder(OrdenProveedor orden)throws BusinessException{
+        try{
+            orderProviderDAO.saveOrder(orden);
+        }catch(DataOriginException e){
+          throw new BusinessException(e.getMessage(),e.getCause());
+        }
+    }
+    
+    public void updateOrder(OrdenProveedor orden)throws BusinessException{
+        try{
+            orderProviderDAO.updateOrder(orden);
+        }catch(DataOriginException e){
+          throw new BusinessException(e.getMessage(),e.getCause());
+        }
+        
+    }
+    
+    public OrdenProveedor getOrderById(Long id)throws BusinessException{
+        
+        OrdenProveedor ordenProveedor;
+        try{
+            ordenProveedor =  orderProviderDAO.getOrderById(id);
+            
+            if(ordenProveedor!= null){
+                ordenProveedor.setPagosProveedor(
+                        providersPaymentsDAO.getAllProviderPaymentsByOrderId(ordenProveedor.getId()));
+            }
+        }catch(DataOriginException e){
+          throw new BusinessException(e.getMessage(),e.getCause());
+        }
+        
+        return ordenProveedor;
+    }
+    
+    public List<OrdenProveedor> getOrdersByRentaId(Integer rentaId)throws BusinessException{
+        try{
+            return orderProviderDAO.getOrdersByRentaId(rentaId);
+        }catch(DataOriginException e){
+          throw new BusinessException(e.getMessage(),e.getCause());
+        }
+    }
+    
+    public List<OrdenProveedor> getOrdersByParameters(ParameterOrderProvider parameter)throws BusinessException{
+        
+        List<OrdenProveedor> list;
+        try{
+            list = orderProviderDAO.getOrdersByParameters(parameter);
+            
+            if(list != null && list.size()>0){
+                // add payments
+                for(OrdenProveedor orden : list){
+                    orden.setPagosProveedor(providersPaymentsDAO.getAllProviderPaymentsByOrderId(orden.getId()));
+                }
+            }
+        }catch(DataOriginException e){
+          throw new BusinessException(e.getMessage(),e.getCause());
+        }
+        
+        return list;
+    }
+    
+}

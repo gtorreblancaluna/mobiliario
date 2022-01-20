@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperOrdenProveedor">
+    
+    <resultMap id="resultDetailOrderProvider" type="model.providers.DetalleOrdenProveedor">
+        
+        <result property="id" column="id"/>
+        <result property="idOrdenProveedor" column="id_orden_proveedor"/>
+        <result property="cantidad" column="cantidad"/>
+        <result property="precio" column="precio"/>   
+        <result property="comentario" column="comentario"/>        
+        <result property="tipoOrden" column="tipo_orden"/>
+        <result property="fgActivo" column="fg_activo"/> 
+        <result property="creado" column="creado"/> 
+        <result property="actualizado" column="actualizado"/> 
+        <result property="status" column="status"/> 
+        
+        <result property="articulo.articuloId" column="articulo_id"/> 
+        <result property="articulo.descripcion" column="articulo_descripcion"/>
+        
+        <result property="articulo.color.color" column="articulo_color"/>         
+        
+    </resultMap>
+  
+    <resultMap id="resultOrderProvider" type="model.providers.OrdenProveedor">        
+        
+        <result property="id" column="id"/>
+        <result property="status" column="status"/>
+        <result property="fgActivo" column="fg_activo"/>        
+        <result property="creado" column="creado"/>
+        <result property="actualizado" column="actualizado"/> 
+        <!-- datos de la renta-->
+        <result property="renta.rentaId" column="renta_id"/>
+        <result property="renta.folio" column="renta_folio"/>
+        <result property="renta.descripcion" column="renta_descripcion"/>
+        <!-- datos usuario -->
+        <result property="usuario.nombre" column="usuario_nombre"/>
+        <result property="usuario.apellidos" column="usuario_apellidos"/>
+        <!-- datos proveedor -->
+        <result property="proveedor.id" column="proveedor_id"/>
+        <result property="proveedor.nombre" column="proveedor_nombre"/>
+        <result property="proveedor.apellidos" column="proveedor_apellidos"/>
+        <result property="proveedor.email" column="proveedor_email"/>
+        
+           
+    </resultMap>
+    
+    <select id= "getOrderByRentaId" resultMap="resultOrderProvider" parameterType="java.lang.Integer">
+         SELECT o.*,
+            r.id_renta AS renta_id,
+            r.folio AS renta_folio,
+            r.descripcion AS renta_descripcion,
+            u.nombre AS usuario_nombre,
+            u.apellidos AS usuario_apellidos,
+            p.id AS proveedor_id,
+            p.nombre AS proveedor_nombre,
+            p.apellidos AS proveedor_apellidos,
+            p.email AS proveedor_email
+        FROM orden_proveedor o
+            INNER JOIN renta r ON (r.id_renta = o.id_renta)
+            INNER JOIN usuarios u ON (u.id_usuarios = o.id_usuario)
+            INNER JOIN proveedores p ON (p.id = o.id_proveedores)
+        WHERE o.fg_activo = '1'
+        AND o.id_renta = #{rentaId}        
+    </select>
+    
+     <select id= "getOrderById" resultMap="resultOrderProvider" parameterType="java.lang.Long">
+         SELECT o.*,
+            r.id_renta AS renta_id,
+            r.folio AS renta_folio,
+            r.descripcion AS renta_descripcion,
+            u.nombre AS usuario_nombre,
+            u.apellidos AS usuario_apellidos,
+            p.id AS proveedor_id,
+            p.nombre AS proveedor_nombre,
+            p.apellidos AS proveedor_apellidos,
+            p.email AS proveedor_email
+        FROM orden_proveedor o
+            INNER JOIN renta r ON (r.id_renta = o.id_renta)
+            INNER JOIN usuarios u ON (u.id_usuarios = o.id_usuario)
+            INNER JOIN proveedores p ON (p.id = o.id_proveedores)
+        WHERE o.fg_activo = '1'
+        AND o.id = #{id}        
+    </select>
+    
+    <select id= "getOrdersByParameters" resultMap="resultOrderProvider" parameterType="parametersVO.ParameterOrderProvider">
+         SELECT o.*,
+            r.id_renta AS renta_id,
+            r.folio AS renta_folio,
+            r.descripcion AS renta_descripcion,
+            u.nombre AS usuario_nombre,
+            u.apellidos AS usuario_apellidos,
+            p.id AS proveedor_id,
+            p.nombre AS proveedor_nombre,
+            p.apellidos AS proveedor_apellidos,
+            p.email AS proveedor_email
+        FROM orden_proveedor o
+            INNER JOIN renta r ON (r.id_renta = o.id_renta)
+            INNER JOIN usuarios u ON (u.id_usuarios = o.id_usuario)
+            INNER JOIN proveedores p ON (p.id = o.id_proveedores)
+        WHERE o.fg_activo = '1'
+        <if test="orderId != null and orderId != '' ">
+            AND o.id = #{orderId}
+        </if> 
+        <if test="folioRenta != null and folioRenta != '' ">
+            AND r.folio = #{folioRenta}
+        </if> 
+        <if test="nameProvider != null and nameProvider != '' ">
+            AND p.nombre LIKE CONCAT('%',#{nameProvider},'%')
+        </if>  
+        <if test="initDate != null and endDate != null ">
+            AND o.creado BETWEEN #{initDate} AND #{endDate}
+        </if>  
+        <if test="status != null and status != '' ">
+            AND o.status = #{status}
+        </if>    
+        LIMIT #{limit}
+    </select>
+  
+    <select id="getAllOrderProvider" resultMap="resultOrderProvider" >
+        SELECT o.*,
+            r.id_renta AS renta_id,
+            r.folio AS renta_folio,
+            r.descripcion AS renta_descripcion,
+            u.nombre AS usuario_nombre,
+            u.apellidos AS usuario_apellidos,
+            p.id AS proveedor_id,
+            p.nombre AS proveedor_nombre,
+            p.apellidos AS proveedor_apellidos,
+            p.email AS proveedor_email
+        FROM orden_proveedor o
+            INNER JOIN renta r ON (r.id_renta = o.id_renta)
+            INNER JOIN usuarios u ON (u.id_usuarios = o.id_usuario)
+            INNER JOIN proveedores p ON (p.id = o.id_proveedores)
+        WHERE o.fg_activo = '1'
+        ORDER BY o.id DESC
+    </select>  
+    
+     <select id="getDetailOrderByOrderId" parameterType="java.lang.Long" resultMap="resultDetailOrderProvider">
+        SELECT detalle.*,
+            a.id_articulo AS articulo_id,
+            a.descripcion AS articulo_descripcion,
+            c.color AS articulo_color
+        FROM detalle_orden_proveedor detalle
+            INNER JOIN articulo a ON (a.id_articulo = detalle.id_articulo)
+            INNER JOIN color c ON (a.id_color = c.id_color)
+        WHERE detalle.fg_activo = '1'
+        AND detalle.id_orden_proveedor = #{idOrdenProveedor}
+        ORDER BY detalle.id DESC
+    </select>  
+    
+    <select id="getDetailOrderById" parameterType="java.lang.Long" resultMap="resultDetailOrderProvider">
+        SELECT detalle.*,
+            a.id_articulo AS articulo_id,
+            a.descripcion AS articulo_descripcion,
+            c.color AS articulo_color
+        FROM detalle_orden_proveedor detalle
+            INNER JOIN articulo a ON (a.id_articulo = detalle.id_articulo)
+            INNER JOIN color c ON (a.id_color = c.id_color)
+        WHERE detalle.fg_activo = '1'
+        AND detalle.id = #{id}
+    </select>  
+    
+    <update id="updateOrder" parameterType="model.providers.OrdenProveedor">
+        
+        UPDATE orden_proveedor SET
+            id_renta = #{renta.rentaId},
+            id_usuario = #{usuario.usuarioId},
+            id_proveedores = #{proveedor.id},
+            status = #{status},
+            comentario = #{comentario},
+            actualizado = #{actualizado} 
+        WHERE id = #{id}          
+        
+    </update>
+    
+    <insert id="saveOrder" parameterType="model.providers.OrdenProveedor"
+        useGeneratedKeys="true" keyProperty="id">
+        
+        INSERT INTO orden_proveedor
+        (   id_renta,
+            id_usuario,
+            id_proveedores,
+            status,
+            comentario,
+            creado,
+            actualizado
+        )
+        VALUES
+        (
+            #{renta.rentaId},
+            #{usuario.usuarioId},
+            #{proveedor.id},
+            #{status},
+            #{comentario},
+            #{creado},
+            #{actualizado}
+        )
+    </insert>
+    
+    <insert id="saveOrderDetail" parameterType="model.providers.DetalleOrdenProveedor">
+        INSERT INTO detalle_orden_proveedor
+        (   
+           id_orden_proveedor,
+           id_articulo,
+           cantidad,
+            precio,
+            comentario,
+            tipo_orden,
+            creado,
+            actualizado
+        )
+        VALUES
+        (
+            #{idOrdenProveedor},
+            #{articulo.articuloId},
+            #{cantidad},
+            #{precio},
+            #{comentario},
+            #{tipoOrden},
+            #{creado},
+            #{actualizado}
+        )
+    </insert>
+    
+    <update id="changeStatusDetailOrderById" parameterType="java.util.Map">
+        UPDATE detalle_orden_proveedor
+            SET status = #{statusToChange},
+                actualizado = #{dateTimestamp}
+        WHERE
+            id = #{id}
+    </update>
+  
+</mapper>

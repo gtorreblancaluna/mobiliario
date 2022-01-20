@@ -1,0 +1,64 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package services.providers;
+
+import dao.providers.OrderProviderDAO;
+import exceptions.BusinessException;
+import exceptions.DataOriginException;
+import java.util.List;
+import model.providers.OrdenProveedor;
+import parametersVO.ParameterOrderProvider;
+
+/**
+ *
+ * @author idscomercial
+ */
+public class OrderProviderService {
+    
+    private final OrderProviderDAO orderProviderDAO = new OrderProviderDAO();
+    
+    public void saveOrder(OrdenProveedor orden)throws BusinessException{
+        try{
+            orderProviderDAO.saveOrder(orden);
+        }catch(DataOriginException e){
+          throw new BusinessException(e.getMessage(),e.getCause());
+        }
+    }
+    
+    public void updateOrder(OrdenProveedor orden)throws BusinessException{
+        try{
+            orderProviderDAO.updateOrder(orden);
+        }catch(DataOriginException e){
+          throw new BusinessException(e.getMessage(),e.getCause());
+        }
+        
+    }
+    
+    public OrdenProveedor getOrderById(Integer id)throws BusinessException{
+        try{
+            return orderProviderDAO.getOrderById(id);
+        }catch(DataOriginException e){
+          throw new BusinessException(e.getMessage(),e.getCause());
+        }
+    }
+    
+    public List<OrdenProveedor> getOrdersByRentaId(Integer rentaId)throws BusinessException{
+        try{
+            return orderProviderDAO.getOrdersByRentaId(rentaId);
+        }catch(DataOriginException e){
+          throw new BusinessException(e.getMessage(),e.getCause());
+        }
+    }
+    
+    public List<OrdenProveedor> getOrdersByParameters(ParameterOrderProvider parameter)throws BusinessException{
+        try{
+            return orderProviderDAO.getOrdersByParameters(parameter);
+        }catch(DataOriginException e){
+          throw new BusinessException(e.getMessage(),e.getCause());
+        }
+    }
+    
+}

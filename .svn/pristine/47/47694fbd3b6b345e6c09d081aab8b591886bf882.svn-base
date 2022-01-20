@@ -1,0 +1,151 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package dao.providers;
+
+import dao.MyBatisConnectionFactory;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import model.providers.DetalleOrdenProveedor;
+import model.providers.OrdenProveedor;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.log4j.Logger;
+import parametersVO.ParameterOrderProvider;
+
+/**
+ *
+ * @author torreblanca gerardo
+ */
+public class OrderProviderDAO {
+    
+     private static Logger log = Logger.getLogger(OrderProviderDAO.class.getName());
+    private SqlSessionFactory sqlSessionFactory;
+    
+    public OrderProviderDAO() {
+        sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();
+    }
+    
+     public List<OrdenProveedor> getOrdersByRentaId(Integer rentaId){
+         List<OrdenProveedor> list = new ArrayList<>();
+         SqlSession session = sqlSessionFactory.openSession();
+          try{
+           list = (List<OrdenProveedor>) session.selectList("MapperOrdenProveedor.getOrderByRentaId",rentaId);   
+           
+            if(list != null && list.size()>0){
+                for(OrdenProveedor ordenProveedor : list){
+                     ordenProveedor.setDetalleOrdenProveedorList((List<DetalleOrdenProveedor>) 
+                       session.selectList("MapperOrdenProveedor.getDetailOrderByOrderId",ordenProveedor.getId()));
+                }
+            }
+         }catch(Exception ex){
+            log.error(ex);
+        } finally {
+            session.close();
+        }
+                    
+        return list;
+         
+     
+     }
+     
+      public OrdenProveedor getOrderById(Integer id){
+         OrdenProveedor orden = new OrdenProveedor();
+         SqlSession session = sqlSessionFactory.openSession();
+          try{
+           orden = (OrdenProveedor) session.selectOne("MapperOrdenProveedor.getOrderById",id);   
+           
+            if(orden != null ){
+                     orden.setDetalleOrdenProveedorList((List<DetalleOrdenProveedor>) 
+                       session.selectList("MapperOrdenProveedor.getDetailOrderByOrderId",orden.getId()));
+                
+            }
+         }catch(Exception ex){
+            log.error(ex);
+        } finally {
+            session.close();
+        }
+                    
+        return orden;
+         
+     
+     }
+     
+     public List<OrdenProveedor> getOrdersByParameters(ParameterOrderProvider parameter){
+         List<OrdenProveedor> list = new ArrayList<>();
+         SqlSession session = sqlSessionFactory.openSession();
+        try{           
+             list = (List<OrdenProveedor>) session.selectList("MapperOrdenProveedor.getOrdersByParameters",parameter);   
+        }catch(Exception ex){
+            log.error(ex);
+        } finally {
+            session.close();
+        }
+                    
+        return list;
+         
+     
+     }
+     
+     public void updateOrder(OrdenProveedor orden){
+       
+        orden.setActualizado(new Timestamp(System.currentTimeMillis()));
+        
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+           session.update("MapperOrdenProveedor.updateOrder",orden);     
+           session.commit();
+         }catch(Exception ex){
+            log.error(ex);
+        } finally {
+            session.close();
+        }
+        
+        for(DetalleOrdenProveedor detail : orden.getDetalleOrdenProveedorList()){
+            detail.setCreado(new Timestamp(System.currentTimeMillis()));
+            detail.setActualizado(new Timestamp(System.currentTimeMillis()));
+            detail.setIdOrdenProveedor(orden.getId());
+            saveOrderDetail(detail);
+        }
+    }
+    
+    public void saveOrder(OrdenProveedor orden){
+        orden.setCreado(new Timestamp(System.currentTimeMillis()));
+        orden.setActualizado(new Timestamp(System.currentTimeMillis()));
+        
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+           session.insert("MapperOrdenProveedor.saveOrder",orden);     
+           session.commit();
+         }catch(Exception ex){
+            log.error(ex);
+        } finally {
+            session.close();
+        }
+        
+        for(DetalleOrdenProveedor detail : orden.getDetalleOrdenProveedorList()){
+            detail.setCreado(new Timestamp(System.currentTimeMillis()));
+            detail.setActualizado(new Timestamp(System.currentTimeMillis()));
+            detail.setIdOrdenProveedor(orden.getId());
+            saveOrderDetail(detail);
+        }
+    }
+    
+    public void saveOrderDetail(DetalleOrdenProveedor detail){
+       
+        
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+           session.insert("MapperOrdenProveedor.saveOrderDetail",detail);     
+           session.commit();
+         }catch(Exception ex){
+            log.error(ex);
+        } finally {
+            session.close();
+        }
+    }
+    
+}

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperOrdenProveedor">
+    
+    <resultMap id="resultDetailOrderProvider" type="model.providers.DetalleOrdenProveedor">
+        
+        <result property="id" column="id"/>
+        <result property="idOrdenProveedor" column="id_orden_proveedor"/>
+        <result property="cantidad" column="orden_proveedor_status"/>
+        <result property="precio" column="orden_proveedor_fg_activo"/>        
+        <result property="tipoOrden" column="orden_proveedor_creado"/>
+        <result property="fgActivo" column="orden_proveedor_actualizado"/> 
+        <result property="creado" column="orden_proveedor_actualizado"/> 
+        <result property="actualizado" column="orden_proveedor_actualizado"/> 
+        
+        <result property="articulo.articuloId" column="articulo_id"/> 
+        <result property="articulo.descripcion" column="articulo_decripcion"/> 
+        
+        
+    </resultMap>
+  
+    <resultMap id="resultOrderProvider" type="model.providers.OrdenProveedor">        
+        
+        <result property="id" column="id"/>
+        <result property="status" column="status"/>
+        <result property="fgActivo" column="fg_activo"/>        
+        <result property="creado" column="creado"/>
+        <result property="actualizado" column="actualizado"/> 
+        <!-- datos de la renta-->
+        <result property="renta.rentaId" column="renta_id"/>
+        <result property="renta.folio" column="renta_folio"/>
+        <result property="renta.descripcion" column="renta_descripcion"/>
+        <!-- datos usuario -->
+        <result property="usuario.nombre" column="usuario_nombre"/>
+        <result property="usuario.apellidos" column="usuario_apellidos"/>
+        <!-- datos proveedor -->
+        <result property="proveedor.id" column="proveedor_id"/>
+        <result property="proveedor.nombre" column="proveedor_nombre"/>
+        <result property="proveedor.apellidos" column="proveedor_apellidos"/>
+        <result property="proveedor.email" column="proveedor_email"/>
+        
+           
+    </resultMap>
+  
+    <select id="getAllOrderProvider" resultMap="resultOrderProvider" >
+        SELECT o.*,
+            r.id AS renta_id,
+            r.folio AS renta_folio,
+            r.descripcion AS renta_descripcion,
+            u.nombre AS usuario_nombre
+            u.apellidos AS usuario_apellidos,
+            p.id AS proveedor_id,
+            p.nombre AS proveedor_nombre,
+            p.apellidos AS proveedor_apellidos,
+            p.email AS proveedor_email
+        FROM orden_proveedor o
+            INNER JOIN renta r ON (r.id_renta = o.id_renta)
+            INNER JOIN usuarios u ON (u.id_usuarios = o.id_usuarios)
+            INNER JOIN proveedor p ON (p.id = o.id_proveedor)
+        WHERE o.fg_activo = '1'
+        ORDER BY o.id DESC
+    </select>  
+    
+     <select id="getDetailOrderByOrderId" parameterType="java.lang.Long" resultMap="resultDetailOrderProvider">
+        SELECT detalle.*,
+            a.id AS articulo_id,
+            a.descripcion AS articulo_descripcion
+        FROM detalle_orden_proveedor detalle
+            INNER JOIN articulo a ON (a.id_articulos = detalle.id_articulo)
+        WHERE detalle.fg_activo = '1'
+        AND detalle.id_orden_proveedor = #{idOrdenProveedor}
+        ORDER BY detalle.id DESC
+    </select>  
+  
+</mapper>

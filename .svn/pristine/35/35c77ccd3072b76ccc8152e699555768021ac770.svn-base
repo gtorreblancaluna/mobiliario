@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperProveedores">
+  
+    <resultMap id="resultProvider" type="model.providers.Proveedor">
+        <result property="id" column="id"/>
+        <result property="nombre" column="nombre"/>
+        <result property="apellidos" column="apellidos"/>
+        <result property="direccion" column="direccion"/>        
+        <result property="telefonos" column="telefonos"/>
+        <result property="email" column="email"/>
+        <result property="fgActivo" column="fg_activo"/>        
+        <result property="creado" column="creado"/>
+        <result property="actualizado" column="actualizado"/>        
+    </resultMap>
+  
+    <select id="getAllProvider" resultMap="resultProvider" >
+        SELECT * FROM proveedores WHERE fg_activo = '1' ORDER BY nombre
+    </select> 
+    
+      <select id="searchByData" resultMap="resultProvider" parameterType="java.lang.String">
+        SELECT * FROM proveedores 
+          WHERE fg_activo = '1' 
+          AND nombre LIKE CONCAT('%',#{data},'%')
+          ORDER BY nombre
+    </select>  
+    
+    <select id="getById" resultMap="resultProvider" parameterType="java.lang.Long">
+        SELECT * FROM proveedores 
+          WHERE fg_activo = '1' 
+          AND id = #{id}
+    </select>  
+    
+    <update id="updateProvider" parameterType="model.providers.Proveedor">
+        UPDATE proveedores SET
+            nombre = #{nombre},
+            apellidos = #{apellidos},
+            direccion = #{direccion},
+            telefonos = #{telefonos},
+            email = #{email},
+            fg_activo = #{fgActivo},
+            actualizado = #{actualizado}
+        WHERE
+            id = #{id}
+        
+    </update>
+    
+     <update id="deleteById" parameterType="java.lang.Long">
+        UPDATE proveedores SET
+            fg_activo = '0'
+        WHERE
+            id = #{id}
+        
+    </update>
+    
+    <insert id="saveProvider" parameterType="model.providers.Proveedor">
+        INSERT INTO proveedores
+        (
+            nombre,
+            apellidos,
+            direccion,
+            telefonos,
+            email,
+            fg_activo,
+            creado,
+            actualizado
+        )
+        VALUES
+        (
+            #{nombre},
+            #{apellidos},
+            #{direccion},
+            #{telefonos},
+            #{email},
+            #{fgActivo},
+            #{creado},
+            #{actualizado}
+        )
+        
+    </insert>
+  
+</mapper>

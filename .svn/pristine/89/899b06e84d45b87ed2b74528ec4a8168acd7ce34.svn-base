@@ -1,0 +1,103 @@
+/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+/**
+ * Author:  jerry
+ * Created: 21/01/2019
+ */
+
+CREATE TABLE tipo_abono (
+  id_tipo_abono INT(11) NOT NULL AUTO_INCREMENT,
+  descripcion VARCHAR(150) NULL,
+  fg_activo ENUM('1','0') NOT NULL DEFAULT '1',  
+  fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
+  PRIMARY KEY(id_tipo_abono)
+)
+ENGINE = InnoDB;
+
+INSERT INTO tipo_abono (descripcion) VALUES ('Efectivo');
+INSERT INTO tipo_abono (descripcion) VALUES ('Transferencia bancaria');
+INSERT INTO tipo_abono (descripcion) VALUES ('Cheque');
+
+-- agregar columna 
+ALTER TABLE abonos ADD COLUMN id_tipo_abono INT(11) NOT NULL DEFAULT 1 AFTER comentario,
+ADD FOREIGN KEY fk_id_tipo_abono(id_tipo_abono) REFERENCES tipo_abono(id_tipo_abono) ON DELETE CASCADE;
+
+-- faltantes 2019.03.11 GTL
+
+CREATE TABLE faltantes (
+  id_faltante INT(11) NOT NULL AUTO_INCREMENT,
+  id_articulo INT(11) NOT NULL,
+  id_renta INT(11) NOT NULL,
+  id_usuarios INT(11) NOT NULL,
+  fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  cantidad FLOAT NULL,
+  comentario VARCHAR(350) NULL,
+  fg_faltante ENUM('1','0') NOT NULL DEFAULT '1',
+  fg_devolucion ENUM('1','0') NOT NULL DEFAULT '0',
+  fg_accidente_trabajo ENUM('1','0') NOT NULL DEFAULT '0',
+  fg_activo ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY(id_faltante),
+  CONSTRAINT fk_faltantes_articulo FOREIGN KEY (id_articulo) REFERENCES articulo (id_articulo),
+  CONSTRAINT fk_faltantes_renta FOREIGN KEY (id_renta) REFERENCES renta (id_renta),
+  CONSTRAINT fk_faltantes_usuario FOREIGN KEY (id_usuarios) REFERENCES usuarios (id_usuarios)
+)
+ENGINE = InnoDB;
+
+-- agregar columna 
+ALTER TABLE faltantes ADD COLUMN fg_accidente_trabajo ENUM('1','0') NOT NULL DEFAULT '0' AFTER fg_devolucion;
+
+-- agregar columna 
+ALTER TABLE articulo ADD COLUMN fecha_ultima_modificacion TIMESTAMP NULL;
+
+-- 2019.04.19 GTL, tabla para almacenar informacion de ingresos y egresos
+
+CREATE TABLE contabilidad (
+  id_contabilidad INT(11) NOT NULL AUTO_INCREMENT,
+  id_sub_categoria_contabilidad INT(11) NOT NULL,
+  id_usuarios INT(11) NOT NULL,
+  fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  comentario VARCHAR(350) NULL,
+  fg_activo ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY(id_contabilidad),
+  CONSTRAINT fk_contabilidad_sub_categoria_contablidad 
+    FOREIGN KEY (id_sub_categoria_contabilidad) REFERENCES sub_categoria_contabilidad (id_sub_categoria_contabilidad),
+  CONSTRAINT fk_contabilidad_usuario FOREIGN KEY (id_usuarios) REFERENCES usuarios (id_usuarios)
+)
+ENGINE = InnoDB;
+
+-- tipo de contabilidad
+
+CREATE TABLE categoria_contabilidad (
+  id_categoria_contabilidad INT(11) NOT NULL AUTO_INCREMENT,
+  descripcion VARCHAR(150) NULL,
+  fg_activo ENUM('1','0') NOT NULL DEFAULT '1',  
+  fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(id_categoria_contabilidad)
+)
+ENGINE = InnoDB;
+
+CREATE TABLE sub_categoria_contabilidad (
+  id_sub_categoria_contabilidad INT(11) NOT NULL AUTO_INCREMENT,
+  id_categoria_contabilidad INT(11) NOT NULL,
+  descripcion VARCHAR(150) NULL,
+  ingreso ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY(id_sub_categoria_contabilidad),
+  CONSTRAINT fk_categoria_contabilidad 
+    FOREIGN KEY (id_categoria_contabilidad) REFERENCES categoria_contabilidad (id_categoria_contabilidad)
+)
+ENGINE = InnoDB;
+
+INSERT INTO categoria_contabilidad (descripcion) VALUES ("operativos");
+INSERT INTO categoria_contabilidad (descripcion) VALUES ("administrativos");
+
+INSERT INTO sub_categoria_contabilidad (id_categoria_contabilidad,descripcion,ingreso)
+VALUES (1,"sueldos",'0');
+
+INSERT INTO sub_categoria_contabilidad (id_categoria_contabilidad,descripcion,ingreso)
+VALUES (1,"gasolina",'0');
+
+INSERT INTO sub_categoria_contabilidad (id_categoria_contabilidad,descripcion,ingreso)
+VALUES (2,"facturacion",'0');

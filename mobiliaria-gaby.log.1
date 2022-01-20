@@ -1,0 +1,613 @@
+2019-03-21 08:13:18,538 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:18,541 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 75(Integer)
+2019-03-21 08:13:18,609 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:18,611 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:18,617 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:18,619 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 75(Integer)
+2019-03-21 08:13:18,682 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:18,682 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:18,683 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:18,684 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 75(Integer)
+2019-03-21 08:13:18,741 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:18,742 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:18,743 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:18,743 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 75(Integer)
+2019-03-21 08:13:18,815 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:18,815 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:18,816 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:18,816 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 76(Integer), 2(String), 1(String)
+2019-03-21 08:13:18,878 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:18,878 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 7
+2019-03-21 08:13:18,883 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:18,884 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 76(Integer)
+2019-03-21 08:13:18,944 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:18,944 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:18,945 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:18,945 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 76(Integer)
+2019-03-21 08:13:19,009 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,010 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:19,015 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:19,016 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 76(Integer)
+2019-03-21 08:13:19,077 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,079 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:19,082 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:19,082 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 76(Integer)
+2019-03-21 08:13:19,142 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,142 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:19,143 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:19,144 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 77(Integer), 2(String), 1(String)
+2019-03-21 08:13:19,202 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,204 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 9
+2019-03-21 08:13:19,209 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:19,210 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 77(Integer)
+2019-03-21 08:13:19,276 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,276 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:19,279 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:19,279 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 77(Integer)
+2019-03-21 08:13:19,341 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,342 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:19,346 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:19,348 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 77(Integer)
+2019-03-21 08:13:19,409 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,410 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:19,412 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:19,413 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 77(Integer)
+2019-03-21 08:13:19,494 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,495 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:19,505 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:19,509 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 78(Integer), 2(String), 1(String)
+2019-03-21 08:13:19,567 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,568 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 3
+2019-03-21 08:13:19,570 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:19,571 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 78(Integer)
+2019-03-21 08:13:19,640 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,642 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:19,647 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:19,649 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 78(Integer)
+2019-03-21 08:13:19,706 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,707 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:19,709 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:19,710 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 78(Integer)
+2019-03-21 08:13:19,772 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,774 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:19,778 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:19,779 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 78(Integer)
+2019-03-21 08:13:19,838 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,839 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:19,841 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:19,842 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 279(Integer), 2(String), 1(String)
+2019-03-21 08:13:19,901 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,903 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:19,907 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:19,908 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 279(Integer)
+2019-03-21 08:13:19,974 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:19,975 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:19,980 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:19,981 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 279(Integer)
+2019-03-21 08:13:20,041 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,041 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:20,043 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:20,044 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 279(Integer)
+2019-03-21 08:13:20,106 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,106 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:20,107 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:20,107 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 279(Integer)
+2019-03-21 08:13:20,165 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,165 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:20,166 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:20,167 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 79(Integer), 2(String), 1(String)
+2019-03-21 08:13:20,244 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,245 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 9
+2019-03-21 08:13:20,245 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:20,246 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 79(Integer)
+2019-03-21 08:13:20,313 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,315 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:20,319 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:20,320 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 79(Integer)
+2019-03-21 08:13:20,388 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,389 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:20,393 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:20,395 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 79(Integer)
+2019-03-21 08:13:20,452 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,453 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:20,455 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:20,455 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 79(Integer)
+2019-03-21 08:13:20,513 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,514 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:20,515 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:20,515 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 397(Integer), 2(String), 1(String)
+2019-03-21 08:13:20,584 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,584 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 4
+2019-03-21 08:13:20,585 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:20,585 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 397(Integer)
+2019-03-21 08:13:20,645 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,645 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:20,646 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:20,646 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 397(Integer)
+2019-03-21 08:13:20,730 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,730 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:20,731 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:20,731 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 397(Integer)
+2019-03-21 08:13:20,789 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,789 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:20,790 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:20,791 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 397(Integer)
+2019-03-21 08:13:20,864 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,864 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:20,865 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:20,865 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 412(Integer), 2(String), 1(String)
+2019-03-21 08:13:20,962 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:20,963 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:20,966 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:20,967 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 412(Integer)
+2019-03-21 08:13:21,026 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,027 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:21,028 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:21,029 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 412(Integer)
+2019-03-21 08:13:21,087 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,088 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:21,090 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:21,090 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 412(Integer)
+2019-03-21 08:13:21,156 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,157 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:21,158 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:21,159 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 412(Integer)
+2019-03-21 08:13:21,216 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,216 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:21,220 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:21,222 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 80(Integer), 2(String), 1(String)
+2019-03-21 08:13:21,279 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,281 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 3
+2019-03-21 08:13:21,284 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:21,285 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 80(Integer)
+2019-03-21 08:13:21,350 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,351 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:21,355 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:21,356 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 80(Integer)
+2019-03-21 08:13:21,415 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,417 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:21,420 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:21,422 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 80(Integer)
+2019-03-21 08:13:21,481 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,482 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:21,484 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:21,484 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 80(Integer)
+2019-03-21 08:13:21,541 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,542 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:21,545 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:21,546 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 81(Integer), 2(String), 1(String)
+2019-03-21 08:13:21,607 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,607 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 33
+2019-03-21 08:13:21,608 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:21,609 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 81(Integer)
+2019-03-21 08:13:21,689 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,689 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:21,691 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:21,691 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 81(Integer)
+2019-03-21 08:13:21,747 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,747 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:21,748 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:21,748 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 81(Integer)
+2019-03-21 08:13:21,805 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,806 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:21,807 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:21,807 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 81(Integer)
+2019-03-21 08:13:21,864 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,865 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:21,866 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:21,866 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 84(Integer), 2(String), 1(String)
+2019-03-21 08:13:21,922 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,923 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 8
+2019-03-21 08:13:21,923 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:21,924 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 84(Integer)
+2019-03-21 08:13:21,987 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:21,987 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:21,989 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:21,989 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 84(Integer)
+2019-03-21 08:13:22,047 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,048 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,049 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:22,049 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 84(Integer)
+2019-03-21 08:13:22,107 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,108 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,108 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:22,109 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 84(Integer)
+2019-03-21 08:13:22,164 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,165 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,166 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:22,167 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 86(Integer), 2(String), 1(String)
+2019-03-21 08:13:22,230 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,230 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 1
+2019-03-21 08:13:22,231 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:22,231 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 86(Integer)
+2019-03-21 08:13:22,293 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,293 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,294 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:22,294 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 86(Integer)
+2019-03-21 08:13:22,356 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,356 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,357 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:22,357 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 86(Integer)
+2019-03-21 08:13:22,415 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,415 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,416 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:22,416 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 86(Integer)
+2019-03-21 08:13:22,477 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,478 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,480 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:22,480 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 87(Integer), 2(String), 1(String)
+2019-03-21 08:13:22,538 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,539 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,540 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:22,540 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 87(Integer)
+2019-03-21 08:13:22,604 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,604 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,605 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:22,605 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 87(Integer)
+2019-03-21 08:13:22,662 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,662 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,663 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:22,663 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 87(Integer)
+2019-03-21 08:13:22,722 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,723 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,726 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:22,726 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 87(Integer)
+2019-03-21 08:13:22,785 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,785 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,787 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:22,788 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 438(Integer), 2(String), 1(String)
+2019-03-21 08:13:22,846 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,847 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,848 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:22,848 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 438(Integer)
+2019-03-21 08:13:22,915 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,915 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,919 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:22,920 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 438(Integer)
+2019-03-21 08:13:22,983 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:22,983 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:22,984 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:22,984 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 438(Integer)
+2019-03-21 08:13:23,043 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,043 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:23,045 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:23,046 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 438(Integer)
+2019-03-21 08:13:23,106 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,107 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:23,107 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:23,107 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 442(Integer), 2(String), 1(String)
+2019-03-21 08:13:23,170 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,204 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 5
+2019-03-21 08:13:23,208 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:23,209 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 442(Integer)
+2019-03-21 08:13:23,282 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,282 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:23,286 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:23,287 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 442(Integer)
+2019-03-21 08:13:23,354 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,355 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:23,359 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:23,360 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 442(Integer)
+2019-03-21 08:13:23,421 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,421 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:23,422 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:23,423 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 442(Integer)
+2019-03-21 08:13:23,482 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,483 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:23,486 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:23,487 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 82(Integer), 2(String), 1(String)
+2019-03-21 08:13:23,546 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,547 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 2
+2019-03-21 08:13:23,550 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:23,551 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 82(Integer)
+2019-03-21 08:13:23,613 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,614 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:23,618 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:23,618 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 82(Integer)
+2019-03-21 08:13:23,681 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,681 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:23,682 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:23,682 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 82(Integer)
+2019-03-21 08:13:23,756 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,757 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:23,761 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:23,762 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 82(Integer)
+2019-03-21 08:13:23,828 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,828 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:23,829 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:23,829 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 83(Integer), 2(String), 1(String)
+2019-03-21 08:13:23,891 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,891 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 1
+2019-03-21 08:13:23,892 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:23,892 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 83(Integer)
+2019-03-21 08:13:23,950 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:23,951 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:23,951 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:23,951 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 83(Integer)
+2019-03-21 08:13:24,007 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:24,008 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:24,008 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:24,008 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 83(Integer)
+2019-03-21 08:13:24,064 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:24,065 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:24,065 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:24,065 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 83(Integer)
+2019-03-21 08:13:24,123 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:24,123 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:24,124 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:24,124 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 85(Integer), 2(String), 1(String)
+2019-03-21 08:13:24,183 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:24,183 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:24,184 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:24,184 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 85(Integer)
+2019-03-21 08:13:24,251 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:24,252 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:24,256 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:24,257 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 85(Integer)
+2019-03-21 08:13:24,314 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:24,315 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:24,318 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:24,319 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 85(Integer)
+2019-03-21 08:13:24,376 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:24,376 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:24,377 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:24,377 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 85(Integer)
+2019-03-21 08:13:24,434 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:24,435 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:24,439 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:24,440 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 416(Integer), 2(String), 1(String)
+2019-03-21 08:13:24,522 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:24,522 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:24,526 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:24,527 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 416(Integer)
+2019-03-21 08:13:24,590 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:24,592 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:24,594 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:24,595 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 416(Integer)
+2019-03-21 08:13:24,652 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:24,652 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:24,653 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:24,653 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 416(Integer)
+2019-03-21 08:13:24,712 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:24,712 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:24,713 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:24,713 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 416(Integer)
+2019-03-21 08:13:24,772 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:24,772 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:24,836 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - xxx Connection Closed
+2019-03-21 08:13:24,836 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - Returned connection 654786922 to pool.
+2019-03-21 08:13:46,826 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - Checked out connection 654786922 from pool.
+2019-03-21 08:13:46,827 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ooo Connection Opened
+2019-03-21 08:13:46,889 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT articulo.*, categoria.descripcion AS descripcion_categoria, color.color FROM articulo articulo INNER JOIN categoria categoria ON (categoria.id_categoria = articulo.id_categoria) INNER JOIN color color ON (color.id_color = articulo.id_color ) WHERE articulo.activo = 1 AND categoria.descripcion LIKE CONCAT('%',?,'%') 
+2019-03-21 08:13:46,889 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: Sillas de Resina(String)
+2019-03-21 08:13:46,950 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: id_articulo, id_categoria, id_usuario, cantidad, descripcion, id_color, fecha_ingreso, precio_compra, precio_renta, activo, stock, codigo, en_renta, descripcion, color
+2019-03-21 08:13:46,951 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 88, 8, 12, 0, Silla Tiffany Resina, 29, 07/01/2019, 667, 35, 1, null, S1001, 0, Sillas de Resina, Blanco
+2019-03-21 08:13:46,955 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 92, 8, 12, 0, Silla Versalles Resina, 29, 07/01/2019, 667, 35, 1, null, S1012, 0, Sillas de Resina, Blanco
+2019-03-21 08:13:46,960 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 96, 8, 12, 0, Silla Avant Garde Resina, 29, 07/01/2019, 667, 30, 1, null, S1016, 0, Sillas de Resina, Blanco
+2019-03-21 08:13:46,962 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 97, 8, 12, 0, Silla Cross Back , 29, 07/01/2019, 1067, 75, 1, null, S1018, 0, Sillas de Resina, Blanco
+2019-03-21 08:13:46,965 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 197, 8, 12, 17, Eams, 29, 23/01/2019, 1000, 75, 1, null, S1020, null, Sillas de Resina, Blanco
+2019-03-21 08:13:46,967 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 89, 8, 12, 144, Silla Tiffany Resina, 33, 07/01/2019, 667, 35, 1, null, S1002, -15, Sillas de Resina, Chocolate
+2019-03-21 08:13:46,970 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 91, 8, 12, 0, Silla Mini Tiffany Resina, 33, 07/01/2019, 533, 35, 1, null, S1004, 0, Sillas de Resina, Chocolate
+2019-03-21 08:13:46,972 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 94, 8, 12, 0, Silla Versalles Resina, 33, 07/01/2019, 667, 35, 1, null, S1027, 0, Sillas de Resina, Chocolate
+2019-03-21 08:13:46,975 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 90, 8, 12, 1, Silla Tiffany, 34, 07/01/2019, 1334, 55, 1, null, S1005, 0, Sillas de Resina, Transparente
+2019-03-21 08:13:46,977 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 95, 8, 12, 0, Silla Versalles, 34, 07/01/2019, 1334, 55, 1, null, S1026, 0, Sillas de Resina, Transparente
+2019-03-21 08:13:46,979 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 93, 8, 12, 1, Silla Versalles Plata, 35, 07/01/2019, 667, 35, 1, null, S1014, 0, Sillas de Resina, Plata
+2019-03-21 08:13:46,982 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 164, 8, 12, 0, Silla Tiffany Resina, 36, 07/01/2019, 667, 35, 1, null, S1005, -80, Sillas de Resina, Dorado
+2019-03-21 08:13:46,984 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 196, 8, 12, 8, Eams, 37, 23/01/2019, 1000, 75, 1, null, S1019, null, Sillas de Resina, Negro
+2019-03-21 08:13:46,988 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:46,988 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 88(Integer), 2(String), 1(String)
+2019-03-21 08:13:47,045 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,046 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 72
+2019-03-21 08:13:47,047 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:47,047 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 88(Integer)
+2019-03-21 08:13:47,111 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,111 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,113 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:47,115 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 88(Integer)
+2019-03-21 08:13:47,178 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,179 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,181 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:47,182 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 88(Integer)
+2019-03-21 08:13:47,249 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,250 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,253 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:47,254 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 88(Integer)
+2019-03-21 08:13:47,312 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,313 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,314 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:47,314 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 92(Integer), 2(String), 1(String)
+2019-03-21 08:13:47,380 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,381 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,384 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:47,385 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 92(Integer)
+2019-03-21 08:13:47,443 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,444 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,446 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:47,447 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 92(Integer)
+2019-03-21 08:13:47,506 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,506 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,507 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:47,507 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 92(Integer)
+2019-03-21 08:13:47,588 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,590 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,592 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:47,593 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 92(Integer)
+2019-03-21 08:13:47,651 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,652 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,656 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:47,657 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 96(Integer), 2(String), 1(String)
+2019-03-21 08:13:47,717 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,717 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,718 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:47,719 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 96(Integer)
+2019-03-21 08:13:47,777 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,778 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,780 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:47,781 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 96(Integer)
+2019-03-21 08:13:47,838 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,839 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,841 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:47,842 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 96(Integer)
+2019-03-21 08:13:47,900 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,900 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,902 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:47,902 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 96(Integer)
+2019-03-21 08:13:47,966 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:47,967 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:47,969 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:47,970 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 97(Integer), 2(String), 1(String)
+2019-03-21 08:13:48,041 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,042 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 10
+2019-03-21 08:13:48,045 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:48,046 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 97(Integer)
+2019-03-21 08:13:48,105 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,106 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:48,109 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:48,110 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 97(Integer)
+2019-03-21 08:13:48,213 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,214 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:48,217 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:48,218 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 97(Integer)
+2019-03-21 08:13:48,276 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,277 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:48,279 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:48,279 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 97(Integer)
+2019-03-21 08:13:48,343 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,344 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:48,345 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:48,345 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 197(Integer), 2(String), 1(String)
+2019-03-21 08:13:48,405 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,406 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:48,409 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:48,410 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 197(Integer)
+2019-03-21 08:13:48,476 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,477 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:48,479 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:48,481 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 197(Integer)
+2019-03-21 08:13:48,542 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,543 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:48,546 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:48,548 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 197(Integer)
+2019-03-21 08:13:48,612 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,612 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:48,614 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:48,614 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 197(Integer)
+2019-03-21 08:13:48,684 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,685 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:48,688 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:48,689 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 89(Integer), 2(String), 1(String)
+2019-03-21 08:13:48,748 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,749 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: 100
+2019-03-21 08:13:48,753 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:48,755 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 89(Integer)
+2019-03-21 08:13:48,820 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,820 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:48,822 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:48,822 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 89(Integer)
+2019-03-21 08:13:48,883 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,884 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:48,887 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:48,889 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 89(Integer)
+2019-03-21 08:13:48,953 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:48,955 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:48,957 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:48,958 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 89(Integer)
+2019-03-21 08:13:49,020 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,020 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,021 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:49,022 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 91(Integer), 2(String), 1(String)
+2019-03-21 08:13:49,085 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,086 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,089 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:49,090 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 91(Integer)
+2019-03-21 08:13:49,149 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,150 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,153 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:49,154 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 91(Integer)
+2019-03-21 08:13:49,214 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,214 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,215 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:49,215 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 91(Integer)
+2019-03-21 08:13:49,272 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,272 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,273 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:49,273 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 91(Integer)
+2019-03-21 08:13:49,343 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,343 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,344 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:49,344 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 94(Integer), 2(String), 1(String)
+2019-03-21 08:13:49,402 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,402 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,404 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:49,405 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 94(Integer)
+2019-03-21 08:13:49,473 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,474 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,477 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:49,477 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 94(Integer)
+2019-03-21 08:13:49,535 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,536 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,539 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:49,540 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 94(Integer)
+2019-03-21 08:13:49,599 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,600 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,602 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:49,603 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 94(Integer)
+2019-03-21 08:13:49,661 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,661 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,662 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:49,663 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 90(Integer), 2(String), 1(String)
+2019-03-21 08:13:49,721 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,722 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,724 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:49,725 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 90(Integer)
+2019-03-21 08:13:49,794 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,796 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,798 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:49,799 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 90(Integer)
+2019-03-21 08:13:49,856 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,857 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,860 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:49,861 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 90(Integer)
+2019-03-21 08:13:49,940 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:49,941 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:49,944 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:49,945 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 90(Integer)
+2019-03-21 08:13:50,004 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:50,005 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:50,008 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:50,009 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 95(Integer), 2(String), 1(String)
+2019-03-21 08:13:50,068 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:50,068 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:50,071 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:50,072 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 95(Integer)
+2019-03-21 08:13:50,133 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:50,133 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:50,134 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:50,135 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 95(Integer)
+2019-03-21 08:13:50,194 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:50,195 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:50,197 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:50,198 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 95(Integer)
+2019-03-21 08:13:50,260 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:50,261 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:50,264 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:50,265 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 95(Integer)
+2019-03-21 08:13:50,335 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:50,335 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:50,337 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(detalle.cantidad)AS cantidad FROM renta renta INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) WHERE detalle.id_articulo = ? AND renta.id_estado = ? AND renta.id_tipo = ? 
+2019-03-21 08:13:50,337 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 93(Integer), 2(String), 1(String)
+2019-03-21 08:13:50,394 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:50,395 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:50,397 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '1' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:50,398 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 93(Integer)
+2019-03-21 08:13:50,459 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:50,460 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:50,463 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '0' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:50,464 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 93(Integer)
+2019-03-21 08:13:50,522 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:50,524 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:50,526 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_faltante = '0' AND faltante.fg_devolucion = '0' AND faltante.fg_accidente_trabajo = '1' AND faltante.fg_activo = '1' 
+2019-03-21 08:13:50,528 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==> Parameters: 93(Integer)
+2019-03-21 08:13:50,584 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==    Columns: cantidad
+2019-03-21 08:13:50,584 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - <==        Row: null
+2019-03-21 08:13:50,585 DEBUG [AWT-EventQueue-0] (JakartaCommonsLoggingImpl.java:27) - ==>  Executing: SELECT SUM(faltante.cantidad)AS cantidad FROM faltantes faltante WHERE faltante.id_articulo = ? AND faltante.fg_devolucion = '1' AND faltante.fg_faltante = '0' AND faltante.fg_activo = '1' 

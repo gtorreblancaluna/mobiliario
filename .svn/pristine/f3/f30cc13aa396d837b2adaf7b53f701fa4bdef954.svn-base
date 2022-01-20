@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperAbonos">
+  
+    <resultMap id="resultMapAbonos" type="model.Abono">        
+        <result property="abonoId" column="id_abonos"/>
+        <result property="fecha" column="fecha"/>
+        <result property="abono" column="abono"/>
+        <result property="comentario" column="comentario"/>
+        <result property="fechaPago" column="fecha_pago"/>
+        
+        <!-- tipo abono -->
+        <result property="tipoAbono.tipoAbonoId" column="tipo_id"/>
+        <result property="tipoAbono.descripcion" column="tipo_descripcion"/>
+        <result property="tipoAbono.fgActivo" column="tipo_fg_activo"/>
+        <result property="tipoAbono.fechaRegistro" column="tipo_fecha_registro"/>
+        
+        <!-- cuenta -->
+       <result property="tipoAbono.cuenta.id" column="cuenta_id"/>
+       <result property="tipoAbono.cuenta.descripcion" column="cuenta_descripcion"/>
+       <result property="tipoAbono.cuenta.createdAt" column="cuenta_created_at"/>
+       <result property="tipoAbono.cuenta.updatedAt" column="cuenta_updated_at"/>
+       <result property="tipoAbono.cuenta.fgActivo" column="cuenta_fg_activo"/>
+       
+       <!-- usuario -->
+       <result property="usuario.usuarioId" column="usuario_id"/>
+       <result property="usuario.nombre" column="usuario_nombre"/>
+       <result property="usuario.apellidos" column="usuario_apellidos"/>
+       
+       <!-- renta -->
+       <result property="renta.rentaId" column="renta_id"/>
+       <result property="renta.folio" column="renta_folio"/>
+       <result property="renta.tipo.tipo" column="renta_tipo"/>
+       
+        <result property="totalAbonos" column="suma_abonos"/>
+        
+        
+    </resultMap>
+     
+     <select id="getAbonosByDates" resultMap="resultMapAbonos" parameterType="java.util.Map">
+        SELECT abonos.*,
+            tipo.id_tipo_abono AS tipo_id,
+            tipo.descripcion AS tipo_descripcion,
+            tipo.fg_activo AS tipo_fg_activo,
+            tipo.fecha_registro AS tipo_fecha_registro,
+            cuenta.id AS cuenta_id,
+            cuenta.descripcion AS cuenta_descripcion,
+            cuenta.created_at AS cuenta_created_at,
+            cuenta.updated_at AS cuenta_updated_at,
+            cuenta.fg_activo AS cuenta_fg_activo,
+            usuarios.id_usuarios AS usuario_id,
+            usuarios.nombre AS usuario_nombre,
+            usuarios.apellidos AS usuario_apellidos,
+            renta.id_renta AS renta_id,
+            renta.folio AS renta_folio,
+            tipo_renta.tipo AS renta_tipo
+         FROM abonos abonos
+            INNER JOIN tipo_abono tipo ON (tipo.id_tipo_abono = abonos.id_tipo_abono)
+            INNER JOIN cuenta cuenta ON (cuenta.id = tipo.cuenta_id)
+            INNER JOIN usuarios usuarios ON (usuarios.id_usuarios = abonos.id_usuario)
+            INNER JOIN renta renta ON (renta.id_renta = abonos.id_renta)
+            INNER JOIN tipo tipo_renta ON (tipo_renta.id_tipo = renta.id_tipo)
+            WHERE STR_TO_DATE(abonos.fecha,'%d/%m/%Y') 
+            BETWEEN STR_TO_DATE (#{initDate},'%d/%m/%Y')
+            AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
+
+    </select>
+    
+    <select id="getAbonosByDatesGroupByBankAccounts" resultMap="resultMapAbonos" parameterType="java.util.Map">
+        SELECT SUM(abonos.abono) AS suma_abonos,
+            cuenta.id AS cuenta_id,
+            cuenta.descripcion AS cuenta_descripcion,
+            cuenta.created_at AS cuenta_created_at,
+            cuenta.updated_at AS cuenta_updated_at,
+            cuenta.fg_activo AS cuenta_fg_activo
+        FROM abonos abonos
+            INNER JOIN tipo_abono tipo ON (tipo.id_tipo_abono = abonos.id_tipo_abono)
+            INNER JOIN cuenta cuenta ON (cuenta.id = tipo.cuenta_id)
+            WHERE STR_TO_DATE(abonos.fecha,'%d/%m/%Y') 
+            BETWEEN STR_TO_DATE (#{initDate},'%d/%m/%Y')
+            AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
+        GROUP BY tipo.cuenta_id
+    </select>
+  
+</mapper>

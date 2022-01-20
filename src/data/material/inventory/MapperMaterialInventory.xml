@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperMaterialInventory">
+    
+    <resultMap id="resultMapMapperMaterialSaleItemReport" type="model.material.inventory.MaterialSaleItemReport">
+        <result property="amount" column="amount"/>
+        <result property="measurementUnitDescription" column="measurement_unit_description"/>
+        <result property="materialInventoryDescription" column="material_inventory_description"/>
+        <result property="purchaseAmount" column="purchase_amount"/>
+        <result property="purchaseAmountRound" column="purchase_amount_round"/>
+        <result property="purchaseMeasurementUnitDescription" column="purchase_measurement_unit_description"/>
+        <result property="providerId" column="provider_id"/>
+        <result property="providerName" column="provider_name"/>
+        <result property="providerAddress" column="provider_address"/>
+        <result property="providerPhoneNumber" column="provider_phone_number"/>
+        <result property="amountItem" column="amount_item"/>
+        <result property="descriptionItem" column="description_item"/>
+    </resultMap>
+    
+    <resultMap id="resultMapMapperMaterialSaleItem" type="model.material.inventory.MaterialSaleItem">
+        
+        <result property="id" column="id"/>
+        <result property="amount" column="amount"/>
+        <result property="fgActive" column="fg_active"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        
+        <!-- material inventory -->
+        <result property="materialInventory.description" column="mi_description"/>
+        <result property="materialInventory.measurementUnit.description" column="mi_mu_description"/>
+        
+        <!-- material provider -->
+        <result property="provider.nombre" column="p_name"/>
+        <result property="provider.apellidos" column="p_last_name"/>
+                
+        
+    </resultMap>
+  
+    <resultMap id="resultMapMapperMaterialInventory" type="model.material.inventory.MaterialInventory">        
+        <result property="id" column="id"/>
+        <result property="stock" column="stock"/>
+        <result property="description" column="description"/>
+        <result property="purchaseAmount" column="purchase_amount"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        
+        <!-- material area -->
+        <result property="area.id" column="area_id"/>
+        <result property="area.description" column="area_description"/>  
+        
+        <!-- unidad de medida -->
+        <result property="measurementUnit.id" column="measurement_unit_id"/>
+        <result property="measurementUnit.description" column="measurement_unit_description"/>    
+        
+        <!-- unidad de medida compra -->
+        <result property="measurementUnitPurchase.id" column="measurement_unit_purchase_id"/>
+        <result property="measurementUnitPurchase.description" column="measurement_unit_purchase_description"/>                    
+        
+    </resultMap>
+    
+    <resultMap id="resultMapMeasurementUnit" type="model.material.inventory.MeasurementUnit">
+        <result property="id" column="id"/>
+        <result property="description" column="description"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    
+    <resultMap id="resultMapMaterialArea" type="model.material.inventory.MaterialArea">
+        <result property="id" column="id"/>
+        <result property="description" column="description"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    
+    <select id="getMaterialSaleItemsByItemsIdReport" resultMap="resultMapMapperMaterialSaleItemReport" parameterType="java.lang.String" >
+        SELECT
+        detalle_renta.cantidad AS amount_item,
+        articulo.descripcion AS description_item,
+        SUM(material_sale_items.amount*detalle_renta.cantidad) AS amount,
+        measurement_units.description AS measurement_unit_description,
+        material_inventory.description AS material_inventory_description,
+        ROUND(SUM((material_sale_items.amount*detalle_renta.cantidad)/material_inventory.purchase_amount),2) AS purchase_amount,
+        (
+            CASE
+                WHEN SUM((material_sale_items.amount*detalle_renta.cantidad)/material_inventory.purchase_amount) BETWEEN 0 AND 1 THEN '1'
+                ELSE CEILING(SUM((material_sale_items.amount*detalle_renta.cantidad)/material_inventory.purchase_amount))
+            END
+        ) AS purchase_amount_round,
+        measurement_units_purchase.description AS purchase_measurement_unit_description,
+        CONCAT(proveedores.nombre," ",proveedores.apellidos) AS provider_name,
+        proveedores.id AS provider_id,
+        proveedores.direccion AS provider_address,
+        proveedores.telefonos AS provider_phone_number
+        FROM renta renta 
+        INNER JOIN detalle_renta detalle_renta ON (renta.id_renta = detalle_renta.id_renta)
+        INNER JOIN articulo articulo ON (detalle_renta.id_articulo = articulo.id_articulo)
+        INNER JOIN material_sale_items material_sale_items ON (articulo.id_articulo = material_sale_items.item_id)
+        INNER JOIN material_inventory material_inventory ON (material_inventory.id = material_sale_items.material_inventory_id)
+        INNER JOIN proveedores proveedores ON (proveedores.id = material_sale_items.provider_id)
+        INNER JOIN measurement_units measurement_units ON (measurement_units.id = material_inventory.measurement_unit_id)
+        INNER JOIN measurement_units measurement_units_purchase ON (measurement_units_purchase.id = material_inventory.measurement_unit_purchase_id)
+        WHERE renta.id_renta = #{rentId}
+        GROUP BY 
+            description_item,
+            amount_item,
+            measurement_unit_description,
+            material_inventory_description,
+            purchase_measurement_unit_description,
+            provider_name,
+            provider_address,
+            provider_phone_number,
+            provider_id
+    </select>
+    
+    <insert id="insertMaterialSaleItem" parameterType="model.material.inventory.MaterialSaleItem" >
+        INSERT INTO material_sale_items
+        (
+            material_inventory_id,
+            provider_id,
+            item_id,
+            amount,
+            created_at,
+            updated_at
+        )
+        VALUES
+        (
+            #{materialInventory.id},
+            #{provider.id},
+            #{item.articuloId},
+            #{amount},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
+    <select id="getMaterialSaleItemsByItemId" resultMap="resultMapMapperMaterialSaleItem" parameterType="java.lang.Long">
+       SELECT m.*,
+        mi.description AS mi_description,
+        mu.description AS mi_mu_description,
+        p.nombre AS p_name,
+        p.apellidos AS p_last_name
+        FROM material_sale_items m
+        INNER JOIN material_inventory mi ON (mi.id = m.material_inventory_id)
+        INNER JOIN measurement_units mu ON (mu.id = mi.measurement_unit_id)
+        INNER JOIN proveedores p ON (p.id = m.provider_id)
+        WHERE m.fg_active = '1' AND m.item_id = #{id} ORDER BY mi.description
+    </select>
+    
+    <select id="getByIdMaterialInventory" resultMap="resultMapMapperMaterialInventory" parameterType="java.lang.Long">
+        SELECT m.*,
+         a.id AS area_id,
+         a.description AS area_description,
+         mu.id AS measurement_unit_id,
+         mu.description AS measurement_unit_description,
+         mp.id AS measurement_unit_purchase_id,
+         mp.description AS measurement_unit_purchase_description
+        FROM material_inventory m
+         INNER JOIN material_area a ON (a.id = m.material_area_id)
+         INNER JOIN measurement_units mu ON (mu.id = m.measurement_unit_id)
+         INNER JOIN measurement_units mp ON (mp.id = m.measurement_unit_purchase_id)
+         WHERE m.id = #{id}
+    </select>
+     
+     <select id="getAllMaterialInventory" resultMap="resultMapMapperMaterialInventory" parameterType="java.util.Map">
+        SELECT m.*,
+         a.id AS area_id,
+         a.description AS area_description,
+         mu.id AS measurement_unit_id,
+         mu.description AS measurement_unit_description,
+         mp.id AS measurement_unit_purchase_id,
+         mp.description AS measurement_unit_purchase_description
+        FROM material_inventory m
+         INNER JOIN material_area a ON (a.id = m.material_area_id)
+         INNER JOIN measurement_units mu ON (mu.id = m.measurement_unit_id)
+         INNER JOIN measurement_units mp ON (mp.id = m.measurement_unit_purchase_id)
+         WHERE m.fg_active = '1'
+        <if test="measurementUnitId != null and measurementUnitId != '' ">
+            AND m.measurement_unit_id = #{measurementUnitId}
+        </if> 
+        <if test="measurementUnitPurchaseId != null and measurementUnitPurchaseId != '' ">
+            AND m.measurement_unit_purchase_id = #{measurementUnitPurchaseId}
+        </if> 
+        <if test="description != null and description != '' ">
+            AND m.description LIKE CONCAT('%',#{description},'%')
+        </if>  
+        <if test="materialAreaId != null and materialAreaId != null ">
+            AND m.material_area_id = #{materialAreaId}
+        </if>         
+         ORDER BY m.description
+    </select>
+    
+    <update id="updateMaterialInventory" parameterType="model.material.inventory.MaterialInventory">
+        UPDATE material_inventory SET
+            material_area_id = #{area.id},
+            stock = #{stock},
+            measurement_unit_id = #{measurementUnit.id},
+            measurement_unit_purchase_id = #{measurementUnitPurchase.id},
+            description = #{description},
+            purchase_amount = #{purchaseAmount},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <insert id="insertMaterialInventory" parameterType="model.material.inventory.MaterialInventory">
+        INSERT INTO material_inventory
+        (
+            material_area_id,
+            measurement_unit_id,
+            measurement_unit_purchase_id,
+            stock,
+            description,
+            purchase_amount,
+            created_at,
+            updated_at
+        )
+        VALUES
+        (
+            #{area.id},
+            #{measurementUnit.id},
+            #{measurementUnitPurchase.id},
+            #{stock},
+            #{description},
+            #{purchaseAmount},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
+    <update id="updateMeasurementUnit" parameterType="model.material.inventory.MeasurementUnit">
+        UPDATE measurement_units SET
+            description = #{description},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="updateMaterialArea" parameterType="model.material.inventory.MaterialArea">
+        UPDATE material_area SET
+            description = #{description},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="deleteMeasurementUnit" parameterType="model.material.inventory.MeasurementUnit">
+        UPDATE measurement_units SET
+            fg_active = '0',
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="deleteMaterialSaleItem" parameterType="model.material.inventory.MaterialSaleItem">
+        UPDATE material_sale_items SET
+            fg_active = '0',
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="deleteMaterialInventory" parameterType="model.material.inventory.MaterialInventory">
+        UPDATE material_inventory SET
+            fg_active = '0',
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <insert id="insertMeasurementUnit" parameterType="model.material.inventory.MeasurementUnit">
+        INSERT INTO measurement_units
+        (
+            description,
+            created_at,
+            updated_at
+        )
+        VALUES
+        (
+            #{description},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
+    <update id="deleteMaterialArea" parameterType="model.material.inventory.MaterialArea">
+        UPDATE material_area SET
+            fg_active = '0',
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <insert id="insertMaterialArea" parameterType="model.material.inventory.MaterialArea">
+        INSERT INTO material_area
+        (
+            description,
+            created_at,
+            updated_at
+        )
+        VALUES
+        (
+            #{description},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
+    <select id="getMeasurementUnits" resultMap="resultMapMeasurementUnit">
+       SELECT * FROM measurement_units WHERE fg_active = '1' ORDER BY description
+    </select>
+    
+    <select id="getMaterialAreaList" resultMap="resultMapMaterialArea">
+       SELECT * FROM material_area WHERE fg_active = '1' ORDER BY description
+    </select>
+      
+</mapper>

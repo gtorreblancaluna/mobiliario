@@ -1,0 +1,589 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package forms.proveedores;
+
+
+import exceptions.BusinessException;
+import java.awt.Toolkit;
+import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import mobiliario.ApplicationConstants;
+import mobiliario.principal;
+import model.providers.OrdenProveedor;
+import model.providers.PagosProveedor;
+import parametersVO.ParameterOrderProvider;
+import services.SystemService;
+import services.providers.OrderProviderService;
+import utilities.Utility;
+
+/**
+ *
+ * @author Carlos Alberto
+ */
+public class ViewOrdersProviders extends javax.swing.JInternalFrame {
+
+    
+    private final SystemService systemService = new SystemService();
+    private final OrderProviderService orderService = new OrderProviderService();
+    private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
+    private PaymentsProvidersForm paymentsProvidersForm = null;
+    
+    
+    public static String g_idRenta=null;
+    public static String g_idOrder=null;
+    
+    private OrderProviderForm orderProviderForm = null;
+  
+   
+
+    /**
+     * Creates new form clientes
+     */
+    public ViewOrdersProviders() {
+        
+        initComponents();
+        this.setTitle("Ordenes al proveedor");
+        initComboBox();
+        tableFormat();
+        
+        
+    }
+    
+     public void mostrar_agregar_orden_proveedor() {
+         
+        g_idRenta = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 8).toString();
+        g_idOrder = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 0).toString();
+         
+        if (Utility.verifyIfInternalFormIsOpen(orderProviderForm)) {
+            orderProviderForm = new OrderProviderForm();
+//            orderProviderForm.setLocation(this.getWidth() / 2 - orderProviderForm.getWidth() / 2, this.getHeight() / 2 - orderProviderForm.getHeight() / 2 - 20);
+            principal.jDesktopPane1.add(orderProviderForm);
+            orderProviderForm.show();
+        } else {
+            JOptionPane.showMessageDialog(this, "Ahi ta la ventana =)");
+        }
+//        ventana.setLocationRelativeTo(null);
+    }
+
+   public void initComboBox(){
+       
+        this.cmbLimit.removeAllItems();
+        this.cmbStatus.removeAllItems();
+        cmbLimit.addItem("100");
+        cmbLimit.addItem("500");
+        cmbLimit.addItem("1000");
+        cmbLimit.addItem("10000");
+        cmbStatus.addItem(ApplicationConstants.CMB_SELECCIONE);
+        cmbStatus.addItem(ApplicationConstants.DS_STATUS_ORDER_PROVIDER_ORDER);
+        cmbStatus.addItem(ApplicationConstants.DS_STATUS_ORDER_PROVIDER_PENDING);
+        cmbStatus.addItem(ApplicationConstants.DS_STATUS_ORDER_PROVIDER_CANCELLED);     
+   
+   }
+   
+   public void tableFormat() {
+        Object[][] data = {{"","","","","","","","","",""}};
+        String[] columnNames = {                        
+                        "No orden",
+                        "Folio renta", 
+                        "Usuario",
+                        "Proveedor", 
+                        "Status",                        
+                        "Creado",
+                        "Actualizado",
+                        "Comentario",
+                        "id_renta",
+                        "Pagos"
+        };
+        DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
+        this.tableViewOrdersProviders.setModel(tableModel);
+        
+        TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
+        tableViewOrdersProviders.setRowSorter(ordenarTabla);
+
+        int[] anchos = {20,20,80,40,40, 80,100,100,20,80};
+
+        for (int inn = 0; inn < tableViewOrdersProviders.getColumnCount(); inn++) {
+            tableViewOrdersProviders.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
+        }
+
+        try {
+            DefaultTableModel temp = (DefaultTableModel) tableViewOrdersProviders.getModel();
+            temp.removeRow(temp.getRowCount() - 1);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            ;
+        }
+        DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
+        centrar.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        DefaultTableCellRenderer right = new DefaultTableCellRenderer();
+        right.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        tableViewOrdersProviders.getColumnModel().getColumn(8).setMaxWidth(0);
+        tableViewOrdersProviders.getColumnModel().getColumn(8).setMinWidth(0);
+        tableViewOrdersProviders.getColumnModel().getColumn(8).setPreferredWidth(0);
+     
+        tableViewOrdersProviders.getColumnModel().getColumn(0).setCellRenderer(centrar);
+        tableViewOrdersProviders.getColumnModel().getColumn(1).setCellRenderer(centrar);
+        tableViewOrdersProviders.getColumnModel().getColumn(9).setCellRenderer(right);
+        
+    }
+   
+   public void showPaymentsProvidersForm() {
+       
+       if (this.tableViewOrdersProviders.getSelectedRow() == - 1) {
+            JOptionPane.showMessageDialog(null, "Selecciona una fila para continuar ", "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+       g_idOrder = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 0).toString();
+       
+        if (Utility.verifyIfInternalFormIsOpen(paymentsProvidersForm)) {
+            paymentsProvidersForm = new PaymentsProvidersForm();
+//            orderProviderForm.setLocation(this.getWidth() / 2 - orderProviderForm.getWidth() / 2, this.getHeight() / 2 - orderProviderForm.getHeight() / 2 - 20);
+            principal.jDesktopPane1.add(paymentsProvidersForm);
+            paymentsProvidersForm.show();
+        } else {
+            JOptionPane.showMessageDialog(this, "Ahi ta la ventana =)");
+        }
+    }
+   
+   public void search(){
+     tableFormat();
+   
+     ParameterOrderProvider parameter = new ParameterOrderProvider();
+     
+     Integer folioRenta = null;
+     try{
+         folioRenta = new Integer(this.txtSearchFolioRenta.getText());
+     }catch(NumberFormatException e){
+         
+     }
+     
+     if(folioRenta != null){
+         parameter.setFolioRenta(folioRenta);
+     }
+     
+     if(!this.txtSearchByNameProvider.getText().equals("")){
+         parameter.setNameProvider(this.txtSearchByNameProvider.getText());
+     }
+     if(this.txtSearchInitialDate.getDate() != null && this.txtSearchEndDate.getDate() != null){
+         parameter.setInitDate(new Timestamp(txtSearchInitialDate.getDate().getTime()));
+         parameter.setEndDate(new Timestamp(txtSearchEndDate.getDate().getTime()));
+     }
+     if(!this.cmbStatus.equals(ApplicationConstants.CMB_SELECCIONE)){
+         parameter.setStatus(this.cmbStatus.getSelectedItem().toString());
+     }
+     parameter.setLimit(new Integer(this.cmbLimit.getSelectedItem().toString()));
+     List<OrdenProveedor> list;
+     try{
+        list = orderService.getOrdersByParameters(parameter);
+     }catch(BusinessException e){
+        JOptionPane.showMessageDialog(null, e.getMessage()+"\n"+e.getCause(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        return;
+     }
+     Toolkit.getDefaultToolkit().beep();
+     if(list == null || list.size()<=0){
+         this.lblInfoGeneral.setText("No se han obtenido resultados :(");
+         return;
+     }
+     if(list.size() == 1){
+        this.lblInfoGeneral.setText("Se obtuvo "+list.size()+" resultado");
+     }else{
+        this.lblInfoGeneral.setText("Se obtuvieron "+list.size()+" resultados");
+     }
+     
+     DefaultTableModel tableModel = (DefaultTableModel) this.tableViewOrdersProviders.getModel();
+     
+     for(OrdenProveedor orden : list){
+         
+         float fPagos = 0f;
+         
+         if(orden.getPagosProveedor() != null && orden.getPagosProveedor().size()>0){
+             for(PagosProveedor pagos : orden.getPagosProveedor()){
+                 fPagos += pagos.getCantidad();
+             }
+         }
+         
+          Object fila[] = {                                          
+              orden.getId(),
+              orden.getRenta().getFolio(),
+              orden.getUsuario().getNombre()+" "+orden.getUsuario().getApellidos(),
+              orden.getProveedor().getNombre()+" "+orden.getProveedor().getApellidos(),
+              orden.getStatus(),
+              orden.getCreado(),
+              orden.getActualizado(),
+              orden.getComentario(),
+              orden.getRenta().getRentaId(),
+             decimalFormat.format(fPagos)
+            };
+            tableModel.addRow(fila);
+     
+     }
+     
+       
+   }
+
+    
+    
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jLabel9 = new javax.swing.JLabel();
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jPanel1 = new javax.swing.JPanel();
+        txtSearchFolioRenta = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        cmbStatus = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
+        cmbLimit = new javax.swing.JComboBox();
+        jLabel3 = new javax.swing.JLabel();
+        txtSearchInitialDate = new com.toedter.calendar.JDateChooser();
+        txtSearchEndDate = new com.toedter.calendar.JDateChooser();
+        jLabel4 = new javax.swing.JLabel();
+        jbtnSearch = new javax.swing.JButton();
+        txtSearchByNameProvider = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tableViewOrdersProviders = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
+        lblInfoGeneral = new javax.swing.JLabel();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem5 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        jMenuItem4 = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
+
+        jLabel9.setText("jLabel9");
+
+        jMenuItem3.setText("jMenuItem3");
+
+        setClosable(true);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Busqueda", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 11))); // NOI18N
+
+        txtSearchFolioRenta.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+
+        jLabel1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel1.setText("Nombre proveedor:");
+
+        cmbStatus.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmbStatus.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel2.setText("Por fecha de creación:");
+
+        cmbLimit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmbLimit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel3.setText("Status orden:");
+
+        txtSearchInitialDate.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtSearchInitialDate.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtSearchInitialDateMouseClicked(evt);
+            }
+        });
+        txtSearchInitialDate.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchInitialDateKeyPressed(evt);
+            }
+        });
+
+        txtSearchEndDate.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtSearchEndDate.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtSearchEndDateMouseClicked(evt);
+            }
+        });
+        txtSearchEndDate.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchEndDateKeyPressed(evt);
+            }
+        });
+
+        jLabel4.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel4.setText("Limitar resultados a:");
+
+        jbtnSearch.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jbtnSearch.setText("Enviar");
+        jbtnSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbtnSearchActionPerformed(evt);
+            }
+        });
+
+        txtSearchByNameProvider.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+
+        jLabel5.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel5.setText("Folio renta:");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(jLabel3)
+                        .addGap(117, 117, 117)
+                        .addComponent(jLabel2))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(4, 4, 4)
+                        .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(8, 8, 8)
+                        .addComponent(txtSearchInitialDate, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtSearchEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(70, 70, 70)
+                        .addComponent(jbtnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(jLabel1))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(txtSearchByNameProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addGap(75, 75, 75)
+                                .addComponent(jLabel5))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(cmbLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtSearchFolioRenta, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addGap(234, 234, 234))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel5))
+                .addGap(6, 6, 6)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtSearchFolioRenta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtSearchByNameProvider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(2, 2, 2)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(7, 7, 7)
+                        .addComponent(jLabel3))
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtSearchInitialDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtSearchEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jbtnSearch)))
+        );
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 970, 120));
+
+        tableViewOrdersProviders.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        tableViewOrdersProviders.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tableViewOrdersProviders.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tableViewOrdersProviders.setRowHeight(14);
+        tableViewOrdersProviders.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableViewOrdersProvidersMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(tableViewOrdersProviders);
+
+        lblInfoGeneral.setFont(new java.awt.Font("Arial", 1, 11)); // NOI18N
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(lblInfoGeneral, javax.swing.GroupLayout.PREFERRED_SIZE, 441, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 946, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblInfoGeneral, javax.swing.GroupLayout.DEFAULT_SIZE, 14, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18))
+        );
+
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, 970, 340));
+
+        jMenuBar1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenuBar1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        jMenu1.setText("Archivo");
+        jMenu1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        jMenuItem2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jMenuItem2.setText("Pagos a proveedor");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem2);
+
+        jMenuItem5.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jMenuItem5.setText("Ver detalle orden");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem5);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Exportar");
+        jMenu2.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        jMenuItem4.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jMenuItem4.setText("Exportar a Excel");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem4);
+
+        jMenuItem1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jMenuItem1.setText("Generar PDF");
+        jMenu2.add(jMenuItem1);
+
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void txtSearchInitialDateMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchInitialDateMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchInitialDateMouseClicked
+
+    private void txtSearchInitialDateKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchInitialDateKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchInitialDateKeyPressed
+
+    private void txtSearchEndDateMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchEndDateMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchEndDateMouseClicked
+
+    private void txtSearchEndDateKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchEndDateKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchEndDateKeyPressed
+
+    private void tableViewOrdersProvidersMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableViewOrdersProvidersMouseClicked
+        // TODO add your handling code here:
+        if (evt.getClickCount() == 2) {
+            mostrar_agregar_orden_proveedor();
+        }
+    }//GEN-LAST:event_tableViewOrdersProvidersMouseClicked
+
+    private void jbtnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnSearchActionPerformed
+        // TODO add your handling code here:
+        this.search();
+    }//GEN-LAST:event_jbtnSearchActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        // TODO add your handling code here:
+        systemService.exportarExcel(tableViewOrdersProviders);
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+        // TODO add your handling code here:
+        if (this.tableViewOrdersProviders.getSelectedRow() == - 1) {
+            JOptionPane.showMessageDialog(null, "Selecciona una fila para continuar ", "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        mostrar_agregar_orden_proveedor();
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        showPaymentsProvidersForm();
+        
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JComboBox cmbLimit;
+    private javax.swing.JComboBox cmbStatus;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JButton jbtnSearch;
+    private javax.swing.JLabel lblInfoGeneral;
+    private javax.swing.JTable tableViewOrdersProviders;
+    private javax.swing.JTextField txtSearchByNameProvider;
+    private com.toedter.calendar.JDateChooser txtSearchEndDate;
+    private javax.swing.JTextField txtSearchFolioRenta;
+    private com.toedter.calendar.JDateChooser txtSearchInitialDate;
+    // End of variables declaration//GEN-END:variables
+
+    private void setLocationRelativeTo(Object object) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+}

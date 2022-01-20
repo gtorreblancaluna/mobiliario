@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperPedidos">
+  
+    <resultMap id="resultMapTipoAbono" type="model.TipoAbono">        
+        <result property="tipoAbonoId" column="id_tipo_abono"/>
+        <result property="descripcion" column="descripcion"/>
+        <result property="fgActivo" column="fg_activo"/>
+        <result property="fechaRegistro" column="fecha_registro"/>
+      
+    </resultMap>    
+   
+    
+    <select id="obtenerTipoAbonoPorDescripcion" resultMap="resultMapTipoAbono" parameterType="java.lang.String">
+        SELECT * 
+        FROM tipo_abono 
+        WHERE descripcion = #{descripcion}   
+    </select> 
+    
+    <update id="actualizarAbonoPorId" parameterType="model.Abono">
+        UPDATE abonos
+        <set>
+            <if test="abono != null">abono = #{abono},</if>
+            <if test="comentario != null">comentario = #{comentario},</if>            
+            <if test="tipoAbono.tipoAbonoId != null">id_tipo_abono = #{tipoAbono.tipoAbonoId},</if>
+            <if test="fechaPago != null and fechaPago!= '' ">fecha_pago = #{fechaPago}</if>          
+        </set>       
+        WHERE id_abonos = #{abonoId}
+    </update>
+  
+  
+  
+</mapper>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="subReport_faltantes" language="groovy" pageWidth="695" pageHeight="802" columnWidth="695" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="4418b4d8-899a-4e34-b012-73ce6df39cf9">
+	<property name="ireport.zoom" value="1.4641000000000093"/>
+	<property name="ireport.x" value="77"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="id_renta" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT f.id_faltante, f.id_articulo, f.id_renta, f.id_usuarios,
+            f.fecha_registro, f.cantidad,f.comentario,f.fg_faltante,f.fg_devolucion,
+            f.fg_accidente_trabajo,f.fg_activo,a.descripcion,a.codigo,c.color,
+            a.precio_compra, f.precio_cobrar
+            FROM faltantes f
+            INNER JOIN articulo a ON (a.id_articulo = f.id_articulo)
+            INNER JOIN color c ON (c.id_color = a.id_color)
+            WHERE
+            f.id_renta = $P{id_renta}
+            AND f.fg_activo = '1']]>
+	</queryString>
+	<field name="id_faltante" class="java.lang.String"/>
+	<field name="id_articulo" class="java.lang.String"/>
+	<field name="id_renta" class="java.lang.String"/>
+	<field name="id_usuarios" class="java.lang.String"/>
+	<field name="fecha_registro" class="java.lang.String"/>
+	<field name="cantidad" class="java.lang.String"/>
+	<field name="comentario" class="java.lang.String"/>
+	<field name="fg_faltante" class="java.lang.String"/>
+	<field name="fg_devolucion" class="java.lang.String"/>
+	<field name="fg_accidente_trabajo" class="java.lang.String"/>
+	<field name="fg_activo" class="java.lang.String"/>
+	<field name="descripcion" class="java.lang.String"/>
+	<field name="codigo" class="java.lang.String"/>
+	<field name="color" class="java.lang.String"/>
+	<field name="precio_compra" class="java.lang.Integer"/>
+	<field name="precio_cobrar" class="java.lang.Float"/>
+	<variable name="TOTAL" class="java.lang.Integer" incrementType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{precio_compra}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<pageHeader>
+		<band height="23" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="c240f952-22e3-4030-becc-d48e9e9694d1" x="0" y="6" width="634" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial Black" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Faltantes]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="046f9ca3-acc0-44bc-8375-edb471e67976" x="466" y="0" width="100" height="16"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Descripción]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9be7d4e1-a279-4a7f-b192-8981bd4cc9ae" x="0" y="0" width="49" height="15"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fa203781-ebf9-4c18-9028-d73ddf797a86" x="49" y="0" width="165" height="15"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Comentario]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0a1873c9-2981-4d90-bab8-384911de1aa9" x="214" y="0" width="144" height="16"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Artículo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="39895650-ef88-45b4-90e6-e6e50343f98c" x="409" y="0" width="57" height="16"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Código]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0e756874-2474-436c-9126-b532b5821467" x="566" y="0" width="35" height="15"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Precio U.]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="fee8d12d-5ca7-44c2-830d-2b92e3200bf6" x="0" y="15" width="634" height="1" forecolor="#999999"/>
+			</line>
+			<staticText>
+				<reportElement uuid="79ffc84d-b74f-4b07-a15e-1c6830bdb402" x="601" y="0" width="33" height="15"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Importe]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement uuid="14e4dd2d-edcf-45ee-9f93-227cc5b6efa7" x="409" y="0" width="57" height="12" backcolor="#999999"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="1c025acf-ff07-486e-b796-d97fc989e55f" x="566" y="0" width="35" height="12" backcolor="#999999"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{precio_cobrar} != null ? $F{precio_cobrar} : $F{precio_compra}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="de039a40-626f-49d1-9219-6de4249ecaa0" x="214" y="0" width="195" height="12" backcolor="#999999"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{descripcion}+" "+$F{color}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4660da49-3e60-4798-98cb-b1957770f899" x="466" y="0" width="100" height="12" backcolor="#999999"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{fg_faltante}.equals("1") ? "Faltante" :
+( $F{fg_devolucion}.equals("1") ? "Devolución" :
+( $F{fg_accidente_trabajo}.equals("1") ? "Accidente trabajo" : "Reparación" )))]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="c38b410a-0ad0-4256-86a6-aae4bb496629" x="49" y="0" width="165" height="12" backcolor="#999999"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{comentario}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="67fc6c35-1aa0-41a8-b5da-bef3438461be" x="0" y="0" width="46" height="12" backcolor="#999999"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="33edd24c-88ba-411e-b7ff-23f40c7fce93" x="0" y="13" width="634" height="1" forecolor="#CCCCCC" backcolor="#999999"/>
+			</line>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="fe73e875-351a-4bf2-87c7-c3cb0103fe2e" x="601" y="0" width="33" height="12" backcolor="#999999"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{precio_cobrar} != null ?
+    (new Float(String.valueOf($F{cantidad})) * new Float(String.valueOf($F{precio_cobrar}))) :
+    (new Float(String.valueOf($F{cantidad})) * new Float(String.valueOf($F{precio_compra}))))]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

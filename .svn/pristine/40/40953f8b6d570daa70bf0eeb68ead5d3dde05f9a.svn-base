@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperContabilidad">
+  
+    <resultMap id="resultMapContabilidad" type="model.Contabilidad">        
+        <result property="contabilidadId" column="id_contabilidad"/>
+        
+        <!-- SubCategoriaContabilidad -->
+        <result property="subCategoriaContabilidad.subCategoriaContabilidadId" column="id_sub_categoria_contabilidad"/>
+        <result property="subCategoriaContabilidad.descripcion" column="descripcion_sub_categoria"/>
+        <result property="subCategoriaContabilidad.ingreso" column="ingreso_sub_categoria"/>
+        
+        <!-- CategoriaContabilidad -->
+        <result property="subCategoriaContabilidad.categoriaContabilidad.categoriaContabilidadId" 
+                column="id_categoria"/>
+        <result property="subCategoriaContabilidad.categoriaContabilidad.descripcion" 
+                column="descripcion_categoria"/>
+        <result property="subCategoriaContabilidad.categoriaContabilidad.fgActivo" 
+                column="activo_categoria"/>
+        <result property="subCategoriaContabilidad.categoriaContabilidad.fechaRegistro" 
+                column="fecha_registro_categoria"/>
+        <!-- usuario -->
+        <result property="usuario.usuarioId" column="id_usuarios"/>
+        <result property="usuario.nombre" column="nombre_usuario"/> 
+        <result property="usuario.apellidos" column="apellidos_usuario"/> 
+        <result property="usuario.administrador" column="administrador_usuario"/>      
+        
+        <result property="fechaRegistro" column="fecha_registro"/>        
+        <result property="comentario" column="comentario"/>
+        <result property="fgActivo" column="fg_activo"/>
+        
+        <!-- cuenta -->
+        <result property="subCategoriaContabilidad.cuenta.id" column="cuenta_id"/>        
+        <result property="subCategoriaContabilidad.cuenta.descripcion" column="cuenta_descripcion"/>
+        
+         <result property="totalIngresos" column="total_ingreso"/>        
+        <result property="totalEgresos" column="total_egreso"/>
+   
+    </resultMap>
+    
+    <resultMap id="resultMapCategorias" type="model.CategoriaContabilidad">   
+        <result property="categoriaContabilidadId" column="id_categoria_contabilidad"/>        
+        <result property="descripcion" column="descripcion"/>
+        <result property="fgActivo" column="fg_activo"/>
+        <result property="fechaRegistro" column="fecha_registro"/>
+    </resultMap>
+    
+    <resultMap id="resultMapSubCategorias" type="model.SubCategoriaContabilidad">   
+        <result property="subCategoriaContabilidadId" column="id_sub_categoria_contabilidad"/>        
+        <result property="descripcion" column="descripcion_sub_categoria"/>
+        <result property="ingreso" column="ingreso_sub_categoria"/>
+        <result property="fgActivo" column="fg_activo"/>
+        
+        <result property="categoriaContabilidad.categoriaContabilidadId" column="id_categoria_contabilidad"/>
+        <result property="categoriaContabilidad.descripcion" column="descripcion_categoria"/>
+        <result property="categoriaContabilidad.fgActivo" column="activo_categoria"/>
+        <result property="categoriaContabilidad.fechaRegistro" column="fecha_registro_categoria"/>
+        
+        <result property="cuenta.id" column="cuenta_id"/>
+        <result property="cuenta.descripcion" column="cuenta_descripcion"/>
+        <result property="cuenta.createdAt" column="cuenta_created_at"/>
+        <result property="cuenta.updatedAt" column="cuenta_updated_at"/>
+        <result property="cuenta.fgActivo" column="cuenta_fg_Activo"/>
+        
+    
+    </resultMap>
+    
+    <select id="getContabilidadById" resultMap="resultMapContabilidad" parameterType="java.lang.Integer">
+       SELECT * FROM contabilidad
+        WHERE id_contabilidad = #{id}
+        AND fg_activo = '1'
+    </select>
+    
+    <select id="getAllContabilidad" resultMap="resultMapContabilidad">
+       SELECT contabilidad.*,
+        usuario.nombre AS nombre_usuario,
+        usuario.apellidos AS apellidos_usuario,
+        sub_categoria.id_sub_categoria_contabilidad,
+        sub_categoria.id_categoria_contabilidad,
+        sub_categoria.descripcion AS descripcion_sub_categoria,
+        sub_categoria.ingreso AS ingreso_sub_categoria,
+        categoria.id_categoria_contabilidad AS id_categoria,
+        categoria.descripcion AS descripcion_categoria,
+        categoria.fg_activo AS activo_categoria,
+        categoria.fecha_registro AS fecha_registro_categoria
+        FROM contabilidad contabilidad
+        INNER JOIN sub_categoria_contabilidad sub_categoria ON (sub_categoria.id_sub_categoria_contabilidad = contabilidad.id_sub_categoria_contabilidad)
+        INNER JOIN categoria_contabilidad categoria ON (categoria.id_categoria_contabilidad = sub_categoria.id_categoria_contabilidad)
+        INNER JOIN usuarios usuario ON (contabilidad.id_usuarios = usuario.id_usuarios)
+        WHERE contabilidad.fg_activo = '1'
+    </select>
+    
+    <select id="getAllCategoriasContabilidad" resultMap="resultMapCategorias">
+        SELECT * 
+        FROM categoria_contabilidad 
+        WHERE fg_activo = '1'
+        ORDER BY descripcion        
+    </select>
+    
+    <select id="getCategoryByName" resultMap="resultMapCategorias" parameterType="java.lang.String">
+        SELECT * 
+        FROM categoria_contabilidad 
+        WHERE fg_activo = '1'
+        AND descripcion = #{category}
+    </select>
+    
+    <select id="getSubCategoryByName" resultMap="resultMapSubCategorias" parameterType="java.lang.String">
+        SELECT 
+        s.id_sub_categoria_contabilidad,
+        s.id_categoria_contabilidad,
+        s.descripcion AS descripcion_sub_categoria,
+        s.ingreso,
+        s.cuenta_id,
+        cuenta.id AS cuenta_id,
+        cuenta.descripcion AS cuenta_descripcion,
+        cuenta.created_at AS cuenta_created_at,
+        cuenta.updated_at AS cuenta_updated_at,
+        cuenta.fg_activo AS cuenta_fg_activo 
+        FROM sub_categoria_contabilidad s
+        INNER JOIN cuenta cuenta ON (s.cuenta_id = cuenta.id)         
+        WHERE s.fg_activo = '1'
+        AND s.descripcion = #{category}
+    </select>
+    
+     <select id="getAllSubCategoriasContabilidadByCategoriaId" resultMap="resultMapSubCategorias" parameterType="java.lang.Integer">
+        SELECT sub_categoria.id_sub_categoria_contabilidad,
+        sub_categoria.id_sub_categoria_contabilidad,
+        sub_categoria.descripcion AS descripcion_sub_categoria,
+        sub_categoria.ingreso AS ingreso_sub_categoria,
+        categoria.id_categoria_contabilidad,
+        categoria.descripcion AS descripcion_categoria,
+        categoria.fg_activo AS activo_categoria,
+        categoria.fecha_registro AS fecha_registro_categoria,
+        cuenta.id AS cuenta_id,
+        cuenta.descripcion AS cuenta_descripcion,
+        cuenta.created_at AS cuenta_created_at,
+        cuenta.updated_at AS cuenta_updated_at,
+        cuenta.fg_activo AS cuenta_fg_activo
+        FROM sub_categoria_contabilidad sub_categoria
+        INNER JOIN categoria_contabilidad categoria ON (categoria.id_categoria_contabilidad = sub_categoria.id_categoria_contabilidad)        
+        INNER JOIN cuenta cuenta ON (sub_categoria.cuenta_id = cuenta.id)        
+        WHERE sub_categoria.fg_activo = '1'
+         AND categoria.id_categoria_contabilidad = #{categoriaId}
+        ORDER BY descripcion_sub_categoria
+     </select>
+     <insert id="save" parameterType="model.Contabilidad">
+         INSERT INTO contabilidad(
+            id_sub_categoria_contabilidad,
+            id_usuarios,
+            comentario,
+            cantidad
+         )
+         VALUES
+         (
+            #{subCategoriaContabilidad.subCategoriaContabilidadId},
+            #{usuario.usuarioId},
+            #{comentario},
+            #{cantidad}
+         )
+     </insert>
+     
+      <insert id="saveCategory" parameterType="model.CategoriaContabilidad">
+         INSERT INTO categoria_contabilidad(
+            descripcion
+         )
+         VALUES
+         (
+            #{descripcion}
+         )
+     </insert>
+     
+     <update id="updateCategory" parameterType="model.CategoriaContabilidad">
+         UPDATE categoria_contabilidad
+         SET descripcion = #{descripcion}
+         WHERE id_categoria_contabilidad = #{categoriaContabilidadId}
+         
+     </update>
+     
+       <update id="deleteContabilidadById" parameterType="java.lang.Integer">
+         UPDATE contabilidad
+         SET fg_activo = '0'
+         WHERE id_contabilidad = #{id}
+         
+     </update>
+     
+     <insert id="saveSubCategory" parameterType="model.SubCategoriaContabilidad">
+         INSERT INTO sub_categoria_contabilidad
+         (
+            id_categoria_contabilidad,
+            descripcion,
+            ingreso,
+            cuenta_id
+         )
+         VALUES
+         (
+            #{categoriaContabilidad.categoriaContabilidadId},
+            #{descripcion},
+            #{ingreso},
+            #{cuenta.id}
+         )
+     </insert>
+     <delete id="deleteSubCategoryById" parameterType="java.lang.Integer">
+         UPDATE sub_categoria_contabilidad
+         SET fg_activo = '0'
+         WHERE id_sub_categoria_contabilidad = #{id}
+         
+     </delete>
+     
+      <update id="updateSubCategory" parameterType="model.SubCategoriaContabilidad">
+         UPDATE sub_categoria_contabilidad
+         SET 
+          descripcion = #{descripcion},
+          ingreso = #{ingreso},
+          cuenta_id = #{cuenta.id}
+         WHERE id_sub_categoria_contabilidad = #{subCategoriaContabilidadId}
+     </update>
+     
+     <select id="getAllContabilidadByDates" resultMap="resultMapContabilidad" parameterType="java.util.Map">
+       SELECT contabilidad.*,
+        usuario.nombre AS nombre_usuario,
+        usuario.apellidos AS apellidos_usuario,
+        sub_categoria.id_sub_categoria_contabilidad,
+        sub_categoria.id_categoria_contabilidad,
+        sub_categoria.descripcion AS descripcion_sub_categoria,
+        sub_categoria.ingreso AS ingreso_sub_categoria,
+        categoria.id_categoria_contabilidad AS id_categoria,
+        categoria.descripcion AS descripcion_categoria,
+        categoria.fg_activo AS activo_categoria,
+        categoria.fecha_registro AS fecha_registro_categoria,
+        cuenta.id AS cuenta_id,
+         cuenta.descripcion AS cuenta_descripcion
+         FROM contabilidad contabilidad
+        INNER JOIN sub_categoria_contabilidad sub_categoria ON (sub_categoria.id_sub_categoria_contabilidad = contabilidad.id_sub_categoria_contabilidad)
+        INNER JOIN categoria_contabilidad categoria ON (categoria.id_categoria_contabilidad = sub_categoria.id_categoria_contabilidad)
+        INNER JOIN usuarios usuario ON (contabilidad.id_usuarios = usuario.id_usuarios)
+        INNER JOIN cuenta cuenta ON (cuenta.id = sub_categoria.cuenta_id)
+        WHERE contabilidad.fg_activo = '1'
+        AND categoria.fecha_registro BETWEEN #{initDate} AND #{endDate}
+    </select>
+    
+    <select id="getAllContabilidadByDatesGroupByBankAccounts" resultMap="resultMapContabilidad" parameterType="java.util.Map">
+       SELECT SUM(IF(sub_categoria.ingreso='1', contabilidad.cantidad, 0)) AS total_ingreso,
+            SUM(IF(sub_categoria.ingreso='1', 0, contabilidad.cantidad)) AS total_egreso,
+            contabilidad.*,
+            sub_categoria.id_categoria_contabilidad,
+            sub_categoria.descripcion AS descripcion_sub_categoria,
+            sub_categoria.ingreso AS ingreso_sub_categoria,
+            cuenta.id AS cuenta_id,
+             cuenta.descripcion AS cuenta_descripcion
+        FROM contabilidad contabilidad
+            INNER JOIN sub_categoria_contabilidad sub_categoria ON (sub_categoria.id_sub_categoria_contabilidad = contabilidad.id_sub_categoria_contabilidad)
+            INNER JOIN categoria_contabilidad categoria ON (categoria.id_categoria_contabilidad = sub_categoria.id_categoria_contabilidad)
+            INNER JOIN usuarios usuario ON (contabilidad.id_usuarios = usuario.id_usuarios)
+            INNER JOIN cuenta cuenta ON (cuenta.id = sub_categoria.cuenta_id)
+        WHERE contabilidad.fg_activo = '1'
+        AND categoria.fecha_registro BETWEEN #{initDate} AND #{endDate}
+        GROUP BY sub_categoria.cuenta_id
+    </select>
+  
+
+</mapper>
