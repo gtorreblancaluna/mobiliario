@@ -1632,12 +1632,9 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     }
     
     public void buscar() {
-        // sql = "SELECT r.`id_renta`,r.`folio`,CONCAT(c.`nombre`,\" \", c.`apellidos`)AS cliente,e.`descripcion` as estado, r.`fecha_entrega`, r.`hora_entrega`, r.`descripcion`, CONCAT(u.`nombre`,\" \",u.`apellidos`)AS Chofer FROM renta r, estado e, clientes c, usuarios u WHERE r.id_estado=e.id_estado AND r.id_clientes=c.id_clientes AND r.id_usuario_chofer=u.id_usuarios ";
-        //id_estado = "2"; //en renta
+
         String tipoId = null;
         
-//        id_tipo = "1"; // pedido
-
         if (check_cotizacion.isSelected() == true)
             tipoId = ApplicationConstants.TIPO_COTIZACION;
         if(this.check_pedido.isSelected() == true)
@@ -1657,7 +1654,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 && check_pedido.isSelected() == false                
                 ) {
             sql = "SELECT r.id_renta, r.folio, c.nombre, c.apellidos, estado.id_estado, estado.descripcion, "
-                    + "r.fecha_evento, r.fecha_entrega, r.hora_entrega, r.descripcion, chofer.nombre, chofer.apellidos, "
+                    + "r.fecha_pedido, r.fecha_evento, r.fecha_entrega, r.hora_entrega, r.descripcion, chofer.nombre, chofer.apellidos, "
                     + "tipo.id_tipo, tipo.tipo, r.cantidad_descuento, r.iva, r.deposito_garantia, r.envio_recoleccion ,u.nombre AS nombre_usuario, u.apellidos AS apellidos_usuario "
                     + "FROM renta r "
                     + "INNER JOIN clientes c ON (r.id_clientes = c.id_clientes) "
@@ -1668,12 +1665,8 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                     + "WHERE STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') >= STR_TO_DATE(' "+ fecha_sistema +" ', '%d/%m/%Y' ) AND r.id_estado<> '"+ApplicationConstants.ESTADO_CANCELADO+"' "
                     + "AND tipo.id_tipo = '"+ApplicationConstants.TIPO_PEDIDO+"' "
                     + "ORDER BY STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') ";
-//            sql = "SELECT r.`id_renta`,r.`folio`,CONCAT(c.`nombre`,\" \", c.`apellidos`)AS cliente,e.`descripcion` as estado, r.fecha_evento,r.`fecha_entrega`, r.`hora_entrega`, r.`descripcion`, CONCAT(u.`nombre`,\" \",u.`apellidos`)AS Chofer FROM renta r, estado e, clientes c, usuarios u WHERE r.id_estado=e.id_estado AND r.id_clientes=c.id_clientes AND r.id_usuario_chofer=u.id_usuarios AND STR_TO_DATE(r.`fecha_entrega`, '%d/%m/%Y') >= STR_TO_DATE('" + fecha_sistema + "', '%d/%m/%Y' ) AND r.`id_tipo`='" + id_tipo + "' AND r.`id_estado`<> '4' ORDER BY r.`folio`";
-            /*sql = "SELECT r.`id_renta`,CONCAT(c.`nombre`,\" \", c.`apellidos`)AS cliente,e.`descripcion` as estado, r.`fecha_entrega`, r.`hora_entrega`, r.`descripcion` FROM renta r, estado e, clientes c\n"
-             + "WHERE r.id_estado=e.id_estado AND r.id_clientes=c.id_clientes AND STR_TO_DATE(r.`fecha_entrega`, '%d/%m/%Y') >= STR_TO_DATE('" + fecha_sistema + "', '%d/%m/%Y')";
-             */
+
         } else {
-//            sql = "SELECT r.`id_renta`,r.`folio`,CONCAT(c.`nombre`,\" \", c.`apellidos`)AS cliente,e.`descripcion` as estado, r.fecha_evento, r.`fecha_entrega`, r.`hora_entrega`, r.`descripcion`, CONCAT(u.`nombre`,\" \",u.`apellidos`)AS Chofer FROM renta r, estado e, clientes c, usuarios u WHERE r.id_estado=e.id_estado AND r.id_clientes=c.id_clientes AND r.id_usuario_chofer=u.id_usuarios ";
            sql = "SELECT r.id_renta, r.folio, c.nombre, c.apellidos, estado.id_estado, estado.descripcion, "
                     + "r.fecha_evento, r.fecha_entrega, r.hora_entrega, r.descripcion, chofer.nombre, chofer.apellidos, "
                     + "tipo.id_tipo, tipo.tipo, r.cantidad_descuento, r.iva, r.deposito_garantia, r.envio_recoleccion,u.nombre AS nombre_usuario, u.apellidos AS apellidos_usuario "
@@ -1775,17 +1768,15 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     }
     
     public void tabla_consultar_renta() {   // funcion para llenar al abrir la ventana   
-        Object[][] data = {{"","","","","","", "", "", "", "", "","","","","","","",""}};
+        Object[][] data = {{"","","","","","","", "", "", "", "", "","","","","","","",""}};
         String[] columNames = {
             "Id", 
             "Folio", 
             "Cliente", 
-            "Estado", 
-            "Fecha evento",
+            "Estado",
+            "Fecha Elaboración",
+            "Fecha Evento",
             "Fecha Entrega", 
-//            "Hora Entrega", 
-//            "Descripcion", 
-//            "Chofer",
             "Tipo",
             "Estado Pagado",
             "Atendió",
@@ -1811,7 +1802,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             DefaultTableCellRenderer right = new DefaultTableCellRenderer();
             right.setHorizontalAlignment(SwingConstants.RIGHT);
             
-            int[] anchos = {40,30,120,60,70,70,70,70,70,60,60,60,60,60,60,60,60,70};
+            int[] anchos = {40,30,120,60,70,70,70,70,70,70,60,60,60,60,60,60,60,60,70};
             
             for (int inn = 0; inn < tabla_prox_rentas.getColumnCount(); inn++){
                 tabla_prox_rentas.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -1834,22 +1825,10 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             tabla_prox_rentas.setDefaultRenderer(Object.class, ft);
             
         
-            /* tabla_prox_rentas.getColumnModel().getColumn(2).setCellRenderer(centrar);
-             tabla_prox_rentas.getColumnModel().getColumn(3).setCellRenderer(centrar);
-             tabla_prox_rentas.getColumnModel().getColumn(4).setCellRenderer(centrar);
-             tabla_prox_rentas.getColumnModel().getColumn(0).setCellRenderer(centrar);*/
 
-            //tabla_prox_rentas.setDefaultRenderer(Object.class, new TableCellRendererColor());
-            // funcion.desconecta();
             jPanel2.setVisible(true);
-            //lbl_aviso_resultados.setVisible(false);
 
-//        } else {
-//            
-//            jPanel2.setVisible(false);
-//            lbl_aviso_resultados.setVisible(true);
-//            lbl_aviso_resultados.setText("< No hay resultados para mostrar >");
-//        }
+
         try {
             DefaultTableModel temp = (DefaultTableModel) tabla_prox_rentas.getModel();
             temp.removeRow(temp.getRowCount() - 1);
@@ -1871,7 +1850,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private void fillTable (List<Renta> rentas) {
         if(rentas == null || rentas.size()<=0)
     {
-//        JOptionPane.showMessageDialog(null, "no se obtuvieron resultados :( ", "Error", JOptionPane.ERROR_MESSAGE);
         this.lblInformation.setText("No se obtuvieron resultados :( ");
         return;
     }else{
@@ -1885,15 +1863,12 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 this.lblInformation.setText("Se a obtenido "+rentas.size()+" resultado");
             }
             
-//            JOptionPane.showMessageDialog(null, "Se han obtenido "+rentas.size()+" resultados", "Resultados", JOptionPane.INFORMATION_MESSAGE);
         }else{
             if(rentas.size()>1){
                this.lblInformation.setText("Se han obtenido "+rentas.size()+" resultados, con un limite de "+limit+" registros");  
             }else{
               this.lblInformation.setText("Se a obtenido "+rentas.size()+" resultado, con un limite de "+limit+" registros");
             }
-            
-//            JOptionPane.showMessageDialog(null, "Se han obtenido "+rentas.size()+" resultados, con un limite de "+limit+" registros", "Resultados", JOptionPane.INFORMATION_MESSAGE);
         }
         
     }
@@ -1911,11 +1886,9 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                     renta.getFolio()+"",
                     renta.getCliente().getNombre()+" "+renta.getCliente().getApellidos(),              
                     renta.getEstado().getDescripcion(),
+                    renta.getFechaPedido(),
                     renta.getFechaEvento(),
                     renta.getFechaEntrega(),
-//                    renta.getHoraEntrega(),
-//                    renta.getDescripcion(),
-//                    renta.getChofer().getNombre()+" "+renta.getChofer().getApellidos(),
                     renta.getTipo().getTipo(),
                     renta.getDescripcionCobranza(),
                     renta.getUsuario().getNombre()+" "+renta.getUsuario().getApellidos(),
@@ -4138,11 +4111,9 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private void txt_buscar_folioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_buscar_folioKeyPressed
         // TODO add your handling code here:
         if (evt.getKeyCode() == 10) {
-            /* sql = "SELECT r.`id_renta`,r.`folio`,CONCAT(c.`nombre`,\" \", c.`apellidos`)AS cliente,e.`descripcion` as estado, r.`fecha_entrega`, r.`hora_entrega`, r.`descripcion` FROM renta r, estado e, clientes c\n"
-             + "WHERE r.id_estado=e.id_estado AND r.id_clientes=c.id_clientes AND r.`folio`='" + txt_buscar_folio.getText().toString() + "'";
-             */
+
               sql = "SELECT r.id_renta, r.folio, c.nombre, c.apellidos, estado.id_estado, estado.descripcion, "
-                    + "r.fecha_evento, r.fecha_entrega, r.hora_entrega, r.descripcion, chofer.nombre, chofer.apellidos, "
+                    + "r.fecha_pedido, r.fecha_evento, r.fecha_entrega, r.hora_entrega, r.descripcion, chofer.nombre, chofer.apellidos, "
                     + "tipo.id_tipo, tipo.tipo, r.cantidad_descuento, r.iva, r.deposito_garantia, r.envio_recoleccion ,u.nombre AS nombre_usuario, u.apellidos AS apellidos_usuario "
                     + "FROM renta r "
                     + "INNER JOIN clientes c ON (r.id_clientes = c.id_clientes) "
