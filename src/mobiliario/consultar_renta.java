@@ -58,8 +58,12 @@ import net.sf.jasperreports.engine.util.JRLoader;
 import parametersVO.ModelTableItem;
 import parametersVO.DataEmailTemplate;
 import services.CategoryService;
+import services.EstadoEventoService;
 import utilities.BuildEmailTemplate;
 import utilities.Utility;
+import model.EstadoEvento;
+import model.Tipo;
+import services.TipoEventoService;
 
 public class consultar_renta extends javax.swing.JInternalFrame {
     private OrderProviderForm orderProviderForm;
@@ -80,7 +84,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     sqlclass funcion = new sqlclass();    
     private final ItemService itemService;
     private final SaleService saleService;
-    UserService userService = new UserService();
+    private final UserService userService = UserService.getInstance();
     private final SystemService systemService = SystemService.getInstance();
     CategoryService categoryService = new CategoryService();
     Object[][] dtconduc, datos_cliente;
@@ -89,13 +93,15 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     public static String cant, precio;
     public static boolean v_mod_precio = false;
     float canti = 0;
+    private final EstadoEventoService estadoEventoService = EstadoEventoService.getInstance();
+    private final TipoEventoService tipoEventoService = TipoEventoService.getInstance();
 
     /**
      * Creates new form consultar_renta
      */
     public consultar_renta() throws PropertyVetoException {
+        
         funcion.conectate();
-       
         initComponents();
         saleService = SaleService.getInstance();
         itemService = ItemService.getInstance();
@@ -104,9 +110,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         new Thread(() -> {
             llenar_combo_estado();
         }).start();
-        new Thread(() -> {
-            llenar_combo_tipo();
-        }).start();
+        
         new Thread(() -> {
             llenar_abonos();
         }).start();
@@ -136,7 +140,11 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             tabla_clientes();
         }).start();
        
+        try {                   
             buscar();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+        }
         panel_articulos.setVisible(false);
         jbtn_disponible.setEnabled(false);
         txt_buscar_folio.requestFocus();
@@ -276,7 +284,16 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             rentaId = id_renta;
         }
             
-            Renta renta = saleService.obtenerRentaPorId(new Integer(rentaId), funcion);
+            Renta renta = null;
+            
+            try {
+                renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId), funcion);
+            } catch (Exception e) {
+                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+                JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+                return;
+            }
+            
             if(renta == null){
                 JOptionPane.showMessageDialog(null, "No se obtuvieron resultados, porfavor cierra y abre la aplicacion ", "ERROR", JOptionPane.INFORMATION_MESSAGE);
                 return;
@@ -1115,66 +1132,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         String id_chofer = funcion.GetData("id_usuarios", "Select id_usuarios from usuarios where CONCAT(nombre,\" \",apellidos)='" + cmb_chofer.getSelectedItem().toString() + "'");
         String id_tipo = funcion.GetData("id_tipo", "Select id_tipo from tipo where tipo='" + cmb_tipo.getSelectedItem().toString() + "'");
         System.out.println("id_estado: "+id_estado);
-//        String estadoActualPedido = funcion.GetData("id_estado", "SELECT id_estado FROM renta WHERE id_renta=" + id_renta + "");
-//        System.out.println("estadoActualPedido: "+estadoActualPedido); 
-
-        /*
-            // si el pedido actual es diferente a EN RENTA y eligieron EN RENTA
-            if( (!ApplicationConstants.ESTADO_EN_RENTA.equals(estadoActualPedido )
-                    && id_estado.equals(ApplicationConstants.ESTADO_EN_RENTA)
-            ) ){
-            for (int i = 0; i <= tabla_detalle.getRowCount() - 1; i++) {                
-
-
-
-                    // 2018.11.14
-                // vamos a incrementar el campo "en renta" para no modificar el stock
-                
-                String esNuevo = tabla_detalle.getValueAt(i, 6).toString();
-                if(esNuevo.equals("0")){
-                    // solo aumentaremos los articulos que vengan desde un inicio
-                    String cant = EliminaCaracteres(tabla_detalle.getValueAt(i, 1).toString(), "$,");
-                    String id_art = tabla_detalle.getValueAt(i, 2).toString();
-                    String cantEnRenta = funcion.GetData("en_renta", "SELECT en_renta FROM articulo WHERE id_articulo=" + id_art + "");
-                    System.out.println("EN RENTA: "+cantEnRenta);
-                    if(cantEnRenta == null || cantEnRenta.equals(""))
-                        cantEnRenta = "0";                
-                    float aumentar = Float.parseFloat(cantEnRenta) + Float.parseFloat(cant);
-                    System.out.println("AUMENTAR: "+aumentar);
-                    String[] datos_en_renta= {String.valueOf(aumentar), id_art};                
-                    funcion.UpdateRegistro(datos_en_renta, "UPDATE articulo SET en_renta=? WHERE id_articulo=?");
-                }
-                
-            }
-            aviso = " Se resto del inventario los articulos de renta";
-        }
-        */
-            /*
-
-            if( ApplicationConstants.ESTADO_EN_RENTA.equals(estadoActualPedido) && !id_estado.equals(ApplicationConstants.ESTADO_EN_RENTA) ){
-                // aumentar los articulos al inventario
-                for (int i = 0; i <= tabla_detalle.getRowCount() - 1; i++) {
-                // 2018.11.14
-                // vamos a incrementar el campo "en renta" para no modificar el stock
-                
-                String cant = EliminaCaracteres(tabla_detalle.getValueAt(i, 1).toString(), "$,");
-                String id_art = tabla_detalle.getValueAt(i, 2).toString();
-                String cantEnRenta = funcion.GetData("en_renta", "SELECT en_renta FROM articulo WHERE id_articulo=" + id_art + "");
-                System.out.println("EN RENTA: "+cantEnRenta);
-                if(cantEnRenta == null || cantEnRenta.equals(""))
-                    cantEnRenta = "0";                
-                float restar = Float.parseFloat(cantEnRenta) - Float.parseFloat(cant);
-                System.out.println("RESTAR: "+restar);
-                String[] datos_en_renta= {String.valueOf(restar), id_art};                
-                funcion.UpdateRegistro(datos_en_renta, "UPDATE articulo SET en_renta=? WHERE id_articulo=?");
-                    
-                }
-                aviso = "Se aumento los articulos de renta al inventario";
-
-            
-        }
-            
-            */
         String porcentajeDescuentoRenta;
         String cantidadDescuento;
         if (!txt_descuento.getText().toString().equals("") && !txtPorcentajeDescuento.getText().toString().equals("")) {
@@ -1266,7 +1223,15 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     
     public void llenarTablaDetalle(){
          DefaultTableModel tablaDetalle = (DefaultTableModel) tabla_detalle.getModel();
-                Renta renta = saleService.obtenerRentaPorId(new Integer(id_renta), funcion);
+                Renta renta = null;
+                
+                try {
+                    renta = saleService.obtenerRentaPorId(Integer.parseInt(id_renta), funcion);
+                } catch (Exception e) {
+                    Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+                    JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+                    return;
+                }
                 
                 for(DetalleRenta detalle : renta.getDetalleRenta()){
                 float descuento = 0f;
@@ -1520,30 +1485,32 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     }
     
     public void llenar_combo_estado() {
-        //
-        // funcion.conectate();
-        datos_combo = funcion.GetColumna("estado", "descripcion", "Select descripcion from estado");
+
+        List<EstadoEvento> list = estadoEventoService.get();
         cmb_estado.removeAllItems();
-        
-        for (int i = 0; i <= datos_combo.length - 1; i++) {
-            cmb_estado.addItem(datos_combo[i].toString());
-            
-        }
-        // funcion.desconecta();
-        
+        cmb_estado.addItem(
+                new EstadoEvento(0, ApplicationConstants.CMB_SELECCIONE)
+        );
+        list.stream().forEach(t -> {
+            cmb_estado.addItem(t);
+        });
     }
     
     public void llenar_combo_tipo() {
-        //
-        // funcion.conectate();
-        datos_combo = funcion.GetColumna("tipo", "tipo", "Select tipo from tipo");
+        
+        if (cmb_tipo.getItemCount() > 0) {
+            return;
+        }
+
+        List<Tipo> list = tipoEventoService.get();
         cmb_tipo.removeAllItems();
         
-        for (int i = 0; i <= datos_combo.length - 1; i++) {
-            cmb_tipo.addItem(datos_combo[i].toString());
-            
-        }
-        // funcion.desconecta();
+        cmb_tipo.addItem(
+                new Tipo(0, ApplicationConstants.CMB_SELECCIONE)
+        );
+        list.stream().forEach(t -> {
+            cmb_tipo.addItem(t);
+        });
         
     }
     
@@ -1562,14 +1529,20 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     }
     public void llenar_combo_chofer() {
         
-        datos_combo = funcion.GetColumna("usuarios", "nombre", "SELECT CONCAT(u.`nombre`,\" \", u.`apellidos`)AS nombre FROM usuarios u");
-        cmb_chofer.removeAllItems();
-     
         
-        for (int i = 0; i <= datos_combo.length - 1; i++) {
-            cmb_chofer.addItem(datos_combo[i].toString());
-                      
+        if (cmb_chofer.getItemCount() > 0) {
+            return;
         }
+
+        List<Usuario> users = userService.obtenerUsuarios(funcion);
+        cmb_chofer.removeAllItems();
+        
+        cmb_chofer.addItem(
+                new Usuario(0, ApplicationConstants.CMB_SELECCIONE)
+        );
+        users.stream().forEach(t -> {
+            cmb_chofer.addItem(t);
+        });
        
         
     }
@@ -1577,18 +1550,22 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     
     
     public void llenar_combo_chofer_buscar() {
-        //
-        // funcion.conectate();
-        datos_combo = funcion.GetColumna("usuarios", "nombre", "SELECT CONCAT(u.`nombre`,\" \", u.`apellidos`)AS nombre FROM usuarios u");
-        cmb_chofer_buscar.removeAllItems();
-           this.cmbUsuarios.removeAllItems();
-           this.cmbUsuarios.addItem("- seleccione -");
-        for (int i = 0; i <= datos_combo.length - 1; i++) {
-            cmb_chofer_buscar.addItem(datos_combo[i].toString());
-             this.cmbUsuarios.addItem(datos_combo[i].toString()); 
-            
-        }
+        
         // funcion.desconecta();
+        
+        if (cmb_chofer_buscar.getItemCount() > 0) {
+            return;
+        }
+
+        List<Usuario> users = userService.obtenerUsuarios(funcion);
+        cmb_chofer_buscar.removeAllItems();
+        
+        cmb_chofer_buscar.addItem(
+                new Usuario(0, ApplicationConstants.CMB_SELECCIONE)
+        );
+        users.stream().forEach(t -> {
+            cmb_chofer_buscar.addItem(t);
+        });
         
     }
     
@@ -1631,14 +1608,17 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         return nueva_cadena;
     }
     
-    public void buscar() {
+    public void buscar() throws Exception{
 
         String tipoId = null;
-        
-        if (check_cotizacion.isSelected() == true)
-            tipoId = ApplicationConstants.TIPO_COTIZACION;
-        if(this.check_pedido.isSelected() == true)
-            tipoId = ApplicationConstants.TIPO_PEDIDO;
+        EstadoEvento estadoEvento = null;
+        Usuario chofer = null;
+        try{
+            chofer = (Usuario) cmb_chofer_buscar.getSelectedItem();
+        } catch (NullPointerException e) {}
+        try {
+            estadoEvento = (EstadoEvento) cmb_estado.getSelectedItem();
+        } catch (NullPointerException e) {}
         
         String limit = "";
         try {
@@ -1647,8 +1627,8 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         
         }
         
-        if (check_cliente.isSelected() == false && check_estado.isSelected() == false && 
-                check_fechas.isSelected() == false && check_chofer.isSelected() == false && 
+        if (check_cliente.isSelected() == false && (estadoEvento == null || estadoEvento.getEstadoId() == 0) && 
+                check_fechas.isSelected() == false && (chofer == null || chofer.getUsuarioId() == 0) && 
                 check_fechas_evento.isSelected() == false
                 && check_cotizacion.isSelected() == false
                 && check_pedido.isSelected() == false                
@@ -1668,7 +1648,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         } else {
            sql = "SELECT r.id_renta, r.folio, c.nombre, c.apellidos, estado.id_estado, estado.descripcion, "
-                    + "r.fecha_evento, r.fecha_entrega, r.hora_entrega, r.descripcion, chofer.nombre, chofer.apellidos, "
+                    + "r.fecha_pedido, r.fecha_evento, r.fecha_entrega, r.hora_entrega, r.descripcion, chofer.nombre, chofer.apellidos, "
                     + "tipo.id_tipo, tipo.tipo, r.cantidad_descuento, r.iva, r.deposito_garantia, r.envio_recoleccion,u.nombre AS nombre_usuario, u.apellidos AS apellidos_usuario "
                     + "FROM renta r "
                     + "INNER JOIN clientes c ON (r.id_clientes = c.id_clientes) "
@@ -1677,8 +1657,12 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                     + "INNER JOIN estado estado ON (estado.id_estado = r.id_estado) "
                     + "INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer) "
                        + "";
-            if(tipoId != null)
-                sql = sql + " AND r.id_tipo = '"+tipoId+"' ";
+            if(check_cotizacion.isSelected() == true) {
+                sql = sql + " AND r.id_tipo = '"+ApplicationConstants.TIPO_COTIZACION+"' ";
+            }
+            if(check_pedido.isSelected() == true) {
+                sql = sql + " AND r.id_tipo = '"+ApplicationConstants.TIPO_PEDIDO+"' ";
+            }
             if (check_cliente.isSelected() == true)
                 sql = sql + " AND CONCAT(c.nombre,\" \",c.apellidos) LIKE '%" + txt_cliente.getText().toString() + "%' ";
             
@@ -1687,8 +1671,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 fecha_inicial = new SimpleDateFormat("dd/MM/yyyy").format(txt_fecha_inicial.getDate());
                 fecha_final = new SimpleDateFormat("dd/MM/yyyy").format(this.txt_fecha_final.getDate());
 
-                /*fecha_inicial = new SimpleDateFormat("dd/MM/yyyy").format(txt_fecha_inicial.getDateFormat());
-                 fecha_final = new SimpleDateFormat("dd/MM/yyyy").format(txt_fecha_final.getDateFormat());*/
                 System.out.println("Fecha inicial: " + fecha_inicial);
                 System.out.println("Fecha Final: " + fecha_final);
                 
@@ -1701,20 +1683,13 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 String fecha_final_evento = new SimpleDateFormat("dd/MM/yyyy").format(dateFechaEventoFinal.getDate());
                 sql = sql + " AND STR_TO_DATE(r.fecha_evento,'%d/%m/%Y') BETWEEN STR_TO_DATE('" + fecha_inicial_evento + "','%d/%m/%Y') AND STR_TO_DATE('" + fecha_final_evento + "','%d/%m/%Y')  ";
             }
-            if (check_estado.isSelected() == true) {
-                // funcion.conectate();
-                id_estado = funcion.GetData("id_estado", "Select id_estado from estado where descripcion='" + cmb_estado.getSelectedItem().toString() + "'");
+            if (estadoEvento != null && estadoEvento.getEstadoId() != 0) {
                 
-                // funcion.desconecta();
-                sql = sql + " AND r.id_estado=" + id_estado + "  AND r.id_tipo='" + id_tipo + "' ";
+                sql = sql + " AND r.id_estado = " + estadoEvento.getEstadoId() + " ";
                 
             }
-            if (check_chofer.isSelected() == true) {
-                // funcion.conectate();
-                String id_chofer = funcion.GetData("id_usuarios", "Select id_usuarios from usuario where CONCAT(nombre,\" \",apellidos)='" + cmb_chofer_buscar.getSelectedItem().toString() + "'");
-                
-                // funcion.desconecta();
-                sql = sql + " AND r.id_usuario_chofer='" + id_chofer + "'  ";
+            if (chofer != null && chofer.getUsuarioId() != 0) {
+                sql = sql + " AND r.id_usuario_chofer='" + chofer.getUsuarioId() + "'  ";
                 
             }
             if(limit.isEmpty() || limit.equals("todos")){
@@ -2073,10 +2048,9 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         lblInformation = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         txt_cliente = new javax.swing.JTextField();
-        cmb_estado = new javax.swing.JComboBox();
+        cmb_estado = new javax.swing.JComboBox<>();
         check_cliente = new javax.swing.JCheckBox();
         check_fechas = new javax.swing.JCheckBox();
-        check_estado = new javax.swing.JCheckBox();
         jToolBar1 = new javax.swing.JToolBar();
         jbtn_buscar = new javax.swing.JButton();
         jbtn_refrescar = new javax.swing.JButton();
@@ -2088,8 +2062,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         btnInventoryMaterialReport = new javax.swing.JButton();
         jLabel30 = new javax.swing.JLabel();
         txt_buscar_folio = new javax.swing.JFormattedTextField();
-        check_chofer = new javax.swing.JCheckBox();
-        cmb_chofer_buscar = new javax.swing.JComboBox();
+        cmb_chofer_buscar = new javax.swing.JComboBox<>();
         check_pedido = new javax.swing.JCheckBox();
         check_cotizacion = new javax.swing.JCheckBox();
         txt_fecha_inicial = new com.toedter.calendar.JDateChooser();
@@ -2100,6 +2073,8 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         cmbUsuarios = new javax.swing.JComboBox<>();
         cmb_limit = new javax.swing.JComboBox();
         jLabel49 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         lbl_aviso_resultados = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         panel_datos_generales = new javax.swing.JPanel();
@@ -2114,10 +2089,10 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         cmb_estado1 = new javax.swing.JComboBox();
         jScrollPane3 = new javax.swing.JScrollPane();
         txt_descripcion = new javax.swing.JTextPane();
-        cmb_chofer = new javax.swing.JComboBox();
+        cmb_chofer = new javax.swing.JComboBox<>();
         jLabel31 = new javax.swing.JLabel();
         lbl_folio = new javax.swing.JLabel();
-        cmb_tipo = new javax.swing.JComboBox();
+        cmb_tipo = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel34 = new javax.swing.JLabel();
@@ -2290,7 +2265,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tabla_prox_rentas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tabla_prox_rentas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tabla_prox_rentas.setRowHeight(14);
         tabla_prox_rentas.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -2313,29 +2288,23 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jPanel3.add(txt_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 20, 181, 20));
 
         cmb_estado.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_estado.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_estado.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_estado.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jPanel3.add(cmb_estado, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 20, 140, -1));
 
         check_cliente.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         check_cliente.setText("Cliente:");
-        check_cliente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        check_cliente.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jPanel3.add(check_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 70, -1));
 
         check_fechas.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         check_fechas.setText("Por fecha entrega: ");
-        check_fechas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        check_fechas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         check_fechas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 check_fechasActionPerformed(evt);
             }
         });
         jPanel3.add(check_fechas, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 150, 20));
-
-        check_estado.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        check_estado.setText("Estado:");
-        check_estado.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel3.add(check_estado, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 20, 80, -1));
 
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
@@ -2344,7 +2313,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jbtn_buscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/search-icon_32.png"))); // NOI18N
         jbtn_buscar.setMnemonic('B');
         jbtn_buscar.setToolTipText("Realizar busqueda (Alt+B)");
-        jbtn_buscar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_buscar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_buscar.setFocusable(false);
         jbtn_buscar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_buscar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2357,7 +2326,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jbtn_refrescar.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jbtn_refrescar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/arrow-refresh-3-icon_32.png"))); // NOI18N
-        jbtn_refrescar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_refrescar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_refrescar.setFocusable(false);
         jbtn_refrescar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_refrescar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2371,7 +2340,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jbtn_generar_reporte1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/blank-catalog-icon.png"))); // NOI18N
         jbtn_generar_reporte1.setMnemonic('R');
         jbtn_generar_reporte1.setToolTipText("Generar reporte (Alt+R)");
-        jbtn_generar_reporte1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_generar_reporte1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_generar_reporte1.setFocusable(false);
         jbtn_generar_reporte1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_generar_reporte1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2389,7 +2358,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jbtnGenerarReporteEntregas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/truck.png"))); // NOI18N
         jbtnGenerarReporteEntregas.setToolTipText("reporte para entregas");
-        jbtnGenerarReporteEntregas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtnGenerarReporteEntregas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtnGenerarReporteEntregas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbtnGenerarReporteEntregasActionPerformed(evt);
@@ -2399,7 +2368,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jtbtnGenerateExcel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/excel-icon.png"))); // NOI18N
         jtbtnGenerateExcel.setToolTipText("Exportar a Excel");
-        jtbtnGenerateExcel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jtbtnGenerateExcel.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jtbtnGenerateExcel.setFocusable(false);
         jtbtnGenerateExcel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jtbtnGenerateExcel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2412,7 +2381,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/archive-icon.png"))); // NOI18N
         jButton2.setToolTipText("Reporte articulos por categoria");
-        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton2.setFocusable(false);
         jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2425,7 +2394,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/faltantes_32x.png"))); // NOI18N
         jButton6.setToolTipText("Ver faltantes");
-        jButton6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton6.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton6.setFocusable(false);
         jButton6.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton6.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2437,7 +2406,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jToolBar1.add(jButton6);
 
         btnInventoryMaterialReport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Inventory-maintenance-icon-32px.png"))); // NOI18N
-        btnInventoryMaterialReport.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnInventoryMaterialReport.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnInventoryMaterialReport.setFocusable(false);
         btnInventoryMaterialReport.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnInventoryMaterialReport.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2464,26 +2433,20 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         });
         jPanel3.add(txt_buscar_folio, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 80, 54, -1));
 
-        check_chofer.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        check_chofer.setText("Chofer:");
-        check_chofer.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel3.add(check_chofer, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 20, 80, -1));
-
         cmb_chofer_buscar.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_chofer_buscar.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_chofer_buscar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_chofer_buscar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jPanel3.add(cmb_chofer_buscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 20, 150, -1));
 
         buttonGroup1.add(check_pedido);
         check_pedido.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         check_pedido.setText("Pedido");
-        check_pedido.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        check_pedido.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jPanel3.add(check_pedido, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 50, -1, -1));
 
         buttonGroup1.add(check_cotizacion);
         check_cotizacion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         check_cotizacion.setText("Cotizacion");
-        check_cotizacion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        check_cotizacion.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jPanel3.add(check_cotizacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 50, -1, -1));
 
         txt_fecha_inicial.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -2514,7 +2477,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         check_fechas_evento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         check_fechas_evento.setText("Por fecha evento: ");
-        check_fechas_evento.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        check_fechas_evento.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         check_fechas_evento.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 check_fechas_eventoActionPerformed(evt);
@@ -2549,18 +2512,25 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jPanel3.add(dateFechaEventoFinal, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 80, 170, 21));
 
         cmbUsuarios.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmbUsuarios.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmbUsuarios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmbUsuarios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jPanel3.add(cmbUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 70, 170, -1));
 
         cmb_limit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_limit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_limit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_limit.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jPanel3.add(cmb_limit, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 80, 140, -1));
 
         jLabel49.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel49.setText("Buscar por folio:");
         jPanel3.add(jLabel49, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 80, 100, 20));
+
+        jLabel2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel2.setText("Estado:");
+        jPanel3.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 20, 60, 20));
+
+        jLabel3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel3.setText("Chofer:");
+        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 20, 60, 20));
 
         jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, 1180, 120));
 
@@ -2614,7 +2584,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         cmb_estado1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_estado1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_estado1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_estado1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_estado1, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 140, 160, -1));
 
         txt_descripcion.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
@@ -2623,8 +2593,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         panel_datos_generales.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 60, 250, 70));
 
         cmb_chofer.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_chofer.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_chofer.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_chofer.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_chofer, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 20, 210, -1));
 
         jLabel31.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -2635,8 +2604,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         panel_datos_generales.add(lbl_folio, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 10, 80, 20));
 
         cmb_tipo.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_tipo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_tipo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_tipo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_tipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 170, 160, -1));
 
         jLabel1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -2653,12 +2621,12 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         cmb_hora_devolucion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_hora_devolucion.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_devolucion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_hora_devolucion.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_hora_devolucion, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 60, -1));
 
         cmb_hora.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_hora.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_hora.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_hora, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 140, 60, -1));
 
         jLabel35.setText("a");
@@ -2669,12 +2637,12 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         cmb_hora_devolucion_dos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_hora_devolucion_dos.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_devolucion_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_hora_devolucion_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_hora_devolucion_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 170, -1, -1));
 
         cmb_hora_dos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_hora_dos.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_hora_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_hora_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 140, -1, -1));
 
         jLabel33.setText("Hrs.");
@@ -2834,7 +2802,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         check_mostrar_precios.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         check_mostrar_precios.setText("Mostrar precios en PDF");
-        check_mostrar_precios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        check_mostrar_precios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(check_mostrar_precios, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 50, 170, 30));
 
         jLabel48.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -2853,7 +2821,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         check_enviar_email.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         check_enviar_email.setText("Enviar email confirmación");
-        check_enviar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        check_enviar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         check_enviar_email.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 check_enviar_emailActionPerformed(evt);
@@ -2943,7 +2911,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tabla_articulos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tabla_articulos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tabla_articulos.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tabla_articulosMouseClicked(evt);
@@ -2982,7 +2950,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tabla_detalle.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tabla_detalle.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tabla_detalle.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tabla_detalleMouseClicked(evt);
@@ -3044,7 +3012,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jbtn_agregar_articulo.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jbtn_agregar_articulo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/shop-cart-down-icon_32.png"))); // NOI18N
-        jbtn_agregar_articulo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_agregar_articulo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_agregar_articulo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbtn_agregar_articuloActionPerformed(evt);
@@ -3055,7 +3023,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jbtn_editar_dinero.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jbtn_editar_dinero.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/editar_dinero_32.png"))); // NOI18N
         jbtn_editar_dinero.setToolTipText("Editar precio");
-        jbtn_editar_dinero.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_editar_dinero.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_editar_dinero.setFocusable(false);
         jbtn_editar_dinero.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_editar_dinero.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -3068,7 +3036,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Actions-edit-icon.png"))); // NOI18N
         jButton4.setToolTipText("Editar datos articulo");
-        jButton4.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton4.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton4.setFocusable(false);
         jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton4.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -3082,7 +3050,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jButton3.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/folder-remove-icon.png"))); // NOI18N
         jButton3.setToolTipText("Quitar elemento");
-        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton3.setFocusable(false);
         jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -3095,7 +3063,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jbtn_disponible.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/application-check-icon_32.png"))); // NOI18N
         jbtn_disponible.setToolTipText("Revisa la disponibilidad en inventario para la fecha indicada");
-        jbtn_disponible.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_disponible.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_disponible.setFocusable(false);
         jbtn_disponible.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_disponible.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -3109,7 +3077,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jbtn_mostrar_articulos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Left-align-icon.png"))); // NOI18N
         jbtn_mostrar_articulos.setMnemonic('X');
         jbtn_mostrar_articulos.setToolTipText("Cambiar panel (Alt+X)");
-        jbtn_mostrar_articulos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_mostrar_articulos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_mostrar_articulos.setFocusable(false);
         jbtn_mostrar_articulos.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_mostrar_articulos.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -3122,7 +3090,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/faltantes_32x.png"))); // NOI18N
         jButton5.setToolTipText("Ver faltantes");
-        jButton5.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton5.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton5.setFocusable(false);
         jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -3134,7 +3102,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jToolBar3.add(jButton5);
 
         jBtnAddOrderProvider.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/customer-service-icon-32.png"))); // NOI18N
-        jBtnAddOrderProvider.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jBtnAddOrderProvider.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jBtnAddOrderProvider.setFocusable(false);
         jBtnAddOrderProvider.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jBtnAddOrderProvider.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -3163,7 +3131,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tabla_abonos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tabla_abonos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tabla_abonos.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tabla_abonosMouseClicked(evt);
@@ -3196,7 +3164,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jbtn_agregar_abono.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jbtn_agregar_abono.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Actions-arrow-right-icon.png"))); // NOI18N
-        jbtn_agregar_abono.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_agregar_abono.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_agregar_abono.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbtn_agregar_abonoActionPerformed(evt);
@@ -3207,7 +3175,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jbtn_quitar_abono.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jbtn_quitar_abono.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/folder-remove-icon.png"))); // NOI18N
         jbtn_quitar_abono.setToolTipText("Quitar elemento");
-        jbtn_quitar_abono.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_quitar_abono.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_quitar_abono.setFocusable(false);
         jbtn_quitar_abono.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_quitar_abono.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -3264,7 +3232,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         cmbTipoPago.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmbTipoPago.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmbTipoPago.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmbTipoPago.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         jLabel46.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel46.setText("Fecha pago:");
@@ -3371,7 +3339,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jbtn_editar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/editar_32.png"))); // NOI18N
         jbtn_editar.setMnemonic('E');
         jbtn_editar.setToolTipText("Editar (Alt+E)");
-        jbtn_editar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_editar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_editar.setFocusable(false);
         jbtn_editar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_editar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -3385,7 +3353,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jbtn_guardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/floppy-disk-icon.png"))); // NOI18N
         jbtn_guardar.setMnemonic('G');
         jbtn_guardar.setToolTipText("Guardar (Alt+G)");
-        jbtn_guardar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_guardar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_guardar.setFocusable(false);
         jbtn_guardar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_guardar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -3398,7 +3366,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jbtn_agregar_articulos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/shop-cart-down-icon_32.png"))); // NOI18N
         jbtn_agregar_articulos.setToolTipText("Agregar mas articulos");
-        jbtn_agregar_articulos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_agregar_articulos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_agregar_articulos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbtn_agregar_articulosActionPerformed(evt);
@@ -3409,7 +3377,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jbtn_generar_reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/blank-catalog-icon.png"))); // NOI18N
         jbtn_generar_reporte.setMnemonic('R');
         jbtn_generar_reporte.setToolTipText("Generar reporte (Alt+R)");
-        jbtn_generar_reporte.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_generar_reporte.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_generar_reporte.setFocusable(false);
         jbtn_generar_reporte.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_generar_reporte.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -3457,7 +3425,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jbtn_guardar_cliente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/floppy-disk-icon.png"))); // NOI18N
         jbtn_guardar_cliente.setToolTipText("Guardar datos cliente");
-        jbtn_guardar_cliente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_guardar_cliente.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_guardar_cliente.setFocusable(false);
         jbtn_guardar_cliente.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_guardar_cliente.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -3630,7 +3598,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tabla_clientes.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tabla_clientes.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tabla_clientes.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tabla_clientesMouseClicked(evt);
@@ -3757,13 +3725,21 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             funcion.setEnableContainer(jTabbedPane2, false);
             funcion.setEnableContainer(panel_abonos, false);
             
+            llenar_combo_tipo();
             llenar_combo_estado2();
             llenar_combo_chofer();
             tabla_articulos();
             tabla_detalle();
                        
             String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
-            Renta renta = saleService.obtenerRentaPorId(new Integer(rentaId), funcion);
+            Renta renta = null;
+            try {
+                renta = saleService.obtenerRentaPorId(new Integer(rentaId), funcion);
+            } catch (Exception e) {
+                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+                JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+                return;
+            }
             if(renta.getMostrarPreciosPdf().equals("1"))
                 this.check_mostrar_precios.setSelected(true);
             else
@@ -3802,7 +3778,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             txt_descripcion.setText(renta.getDescripcion());            
             txt_comentarios.setText(renta.getComentario());            
 
-            cmb_tipo.setSelectedItem(renta.getTipo().getTipo());
+            cmb_tipo.getModel().setSelectedItem(renta.getTipo());
             this.txtPorcentajeDescuento.setValue(renta.getDescuento());
             txt_descuento.setText(decimalFormat.format(renta.getCantidadDescuento()));
             txt_iva.setValue(renta.getIva());
@@ -3858,8 +3834,12 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_tabla_prox_rentasMouseClicked
 
     private void jbtn_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_buscarActionPerformed
-        // TODO add your handling code here:
-        buscar();
+        try {                   
+            buscar();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+        }
+        
 
     }//GEN-LAST:event_jbtn_buscarActionPerformed
 
@@ -4347,7 +4327,15 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             return;
         }            
 
-        Renta renta = saleService.obtenerRentaPorId(new Integer(rentaId), funcion);
+        Renta renta = null;
+        
+        try {
+            renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId), funcion);
+        } catch (Exception e) {
+            Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+            return;
+        }
 
         if(renta == null ){
            JOptionPane.showMessageDialog(rootPane, "No se obtuvo los datos de manuera correcta, intentalo de nuevo o reinicia el sistema ");
@@ -4462,7 +4450,18 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         "WHERE renta.id_renta = "+rentaId+" AND articulo.id_categoria IN (SELECT asigna.id_categoria FROM asigna_categoria asigna WHERE asigna.id_usuarios = "+usuarioId+" )";
          
          
-         List<Renta> rentas = saleService.obtenerPedidosPorConsultaSql(query, funcion);
+         List<Renta> rentas = null;
+         
+         
+        try {
+            rentas = saleService.obtenerPedidosPorConsultaSql(query, funcion);
+        } catch (Exception e) {
+            Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+            return;
+        }
+         
+         
          if(rentas == null || rentas.size()<=0){
             JOptionPane.showMessageDialog(null, "No se obtuvieron registros :( ", "Reporte", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -5157,21 +5156,19 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JCheckBox check_apellidos;
     private javax.swing.JCheckBox check_apodo;
-    private javax.swing.JCheckBox check_chofer;
     private javax.swing.JCheckBox check_cliente;
     private javax.swing.JCheckBox check_cotizacion;
     private javax.swing.JCheckBox check_enviar_email;
-    private javax.swing.JCheckBox check_estado;
     private javax.swing.JCheckBox check_fechas;
     private javax.swing.JCheckBox check_fechas_evento;
     private javax.swing.JCheckBox check_mostrar_precios;
     private javax.swing.JCheckBox check_nombre;
     private javax.swing.JCheckBox check_pedido;
     private javax.swing.JComboBox cmbTipoPago;
-    private javax.swing.JComboBox<String> cmbUsuarios;
-    private javax.swing.JComboBox cmb_chofer;
-    private javax.swing.JComboBox cmb_chofer_buscar;
-    private javax.swing.JComboBox cmb_estado;
+    private javax.swing.JComboBox<Usuario> cmbUsuarios;
+    private javax.swing.JComboBox<Usuario> cmb_chofer;
+    private javax.swing.JComboBox<Usuario> cmb_chofer_buscar;
+    private javax.swing.JComboBox<EstadoEvento> cmb_estado;
     private javax.swing.JComboBox cmb_estado1;
     private com.toedter.calendar.JDateChooser cmb_fecha_devolucion;
     private com.toedter.calendar.JDateChooser cmb_fecha_entrega;
@@ -5182,7 +5179,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox cmb_hora_devolucion_dos;
     private javax.swing.JComboBox cmb_hora_dos;
     private javax.swing.JComboBox cmb_limit;
-    private javax.swing.JComboBox cmb_tipo;
+    private javax.swing.JComboBox<Tipo> cmb_tipo;
     private com.toedter.calendar.JDateChooser dateFechaEventoFinal;
     private com.toedter.calendar.JDateChooser dateFechaEventoInicial;
     private javax.swing.JButton jBtnAddOrderProvider;
@@ -5202,6 +5199,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
@@ -5212,6 +5210,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;

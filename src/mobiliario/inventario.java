@@ -20,6 +20,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
@@ -261,7 +263,13 @@ public class inventario extends javax.swing.JInternalFrame {
 //        List<Articulo> articulos = itemService.obtenerArticulosBusquedaInventario(funcion, query+"");
         map.put("estado_renta", ApplicationConstants.ESTADO_EN_RENTA);
         map.put("tipo_pedido", ApplicationConstants.TIPO_PEDIDO);
-        List<Articulo> articulos = itemService.obtenerArticulosBusquedaInventario( map);
+        List<Articulo> articulos = null;
+        try {
+            articulos = itemService.obtenerArticulosBusquedaInventario( map);
+        } catch (Exception e) {
+            Logger.getLogger(inventario.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+         }
 
        Toolkit.getDefaultToolkit().beep();
        

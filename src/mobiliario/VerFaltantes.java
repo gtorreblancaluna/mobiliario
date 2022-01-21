@@ -11,8 +11,9 @@ import java.awt.Toolkit;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -28,7 +29,7 @@ import services.SystemService;
 
 public class VerFaltantes extends java.awt.Dialog {
 
-    sqlclass funcion = new sqlclass();
+    private final sqlclass funcion = new sqlclass();
     
     Object[][] dtconduc;      
     private final SaleService saleService;
@@ -106,8 +107,14 @@ public class VerFaltantes extends java.awt.Dialog {
         else{
              g_rentaId = AsignarFaltante.g_rentaId+"";
         }
-        
-         Renta renta = saleService.obtenerRentaPorId(new Integer(g_rentaId), funcion);
+            Renta renta = null;
+            try{
+                renta = saleService.obtenerRentaPorId(Integer.parseInt(g_rentaId), funcion);
+            } catch (Exception e) {
+               Logger.getLogger(VerFaltantes.class.getName()).log(Level.SEVERE, null, e);
+               JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+               return;
+           }
          DefaultTableModel tablaDetalle = (DefaultTableModel) tablaArticulos.getModel();
          this.lblInformacionInicial.setText("FOLIO: "+renta.getFolio());
          int itemId = 0;
@@ -118,7 +125,15 @@ public class VerFaltantes extends java.awt.Dialog {
              itemId = VerFoliosPorArticulo.g_articuloId;
          if(renta.getRentaId() == 0 && itemId > 0 )
          {
-             Articulo articulo = itemService.obtenerArticuloPorId( funcion , itemId);
+             Articulo articulo = null;
+             
+             try {
+                articulo = itemService.obtenerArticuloPorId( funcion , itemId);
+           } catch (Exception e) {
+               Logger.getLogger(VerFaltantes.class.getName()).log(Level.SEVERE, null, e);
+               JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+               return;
+           }
               Object fila[] = {                                          
                         articulo.getArticuloId()+"",   
                         "",
@@ -141,7 +156,16 @@ public class VerFaltantes extends java.awt.Dialog {
     
     public void llenar_tabla_faltantes(){        
             
-        List<Faltante> faltantes = itemService.obtenerFaltantesPorRentaId(funcion, new Integer(g_rentaId));
+        List<Faltante> faltantes = null;
+        
+        
+        try {
+             faltantes = itemService.obtenerFaltantesPorRentaId(funcion, Integer.parseInt(g_rentaId));
+        } catch (Exception e) {
+            Logger.getLogger(VerFaltantes.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+            return;
+        }
         
         if(faltantes == null || faltantes.size()<=0)
             return;

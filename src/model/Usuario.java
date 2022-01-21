@@ -15,6 +15,18 @@ public class Usuario {
     private String activo;
     private Puesto puesto;
 
+    public Usuario(int usuarioId, String nombre) {
+        this.usuarioId = usuarioId;
+        this.nombre = nombre;
+        this.apellidos = "";
+    }
+
+    public Usuario() {
+    }
+    
+    
+    
+
     public int getUsuarioId() {
         return usuarioId;
     }
@@ -113,7 +125,7 @@ public class Usuario {
 
     @Override
     public String toString() {
-        return "Usuario{" + "usuarioId=" + usuarioId + ", nombre=" + nombre + ", apellidos=" + apellidos + ", telMovil=" + telMovil + ", telFijo=" + telFijo + ", direccion=" + direccion + ", administrador=" + administrador + ", nivel1=" + nivel1 + ", nivel2=" + nivel2 + ", contrasenia=" + contrasenia + ", activo=" + activo + ", puesto=" + puesto + '}';
+        return nombre + " " + apellidos;
     }
     
     

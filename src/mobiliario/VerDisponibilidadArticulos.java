@@ -11,6 +11,9 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -154,7 +157,15 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                 +"";
         }
         
-        List<Renta> rentas = saleService.obtenerDisponibilidadRentaPorConsulta(stringSql, funcion);
+        List<Renta> rentas = null;
+        
+         try {
+            rentas = saleService.obtenerDisponibilidadRentaPorConsulta(stringSql, funcion);
+        } catch (Exception e) {
+            Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+            return;
+        }
         
         if(rentas == null || rentas.size()<=0){
             lblEncontrados.setText("No se obtuvieron resultados :(");
@@ -333,7 +344,15 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                 +"";
         }
         
-        List<Renta> rentas = saleService.obtenerDisponibilidadRentaPorConsulta(stringSql, funcion);
+        List<Renta> rentas = null;
+        
+        try {
+            rentas = saleService.obtenerDisponibilidadRentaPorConsulta(stringSql, funcion);
+        } catch (Exception e) {
+            Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+            return;
+        }
         
         
         if(rentas == null || rentas.size()<=0){
@@ -349,7 +368,14 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                   // recorremos la tabla para identificar los articulos 
                   String id = detalle.getArticulo().getArticuloId()+"";
                   if (id.equals(inventario.tablaDisponibilidadArticulos.getValueAt(i, 0).toString())) {
-                    Articulo availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
+                    Articulo availabeItem = null;
+                    try {
+                        availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
+                    } catch (Exception e) {
+                        Logger.getLogger(VerDisponibilidadArticulos.class.getName()).log(Level.SEVERE, null, e);
+                        JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+                        return;
+                    }
                       // vamos agregar el articulo encontrado en la tabla detalle
                     DefaultTableModel temp = (DefaultTableModel) tablaArticulos.getModel();
                      Object nuevo[] = {

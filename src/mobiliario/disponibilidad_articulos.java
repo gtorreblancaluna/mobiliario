@@ -8,6 +8,9 @@ package mobiliario;
 import services.SaleService;
 import clases.sqlclass;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -142,13 +145,28 @@ public class disponibilidad_articulos extends java.awt.Dialog {
 
         } else { //es en agregar renta
             System.out.println("Cantidad filas: " + cant_filas);
-            List<Renta> rentas = saleService.obtenerDisponibilidadRenta(fecha_inicial, fecha_final, funcion);
+            List<Renta> rentas = null;
+            
+            try {
+                rentas = saleService.obtenerDisponibilidadRenta(fecha_inicial, fecha_final, funcion);
+            } catch (Exception e) {
+                Logger.getLogger(disponibilidad_articulos.class.getName()).log(Level.SEVERE, null, e);
+                JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+                return;
+            }
              
             System.out.println("Agregando el pedido actual");
             // AGREGAMOS EL PEDIDO ACTUAL EN LA TABLA DE DETALLE
             for (int z = 0; z < agregar_renta.tabla_detalle.getRowCount(); z ++ ){
                 Integer id = new Integer(agregar_renta.tabla_detalle.getValueAt(z,1).toString());
-                Articulo availabeItem = itemService.getItemAvailable(id);
+                Articulo availabeItem = null;
+                try {
+                    availabeItem = itemService.getItemAvailable(id);
+                 } catch (Exception e) {
+                    Logger.getLogger(disponibilidad_articulos.class.getName()).log(Level.SEVERE, null, e);
+                    JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+                    return;
+                }
                 if(availabeItem == null)
                     continue;
                 System.out.println("ID AGREGADO: "+availabeItem.getArticuloId());
@@ -194,7 +212,14 @@ public class disponibilidad_articulos extends java.awt.Dialog {
                   String id = detalle.getArticulo().getArticuloId()+"";
                   if (!id.equals(agregar_renta.tabla_detalle.getValueAt(i, 1).toString()))
                       continue;
-                    Articulo availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
+                    Articulo availabeItem = null;
+                    try {
+                        availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
+                     } catch (Exception e) {
+                        Logger.getLogger(disponibilidad_articulos.class.getName()).log(Level.SEVERE, null, e);
+                        JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+                     }
+                  
                     // vamos agregar el articulo encontrado en la tabla detalle
                     DefaultTableModel temp = (DefaultTableModel) tabla_disponibilidad.getModel();
                      Object nuevo[] = {

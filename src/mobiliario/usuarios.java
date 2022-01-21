@@ -7,8 +7,6 @@ package mobiliario;
 
 import clases.conectate;
 import clases.sqlclass;
-import encryption.exceptions.EncryptionException;
-import encryption.utilities.Crypto;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.List;
@@ -31,7 +29,7 @@ public class usuarios extends javax.swing.JInternalFrame {
 private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(usuarios.class.getName());
     sqlclass funcion = new sqlclass();
     conectate conexion = new conectate();
-    UserService userService = new UserService();
+    private final UserService userService = UserService.getInstance();
     CategoryService categoryService = new CategoryService();
     private final SystemService systemService = SystemService.getInstance();
     Object[][] dtconduc;

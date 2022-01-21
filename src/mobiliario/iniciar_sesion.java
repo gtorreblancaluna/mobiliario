@@ -25,13 +25,9 @@ import services.UserService;
 public class iniciar_sesion extends javax.swing.JFrame {
 //initializing the logger
 private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
-//    sqlclass funcion = new sqlclass();   
-//    sqlclass funcion = new sqlclass();    
-//    conectate conexion = new conectate();
-    private principal ventana_principal;
-    private static UserService userService = new UserService();
-    
 
+    private principal ventana_principal;
+    private static final UserService userService = UserService.getInstance();
     private Timer tiempo;
     int cont;
     public final static int TWO_SECOND = 8;

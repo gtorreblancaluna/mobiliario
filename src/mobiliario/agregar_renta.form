@@ -106,7 +106,7 @@
                     <Property name="mnemonic" type="int" value="78"/>
                     <Property name="toolTipText" type="java.lang.String" value="Agrega el cliente (Alt+N)"/>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                     <Property name="focusable" type="boolean" value="false"/>
                     <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -444,7 +444,7 @@
                           </TableColumnModel>
                         </Property>
                         <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                          <Color id="Cursor de Mano"/>
+                          <Color id="Default Cursor"/>
                         </Property>
                         <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
                           <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
@@ -508,7 +508,7 @@
             <Container class="javax.swing.JTabbedPane" name="jTabbedPane2">
               <Properties>
                 <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                  <Color id="Cursor de Mano"/>
+                  <Color id="Default Cursor"/>
                 </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Microsoft Sans Serif" size="12" style="0"/>
@@ -686,7 +686,7 @@
                                   </Table>
                                 </Property>
                                 <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                                  <Color id="Cursor de Mano"/>
+                                  <Color id="Default Cursor"/>
                                 </Property>
                               </Properties>
                               <Events>
@@ -793,7 +793,7 @@
                                   </Table>
                                 </Property>
                                 <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                                  <Color id="Cursor de Mano"/>
+                                  <Color id="Default Cursor"/>
                                 </Property>
                               </Properties>
                               <Events>
@@ -838,7 +838,7 @@
                               <Image iconType="3" name="/img/shop-cart-down-icon_32.png"/>
                             </Property>
                             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                              <Color id="Cursor de Mano"/>
+                              <Color id="Default Cursor"/>
                             </Property>
                           </Properties>
                           <Events>
@@ -855,7 +855,7 @@
                             </Property>
                             <Property name="toolTipText" type="java.lang.String" value="Editar precio"/>
                             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                              <Color id="Cursor de Mano"/>
+                              <Color id="Default Cursor"/>
                             </Property>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -875,7 +875,7 @@
                             </Property>
                             <Property name="toolTipText" type="java.lang.String" value="Quitar elemento"/>
                             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                              <Color id="Cursor de Mano"/>
+                              <Color id="Default Cursor"/>
                             </Property>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -892,7 +892,7 @@
                             </Property>
                             <Property name="toolTipText" type="java.lang.String" value="Revisa la disponibilidad en inventario para la fecha indicada"/>
                             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                              <Color id="Cursor de Mano"/>
+                              <Color id="Default Cursor"/>
                             </Property>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -910,7 +910,7 @@
                             <Property name="mnemonic" type="int" value="81"/>
                             <Property name="toolTipText" type="java.lang.String" value="Cambiar panel (Alt+Q)"/>
                             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                              <Color id="Cursor de Mano"/>
+                              <Color id="Default Cursor"/>
                             </Property>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -1127,7 +1127,7 @@
                                   <Image iconType="3" name="/img/Actions-arrow-right-icon.png"/>
                                 </Property>
                                 <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                                  <Color id="Cursor de Mano"/>
+                                  <Color id="Default Cursor"/>
                                 </Property>
                               </Properties>
                               <Events>
@@ -1144,7 +1144,7 @@
                                 </Property>
                                 <Property name="toolTipText" type="java.lang.String" value="Quitar elemento"/>
                                 <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                                  <Color id="Cursor de Mano"/>
+                                  <Color id="Default Cursor"/>
                                 </Property>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -1190,7 +1190,7 @@
                               <Image iconType="3" name="/img/Add-icon.png"/>
                             </Property>
                             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                              <Color id="Cursor de Mano"/>
+                              <Color id="Default Cursor"/>
                             </Property>
                           </Properties>
                           <Events>
@@ -1212,7 +1212,7 @@
                               </StringArray>
                             </Property>
                             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                              <Color id="Cursor de Mano"/>
+                              <Color id="Default Cursor"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -1436,7 +1436,7 @@
                       </StringArray>
                     </Property>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -1655,7 +1655,7 @@
                       </StringArray>
                     </Property>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -1696,7 +1696,7 @@
                     </Property>
                     <Property name="text" type="java.lang.String" value="Mostrar precios en PDF"/>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -1719,7 +1719,7 @@
                       </StringArray>
                     </Property>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -1788,7 +1788,7 @@
                       </StringArray>
                     </Property>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -1831,7 +1831,7 @@
                       </StringArray>
                     </Property>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -1874,7 +1874,7 @@
                       </StringArray>
                     </Property>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -1930,7 +1930,7 @@
                       </StringArray>
                     </Property>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -2128,7 +2128,7 @@
                     </Property>
                     <Property name="text" type="java.lang.String" value="Generar reporte al guardar"/>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                   </Properties>
                   <Events>
@@ -2147,7 +2147,7 @@
                     </Property>
                     <Property name="text" type="java.lang.String" value="Enviar email confirmaci&#xf3;n"/>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                   </Properties>
                   <Events>
@@ -2194,7 +2194,7 @@
                     <Property name="mnemonic" type="int" value="71"/>
                     <Property name="toolTipText" type="java.lang.String" value="Guarda en la base de datos (Alt+G)"/>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                     <Property name="focusable" type="boolean" value="false"/>
                     <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -2212,7 +2212,7 @@
                     <Property name="mnemonic" type="int" value="82"/>
                     <Property name="toolTipText" type="java.lang.String" value="Generar reporte (Alt+R)"/>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                     <Property name="focusable" type="boolean" value="false"/>
                     <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -2229,7 +2229,7 @@
                     </Property>
                     <Property name="toolTipText" type="java.lang.String" value="Nuevo evento"/>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Cursor de Mano"/>
+                      <Color id="Default Cursor"/>
                     </Property>
                     <Property name="focusable" type="boolean" value="false"/>
                     <Property name="horizontalTextPosition" type="int" value="0"/>

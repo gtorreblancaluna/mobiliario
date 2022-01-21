@@ -203,7 +203,7 @@ public class ItemService {
         
     }
     
-    public Articulo getItemAvailable (Integer id) {
+    public Articulo getItemAvailable (Integer id)throws Exception {
      Articulo item;
      
      item = itemDao.getItemAvailable(id);
@@ -272,7 +272,7 @@ public class ItemService {
         return articulos;
     }
     
-    public List<Articulo> obtenerArticulosBusquedaInventario(Map<String,Object> map){
+    public List<Articulo> obtenerArticulosBusquedaInventario(Map<String,Object> map) throws Exception{
         List<Articulo> articulos = itemDao.obtenerArticulosBusquedaInventario(map);
         
         if(articulos != null){
@@ -284,7 +284,8 @@ public class ItemService {
         return articulos;
     }
     
-    private void setUtiles (Articulo item) {
+    private void setUtiles (Articulo item) throws Exception{
+        
         
         List<Compra> compras = comprasService.obtenerComprasPorArticuloId(false, item.getArticuloId(), null);
         float totalCompras = 0f;

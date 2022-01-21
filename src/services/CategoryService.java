@@ -27,7 +27,7 @@ import model.CategoriaDTO;
  */
 public class CategoryService {
     
-    UserService userService = new UserService();
+    private final UserService userService = UserService.getInstance();
     CategoryDAO categoryDao = new CategoryDAO();
     
     // obtener las categorias asignadas a un usuario

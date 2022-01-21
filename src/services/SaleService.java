@@ -1,10 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
 package services;
 
 import clases.sqlclass;
@@ -13,7 +6,6 @@ import exceptions.DataOriginException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
 import javax.swing.JOptionPane;
@@ -32,6 +24,7 @@ import model.Usuario;
 public class SaleService {
     private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
     private final SalesDAO salesDao;
+    private final UserService userService = UserService.getInstance();
     
     
     private SaleService () {
@@ -66,7 +59,7 @@ public class SaleService {
     }
     
     // obtener la disponibilidad de articulos en un rango de fechas
-    public List<Renta> obtenerDisponibilidadRenta(String fechaInicial,String fechaFinal,sqlclass sql){
+    public List<Renta> obtenerDisponibilidadRenta(String fechaInicial,String fechaFinal,sqlclass sql)throws Exception{
         
         
 //        String stringSql = "SELECT * FROM renta renta "
@@ -140,8 +133,7 @@ public class SaleService {
          
         List<Renta> rentas = new ArrayList<>();
         CustomerService customerService = new CustomerService();
-        UserService userService = new UserService();
-        
+         
          for (int i = 0; i < dtconduc.length; i++) {
              Renta renta = new Renta();
              renta.setRentaId(Integer.parseInt(dtconduc[i][0].toString()));
@@ -235,7 +227,7 @@ public class SaleService {
     } // fin disponibilidad renta por 
     
     
-     public List<Renta> obtenerDisponibilidadRentaPorConsulta(String query,sqlclass sql){
+     public List<Renta> obtenerDisponibilidadRentaPorConsulta(String query,sqlclass sql)throws Exception {
 
         Object[][] dtconduc = null;
         try {
@@ -254,7 +246,6 @@ public class SaleService {
          
         List<Renta> rentas = new ArrayList<>();
         CustomerService customerService = new CustomerService();
-        UserService userService = new UserService();
         
          for (int i = 0; i < dtconduc.length; i++) {
              Renta renta = new Renta();
@@ -350,7 +341,7 @@ public class SaleService {
     
     
     // obtenemos los pedidos por una consulta armada desde la vista
-    public List<Renta> obtenerPedidosPorConsultaSql(String querySql,sqlclass sql){
+    public List<Renta> obtenerPedidosPorConsultaSql(String querySql,sqlclass sql)throws Exception {
         
         List<Renta> rentas = new ArrayList<>();
       
@@ -371,7 +362,6 @@ public class SaleService {
             return null;
          
         CustomerService customerService = new CustomerService();
-        UserService userService = new UserService();
         
          for (int i = 0; i < dtconduc.length; i++) {
              Renta renta = new Renta();
@@ -549,7 +539,7 @@ public class SaleService {
     } // fin disponibilidad renta por fechas
     
     
-     public List<DetalleRenta> obtenerDetalleRenta(sqlclass sql, int rentaId){
+     public List<DetalleRenta> obtenerDetalleRenta(sqlclass sql, int rentaId)throws Exception{
         
         List<DetalleRenta> detalleRentas = new ArrayList<>();
         String[] colName = {"id_detalle_renta", "id_renta","cantidad", 
@@ -586,7 +576,6 @@ public class SaleService {
                 detalle.setCantidad(Float.parseFloat(dtconduc[i][2].toString()));
              
              if(dtconduc[i][3] != null)
-                //detalle.setArticulo(itemService.obtenerArticuloPorId(sql, Integer.parseInt(dtconduc[i][3].toString())));
                  detalle.setArticulo(itemService.getItemAvailable(Integer.parseInt(dtconduc[i][3].toString())));
              
              if(dtconduc[i][4] != null)
@@ -640,7 +629,7 @@ public class SaleService {
      
          
      
-     public Renta obtenerRentaPorId(int rentaId,sqlclass sql){
+     public Renta obtenerRentaPorId(int rentaId,sqlclass sql) throws Exception { 
         
         Renta renta = new Renta();
         
@@ -664,7 +653,6 @@ public class SaleService {
          // servicio para los clientes
         CustomerService customerService = new CustomerService();
         // serivcio para los usuarios
-        UserService userService = new UserService();        
         
              renta.setRentaId(Integer.parseInt(dtconduc[0][0].toString()));
              if(dtconduc[0][1] != null)
@@ -1244,7 +1232,7 @@ public class SaleService {
                 
     } // fin folios por articulo
   
-  public Renta obtenerRentaPorFolio(int folio,sqlclass sql){
+  public Renta obtenerRentaPorFolio(int folio,sqlclass sql) throws Exception {
         
         Renta renta = new Renta();
         
@@ -1268,7 +1256,6 @@ public class SaleService {
          // servicio para los clientes
         CustomerService customerService = new CustomerService();
         // serivcio para los usuarios
-        UserService userService = new UserService();        
         
              renta.setRentaId(Integer.parseInt(dtconduc[0][0].toString()));
              if(dtconduc[0][1] != null)

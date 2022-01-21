@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperTipoEvento">
+  
+    <resultMap id="resultMapTipoEvento" type="model.Tipo">        
+        <result property="tipoId" column="id_tipo"/>
+        <result property="tipo" column="tipo"/>    
+        
+    </resultMap>   
+  
+    <select id="getTipoEvento" resultMap="resultMapTipoEvento" >
+        SELECT * FROM tipo
+    </select>   
+    
+    
+  
+</mapper>

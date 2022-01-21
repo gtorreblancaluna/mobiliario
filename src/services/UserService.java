@@ -24,6 +24,24 @@ public class UserService {
     private static Logger log = Logger.getLogger(UserService.class.getName());
     UserDAO usuariosDao = new UserDAO();
     
+    private static UserService INSTANCE = null;
+   
+    // Private constructor suppresses 
+    private UserService(){}
+
+    // creador sincronizado para protegerse de posibles problemas  multi-hilo
+    // otra prueba para evitar instanciación múltiple 
+    private synchronized static void createInstance() {
+        if (INSTANCE == null) { 
+            INSTANCE = new UserService();
+        }
+    }
+
+    public static UserService getInstance() {
+        if (INSTANCE == null) createInstance();
+            return INSTANCE;
+    }
+    
      public Usuario obtenerUsuarioPorId(sqlclass sql, int usuarioId){
          String[] colName = {"id_usuarios", 
             "nombre", "apellidos", "tel_movil", "tel_fijo", 

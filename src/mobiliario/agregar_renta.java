@@ -57,7 +57,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
     public static String chofer = "", cuenta_emisor, pass_emisor, servidor_email, puerto_email, conexion_TLS, autenticacion, rutaPDF_email;
     String fecha_entrega, fecha_devolucion, hora_entrega,fecha_evento, hora_devolucion;
     public static boolean utiliza_conexion_TLS = false, utiliza_autenticacion = false, status,validad_tipo_abonos;
-    private UserService userService = new UserService();
+    private final UserService userService = UserService.getInstance();
     private SaleService saleService;
     private final SystemService systemService = SystemService.getInstance();
 
