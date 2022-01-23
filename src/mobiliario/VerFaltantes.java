@@ -109,7 +109,7 @@ public class VerFaltantes extends java.awt.Dialog {
         }
             Renta renta = null;
             try{
-                renta = saleService.obtenerRentaPorId(Integer.parseInt(g_rentaId), funcion);
+                renta = saleService.obtenerRentaPorId(Integer.parseInt(g_rentaId));
             } catch (Exception e) {
                Logger.getLogger(VerFaltantes.class.getName()).log(Level.SEVERE, null, e);
                JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 

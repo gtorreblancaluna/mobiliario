@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.apache.log4j.Logger;
 import javax.swing.JOptionPane;
 import mobiliario.ApplicationConstants;
@@ -61,27 +63,6 @@ public class SaleService {
     // obtener la disponibilidad de articulos en un rango de fechas
     public List<Renta> obtenerDisponibilidadRenta(String fechaInicial,String fechaFinal,sqlclass sql)throws Exception{
         
-        
-//        String stringSql = "SELECT * FROM renta renta "
-//                +"INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) "   
-//                +"INNER JOIN articulo articulo ON (articulo.id_articulo = detalle.id_articulo) "
-//                +"WHERE "
-//                +"(((STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y') >= STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y')) "
-//                +"AND (STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y') <= STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y'))) "
-//                +"OR "
-//                +"((STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y') >= STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y')) "
-//                +"AND (STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y') <= STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y')))) "
-//                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-//                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-//                +"OR "
-//                + "(((STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') >= STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y')) "
-//                +"AND (STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') <= STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y'))) "
-//                +"OR "
-//                +"((STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') >= STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y')) "
-//                +"AND (STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') <= STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y')))) "
-//                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-//                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-//                +"ORDER BY articulo.descripcion "
                 
                 // ajuste de consulta 2019.03.01
                 String stringSql = "SELECT * FROM renta renta "
@@ -216,7 +197,7 @@ public class SaleService {
              renta.setEstado(this.obtenerEstadoEventoPorId(sql, renta.getEstadoId()));
              // obtenemos el detalle de la renta
              renta.setChofer(userService.obtenerUsuarioPorId(sql,renta.getUsuarioChoferId()));
-             renta.setDetalleRenta(this.obtenerDetalleRenta(sql,Integer.parseInt(dtconduc[i][0].toString())));
+             renta.setDetalleRenta(this.obtenerDetalleRenta(Integer.parseInt(dtconduc[i][0].toString())));
              renta.setAbonos(this.obtenerAbonosPorRentaId(sql,Integer.parseInt(dtconduc[i][0].toString())));
              rentas.add(renta);
              
@@ -329,7 +310,7 @@ public class SaleService {
              renta.setEstado(this.obtenerEstadoEventoPorId(sql, renta.getEstadoId()));
              // obtenemos el detalle de la renta
              renta.setChofer(userService.obtenerUsuarioPorId(sql,renta.getUsuarioChoferId()));
-             renta.setDetalleRenta(this.obtenerDetalleRenta(sql,Integer.parseInt(dtconduc[i][0].toString())));
+             renta.setDetalleRenta(this.obtenerDetalleRenta(Integer.parseInt(dtconduc[i][0].toString())));
              renta.setAbonos(this.obtenerAbonosPorRentaId(sql,Integer.parseInt(dtconduc[i][0].toString())));
              rentas.add(renta);
              
@@ -444,7 +425,7 @@ public class SaleService {
              renta.setEstado(this.obtenerEstadoEventoPorId(sql, renta.getEstadoId()));
              renta.setChofer(userService.obtenerUsuarioPorId(sql,renta.getUsuarioChoferId()));
              // obtenemos el detalle de la renta
-             renta.setDetalleRenta(this.obtenerDetalleRenta(sql,Integer.parseInt(dtconduc[i][0].toString())));
+             renta.setDetalleRenta(this.obtenerDetalleRenta(Integer.parseInt(dtconduc[i][0].toString())));
              renta.setAbonos(this.obtenerAbonosPorRentaId(sql,Integer.parseInt(dtconduc[i][0].toString())));
              rentas.add(renta);
          }
@@ -539,63 +520,9 @@ public class SaleService {
     } // fin disponibilidad renta por fechas
     
     
-     public List<DetalleRenta> obtenerDetalleRenta(sqlclass sql, int rentaId)throws Exception{
+     public List<DetalleRenta> obtenerDetalleRenta(int rentaId) throws Exception{
         
-        List<DetalleRenta> detalleRentas = new ArrayList<>();
-        String[] colName = {"id_detalle_renta", "id_renta","cantidad", 
-            "id_articulo", "p_unitario", "comentario", 
-            "se_desconto","porcentaje_descuento" };
-        //nombre de columnas, tabla, instruccion sql
-        
-         Object[][] dtconduc = null;
-        try {
-            dtconduc = sql.GetTabla(colName, "detalle_renta", "SELECT * FROM detalle_renta "
-                + "WHERE id_renta="+rentaId );
-        } catch (SQLNonTransientConnectionException e) {
-            sql.conectate();
-            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }    
-        
-         if(dtconduc == null || dtconduc.length <= 0)
-            return null;
-         
-        ItemService itemService = ItemService.getInstance();
-        
-         for (int i = 0; i < dtconduc.length; i++) {
-             DetalleRenta detalle = new DetalleRenta();
-             detalle.setDetalleRentaId(Integer.parseInt(dtconduc[i][0].toString()));
-             
-             if(dtconduc[i][1] != null)
-                detalle.setRentaId(Integer.parseInt(dtconduc[i][1].toString()));
-             
-             if(dtconduc[i][2] != null)
-                detalle.setCantidad(Float.parseFloat(dtconduc[i][2].toString()));
-             
-             if(dtconduc[i][3] != null)
-                 detalle.setArticulo(itemService.getItemAvailable(Integer.parseInt(dtconduc[i][3].toString())));
-             
-             if(dtconduc[i][4] != null)
-                detalle.setPrecioUnitario(Float.parseFloat(dtconduc[i][4].toString()));
-             
-               if(dtconduc[i][5] != null)
-                detalle.setComentario(dtconduc[i][5].toString());
-              
-                if(dtconduc[i][6] != null)
-                detalle.setSeDesconto(dtconduc[i][6].toString());
-                
-                if(dtconduc[i][7] != null)
-                    detalle.setPorcentajeDescuento(new Float (dtconduc[i][7]+""));
-                else
-                    detalle.setPorcentajeDescuento(0f);
-
-             detalleRentas.add(detalle);
-         }
-        
-        return detalleRentas;
+       return salesDao.getDetailByRentId(rentaId+"");
                 
     } // fin detalle renta
      
@@ -629,144 +556,13 @@ public class SaleService {
      
          
      
-     public Renta obtenerRentaPorId(int rentaId,sqlclass sql) throws Exception { 
+     public Renta obtenerRentaPorId(int rentaId) throws Exception { 
         
-        Renta renta = new Renta();
+        Renta renta = salesDao.obtenerRentaPorId(rentaId);
         
-        //nombre de columnas, tabla, instruccion sql
-         Object[][] dtconduc = null;
-        try {
-            dtconduc = sql.GetTabla(this.obtenerColumnasRenta(), "renta", "SELECT * FROM renta renta "
-                +"WHERE renta.id_renta = "+rentaId );
-        } catch (SQLNonTransientConnectionException e) {
-            sql.conectate();
-            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }    
-       
-         if(dtconduc == null || dtconduc.length <= 0)
-            return null;
-         
-         // servicio para los clientes
-        CustomerService customerService = new CustomerService();
-        // serivcio para los usuarios
-        
-             renta.setRentaId(Integer.parseInt(dtconduc[0][0].toString()));
-             if(dtconduc[0][1] != null)
-                renta.setEstadoId(Integer.parseInt(dtconduc[0][1].toString()));
-             
-             if(dtconduc[0][2] != null)
-                renta.setCliente(customerService.obtenerClientePorId(sql, Integer.parseInt(dtconduc[0][2].toString()))); 
-             
-             if(dtconduc[0][3] != null)
-                renta.setUsuario(userService.obtenerUsuarioPorId(sql, Integer.parseInt(dtconduc[0][3].toString())));  
-             
-             if(dtconduc[0][4] != null)
-                 renta.setFechaPedido(dtconduc[0][4].toString());
-             
-             if(dtconduc[0][5] != null)
-                 renta.setFechaEntrega(dtconduc[0][5].toString());
-             
-             if(dtconduc[0][6] != null)
-                 renta.setHoraEntrega(dtconduc[0][6].toString());
-             
-             if(dtconduc[0][7] != null)
-                 renta.setFechaDevolucion(dtconduc[0][7].toString());
-             
-             if(dtconduc[0][8] != null)
-                 renta.setDescripcion(dtconduc[0][8].toString());
-             
-             if(dtconduc[0][9] == null)
-                 renta.setDescuento(0f);
-             else if(dtconduc[0][9].toString().equals(""))
-                 renta.setDescuento(0f);
-             else
-                 renta.setDescuento(Float.parseFloat(dtconduc[0][9].toString()));
-             
-             if(dtconduc[0][10] != null)
-                 renta.setCantidadDescuento(Float.parseFloat(dtconduc[0][10].toString()));
-             
-             if(dtconduc[0][11] != null)
-                 renta.setIva(Float.parseFloat(dtconduc[0][11].toString()));
-             else
-                 renta.setIva(0f);
-             
-             if(dtconduc[0][12] != null)
-                 renta.setComentario(dtconduc[0][12].toString());
-             
-             if(dtconduc[0][13] != null)
-                 renta.setUsuarioChoferId(Integer.parseInt(dtconduc[0][13].toString()));
-             
-             if(dtconduc[0][14] != null)
-                 renta.setFolio(Integer.parseInt(dtconduc[0][14].toString()));
-             
-             if(dtconduc[0][15] != null)
-                 renta.setStock(dtconduc[0][15].toString());
-              
-             if(dtconduc[0][16] != null)
-                 renta.setTipo(this.obtenerTipoPorId(sql,Integer.parseInt(dtconduc[0][16].toString())));
-             
-             if(dtconduc[0][17] != null)
-                 renta.setHoraDevolucion(dtconduc[0][17].toString());
-             
-             if(dtconduc[0][18] != null)
-                 renta.setFechaEvento(dtconduc[0][18].toString());
-              
-             if(dtconduc[0][19] == null)
-                 renta.setDepositoGarantia(0f);
-             else
-                 renta.setDepositoGarantia(Float.parseFloat(dtconduc[0][19].toString()));
-             
-             if(dtconduc[0][20] == null)
-                 renta.setEnvioRecoleccion(0f);
-             else
-                 renta.setEnvioRecoleccion(Float.parseFloat(dtconduc[0][20].toString()));
-             
-             if(dtconduc[0][21] == null)
-                 renta.setMostrarPreciosPdf("0");
-             else
-                 renta.setMostrarPreciosPdf(dtconduc[0][21]+"");
-             
-             
-             renta.setEstado(this.obtenerEstadoEventoPorId(sql, renta.getEstadoId()));
-             renta.setChofer(userService.obtenerUsuarioPorId(sql,renta.getUsuarioChoferId()));
-             // obtenemos el detalle de la renta
-             renta.setDetalleRenta(this.obtenerDetalleRenta(sql,Integer.parseInt(dtconduc[0][0].toString())));
-             renta.setAbonos(this.obtenerAbonosPorRentaId(sql,Integer.parseInt(dtconduc[0][0].toString())));
-             
-             // calculando faltantes
-            
-             float fTotalFaltantes = 0f;
-             
-             String totalFaltantes = sql.GetData("total",
-//                      "SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * a.precio_compra),0) )AS total "
-                              "SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) )AS total "
-                    + "FROM faltantes f "
-                    + "INNER JOIN articulo a ON (f.id_articulo = a.id_articulo) "
-                    + "WHERE f.id_renta=" + renta.getRentaId() + " "
-                    + "AND f.fg_activo = '1' "
-                    );
-            if(totalFaltantes == null || totalFaltantes.equals(""))
-                totalFaltantes = "0";
-            
-            try {
-                fTotalFaltantes = Float.parseFloat(totalFaltantes);
-            } catch (Exception e) {
-            }
-           
-            if(fTotalFaltantes > 0){
-                // el pedido tiene pago pendiente por faltante
-                if(renta.getDepositoGarantia()>0){
-                    // a dejado deposito en garantia
-                    fTotalFaltantes -= renta.getDepositoGarantia();
-                }                
-            }
-            
-            renta.setTotalFaltantes(fTotalFaltantes);
-        
+
+        renta.setDetalleRenta(this.obtenerDetalleRenta(renta.getRentaId()));
+
         return renta;
                 
     } // renta por id
@@ -909,7 +705,7 @@ public class SaleService {
      
      
  }
- public List<Renta> obtenerPedidosPorConsultaSqlSinDetalle(String querySql,sqlclass sql){
+ public List<Renta> obtenerPedidosPorConsultaSqlSinDetalle(String querySql,sqlclass sql)throws Exception{
         
         List<Renta> rentas = new ArrayList<>();
        String[] columnas = {
@@ -953,169 +749,34 @@ public class SaleService {
             return null;
         
          for (int i = 0; i < dtconduc.length; i++) {
-             Renta renta = new Renta();
-             renta.setRentaId(Integer.parseInt(dtconduc[i][ColumnRenta.ID_RENTA.getColumn()].toString()));
+             Renta renta = obtenerRentaPorId(Integer.parseInt(dtconduc[i][0].toString()));
              
-             if(dtconduc[i][ColumnRenta.FOLIO.getColumn()] != null)
-                renta.setFolio(Integer.parseInt(dtconduc[i][ColumnRenta.FOLIO.getColumn()].toString())); 
-             
-             // CLIENTE
-             Cliente cliente = new Cliente();             
-             if(dtconduc[i][ColumnRenta.CUSTOMER_NAME.getColumn()] != null)
-                 cliente.setNombre(dtconduc[i][ColumnRenta.CUSTOMER_NAME.getColumn()]+"");             
-             if(dtconduc[i][ColumnRenta.CUSTOMER_LAST_NAME.getColumn()] != null)
-                 cliente.setApellidos(dtconduc[i][ColumnRenta.CUSTOMER_LAST_NAME.getColumn()]+"");
-             
-                renta.setCliente(cliente);  
-             
-             EstadoEvento estado = new EstadoEvento();
-             if(dtconduc[i][ColumnRenta.STATUS_ID.getColumn()] != null)
-                 estado.setEstadoId(Integer.parseInt(dtconduc[i][ColumnRenta.STATUS_ID.getColumn()]+""));
-             if(dtconduc[i][ColumnRenta.STATUS_DESCRIPTION.getColumn()] != null)
-                 estado.setDescripcion(dtconduc[i][ColumnRenta.STATUS_DESCRIPTION.getColumn()]+"");
-             
-             renta.setEstado(estado);
-             
-             if(dtconduc[i][ColumnRenta.CREATED_AT.getColumn()] != null)
-                 renta.setFechaPedido(dtconduc[i][ColumnRenta.CREATED_AT.getColumn()]+"");
-             
-             if(dtconduc[i][ColumnRenta.EVENT_DATE.getColumn()] != null)
-                 renta.setFechaEvento(dtconduc[i][ColumnRenta.EVENT_DATE.getColumn()]+"");
-             
-             if(dtconduc[i][ColumnRenta.DELIVERY_DATE.getColumn()] != null)
-                 renta.setFechaEntrega(dtconduc[i][ColumnRenta.DELIVERY_DATE.getColumn()]+"");
-             
-             if(dtconduc[i][ColumnRenta.DELIVERY_HOUR.getColumn()] != null)
-                 renta.setHoraEntrega(dtconduc[i][ColumnRenta.DELIVERY_HOUR.getColumn()]+"");
-             
-             if(dtconduc[i][ColumnRenta.EVENT_DESCRIPTION.getColumn()] != null)
-                 renta.setDescripcion(dtconduc[i][ColumnRenta.EVENT_DESCRIPTION.getColumn()]+"");
-             
-             Usuario chofer = new Usuario();
-             if(dtconduc[i][ColumnRenta.DRIVER_NAME.getColumn()] != null)
-                 chofer.setNombre(dtconduc[i][ColumnRenta.DRIVER_NAME.getColumn()]+"");
-             if(dtconduc[i][ColumnRenta.DRIVER_LAST_NAME.getColumn()] != null)
-                 chofer.setApellidos(dtconduc[i][ColumnRenta.DRIVER_LAST_NAME.getColumn()]+"");
-                 
-            renta.setChofer(chofer);
-            
-            Tipo tipo = new Tipo();
-            if(dtconduc[i][ColumnRenta.EVENT_TYPE_ID.getColumn()] != null)
-                tipo.setTipoId(Integer.parseInt(dtconduc[i][ColumnRenta.EVENT_TYPE_ID.getColumn()]+""));
-            if(dtconduc[i][ColumnRenta.EVENT_TYPE_DESCRIPTION.getColumn()] != null)
-                tipo.setTipo(dtconduc[i][ColumnRenta.EVENT_TYPE_DESCRIPTION.getColumn()]+"");
-            
-            float fDescuento = 0f;
-            float fIva = 0f;
-            float fDepositoGarantia = 0f;
-            float fEnvioRecoleccion = 0f;
-            float fTotal = 0f;
-            float fTotalIva = 0f;            
-            
-            if(dtconduc[i][ColumnRenta.DISCOUNT_AMOUNT.getColumn()] != null)
-                fDescuento = Float.parseFloat(dtconduc[i][ColumnRenta.DISCOUNT_AMOUNT.getColumn()]+"");
-            if(dtconduc[i][ColumnRenta.IVA.getColumn()] != null){
-                fIva = Float.parseFloat(dtconduc[i][ColumnRenta.IVA.getColumn()]+"");
-                
-            }
-            if(dtconduc[i][ColumnRenta.GUARANTEE_DEPOSIT.getColumn()] != null){
-                fDepositoGarantia = Float.parseFloat(dtconduc[i][ColumnRenta.GUARANTEE_DEPOSIT.getColumn()]+"");
-                renta.setDepositoGarantia(fDepositoGarantia);
-            }
-            if(dtconduc[i][ColumnRenta.SHIPPING_RECOLECTION.getColumn()] != null){
-                fEnvioRecoleccion = Float.parseFloat(dtconduc[i][ColumnRenta.SHIPPING_RECOLECTION.getColumn()]+"");
-                renta.setEnvioRecoleccion(fEnvioRecoleccion);
-            }
-            
-            Usuario usuario = new Usuario();
-            if(dtconduc[i][ColumnRenta.USER_NAME.getColumn()] != null)
-                usuario.setNombre(dtconduc[i][ColumnRenta.USER_NAME.getColumn()]+"");
-            
-            if(dtconduc[i][ColumnRenta.USER_LAST_NAME.getColumn()] != null)
-                usuario.setApellidos(dtconduc[i][ColumnRenta.USER_LAST_NAME.getColumn()]+"");
-            
-            renta.setUsuario(usuario);
-                      
-            renta.setTipo(tipo);
-            renta.setCantidadDescuento(fDescuento);
-         
-            if(renta.getTipo().getTipoId() == Integer.parseInt(ApplicationConstants.TIPO_COTIZACION))
-            {
-                 renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_NO_PAGADO);
-                 rentas.add(renta);
-                 continue;
-            }
-           
-           renta.setAbonos(this.obtenerAbonosPorRentaId(sql,Integer.parseInt(dtconduc[i][0].toString())));
-
-           String subtotal = sql.GetData("suma", "SELECT IF(porcentaje_descuento >= 0, "
-                        + "(SUM( (cantidad*p_unitario) - ((cantidad*p_unitario) * (porcentaje_descuento / 100) ))), "
-                        + "(SUM( (cantidad*p_unitario) )) "
-                        + ")AS suma "
-                        + "FROM detalle_renta WHERE id_renta = "+renta.getRentaId());
-           
-          if(subtotal == null || subtotal.isEmpty() || subtotal.equals(""))
-              subtotal = "0";
-           renta.setSubTotal(Float.parseFloat(subtotal));
-           
-            float fAbonos = 0f;
+            Double fAbonos = renta.getTotalAbonos();
             float fSubTotal = 0f;
-            
-            if(subtotal != null)
-                fSubTotal = Float.parseFloat(subtotal);
-             
-             if(renta.getAbonos() != null && renta.getAbonos().size()>0){
-                for(Abono abono : renta.getAbonos())
-                    fAbonos += abono.getAbono();
-             }
-             
+                      
                  
-             fTotal =  (fEnvioRecoleccion + fDepositoGarantia + fTotalIva + fSubTotal);
-             fTotal -= fDescuento;
-             fTotalIva = fTotal * ( fIva/100 );
+             Float fTotal =  (renta.getEnvioRecoleccion() + renta.getDepositoGarantia() + renta.getIva() + renta.getSubTotal());
+             fTotal -= renta.getDescuento();
+             Float fTotalIva = fTotal * ( renta.getIva()/100 );
              renta.setIva(fTotalIva);
-             fTotal =  (fEnvioRecoleccion + fDepositoGarantia + fTotalIva + fSubTotal);
-             fTotal -= fDescuento;
-             fTotal -= fAbonos;
+             fTotal =  (renta.getEnvioRecoleccion() + renta.getDepositoGarantia() + fTotalIva + fSubTotal);
+             fTotal -= renta.getDescuento();
+             fTotal -= Float.parseFloat(fAbonos+"");
              if(fTotal >0 && fTotal<1)
-                 fTotal = 0;
+                 fTotal = 0F;
              
-             
-             // calculando faltantes
-            
-             float fTotalFaltantes = 0f;
-             
-             String totalFaltantes = sql.GetData("total",
-//                      "SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * a.precio_compra),0) )AS total "
-                              "SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) )AS total "
-                    + "FROM faltantes f "
-                    + "INNER JOIN articulo a ON (f.id_articulo = a.id_articulo) "
-                    + "WHERE f.id_renta=" + renta.getRentaId() + " "
-                    + "AND f.fg_activo = '1' "
-                    );
-            if(totalFaltantes == null || totalFaltantes.equals(""))
-                totalFaltantes = "0";
-            
-            try {
-                fTotalFaltantes = Float.parseFloat(totalFaltantes);
-            } catch (Exception e) {
-            }
-           
-            renta.setTotalFaltantes(fTotalFaltantes);
-            
-            if(fTotalFaltantes > 0){
-                // el pedido tiene pago pendiente por faltante
-                if(renta.getDepositoGarantia()>0){
+            if(renta.getTotalFaltantes() > 0 && renta.getDepositoGarantia()>0){
+                // el pedido tiene pago pendiente por faltante 
                     // a dejado deposito en garantia
-                    fTotalFaltantes -= renta.getDepositoGarantia();
-                }                
+                    renta.setTotalFaltantes(renta.getTotalFaltantes() - renta.getDepositoGarantia());
+                
             }
             // fin calcular faltantes
              
-             fTotal += fTotalFaltantes;
-             renta.setTotalFaltantesPorCubrir(fTotalFaltantes);
+             fTotal += renta.getTotalFaltantes();
+             renta.setTotalFaltantesPorCubrir(renta.getTotalFaltantes());
              if(fTotal <= 0){
-                 fTotal = 0;
+                 fTotal = 0F;
                  renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_PAGADO);
              }
              else if(fTotal > 0 && fAbonos == 0)
@@ -1126,6 +787,60 @@ public class SaleService {
              renta.setTotal(fTotal);
              
              rentas.add(renta);
+         }
+        
+        return rentas;
+                
+    } // fin renta sin detalle
+ 
+ public List<Renta> obtenerRentasPorParametros(Map<String,Object> parameters)throws Exception{
+        
+        List<Renta> rentas = salesDao.obtenerRentasPorParametros(parameters);
+       
+        
+         for (Renta renta : rentas) {
+             
+             Double fAbonos = 0D;
+            
+             if (renta.getTotalAbonos() != null){
+                fAbonos = renta.getTotalAbonos();
+             } else{
+                 renta.setTotalAbonos(fAbonos);
+             }
+            float fSubTotal = 0f;
+                      
+                 
+             Float fTotal =  (renta.getEnvioRecoleccion() + renta.getDepositoGarantia() + renta.getIva() + renta.getSubTotal());
+             fTotal -= renta.getDescuento();
+             Float fTotalIva = fTotal * ( renta.getIva()/100 );
+             renta.setIva(fTotalIva);
+             fTotal =  (renta.getEnvioRecoleccion() + renta.getDepositoGarantia() + fTotalIva + fSubTotal);
+             fTotal -= renta.getDescuento();
+             fTotal -= Float.parseFloat(fAbonos+"");
+             if(fTotal >0 && fTotal<1)
+                 fTotal = 0F;
+             
+            if(renta.getTotalFaltantes() > 0 && renta.getDepositoGarantia()>0){
+                // el pedido tiene pago pendiente por faltante 
+                    // a dejado deposito en garantia
+                    renta.setTotalFaltantes(renta.getTotalFaltantes() - renta.getDepositoGarantia());
+                
+            }
+            // fin calcular faltantes
+             
+             fTotal += renta.getTotalFaltantes();
+             renta.setTotalFaltantesPorCubrir(renta.getTotalFaltantes());
+             if(fTotal <= 0){
+                 fTotal = 0F;
+                 renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_PAGADO);
+             }
+             else if(fTotal > 0 && fAbonos == 0)
+                 renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_NO_PAGADO);
+             else if (fTotal > 0 && fAbonos > 0)
+                 renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_PARCIAL_PAGADO);   
+             
+             renta.setTotal(fTotal);
+             
          }
         
         return rentas;
@@ -1337,7 +1052,7 @@ public class SaleService {
              renta.setEstado(this.obtenerEstadoEventoPorId(sql, renta.getEstadoId()));
              renta.setChofer(userService.obtenerUsuarioPorId(sql,renta.getUsuarioChoferId()));
              // obtenemos el detalle de la renta
-             renta.setDetalleRenta(this.obtenerDetalleRenta(sql,Integer.parseInt(dtconduc[0][0].toString())));
+             renta.setDetalleRenta(this.obtenerDetalleRenta(Integer.parseInt(dtconduc[0][0].toString())));
              renta.setAbonos(this.obtenerAbonosPorRentaId(sql,Integer.parseInt(dtconduc[0][0].toString())));
         
         return renta;

@@ -7,6 +7,16 @@ public class TipoAbono {
     private String fechaRegistro;
     private Cuenta cuenta;
 
+    public TipoAbono() {
+    }
+
+    public TipoAbono(int tipoAbonoId, String descripcion) {
+        this.tipoAbonoId = tipoAbonoId;
+        this.descripcion = descripcion;
+    }
+    
+    
+
     public Cuenta getCuenta() {
         return cuenta;
     }
@@ -48,6 +58,13 @@ public class TipoAbono {
     public void setFechaRegistro(String fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
     }
+
+    @Override
+    public String toString() {
+        return descripcion;
+    }
+    
+    
     
     
 }

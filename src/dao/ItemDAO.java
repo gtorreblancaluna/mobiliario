@@ -5,16 +5,13 @@
  */
 package dao;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import mobiliario.ApplicationConstants;
-import mobiliario.iniciar_sesion;
 import model.Articulo;
 import model.CategoriaDTO;
 import model.Color;
-import model.Usuario;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
@@ -60,14 +57,16 @@ public class ItemDAO {
     public Articulo getItemAvailable( Integer id) {
         SqlSession session = sqlSessionFactory.openSession();
         try {
-            Articulo item = (Articulo) session.selectOne("MapperArticulos.obtenerArticuloPorId",id);
-            if(item == null){
-                return null; 
-            }
             Map<String, Object> map = new HashMap<>();
             map.put("articuloId", id);
             map.put("estado_renta", ApplicationConstants.ESTADO_EN_RENTA);
             map.put("tipo_pedido", ApplicationConstants.TIPO_PEDIDO);
+            
+            Articulo item = (Articulo) session.selectOne("MapperArticulos.obtenerArticuloPorId",id);
+            if(item == null){
+                return null; 
+            }
+            
             
             item.setRentados( (String) session.selectOne("MapperArticulos.obtenerEnRenta",map));
             item.setFaltantes((String) session.selectOne("MapperArticulos.obtenerFaltantes",map));

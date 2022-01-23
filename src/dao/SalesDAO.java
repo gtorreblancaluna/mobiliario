@@ -2,8 +2,10 @@ package dao;
 
 import exceptions.DataOriginException;
 import java.util.List;
+import java.util.Map;
 import model.Abono;
 import model.DetalleRenta;
+import model.Renta;
 import model.TipoAbono;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -62,6 +64,24 @@ public class SalesDAO {
            session.commit();
         }catch(Exception ex){
             log.error(ex);           
+        } finally {
+            session.close();
+        }
+    }
+    
+    public Renta obtenerRentaPorId (Integer id) throws Exception {
+        SqlSession session = sqlSessionFactory.openSession();
+        try {
+           return (Renta) session.selectOne("MapperPedidos.obtenerRentaPorId",id);       
+        } finally {
+            session.close();
+        }
+    }
+    
+    public List<Renta> obtenerRentasPorParametros (Map<String,Object> parameters) throws Exception {
+        SqlSession session = sqlSessionFactory.openSession();
+        try {
+           return (List<Renta>) session.selectList("MapperPedidos.obtenerRentaPorParametros",parameters);       
         } finally {
             session.close();
         }

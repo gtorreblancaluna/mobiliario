@@ -4,6 +4,50 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
 <mapper namespace="MapperPedidos">
+    
+    <resultMap id="resultMapRenta" type="model.Renta">
+        <result property="rentaId" column="id_renta"/>
+        <!-- customer info-->
+        <result property="cliente.clienteId" column="cliente_id"/>
+        <result property="cliente.nombre" column="cliente_nombre"/>
+        <result property="cliente.apellidos" column="cliente_apellidos"/>
+        <!--user info-->
+        <result property="usuario.usuarioId" column="usuario_id"/>
+        <result property="usuario.nombre" column="usuario_nombre"/>
+        <result property="usuario.apellidos" column="usuario_apellidos"/>
+        
+        <result property="fechaPedido" column="fecha_pedido"/>
+        <result property="fechaEntrega" column="fecha_entrega"/>
+        <result property="horaEntrega" column="hora_entrega"/>
+        <result property="fechaDevolucion" column="fecha_devolucion"/>
+        <result property="descripcion" column="descripcion"/>
+        <result property="descuento" column="descuento"/>
+        <result property="cantidadDescuento" column="cantidad_descuento"/>
+        <result property="iva" column="iva"/>
+        <result property="comentario" column="comentario"/>
+        <result property="folio" column="folio"/>
+        <result property="stock" column="stock"/>
+        <!--event type-->
+        <result property="tipo.tipoId" column="tipo_id"/>
+        <result property="tipo.tipo" column="tipo_tipo"/>
+        <result property="totalAbonos" column="total_abonos"/>
+        <result property="horaDevolucion" column="hora_devolucion"/>
+        <result property="fechaEvento" column="fecha_evento"/>
+        <result property="depositoGarantia" column="deposito_garantia"/>      
+        <result property="envioRecoleccion" column="envio_recoleccion"/>
+        <!-- driver info-->
+        <result property="chofer.usuarioId" column="chofer_id"/>
+        <result property="chofer.nombre" column="chofer_nombre"/>
+        <result property="chofer.apellidos" column="chofer_apellidos"/>
+        <!--status event-->
+        <result property="estado.estadoId" column="id_estado"/>
+        <result property="estado.descripcion" column="estado_descripcion"/>
+        <result property="mostrarPreciosPdf" column="mostrar_precios_pdf"/>
+        <result property="totalAbonos" column="total_abonos"/>
+        <result property="totalFaltantes" column="total_faltantes"/>
+        <result property="subTotal" column="sub_total"/>
+          
+    </resultMap>
   
     <resultMap id="resultMapTipoAbono" type="model.TipoAbono">        
         <result property="tipoAbonoId" column="id_tipo_abono"/>
@@ -59,7 +103,146 @@
         </set>       
         WHERE id_abonos = #{abonoId}
     </update>
-  
-  
+    
+    <select id="obtenerRentaPorId" resultMap="resultMapRenta" parameterType="java.lang.Integer">
+        SELECT
+            r.id_renta,
+            c.id_clientes AS cliente_id,
+            c.nombre AS cliente_nombre,
+            c.apellidos AS cliente_apellidos,
+            u.id_usuarios AS usuario_id,
+            u.nombre AS usuario_nombre,
+            u.apellidos AS usuario_apellidos,
+            r.fecha_pedido,
+            r.fecha_entrega,
+            r.hora_entrega,
+            r.fecha_devolucion,
+            r.descripcion,
+            r.descuento,
+            r.cantidad_descuento,
+            r.iva,
+            r.comentario,
+            r.folio,
+            r.stock,
+            t.id_tipo AS tipo_id,
+            t.tipo AS tipo_tipo,
+            r.hora_devolucion,
+            r.fecha_evento,
+            r.deposito_garantia,
+            r.envio_recoleccion,
+            r.mostrar_precios_pdf,
+            chofer.id_usuarios AS chofer_id,
+            chofer.nombre AS chofer_nombre,
+            chofer.apellidos AS chofer_apellidos,
+            e.id_estado,
+            e.descripcion AS estado_descripcion,
+            (SELECT SUM(a.abono) FROM abonos a WHERE a.id_renta = #{id})  AS total_abonos,
+            (
+                SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) )AS total
+                FROM faltantes f
+                INNER JOIN articulo a ON (f.id_articulo = a.id_articulo)
+                WHERE f.id_renta=#{id}
+                AND f.fg_activo = '1'
+            ) AS total_faltantes,
+            (
+                SELECT IF(porcentaje_descuento >= 0,
+                (SUM( (cantidad*p_unitario) - ((cantidad*p_unitario) * (porcentaje_descuento / 100) ))),
+                (SUM( (cantidad*p_unitario) ))) AS suma
+                FROM detalle_renta WHERE id_renta = #{id}
+            ) AS sub_total
+        FROM renta r
+            INNER JOIN estado e ON (e.id_estado = r.id_estado)
+            INNER JOIN clientes c ON (c.id_clientes = r.id_clientes)
+            INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios)
+            INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer)
+            INNER JOIN tipo t ON (t.id_tipo = r.id_tipo)
+        WHERE id_renta = #{id}
+    </select>
+    
+    <select id="obtenerRentaPorParametros" resultMap="resultMapRenta" parameterType="java.util.Map">
+        SELECT
+            r.id_renta,
+            c.id_clientes AS cliente_id,
+            c.nombre AS cliente_nombre,
+            c.apellidos AS cliente_apellidos,
+            u.id_usuarios AS usuario_id,
+            u.nombre AS usuario_nombre,
+            u.apellidos AS usuario_apellidos,
+            r.fecha_pedido,
+            r.fecha_entrega,
+            r.hora_entrega,
+            r.fecha_devolucion,
+            r.descripcion,
+            r.descuento,
+            r.cantidad_descuento,
+            r.iva,
+            r.comentario,
+            r.folio,
+            r.stock,
+            t.id_tipo AS tipo_id,
+            t.tipo AS tipo_tipo,
+            r.hora_devolucion,
+            r.fecha_evento,
+            r.deposito_garantia,
+            r.envio_recoleccion,
+            r.mostrar_precios_pdf,
+            chofer.id_usuarios AS chofer_id,
+            chofer.nombre AS chofer_nombre,
+            chofer.apellidos AS chofer_apellidos,
+            e.id_estado,
+            e.descripcion AS estado_descripcion,
+            (SELECT SUM(a.abono) FROM abonos a WHERE a.id_renta = r.id_renta)  AS total_abonos,
+            (
+                SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) )AS total
+                FROM faltantes f
+                INNER JOIN articulo a ON (f.id_articulo = a.id_articulo)
+                WHERE f.id_renta = r.id_renta
+                AND f.fg_activo = '1'
+            ) AS total_faltantes,
+            (
+                SELECT IF(porcentaje_descuento >= 0,
+                (SUM( (cantidad*p_unitario) - ((cantidad*p_unitario) * (porcentaje_descuento / 100) ))),
+                (SUM( (cantidad*p_unitario) ))) AS suma
+                FROM detalle_renta WHERE id_renta = r.id_renta
+            ) AS sub_total
+        FROM renta r
+            INNER JOIN estado e ON (e.id_estado = r.id_estado)
+            INNER JOIN clientes c ON (c.id_clientes = r.id_clientes)
+            INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios)
+            INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer)
+            INNER JOIN tipo t ON (t.id_tipo = r.id_tipo)
+         <if test="systemDate != null and systemDate != '' ">
+             
+                AND STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') <![CDATA[ >= ]]> STR_TO_DATE(#{systemDate}, '%d/%m/%Y' )
+            
+        </if>
+        <if test="applyDiff != null and applyDiff != '' ">
+            <![CDATA[
+                AND r.id_estado <> #{applyDiff}
+            ]]>
+        </if>
+        <if test="type != null and type != '' ">
+            AND t.id_tipo = #{type}
+        </if>
+        <if test="customer != null and customer != '' ">
+            AND CONCAT(c.nombre," ",c.apellidos) LIKE '% #{customer} %'
+        </if>
+        <if test="initDeliveryDate != null and endDeliveryDate != null ">
+            AND STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE('#{initDeliveryDate}','%d/%m/%Y') AND STR_TO_DATE('#{endDeliveryDate}','%d/%m/%Y')
+        </if>
+        
+        <if test="initEventDate != null and endEventDate != null ">
+            AND STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE('#{initEventDate}','%d/%m/%Y') AND STR_TO_DATE('#{endEventDate}','%d/%m/%Y')
+        </if>
+        <if test="statusId != null and statusId != '' ">
+            AND r.id_estado = #{statusId}
+        </if>
+        <if test="driverId != null and driverId != '' ">
+            AND r.id_usuario_chofer = #{driverId}
+        </if>
+        
+        ORDER BY STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') LIMIT #{limit}
+        
+    </select>
   
 </mapper>

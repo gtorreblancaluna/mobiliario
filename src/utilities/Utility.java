@@ -5,6 +5,7 @@
  */
 package utilities;
 
+import java.awt.Component;
 import java.awt.Dialog;
 import java.io.File;
 import java.io.IOException;
@@ -86,7 +87,7 @@ public abstract class Utility {
         
     }
     
-    public static JDialog showDialog(final String title, final String content){
+    public static JDialog showDialog(final String title, final String content, Component componentLocation){
         
         JDialog dialog = new JDialog(new JFrame());
         dialog.setModalityType(Dialog.ModalityType.MODELESS);
@@ -94,8 +95,9 @@ public abstract class Utility {
         dialog.setSize(300,100);
         dialog.add(new JLabel(content));
         dialog.setTitle(title);
-        dialog.setLocationRelativeTo(null);
+        dialog.setLocationRelativeTo(componentLocation);
         dialog.setVisible(true);
+        dialog.setModal(true);
             
         return dialog;
     }

@@ -214,53 +214,34 @@ public class inventario extends javax.swing.JInternalFrame {
 
     public void buscar() {
               
-       JDialog dialog = Utility.showDialog("Espere porfavor...","Espere porfavor...");
+       JDialog dialog = Utility.showDialog("Espere porfavor...","Espere porfavor...", this);
          
         this.formato_tabla_articulos();
-//        StringBuilder query = new StringBuilder();
         Map<String,Object> map = new HashMap<>();
         
         if (check_categoria.isSelected() == false && 
                 check_color.isSelected() == false && 
                 check_descripcion.isSelected() == false) {
-//           query.append("SELECT articulo.id_articulo, articulo.codigo, articulo.cantidad, "
-//                   + "articulo.en_renta, categoria.descripcion AS descripcion_categoria, articulo.descripcion, "
-//                   + "color.color, articulo.fecha_ingreso, articulo.precio_compra, articulo.precio_renta "
-//                   + "FROM articulo articulo "
-//                   + "INNER JOIN categoria categoria ON (categoria.id_categoria = articulo.id_categoria) "
-//                   + "INNER JOIN color color ON (color.id_color = articulo.id_color ) "
-//                   + "WHERE articulo.activo = 1 ");              
+            
           
         } else {
-//            query.append("SELECT articulo.id_articulo, articulo.codigo, articulo.cantidad, "
-//                   + "articulo.en_renta, categoria.descripcion AS descripcion_categoria, articulo.descripcion, "
-//                   + "color.color, articulo.fecha_ingreso, articulo.precio_compra, articulo.precio_renta "
-//                   + "FROM articulo articulo "
-//                   + "INNER JOIN categoria categoria ON (categoria.id_categoria = articulo.id_categoria) "
-//                   + "INNER JOIN color color ON (color.id_color = articulo.id_color ) "
-//                   + "WHERE articulo.activo = 1 ");                
+               
             
             if (check_categoria.isSelected() == true){
                 map.put("categoria", cmb_categoria2.getSelectedItem().toString());
-//                String id_categoria = funcion.GetData("id_categoria", "select id_categoria from categoria where descripcion = '" + cmb_categoria2.getSelectedItem().toString() + "' ");
-//                query.append("AND categoria.id_categoria = '"+id_categoria+"' ");
+
             }
                
             if (check_color.isSelected() == true){
                 map.put("color", cmb_color2.getSelectedItem().toString());
-//                String id_color = funcion.GetData("id_color", "select id_color from color where color = '" + cmb_color2.getSelectedItem().toString() + "' ");
-//                query.append("AND color.id_color = '"+id_color+"' ");
             }
 
             if (check_descripcion.isSelected() == true){
                 map.put("descripcion", txt_descripcion2.getText().toString());
-//                 query.append("AND articulo.descripcion LIKE '%" + txt_descripcion2.getText().toString() + "%' ");
             }
            
         }
-//         query.append("ORDER BY articulo.descripcion ");
-        
-//        List<Articulo> articulos = itemService.obtenerArticulosBusquedaInventario(funcion, query+"");
+
         map.put("estado_renta", ApplicationConstants.ESTADO_EN_RENTA);
         map.put("tipo_pedido", ApplicationConstants.TIPO_PEDIDO);
         List<Articulo> articulos = null;
@@ -283,49 +264,7 @@ public class inventario extends javax.swing.JInternalFrame {
         
         for(Articulo articulo : articulos){
             
-            
-//           String enRenta = funcion.GetData("cantidad", "SELECT SUM(detalle.cantidad)AS cantidad "
-//                   + "FROM renta renta "
-//                   + "INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta) "
-//                   + "WHERE detalle.id_articulo = " + articulo.getArticuloId() + " "
-//                   + "AND renta.id_estado = "+ApplicationConstants.ESTADO_EN_RENTA+" "
-//                   + "AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-//           );
-//           
-//           String faltante = funcion.GetData("cantidad", "SELECT SUM(faltante.cantidad)AS cantidad "
-//                   + "FROM faltantes faltante "                   
-//                   + "WHERE faltante.id_articulo = " + articulo.getArticuloId() + " " 
-//                   + "AND faltante.fg_faltante = '1' "
-//                   + "AND faltante.fg_devolucion = '0' "
-//                   + "AND faltante.fg_accidente_trabajo = '0' "
-//                   + "AND faltante.fg_activo = '1' "
-//           );
-//           
-//           String reparacion = funcion.GetData("cantidad", "SELECT SUM(faltante.cantidad)AS cantidad "
-//                   + "FROM faltantes faltante "                   
-//                   + "WHERE faltante.id_articulo = " + articulo.getArticuloId() + " "   
-//                   + "AND faltante.fg_faltante = '0' "
-//                   + "AND faltante.fg_devolucion = '0' "
-//                   + "AND faltante.fg_accidente_trabajo = '0' "
-//                   + "AND faltante.fg_activo = '1' "
-//           );
-//           
-//           String accidenteTrabajo = funcion.GetData("cantidad", "SELECT SUM(faltante.cantidad)AS cantidad "
-//                   + "FROM faltantes faltante "                   
-//                   + "WHERE faltante.id_articulo = " + articulo.getArticuloId() + " " 
-//                   + "AND faltante.fg_faltante = '0' "
-//                   + "AND faltante.fg_devolucion = '0' "    
-//                   + "AND faltante.fg_accidente_trabajo = '1' "
-//                   + "AND faltante.fg_activo = '1' "
-//           );
-//           
-//           String devolucion = funcion.GetData("cantidad", "SELECT SUM(faltante.cantidad)AS cantidad "
-//                   + "FROM faltantes faltante "                   
-//                   + "WHERE faltante.id_articulo = " + articulo.getArticuloId() + " "
-//                   + "AND faltante.fg_devolucion = '1' "
-//                   + "AND faltante.fg_faltante = '0' "
-//                   + "AND faltante.fg_activo = '1' "
-//           );
+           
             
             DefaultTableModel temp = (DefaultTableModel) tabla_articulos.getModel();
             Object fila[] = {

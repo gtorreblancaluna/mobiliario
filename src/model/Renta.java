@@ -31,6 +31,7 @@ public class Renta {
     private int folio;
     private String stock;
     private Tipo tipo;
+    private Double totalAbonos;
     private List<DetalleRenta> detalleRenta;
     private List<Abono> abonos;
     private String horaDevolucion;
@@ -48,6 +49,16 @@ public class Renta {
     private float totalFaltantes;
     // dato del faltante por cubrir
     private float totalFaltantesPorCubrir;
+
+    public Double getTotalAbonos() {
+        return totalAbonos;
+    }
+
+    public void setTotalAbonos(Double totalAbonos) {
+        this.totalAbonos = totalAbonos;
+    }
+    
+    
 
     public float getTotalFaltantesPorCubrir() {
         return totalFaltantesPorCubrir;
