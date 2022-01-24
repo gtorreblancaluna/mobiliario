@@ -1,4 +1,4 @@
-package mobiliario;
+package forms.rentas;
 
 import forms.tipo.abonos.cuentas.TiposAbonosForm;
 import services.UserService;
@@ -27,6 +27,9 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import mobiliario.ApplicationConstants;
+import mobiliario.disponibilidad_articulos;
+import mobiliario.iniciar_sesion;
 import model.DatosGenerales;
 import model.TipoAbono;
 import model.Usuario;
@@ -40,7 +43,7 @@ import services.SaleService;
 import services.SystemService;
 import utilities.Utility;
 
-public class agregar_renta extends javax.swing.JInternalFrame {
+public class AgregarRenta extends javax.swing.JInternalFrame {
     
     sqlclass funcion = new sqlclass();
     conectate conexion = new conectate();
@@ -61,7 +64,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
     private SaleService saleService;
     private final SystemService systemService = SystemService.getInstance();
 
-    public agregar_renta() {
+    public AgregarRenta() {
         
         funcion.conectate();
         initComponents();
@@ -380,7 +383,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
                 masterReport = (JasperReport) JRLoader.loadObject(archivo);
             } catch (JRException e) {
                 // System.out.println("Error cargando el reporte maestro: " + e.getMessage());
-                Logger.getLogger(agregar_renta.class.getName()).log(Level.SEVERE, null, e);
+                Logger.getLogger(AgregarRenta.class.getName()).log(Level.SEVERE, null, e);
                 JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());
                 
                 //System.exit(3);
@@ -410,11 +413,12 @@ public class agregar_renta extends javax.swing.JInternalFrame {
             try {
                 Desktop.getDesktop().open(file2);
             } catch (IOException ex) {
-                Logger.getLogger(agregar_renta.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(AgregarRenta.class.getName()).log(Level.SEVERE, null, ex);
             }
             // funcion.desconecta();
+            // funcion.desconecta();
         } catch (Exception j) {
-            Logger.getLogger(agregar_renta.class.getName()).log(Level.SEVERE, null, j);
+            Logger.getLogger(AgregarRenta.class.getName()).log(Level.SEVERE, null, j);
             System.out.println("Mensaje de Error:" + j.toString());
             JOptionPane.showMessageDialog(rootPane, "Mensaje de Error:" + j.toString() + "\nExiste un PDF abierto, cierralo e intenta generar el PDF nuevamente");
         }
@@ -447,7 +451,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
                     tabla_clientes();
                     res = true;
                 } catch (SQLException ex) {
-                    Logger.getLogger(agregar_renta.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(AgregarRenta.class.getName()).log(Level.SEVERE, null, ex);
                     JOptionPane.showMessageDialog(null, "Error al insertar registro ", "Error", JOptionPane.INFORMATION_MESSAGE);
                 }
             } else {
@@ -1464,7 +1468,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Document-Add-icon.png"))); // NOI18N
         jButton1.setMnemonic('N');
         jButton1.setToolTipText("Agrega el cliente (Alt+N)");
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton1.setFocusable(false);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -1626,7 +1630,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tabla_clientes.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tabla_clientes.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tabla_clientes.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tabla_clientesMouseClicked(evt);
@@ -1678,7 +1682,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Elige el cliente", jPanel1);
 
-        jTabbedPane2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jTabbedPane2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jTabbedPane2.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
 
         jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -1748,7 +1752,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tabla_articulos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tabla_articulos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tabla_articulos.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tabla_articulosMouseClicked(evt);
@@ -1791,7 +1795,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tabla_detalle.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tabla_detalle.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tabla_detalle.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tabla_detalleMouseClicked(evt);
@@ -1830,7 +1834,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         jbtn_agregar_articulo.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jbtn_agregar_articulo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/shop-cart-down-icon_32.png"))); // NOI18N
-        jbtn_agregar_articulo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_agregar_articulo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_agregar_articulo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbtn_agregar_articuloActionPerformed(evt);
@@ -1841,7 +1845,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         jButton2.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/editar_dinero_32.png"))); // NOI18N
         jButton2.setToolTipText("Editar precio");
-        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton2.setFocusable(false);
         jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -1855,7 +1859,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         jButton3.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/folder-remove-icon.png"))); // NOI18N
         jButton3.setToolTipText("Quitar elemento");
-        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton3.setFocusable(false);
         jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -1868,7 +1872,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         jbtn_disponible.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/application-check-icon_32.png"))); // NOI18N
         jbtn_disponible.setToolTipText("Revisa la disponibilidad en inventario para la fecha indicada");
-        jbtn_disponible.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_disponible.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_disponible.setFocusable(false);
         jbtn_disponible.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_disponible.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -1882,7 +1886,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         jbtn_mostrar_articulos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Left-align-icon.png"))); // NOI18N
         jbtn_mostrar_articulos.setMnemonic('Q');
         jbtn_mostrar_articulos.setToolTipText("Cambiar panel (Alt+Q)");
-        jbtn_mostrar_articulos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_mostrar_articulos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_mostrar_articulos.setFocusable(false);
         jbtn_mostrar_articulos.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_mostrar_articulos.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -1949,7 +1953,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         jbtn_agregar_abono.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jbtn_agregar_abono.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Actions-arrow-right-icon.png"))); // NOI18N
-        jbtn_agregar_abono.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_agregar_abono.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_agregar_abono.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbtn_agregar_abonoActionPerformed(evt);
@@ -1960,7 +1964,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         jbtn_quitar_abono.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jbtn_quitar_abono.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/folder-remove-icon.png"))); // NOI18N
         jbtn_quitar_abono.setToolTipText("Quitar elemento");
-        jbtn_quitar_abono.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_quitar_abono.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_quitar_abono.setFocusable(false);
         jbtn_quitar_abono.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_quitar_abono.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -1986,7 +1990,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         });
 
         lblTipoAbono.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Add-icon.png"))); // NOI18N
-        lblTipoAbono.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblTipoAbono.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         lblTipoAbono.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblTipoAbonoMouseClicked(evt);
@@ -2000,7 +2004,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         cmbTipoPago.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmbTipoPago.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmbTipoPago.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmbTipoPago.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         jLabel39.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel39.setText("Tipo de pago:");
@@ -2150,7 +2154,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         cmb_estado.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_estado.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_estado.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_estado.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_estado, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 140, 170, -1));
 
         txt_subtotal.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
@@ -2235,7 +2239,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         cmb_chofer.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_chofer.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_chofer.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_chofer.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_chofer, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 20, 210, -1));
 
         jLabel26.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -2247,12 +2251,12 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         check_mostrar_precios.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
         check_mostrar_precios.setText("Mostrar precios en PDF");
-        check_mostrar_precios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        check_mostrar_precios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(check_mostrar_precios, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 100, 180, 20));
 
         cmb_tipo.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_tipo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_tipo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_tipo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_tipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 170, 170, -1));
 
         jLabel27.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -2265,17 +2269,17 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         cmb_hora_devolucion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_hora_devolucion.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_devolucion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_hora_devolucion.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_hora_devolucion, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 60, -1));
 
         cmb_hora_dos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_hora_dos.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_hora_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_hora_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 140, -1, -1));
 
         cmb_hora.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_hora.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_hora.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_hora, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 140, 60, -1));
 
         jLabel29.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -2284,7 +2288,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         cmb_hora_devolucion_dos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_hora_devolucion_dos.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_devolucion_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmb_hora_devolucion_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_hora_devolucion_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 170, -1, -1));
 
         jLabel30.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -2375,7 +2379,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         check_generar_reporte.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
         check_generar_reporte.setText("Generar reporte al guardar");
-        check_generar_reporte.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        check_generar_reporte.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         check_generar_reporte.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 check_generar_reporteActionPerformed(evt);
@@ -2385,7 +2389,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         check_enviar_email.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
         check_enviar_email.setText("Enviar email confirmación");
-        check_enviar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        check_enviar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         check_enviar_email.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 check_enviar_emailActionPerformed(evt);
@@ -2409,7 +2413,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         jbtn_agregar_evento.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Misc-New-Database-icon_32.png"))); // NOI18N
         jbtn_agregar_evento.setMnemonic('G');
         jbtn_agregar_evento.setToolTipText("Guarda en la base de datos (Alt+G)");
-        jbtn_agregar_evento.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_agregar_evento.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_agregar_evento.setFocusable(false);
         jbtn_agregar_evento.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_agregar_evento.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2423,7 +2427,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
         jbtn_reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/blank-catalog-icon.png"))); // NOI18N
         jbtn_reporte.setMnemonic('R');
         jbtn_reporte.setToolTipText("Generar reporte (Alt+R)");
-        jbtn_reporte.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_reporte.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_reporte.setFocusable(false);
         jbtn_reporte.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_reporte.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2436,7 +2440,7 @@ public class agregar_renta extends javax.swing.JInternalFrame {
 
         jbtn_nuevo_evento.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Document-Add-icon.png"))); // NOI18N
         jbtn_nuevo_evento.setToolTipText("Nuevo evento");
-        jbtn_nuevo_evento.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_nuevo_evento.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_nuevo_evento.setFocusable(false);
         jbtn_nuevo_evento.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_nuevo_evento.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);

@@ -5,6 +5,8 @@
  */
 package mobiliario;
 
+import forms.rentas.AgregarRenta;
+import forms.rentas.ConsultarRentas;
 import services.SaleService;
 import clases.sqlclass;
 import java.util.List;
@@ -43,23 +45,23 @@ public class disponibilidad_articulos extends java.awt.Dialog {
         saleService = SaleService.getInstance();
         this.setLocationRelativeTo(null);
 
-        if (consultar_renta.validar_consultar.equals("1")) {
+        if (ConsultarRentas.validar_consultar.equals("1")) {
             cant_filas = 0;
-            fecha_inicial = consultar_renta.fecha_inicial.toString();
-            fecha_final = consultar_renta.fecha_final.toString();
-            // id_renta = consultar_renta.id_renta.toString();
-            cant_filas = consultar_renta.tabla_detalle.getRowCount();
+            fecha_inicial = ConsultarRentas.fecha_inicial.toString();
+            fecha_final = ConsultarRentas.fecha_final.toString();
+            // id_renta = ConsultarRentas.id_renta.toString();
+            cant_filas = ConsultarRentas.tabla_detalle.getRowCount();
             es_consultar = true;
         } else {
             cant_filas = 0;
-            fecha_inicial = agregar_renta.fecha_inicial.toString();
-            fecha_final = agregar_renta.fecha_final.toString();
-            //id_renta = agregar_renta.id_ultima_renta.toString();
-            cant_filas = agregar_renta.tabla_detalle.getRowCount();
+            fecha_inicial = AgregarRenta.fecha_inicial.toString();
+            fecha_final = AgregarRenta.fecha_final.toString();
+            //id_renta = AgregarRenta.id_ultima_renta.toString();
+            cant_filas = AgregarRenta.tabla_detalle.getRowCount();
             es_agregar = true;
         }
-        consultar_renta.validar_consultar = "0";
-        agregar_renta.validar_agregar = "0";
+        ConsultarRentas.validar_consultar = "0";
+        AgregarRenta.validar_agregar = "0";
 
         formato_tabla();
         formato_tabla_comparativa();
@@ -120,8 +122,8 @@ public class disponibilidad_articulos extends java.awt.Dialog {
 
                 for (int j = 0; j < dtconduc.length; j++) {
                     System.out.println("dtconduc: " + dtconduc[j][2].toString());
-                    System.out.println("tabla detalle: " + consultar_renta.tabla_detalle.getValueAt(i, 1).toString());
-                    if (dtconduc[j][1].equals(consultar_renta.tabla_detalle.getValueAt(i, 1).toString())) { //si articulo es igual entonces agregamos la fila a la tabla disponibilidad
+                    System.out.println("tabla detalle: " + ConsultarRentas.tabla_detalle.getValueAt(i, 1).toString());
+                    if (dtconduc[j][1].equals(ConsultarRentas.tabla_detalle.getValueAt(i, 1).toString())) { //si articulo es igual entonces agregamos la fila a la tabla disponibilidad
 
                         DefaultTableModel temp = (DefaultTableModel) tabla_disponibilidad.getModel();
                         float cantidad_pedido = Float.parseFloat(dtconduc[j][7].toString());
@@ -157,8 +159,8 @@ public class disponibilidad_articulos extends java.awt.Dialog {
              
             System.out.println("Agregando el pedido actual");
             // AGREGAMOS EL PEDIDO ACTUAL EN LA TABLA DE DETALLE
-            for (int z = 0; z < agregar_renta.tabla_detalle.getRowCount(); z ++ ){
-                Integer id = new Integer(agregar_renta.tabla_detalle.getValueAt(z,1).toString());
+            for (int z = 0; z < AgregarRenta.tabla_detalle.getRowCount(); z ++ ){
+                Integer id = new Integer(AgregarRenta.tabla_detalle.getValueAt(z,1).toString());
                 Articulo availabeItem = null;
                 try {
                     availabeItem = itemService.getItemAvailable(id);
@@ -173,13 +175,13 @@ public class disponibilidad_articulos extends java.awt.Dialog {
                 DefaultTableModel temp2 = (DefaultTableModel) tabla_disponibilidad.getModel();
                 Object nuevo2[] = {
                             availabeItem.getArticuloId()+"",
-                            agregar_renta.tabla_detalle.getValueAt(z, 0).toString(),
+                            AgregarRenta.tabla_detalle.getValueAt(z, 0).toString(),
                             availabeItem.getUtiles(),
                             availabeItem.getDescripcion()+" "+availabeItem.getColor().getColor(),
                             fecha_inicial,
                             fecha_final,
                             "Pedido actual",
-                            agregar_renta.txt_descripcion.getText(),
+                            AgregarRenta.txt_descripcion.getText(),
                             ""
                         };
                 temp2.addRow(nuevo2);
@@ -191,9 +193,9 @@ public class disponibilidad_articulos extends java.awt.Dialog {
                 DefaultTableModel tablaUnicosModel = (DefaultTableModel) tabla_comparativa.getModel();
                 Object unico[] = {
                     availabeItem.getArticuloId()+"", // 0
-                    agregar_renta.tabla_detalle.getValueAt(z, 0).toString(), // 1
+AgregarRenta.tabla_detalle.getValueAt(z, 0).toString(), // 1
                     availabeItem.getUtiles()+"", // 2
-                    availabeItem.getUtiles()- Float.parseFloat( agregar_renta.tabla_detalle.getValueAt(z, 0).toString() ) , // 3                           
+                    availabeItem.getUtiles()- Float.parseFloat(AgregarRenta.tabla_detalle.getValueAt(z, 0).toString() ) , // 3                           
                     availabeItem.getDescripcion()+" "+availabeItem.getColor().getColor() //4
                 };
                 tablaUnicosModel.addRow(unico);
@@ -207,10 +209,10 @@ public class disponibilidad_articulos extends java.awt.Dialog {
         System.out.println("Agregando articulos encontrados en bd ");
         for(Renta renta : rentas){        
             for(DetalleRenta detalle : renta.getDetalleRenta()){
-              for (int i = 0; i < agregar_renta.tabla_detalle.getRowCount(); i++) { 
+              for (int i = 0; i < AgregarRenta.tabla_detalle.getRowCount(); i++) { 
                   // recorremos la tabla para identificar los articulos 
                   String id = detalle.getArticulo().getArticuloId()+"";
-                  if (!id.equals(agregar_renta.tabla_detalle.getValueAt(i, 1).toString()))
+                  if (!id.equals(AgregarRenta.tabla_detalle.getValueAt(i, 1).toString()))
                       continue;
                     Articulo availabeItem = null;
                     try {

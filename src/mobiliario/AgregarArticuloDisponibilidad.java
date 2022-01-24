@@ -18,7 +18,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import static mobiliario.agregar_renta.tabla_articulos;
+import static forms.rentas.AgregarRenta.tabla_articulos;
 import static mobiliario.inventario.cmb_color;
 import model.Articulo;
 import services.ItemService;

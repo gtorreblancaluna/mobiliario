@@ -5,6 +5,8 @@
  */
 package mobiliario;
 
+import forms.rentas.AgregarRenta;
+import forms.rentas.ConsultarRentas;
 import forms.contabilidad.ContabilidadForm;
 import forms.material.inventory.MaterialInventoryView;
 import forms.proveedores.OrderProviderForm;
@@ -36,8 +38,8 @@ public class principal extends javax.swing.JFrame {
     ContabilidadForm ventana_contabilidad;
     inventario ventana_inventario;
     consultar_abonos ventana_abonos;
-    agregar_renta ventana_agregar_renta;
-    consultar_renta v_consultar_renta;
+    AgregarRenta ventana_agregar_renta;
+    ConsultarRentas v_consultar_renta;
     Object[][] dtconduc, datos_cliente;
     Object[] datos_combo;
     String sql = "", fecha_sistema = "";
@@ -227,13 +229,14 @@ public class principal extends javax.swing.JFrame {
 
     }
 
-    public void abrir_nueva_renta() {
+    public void abrir_nueva_renta() throws PropertyVetoException{
         if (Utility.verifyIfInternalFormIsOpen(ventana_agregar_renta)) {
             if(!Utility.showWindowDataUpdateSession()){
                 return;
             }
-                ventana_agregar_renta = new agregar_renta();
+                ventana_agregar_renta = new AgregarRenta();
                 ventana_agregar_renta.setLocation(this.getWidth() / 2 - ventana_agregar_renta.getWidth() / 2, this.getHeight() / 2 - ventana_agregar_renta.getHeight() / 2 - 20);
+                ventana_agregar_renta.setMaximum(true);
                 jDesktopPane1.add(ventana_agregar_renta);
                 ventana_agregar_renta.show();
             
@@ -248,16 +251,12 @@ public class principal extends javax.swing.JFrame {
             if(!Utility.showWindowDataUpdateSession()){
                 return;
             }
-            v_consultar_renta = new consultar_renta();
+            v_consultar_renta = new ConsultarRentas();
             v_consultar_renta.setLocation(this.getWidth() / 2 - v_consultar_renta.getWidth() / 2, this.getHeight() / 2 - v_consultar_renta.getHeight() / 2 - 20);
+            v_consultar_renta.setMaximum(true);
             jDesktopPane1.add(v_consultar_renta);
             v_consultar_renta.show();
-            /*try {
-             v_consultar_renta.setMaximum(true);
-             } catch (PropertyVetoException e) {
-             // Vetoed by internalFrame
-             // ... possibly add some handling for this case
-             }*/
+         
         } else {
             JOptionPane.showMessageDialog(this, "Ahi ta la ventana =)");
         }

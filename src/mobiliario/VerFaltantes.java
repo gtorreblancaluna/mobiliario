@@ -5,6 +5,7 @@
  */
 package mobiliario;
 
+import forms.rentas.ConsultarRentas;
 import services.SaleService;
 import clases.sqlclass;
 import java.awt.Toolkit;
@@ -98,8 +99,8 @@ public class VerFaltantes extends java.awt.Dialog {
     
     public void llenar_tabla_articulos(){
         
-        if(consultar_renta.g_idRenta != null && !consultar_renta.g_idRenta.equals("")){
-             g_rentaId = consultar_renta.g_idRenta;
+        if(ConsultarRentas.g_idRenta != null && !ConsultarRentas.g_idRenta.equals("")){
+             g_rentaId = ConsultarRentas.g_idRenta;
         }
         else if (VerFoliosPorArticulo.g_rentaId !=null && !VerFoliosPorArticulo.g_rentaId.equals("")){
              g_rentaId = VerFoliosPorArticulo.g_rentaId;

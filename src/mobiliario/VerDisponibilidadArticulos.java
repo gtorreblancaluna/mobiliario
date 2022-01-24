@@ -5,6 +5,7 @@
  */
 package mobiliario;
 
+import forms.rentas.ConsultarRentas;
 import services.SaleService;
 import clases.sqlclass;
 import java.text.DecimalFormat;
@@ -162,7 +163,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
          try {
             rentas = saleService.obtenerDisponibilidadRentaPorConsulta(stringSql, funcion);
         } catch (Exception e) {
-            Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
             return;
         }
@@ -349,7 +350,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         try {
             rentas = saleService.obtenerDisponibilidadRentaPorConsulta(stringSql, funcion);
         } catch (Exception e) {
-            Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
             return;
         }

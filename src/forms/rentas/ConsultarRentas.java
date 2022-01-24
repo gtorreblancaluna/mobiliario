@@ -1,4 +1,4 @@
-package mobiliario;
+package forms.rentas;
 
 import services.ItemService;
 import services.SaleService;
@@ -41,6 +41,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import mobiliario.ApplicationConstants;
+import mobiliario.VerFaltantes;
+import mobiliario.disponibilidad_articulos;
+import mobiliario.iniciar_sesion;
+import mobiliario.principal;
 import model.Abono;
 import model.Articulo;
 import model.AsignaCategoria;
@@ -66,9 +71,9 @@ import model.EstadoEvento;
 import model.Tipo;
 import services.TipoEventoService;
 
-public class consultar_renta extends javax.swing.JInternalFrame {
+public class ConsultarRentas extends javax.swing.JInternalFrame {
     private OrderProviderForm orderProviderForm;
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(consultar_renta.class.getName());
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ConsultarRentas.class.getName());
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
     // variable global para almacenar el id detalle de renta
     public static String g_idDetalleRenta;
@@ -100,7 +105,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     /**
      * Creates new form consultar_renta
      */
-    public consultar_renta() throws PropertyVetoException {
+    public ConsultarRentas() throws PropertyVetoException {
         
         funcion.conectate();
         initComponents();
@@ -259,9 +264,8 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 tabla_clientes();
                 res = true;
 
-//jbtn_agregar.setEnabled(false);
             } catch (SQLException ex) {
-                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog(null, "Error al insertar registro ", "Error", JOptionPane.ERROR);
             }
         }
@@ -290,7 +294,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             try {
                 renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
             } catch (Exception e) {
-                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
                 JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
                 return;
             }
@@ -879,7 +883,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 total();
                 editar_abonos = false;
 //            } catch (SQLException ex) {
-//                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, ex);
+//                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, ex);
 //            }
         }
         
@@ -915,7 +919,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                       +iniciar_sesion.usuarioGlobal.getApellidos()+" intenta modificar el abono: "+txt_abono.getText().toString()+
                       " id_renta: "+this.id_renta);
             } catch (ParseException ex) {
-                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, ex);
             }
             
         } else {
@@ -1042,7 +1046,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                     subTotal();
                     total();
                 } catch (SQLException ex) {
-                    Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         } else {
@@ -1220,7 +1224,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 try {
                     renta = saleService.obtenerRentaPorId(Integer.parseInt(id_renta));
                 } catch (Exception e) {
-                    Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+                    Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
                     JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
                     return;
                 }
@@ -1826,7 +1830,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 fillTable(rentas);
                 enabledButtonsActions();
             } catch (Exception e) {
-                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
                 JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
                 
                 return;
@@ -3311,7 +3315,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(panel_abonos, javax.swing.GroupLayout.PREFERRED_SIZE, 315, Short.MAX_VALUE)
+                    .addComponent(panel_abonos, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
                     .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(73, Short.MAX_VALUE))
         );
@@ -3695,7 +3699,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel13, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jPanel13, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(jPanel9Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(panel_datos_cliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -3716,7 +3720,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 664, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -3747,7 +3751,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             try {
                 renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
             } catch (Exception e) {
-                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
                 JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
                 return;
             }
@@ -3781,7 +3785,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 cmb_fecha_devolucion.setDate((Date) formatoDelTexto.parse((String) renta.getFechaDevolucion()));
                 cmb_fecha_evento.setDate((Date) formatoDelTexto.parse((String) renta.getFechaEvento()));
             } catch (ParseException ex) {
-                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, ex);
             }
             
             cmb_estado1.getModel().setSelectedItem(renta.getEstado());            
@@ -4348,7 +4352,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         try {
             renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
         } catch (Exception e) {
-            Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
             return;
         }
@@ -4470,7 +4474,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         try {
             rentas = saleService.obtenerPedidosPorConsultaSql(query, funcion);
         } catch (Exception e) {
-            Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
             return;
         }

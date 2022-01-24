@@ -19,7 +19,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import mobiliario.ApplicationConstants;
-import mobiliario.consultar_renta;
+import forms.rentas.ConsultarRentas;
 import mobiliario.iniciar_sesion;
 import mobiliario.principal;
 import model.Articulo;
@@ -292,9 +292,9 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         List<OrdenProveedor> ordenProveedorList = new ArrayList<>();
                 
         navigation = NEW_ORDER;
-        if(consultar_renta.g_idRenta == null || 
-                consultar_renta.g_idRenta.equals("") ||
-                consultar_renta.g_idRenta.isEmpty()){
+        if(ConsultarRentas.g_idRenta == null || 
+                ConsultarRentas.g_idRenta.equals("") ||
+                ConsultarRentas.g_idRenta.isEmpty()){
             // viene de ver ordenes proveedores
             navigation = UPDATE_ORDER;
             g_rentaId = ViewOrdersProviders.g_idRenta;
@@ -319,7 +319,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             // viene desde consutar renta
             cmbStatusOrder.setEnabled(false);
             cmbStatusOrder.setSelectedItem(ApplicationConstants.DS_STATUS_ORDER_PROVIDER_ORDER);
-            g_rentaId = consultar_renta.g_idRenta;
+            g_rentaId = ConsultarRentas.g_idRenta;
             try{
                 ordenProveedorList = orderProviderService.getOrdersByRentaId(new Integer(g_rentaId));
             }catch(BusinessException e){
@@ -403,7 +403,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         
         this.total();
         ViewOrdersProviders.g_idRenta = null;
-        consultar_renta.g_idRenta = null;
+        ConsultarRentas.g_idRenta = null;
          
     }
     
