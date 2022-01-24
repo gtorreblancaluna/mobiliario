@@ -559,10 +559,7 @@ public class SaleService {
      public Renta obtenerRentaPorId(int rentaId) throws Exception { 
         
         Renta renta = salesDao.obtenerRentaPorId(rentaId);
-        
-
         renta.setDetalleRenta(this.obtenerDetalleRenta(renta.getRentaId()));
-
         return renta;
                 
     } // renta por id

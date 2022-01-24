@@ -144,7 +144,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         try {                   
             buscar();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+            JOptionPane.showMessageDialog(null, "Ocurrió un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
         }
         panel_articulos.setVisible(false);
         jbtn_disponible.setEnabled(false);
@@ -1606,7 +1606,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     
     public void buscar() throws Exception{
 
-        String tipoId = null;
         EstadoEvento estadoEvento = null;
         Usuario chofer = null;
         try{
@@ -1644,6 +1643,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                     + "WHERE STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') >= STR_TO_DATE(' "+ fecha_sistema +" ', '%d/%m/%Y' ) AND r.id_estado<> '"+ApplicationConstants.ESTADO_CANCELADO+"' "
                     + "AND tipo.id_tipo = '"+ApplicationConstants.TIPO_PEDIDO+"' "
                     + "ORDER BY STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') ";
+            
             parameters.put("applyDiff", ApplicationConstants.ESTADO_CANCELADO);
             parameters.put("type", ApplicationConstants.TIPO_PEDIDO);
             parameters.put("systemDate", fecha_sistema);
