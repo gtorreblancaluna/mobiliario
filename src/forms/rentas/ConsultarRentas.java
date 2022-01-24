@@ -89,7 +89,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     public static String fecha_inicial, fecha_final, validar_consultar = "0", id_renta;
     sqlclass funcion = new sqlclass();    
     private final ItemService itemService;
-    private final SaleService saleService;
+    private static SaleService saleService;
     private final UserService userService = UserService.getInstance();
     private final SystemService systemService = SystemService.getInstance();
     CategoryService categoryService = new CategoryService();
@@ -102,9 +102,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private final EstadoEventoService estadoEventoService = EstadoEventoService.getInstance();
     private final TipoEventoService tipoEventoService = TipoEventoService.getInstance();
 
-    /**
-     * Creates new form consultar_renta
-     */
+
     public ConsultarRentas() throws PropertyVetoException {
         
         funcion.conectate();
@@ -113,23 +111,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         itemService = ItemService.getInstance();
         fecha_sistema();
         
-        new Thread(() -> {
-            llenar_combo_estado();
-        }).start();
-        
-        new Thread(() -> {
-            llenar_abonos();
-        }).start();
-        new Thread(() -> {
-            llenar_combo_chofer_buscar();
-        }).start();
         formato_tabla_detalles();
-        new Thread(() -> {
-            llenar_combo_limite();
-        }).start();
         
-
-        // lbl_aviso_resultados.setVisible(false);
         jTabbedPane1.setEnabledAt(1, false);
         jTabbedPane1.setEnabledAt(2, false);
         jbtn_guardar.setEnabled(false);
@@ -142,18 +125,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         txt_total.setEditable(false);
         txt_calculo.setEditable(false);
         jbtn_guardar_cliente.setEnabled(false);
-        new Thread(() -> {
-            tabla_clientes();
-        }).start();
-       
-        try {                   
-            buscar();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Ocurrió un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }
+      
         panel_articulos.setVisible(false);
         jbtn_disponible.setEnabled(false);
-        txt_buscar_folio.requestFocus();
         panel_conceptos.setVisible(true);
         panel_articulos.setVisible(false);
         check_nombre.setSelected(true);
@@ -161,9 +135,35 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         this.txt_editar_precio_unitario.setEnabled(false);
         this.txt_editar_porcentaje_descuento.setEnabled(false);
         
+        new Thread(() -> {
+            fillCmbUsers();
+        }).start();
+        initalData ();
+         
     }
     
-    private void disableButtonsActions () {
+    private void initalData () {
+        Map<String, Object> map = new HashMap<>();
+        map.put("limit", 200);
+        map.put("applyDiff", ApplicationConstants.ESTADO_CANCELADO);
+        map.put("systemDate", fecha_sistema );
+        map.put("type", ApplicationConstants.ESTADO_APARTADO );
+        tabla_consultar_renta(map);
+    }
+    
+    private void fillCmbUsers () {
+        List<Usuario> users = userService.obtenerUsuarios(funcion);
+        cmbUsuarios.removeAllItems();
+        
+        cmbUsuarios.addItem(
+                new Usuario(0, ApplicationConstants.CMB_SELECCIONE)
+        );
+        users.stream().forEach(t -> {
+            cmbUsuarios.addItem(t);
+        });
+    }
+    
+    public static void disableButtonsActions () {
         
         jbtn_buscar.setEnabled(false);
         
@@ -179,7 +179,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         btnInventoryMaterialReport.setEnabled(false);
     }
     
-    private void enabledButtonsActions () {
+    public static void enabledButtonsActions () {
         
         jbtn_buscar.setEnabled(true);
         
@@ -1472,25 +1472,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
     }
     
-    public void llenar_combo_limite(){
-        this.cmb_limit.removeAllItems();
-        this.cmb_limit.addItem("100");
-        this.cmb_limit.addItem("1000");
-        this.cmb_limit.addItem("5000");
-        this.cmb_limit.addItem("todos");
-    }
-    
-    public void llenar_combo_estado() {
 
-        List<EstadoEvento> list = estadoEventoService.get();
-        cmb_estado.removeAllItems();
-        cmb_estado.addItem(
-                new EstadoEvento(0, ApplicationConstants.CMB_SELECCIONE)
-        );
-        list.stream().forEach(t -> {
-            cmb_estado.addItem(t);
-        });
-    }
     
     public void llenar_combo_tipo() {
         
@@ -1547,26 +1529,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     
     
     
-    public void llenar_combo_chofer_buscar() {
-        
-        // funcion.desconecta();
-        
-        if (cmb_chofer_buscar.getItemCount() > 0) {
-            return;
-        }
-
-        List<Usuario> users = userService.obtenerUsuarios(funcion);
-        cmb_chofer_buscar.removeAllItems();
-        
-        cmb_chofer_buscar.addItem(
-                new Usuario(0, ApplicationConstants.CMB_SELECCIONE)
-        );
-        users.stream().forEach(t -> {
-            cmb_chofer_buscar.addItem(t);
-        });
-        
-    }
-    
     public void llenar_combo_estado2() {
                
         if (cmb_estado1.getItemCount() > 1) {
@@ -1608,110 +1570,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         return nueva_cadena;
     }
     
-    public void buscar() throws Exception{
-
-        EstadoEvento estadoEvento = null;
-        Usuario chofer = null;
-        try{
-            chofer = (Usuario) cmb_chofer_buscar.getSelectedItem();
-        } catch (NullPointerException e) {}
-        try {
-            estadoEvento = (EstadoEvento) cmb_estado.getSelectedItem();
-        } catch (NullPointerException e) {}
-        
-        Integer limit = 100;
-        try {
-            limit = Integer.parseInt(this.cmb_limit.getSelectedItem().toString());
-        } catch (Exception e) {
-            
-        }
-        
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("limit", limit);
-        
-        if (check_cliente.isSelected() == false && (estadoEvento == null || estadoEvento.getEstadoId() == 0) && 
-                check_fechas.isSelected() == false && (chofer == null || chofer.getUsuarioId() == 0) && 
-                check_fechas_evento.isSelected() == false
-                && check_cotizacion.isSelected() == false
-                && check_pedido.isSelected() == false                
-                ) {
-            sql = "SELECT r.id_renta, r.folio, c.nombre, c.apellidos, estado.id_estado, estado.descripcion, "
-                    + "r.fecha_pedido, r.fecha_evento, r.fecha_entrega, r.hora_entrega, r.descripcion, chofer.nombre, chofer.apellidos, "
-                    + "tipo.id_tipo, tipo.tipo, r.cantidad_descuento, r.iva, r.deposito_garantia, r.envio_recoleccion ,u.nombre AS nombre_usuario, u.apellidos AS apellidos_usuario "
-                    + "FROM renta r "
-                    + "INNER JOIN clientes c ON (r.id_clientes = c.id_clientes) "
-                    +" INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios) "
-                    + "INNER JOIN tipo tipo ON(tipo.id_tipo = r.id_tipo) "
-                    + "INNER JOIN estado estado ON (estado.id_estado = r.id_estado) "
-                    + "INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer) "
-                    + "WHERE STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') >= STR_TO_DATE(' "+ fecha_sistema +" ', '%d/%m/%Y' ) AND r.id_estado<> '"+ApplicationConstants.ESTADO_CANCELADO+"' "
-                    + "AND tipo.id_tipo = '"+ApplicationConstants.TIPO_PEDIDO+"' "
-                    + "ORDER BY STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') ";
-            
-            parameters.put("applyDiff", ApplicationConstants.ESTADO_CANCELADO);
-            parameters.put("type", ApplicationConstants.TIPO_PEDIDO);
-            parameters.put("systemDate", fecha_sistema);
-
-        } else {
-           sql = "SELECT r.id_renta, r.folio, c.nombre, c.apellidos, estado.id_estado, estado.descripcion, "
-                    + "r.fecha_pedido, r.fecha_evento, r.fecha_entrega, r.hora_entrega, r.descripcion, chofer.nombre, chofer.apellidos, "
-                    + "tipo.id_tipo, tipo.tipo, r.cantidad_descuento, r.iva, r.deposito_garantia, r.envio_recoleccion,u.nombre AS nombre_usuario, u.apellidos AS apellidos_usuario "
-                    + "FROM renta r "
-                    + "INNER JOIN clientes c ON (r.id_clientes = c.id_clientes) "
-                    +" INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios) "
-                    + "INNER JOIN tipo tipo ON(tipo.id_tipo = r.id_tipo) "
-                    + "INNER JOIN estado estado ON (estado.id_estado = r.id_estado) "
-                    + "INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer) "
-                       + "";
-            if(check_cotizacion.isSelected() == true) {
-                sql = sql + " AND r.id_tipo = '"+ApplicationConstants.TIPO_COTIZACION+"' ";
-                parameters.put("type", ApplicationConstants.TIPO_COTIZACION);
-            }
-            if(check_pedido.isSelected() == true) {
-                sql = sql + " AND r.id_tipo = '"+ApplicationConstants.TIPO_PEDIDO+"' ";
-                parameters.put("type", ApplicationConstants.TIPO_COTIZACION);
-            }
-            if (check_cliente.isSelected() == true){
-                sql = sql + " AND CONCAT(c.nombre,\" \",c.apellidos) LIKE '%" + txt_cliente.getText().toString() + "%' ";
-                parameters.put("customer", txt_cliente.getText());
-            }
-            
-            
-            if (check_fechas.isSelected() == true) {
-                
-                fecha_inicial = new SimpleDateFormat("dd/MM/yyyy").format(txt_fecha_inicial.getDate());
-                fecha_final = new SimpleDateFormat("dd/MM/yyyy").format(this.txt_fecha_final.getDate());
-
-                System.out.println("Fecha inicial: " + fecha_inicial);
-                System.out.println("Fecha Final: " + fecha_final);
-                parameters.put("initDeliveryDate", fecha_inicial);
-                parameters.put("endDeliveryDate", fecha_final);
-                sql = sql + " AND STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE('" + fecha_inicial + "','%d/%m/%Y') AND STR_TO_DATE('" + fecha_final + "','%d/%m/%Y')  ";
-            }
-            
-            if (check_fechas_evento.isSelected() == true) {
-                // por fecha de evento
-                String fecha_inicial_evento = new SimpleDateFormat("dd/MM/yyyy").format(dateFechaEventoInicial.getDate());
-                String fecha_final_evento = new SimpleDateFormat("dd/MM/yyyy").format(dateFechaEventoFinal.getDate());
-                sql = sql + " AND STR_TO_DATE(r.fecha_evento,'%d/%m/%Y') BETWEEN STR_TO_DATE('" + fecha_inicial_evento + "','%d/%m/%Y') AND STR_TO_DATE('" + fecha_final_evento + "','%d/%m/%Y')  ";
-                parameters.put("initEventDate", fecha_inicial_evento);
-                parameters.put("endEventDate", fecha_final_evento);
-            }
-            if (estadoEvento != null && estadoEvento.getEstadoId() != 0) {
-                
-                sql = sql + " AND r.id_estado = " + estadoEvento.getEstadoId() + " ";
-                parameters.put("statusId", estadoEvento.getEstadoId());
-                
-            }
-            if (chofer != null && chofer.getUsuarioId() != 0) {
-                sql = sql + " AND r.id_usuario_chofer='" + chofer.getUsuarioId() + "'  ";
-                parameters.put("driverId", chofer.getUsuarioId());
-            }
-            
-            
-        }
-        tabla_consultar_renta(parameters);
-    }
+    
     
     public String dia_semana(String fecha) {
         //String fecha1[];  
@@ -1752,7 +1611,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         return fechafinal;
     }
     
-    public void tabla_consultar_renta(Map<String,Object> parameters) {   // funcion para llenar al abrir la ventana   
+    public static void tabla_consultar_renta(Map<String,Object> parameters) {   // funcion para llenar al abrir la ventana   
         Object[][] data = {{"","","","","","","", "", "", "", "", "","","","","","","",""}};
         String[] columNames = {
             "Id", 
@@ -1821,55 +1680,43 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             ;
         }
 
-        this.lblInformation.setText("Obteniendo resultados, porfavor espere ... "); 
-        this.disableButtonsActions();
-        new Thread(() -> {
-            JDialog dialog = Utility.showDialog("Esperando al servidor","Obteniendo resultados, por favor espere...", this);
-            try{
-                List<Renta> rentas = saleService.obtenerRentasPorParametros(parameters);
-                fillTable(rentas);
-                enabledButtonsActions();
-            } catch (Exception e) {
-                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
-                JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-                
-                return;
-            } finally {
-                dialog.dispose();
-            }
-            
-            
-        }).start();
+        lblInformation.setText("Obteniendo resultados, porfavor espere ... "); 
+        disableButtonsActions();
         
-    }
-    
-    
-    private void fillTable (List<Renta> rentas) {
-        if(rentas == null || rentas.size()<=0)
-    {
-        this.lblInformation.setText("No se obtuvieron resultados :( ");
-        return;
-    }else{
-        Toolkit.getDefaultToolkit().beep();
-        String limit = this.cmb_limit.getSelectedItem().toString();
-        
-        if(limit.equals("todos") || limit.toLowerCase().equals("item 1")){
-            if(rentas.size()>1){
-                this.lblInformation.setText("Se han obtenido "+rentas.size()+" resultados");
+        try{
+            List<Renta> rentas = saleService.obtenerRentasPorParametros(parameters);
+            fillTable(rentas);
+            if(rentas == null || rentas.size()<=0)
+            {
+                lblInformation.setText("No se obtuvieron resultados :( ");      
             }else{
-                this.lblInformation.setText("Se a obtenido "+rentas.size()+" resultado");
+                Toolkit.getDefaultToolkit().beep();
+
+                if(rentas.size()>1){
+                   lblInformation.setText("Se han obtenido "+rentas.size()+" resultados");  
+                }else{
+                  lblInformation.setText("Se a obtenido "+rentas.size()+" resultado");
+                }
             }
-            
-        }else{
-            if(rentas.size()>1){
-               this.lblInformation.setText("Se han obtenido "+rentas.size()+" resultados, con un limite de "+limit+" registros");  
-            }else{
-              this.lblInformation.setText("Se a obtenido "+rentas.size()+" resultado, con un limite de "+limit+" registros");
-            }
+        } catch (Exception e) {
+            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        } finally {
+            enabledButtonsActions();
         }
+            
+            
+        
         
     }
-        
+    
+    
+    public static void fillTable (List<Renta> rentas) {
+        if(rentas == null || rentas.size()<=0)
+        {
+            return;
+        }
         DefaultTableModel tableModel = (DefaultTableModel) tabla_prox_rentas.getModel();
         for(Renta renta : rentas){
             
@@ -2064,10 +1911,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         tabla_prox_rentas = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
         lblInformation = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        txt_cliente = new javax.swing.JTextField();
-        cmb_estado = new javax.swing.JComboBox<>();
-        check_cliente = new javax.swing.JCheckBox();
-        check_fechas = new javax.swing.JCheckBox();
         jToolBar1 = new javax.swing.JToolBar();
         jbtn_buscar = new javax.swing.JButton();
         jbtn_refrescar = new javax.swing.JButton();
@@ -2077,21 +1920,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jButton2 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         btnInventoryMaterialReport = new javax.swing.JButton();
-        jLabel30 = new javax.swing.JLabel();
-        txt_buscar_folio = new javax.swing.JFormattedTextField();
-        cmb_chofer_buscar = new javax.swing.JComboBox<>();
-        check_pedido = new javax.swing.JCheckBox();
-        check_cotizacion = new javax.swing.JCheckBox();
-        txt_fecha_inicial = new com.toedter.calendar.JDateChooser();
-        txt_fecha_final = new com.toedter.calendar.JDateChooser();
-        check_fechas_evento = new javax.swing.JCheckBox();
-        dateFechaEventoInicial = new com.toedter.calendar.JDateChooser();
-        dateFechaEventoFinal = new com.toedter.calendar.JDateChooser();
         cmbUsuarios = new javax.swing.JComboBox<>();
-        cmb_limit = new javax.swing.JComboBox();
-        jLabel49 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         lbl_aviso_resultados = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         panel_datos_generales = new javax.swing.JPanel();
@@ -2293,35 +2122,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         jPanel2.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 1150, 450));
 
-        lblInformation.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jPanel2.add(lblInformation, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 370, 20));
+        lblInformation.setFont(new java.awt.Font("Arial", 3, 16)); // NOI18N
+        jPanel2.add(lblInformation, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 590, 30));
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 1190, 500));
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 1190, 550));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Parametros"));
-        jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        txt_cliente.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jPanel3.add(txt_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 20, 181, 20));
-
-        cmb_estado.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_estado.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(cmb_estado, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 20, 140, -1));
-
-        check_cliente.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        check_cliente.setText("Cliente:");
-        check_cliente.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(check_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 70, -1));
-
-        check_fechas.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        check_fechas.setText("Por fecha entrega: ");
-        check_fechas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        check_fechas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                check_fechasActionPerformed(evt);
-            }
-        });
-        jPanel3.add(check_fechas, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 150, 20));
 
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
@@ -2434,122 +2240,31 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         });
         jToolBar1.add(btnInventoryMaterialReport);
 
-        jPanel3.add(jToolBar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 20, 340, -1));
-
-        jLabel30.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel30.setText("Limitar los resultados a:");
-        jPanel3.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 60, 140, 20));
-
-        txt_buscar_folio.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
-        txt_buscar_folio.setToolTipText("Busca por el folio del pedido (Enter)");
-        txt_buscar_folio.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_buscar_folio.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_buscar_folioKeyPressed(evt);
-            }
-        });
-        jPanel3.add(txt_buscar_folio, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 80, 54, -1));
-
-        cmb_chofer_buscar.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_chofer_buscar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(cmb_chofer_buscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 20, 150, -1));
-
-        buttonGroup1.add(check_pedido);
-        check_pedido.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        check_pedido.setText("Pedido");
-        check_pedido.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(check_pedido, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 50, -1, -1));
-
-        buttonGroup1.add(check_cotizacion);
-        check_cotizacion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        check_cotizacion.setText("Cotizacion");
-        check_cotizacion.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(check_cotizacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 50, -1, -1));
-
-        txt_fecha_inicial.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_fecha_inicial.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                txt_fecha_inicialMouseClicked(evt);
-            }
-        });
-        txt_fecha_inicial.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_fecha_inicialKeyPressed(evt);
-            }
-        });
-        jPanel3.add(txt_fecha_inicial, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 50, 160, 21));
-
-        txt_fecha_final.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_fecha_final.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                txt_fecha_finalMouseClicked(evt);
-            }
-        });
-        txt_fecha_final.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_fecha_finalKeyPressed(evt);
-            }
-        });
-        jPanel3.add(txt_fecha_final, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 50, 170, 21));
-
-        check_fechas_evento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        check_fechas_evento.setText("Por fecha evento: ");
-        check_fechas_evento.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        check_fechas_evento.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                check_fechas_eventoActionPerformed(evt);
-            }
-        });
-        jPanel3.add(check_fechas_evento, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 150, -1));
-
-        dateFechaEventoInicial.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        dateFechaEventoInicial.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                dateFechaEventoInicialMouseClicked(evt);
-            }
-        });
-        dateFechaEventoInicial.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                dateFechaEventoInicialKeyPressed(evt);
-            }
-        });
-        jPanel3.add(dateFechaEventoInicial, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 80, 160, 21));
-
-        dateFechaEventoFinal.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        dateFechaEventoFinal.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                dateFechaEventoFinalMouseClicked(evt);
-            }
-        });
-        dateFechaEventoFinal.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                dateFechaEventoFinalKeyPressed(evt);
-            }
-        });
-        jPanel3.add(dateFechaEventoFinal, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 80, 170, 21));
-
         cmbUsuarios.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmbUsuarios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(cmbUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 70, 170, -1));
 
-        cmb_limit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_limit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_limit.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(cmb_limit, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 80, 140, -1));
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmbUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(2, 2, 2)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(cmbUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(53, 53, 53))
+        );
 
-        jLabel49.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel49.setText("Buscar por folio:");
-        jPanel3.add(jLabel49, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 80, 100, 20));
-
-        jLabel2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel2.setText("Estado:");
-        jPanel3.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 20, 60, 20));
-
-        jLabel3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel3.setText("Chofer:");
-        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 20, 60, 20));
-
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, 1180, 120));
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, 1180, 70));
 
         lbl_aviso_resultados.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jPanel1.add(lbl_aviso_resultados, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 160, 510, 30));
@@ -3315,7 +3030,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(panel_abonos, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
+                    .addComponent(panel_abonos, javax.swing.GroupLayout.PREFERRED_SIZE, 315, Short.MAX_VALUE)
                     .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(73, Short.MAX_VALUE))
         );
@@ -3699,7 +3414,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel13, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jPanel13, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(jPanel9Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(panel_datos_cliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -3720,7 +3435,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 664, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -3745,6 +3460,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             llenar_combo_chofer();
             tabla_articulos();
             tabla_detalle();
+            llenar_abonos();
+            tabla_clientes();
                        
             String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
             Renta renta = null;
@@ -3847,16 +3564,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             
         }
     }//GEN-LAST:event_tabla_prox_rentasMouseClicked
-
-    private void jbtn_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_buscarActionPerformed
-        try {                   
-            buscar();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }
-        
-
-    }//GEN-LAST:event_jbtn_buscarActionPerformed
 
     private void jbtn_refrescarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_refrescarActionPerformed
         // TODO add your handling code here:
@@ -4105,29 +3812,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         funcion.setEnableContainer(panel_datos_cliente, true);
     }//GEN-LAST:event_jbtn_editar_clienteActionPerformed
 
-    private void txt_buscar_folioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_buscar_folioKeyPressed
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == 10) {
-
-              sql = "SELECT r.id_renta, r.folio, c.nombre, c.apellidos, estado.id_estado, estado.descripcion, "
-                    + "r.fecha_pedido, r.fecha_evento, r.fecha_entrega, r.hora_entrega, r.descripcion, chofer.nombre, chofer.apellidos, "
-                    + "tipo.id_tipo, tipo.tipo, r.cantidad_descuento, r.iva, r.deposito_garantia, r.envio_recoleccion ,u.nombre AS nombre_usuario, u.apellidos AS apellidos_usuario "
-                    + "FROM renta r "
-                    + "INNER JOIN clientes c ON (r.id_clientes = c.id_clientes) "
-                    +" INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios) "
-                    + "INNER JOIN tipo tipo ON(tipo.id_tipo = r.id_tipo) "
-                    + "INNER JOIN estado estado ON (estado.id_estado = r.id_estado) "
-                    + "INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer) "
-                    + "WHERE r.folio = ' "+this.txt_buscar_folio.getText().toString() +"' "
-                    + "";
-              
-            Map<String,Object> parameters = new HashMap<>();
-            parameters.put("folio", txt_buscar_folio.getText());
-              
-            tabla_consultar_renta(parameters);
-        }
-    }//GEN-LAST:event_txt_buscar_folioKeyPressed
-
     private void jTabbedPane2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTabbedPane2MouseClicked
         // TODO add your handling code here:
         txt_abono.requestFocus();
@@ -4267,26 +3951,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
     }//GEN-LAST:event_jbtn_generar_reporteActionPerformed
 
-    private void txt_fecha_inicialMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txt_fecha_inicialMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_fecha_inicialMouseClicked
-
-    private void txt_fecha_inicialKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_fecha_inicialKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_fecha_inicialKeyPressed
-
-    private void txt_fecha_finalMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txt_fecha_finalMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_fecha_finalMouseClicked
-
-    private void txt_fecha_finalKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_fecha_finalKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_fecha_finalKeyPressed
-
-    private void check_fechasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_check_fechasActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_check_fechasActionPerformed
-
     private void jbtn_disponibleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_disponibleActionPerformed
         // TODO add your handling code here:
         if (tabla_detalle.getRowCount() < 0 && cmb_fecha_entrega.getDate() == null && cmb_fecha_devolucion.getDate() == null) {
@@ -4409,26 +4073,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private void jtbtnGenerateExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtbtnGenerateExcelActionPerformed
         systemService.exportarExcel(tabla_prox_rentas);
     }//GEN-LAST:event_jtbtnGenerateExcelActionPerformed
-
-    private void check_fechas_eventoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_check_fechas_eventoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_check_fechas_eventoActionPerformed
-
-    private void dateFechaEventoInicialMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dateFechaEventoInicialMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_dateFechaEventoInicialMouseClicked
-
-    private void dateFechaEventoInicialKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dateFechaEventoInicialKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_dateFechaEventoInicialKeyPressed
-
-    private void dateFechaEventoFinalMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dateFechaEventoFinalMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_dateFechaEventoFinalMouseClicked
-
-    private void dateFechaEventoFinalKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dateFechaEventoFinalKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_dateFechaEventoFinalKeyPressed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
        
@@ -5166,27 +4810,27 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
     }//GEN-LAST:event_btnInventoryMaterialReportActionPerformed
 
+    private void jbtn_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_buscarActionPerformed
+        FiltersConsultarRentas win = new FiltersConsultarRentas(null,true);
+        win.setLocationRelativeTo(this);
+        win.setVisible(true);
+
+    }//GEN-LAST:event_jbtn_buscarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnInventoryMaterialReport;
+    public static javax.swing.JButton btnInventoryMaterialReport;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JCheckBox check_apellidos;
     private javax.swing.JCheckBox check_apodo;
-    private javax.swing.JCheckBox check_cliente;
-    private javax.swing.JCheckBox check_cotizacion;
     private javax.swing.JCheckBox check_enviar_email;
-    private javax.swing.JCheckBox check_fechas;
-    private javax.swing.JCheckBox check_fechas_evento;
     private javax.swing.JCheckBox check_mostrar_precios;
     private javax.swing.JCheckBox check_nombre;
-    private javax.swing.JCheckBox check_pedido;
     private javax.swing.JComboBox<TipoAbono> cmbTipoPago;
     private javax.swing.JComboBox<Usuario> cmbUsuarios;
     private javax.swing.JComboBox<Usuario> cmb_chofer;
-    private javax.swing.JComboBox<Usuario> cmb_chofer_buscar;
-    private javax.swing.JComboBox<EstadoEvento> cmb_estado;
     private javax.swing.JComboBox<EstadoEvento> cmb_estado1;
     private com.toedter.calendar.JDateChooser cmb_fecha_devolucion;
     private com.toedter.calendar.JDateChooser cmb_fecha_entrega;
@@ -5196,16 +4840,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox cmb_hora_devolucion;
     private javax.swing.JComboBox cmb_hora_devolucion_dos;
     private javax.swing.JComboBox cmb_hora_dos;
-    private javax.swing.JComboBox cmb_limit;
     private javax.swing.JComboBox<Tipo> cmb_tipo;
-    private com.toedter.calendar.JDateChooser dateFechaEventoFinal;
-    private com.toedter.calendar.JDateChooser dateFechaEventoInicial;
     private javax.swing.JButton jBtnAddOrderProvider;
-    private javax.swing.JButton jButton2;
+    public static javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
+    public static javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -5217,7 +4858,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
@@ -5228,8 +4868,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel33;
@@ -5248,7 +4886,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel46;
     private javax.swing.JLabel jLabel47;
     private javax.swing.JLabel jLabel48;
-    private javax.swing.JLabel jLabel49;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -5258,7 +4895,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel2;
+    public static javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
@@ -5278,28 +4915,28 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JToolBar jToolBar3;
     private javax.swing.JToolBar jToolBar4;
     private javax.swing.JToolBar jToolBar5;
-    private javax.swing.JButton jbtnGenerarReporteEntregas;
+    public static javax.swing.JButton jbtnGenerarReporteEntregas;
     private javax.swing.JButton jbtn_agregar_abono;
     private javax.swing.JButton jbtn_agregar_articulo;
     private javax.swing.JButton jbtn_agregar_articulos;
     private javax.swing.JButton jbtn_agregar_cliente;
-    private javax.swing.JButton jbtn_buscar;
+    public static javax.swing.JButton jbtn_buscar;
     private javax.swing.JButton jbtn_disponible;
     private javax.swing.JButton jbtn_editar;
     private javax.swing.JButton jbtn_editar_abonos;
     private javax.swing.JButton jbtn_editar_cliente;
     private javax.swing.JButton jbtn_editar_dinero;
-    private javax.swing.JButton jbtn_generar_reporte;
-    private javax.swing.JButton jbtn_generar_reporte1;
+    public static javax.swing.JButton jbtn_generar_reporte;
+    public static javax.swing.JButton jbtn_generar_reporte1;
     private javax.swing.JButton jbtn_guardar;
     private javax.swing.JButton jbtn_guardar_abonos;
     private javax.swing.JButton jbtn_guardar_cliente;
     private javax.swing.JButton jbtn_mostrar_articulos;
     private javax.swing.JButton jbtn_nuevo_cliente;
     private javax.swing.JButton jbtn_quitar_abono;
-    private javax.swing.JButton jbtn_refrescar;
-    private javax.swing.JButton jtbtnGenerateExcel;
-    private javax.swing.JLabel lblInformation;
+    public static javax.swing.JButton jbtn_refrescar;
+    public static javax.swing.JButton jtbtnGenerateExcel;
+    public static javax.swing.JLabel lblInformation;
     private javax.swing.JLabel lbl_atiende;
     private javax.swing.JLabel lbl_aviso_resultados;
     private javax.swing.JLabel lbl_cliente;
@@ -5315,7 +4952,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     public static javax.swing.JTable tabla_articulos;
     private javax.swing.JTable tabla_clientes;
     public static javax.swing.JTable tabla_detalle;
-    private javax.swing.JTable tabla_prox_rentas;
+    public static javax.swing.JTable tabla_prox_rentas;
     private javax.swing.JTextField txtEmailToSend;
     private javax.swing.JFormattedTextField txtPorcentajeDescuento;
     private javax.swing.JTextField txt_abono;
@@ -5324,10 +4961,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txt_apodo;
     private javax.swing.JTextField txt_buscar;
     private javax.swing.JTextField txt_buscar1;
-    private javax.swing.JFormattedTextField txt_buscar_folio;
     private javax.swing.JFormattedTextField txt_calculo;
     private javax.swing.JTextField txt_cantidad;
-    private javax.swing.JTextField txt_cliente;
     private javax.swing.JTextField txt_comentario;
     private javax.swing.JTextPane txt_comentarios;
     private javax.swing.JFormattedTextField txt_depositoGarantia;
@@ -5340,8 +4975,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txt_email;
     private javax.swing.JFormattedTextField txt_envioRecoleccion;
     private javax.swing.JFormattedTextField txt_faltantes;
-    private com.toedter.calendar.JDateChooser txt_fecha_final;
-    private com.toedter.calendar.JDateChooser txt_fecha_inicial;
     private javax.swing.JFormattedTextField txt_iva;
     private javax.swing.JTextField txt_localidad;
     private javax.swing.JTextField txt_nombre;
