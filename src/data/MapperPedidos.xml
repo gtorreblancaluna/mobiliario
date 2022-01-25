@@ -212,6 +212,9 @@
             INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios)
             INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer)
             INNER JOIN tipo t ON (t.id_tipo = r.id_tipo)
+        <if test="folio != null and folio != '' ">
+            AND r.folio = #{folio}
+        </if>
         <if test="systemDate != null and systemDate != '' ">
             AND STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') <![CDATA[ >= ]]> STR_TO_DATE(#{systemDate}, '%d/%m/%Y' )
         </if>

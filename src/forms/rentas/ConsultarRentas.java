@@ -435,15 +435,15 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         // funcion.conectate();
         String nombre, ap, apodo, tel1, tel2, email, dir, loc, rfc;
-        nombre = txt_nombre.getText().toString();
-        ap = txt_apellidos.getText().toString();
-        apodo = txt_apodo.getText().toString();
-        tel1 = txt_tel_movil.getText().toString();
+        nombre = txt_nombre.getText();
+        ap = txt_apellidos.getText();
+        apodo = txt_apodo.getText();
+        tel1 = txt_tel_movil.getText();
         tel2 = txt_tel_casa.getText();
-        email = txt_email.getText().toString();
-        dir = txt_direccion.getText().toString();
-        loc = txt_localidad.getText().toString();
-        rfc = txt_rfc.getText().toString();
+        email = txt_email.getText();
+        dir = txt_direccion.getText();
+        loc = txt_localidad.getText();
+        rfc = txt_rfc.getText();
         String datos[] = {nombre, ap, apodo, tel1, tel2, email, dir, loc, rfc, id_cliente};
         try {      
             funcion.UpdateRegistro(datos, "update clientes set nombre=?,apellidos=?,apodo=?,tel_movil=?,tel_fijo=?,email=?,direccion=?,localidad=?,rfc=? where id_clientes=? ");
@@ -575,15 +575,15 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
        
         
         String nombre, ap, apodo, tel1, tel2, email, dir, loc, rfc;
-        nombre = txt_nombre.getText().toString();
-        ap = txt_apellidos.getText().toString();
-        apodo = txt_apodo.getText().toString();
-        tel1 = txt_tel_movil.getText().toString();
+        nombre = txt_nombre.getText();
+        ap = txt_apellidos.getText();
+        apodo = txt_apodo.getText();
+        tel1 = txt_tel_movil.getText();
         tel2 = txt_tel_casa.getText();
-        email = txt_email.getText().toString();
-        dir = txt_direccion.getText().toString();
-        loc = txt_localidad.getText().toString();
-        rfc = txt_rfc.getText().toString();
+        email = txt_email.getText();
+        dir = txt_direccion.getText();
+        loc = txt_localidad.getText();
+        rfc = txt_rfc.getText();
         
         nombre = String.valueOf(datos_cliente[0][1].toString());
         ap = String.valueOf(datos_cliente[0][2].toString());
@@ -1921,6 +1921,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jButton6 = new javax.swing.JButton();
         btnInventoryMaterialReport = new javax.swing.JButton();
         cmbUsuarios = new javax.swing.JComboBox<>();
+        jButton1 = new javax.swing.JButton();
         lbl_aviso_resultados = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         panel_datos_generales = new javax.swing.JPanel();
@@ -2123,6 +2124,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jPanel2.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 1150, 450));
 
         lblInformation.setFont(new java.awt.Font("Arial", 3, 16)); // NOI18N
+        lblInformation.setForeground(new java.awt.Color(204, 0, 51));
         jPanel2.add(lblInformation, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 590, 30));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 1190, 550));
@@ -2243,6 +2245,14 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         cmbUsuarios.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmbUsuarios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
+        jButton1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jButton1.setText("Buscar por folio");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -2252,16 +2262,20 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cmbUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1)
+                .addContainerGap(523, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(2, 2, 2)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(cmbUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(cmbUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton1))
                     .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(53, 53, 53))
+                .addGap(52, 52, 52))
         );
 
         jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, 1180, 70));
@@ -4817,6 +4831,22 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
     }//GEN-LAST:event_jbtn_buscarActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String folio = JOptionPane.showInputDialog("Ingresa el folio");
+        if (folio == null) {
+            return;
+        }
+        try {
+            Integer number = Integer.parseInt(folio);
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("folio", number);
+            parameters.put("limit", 1250);
+            tabla_consultar_renta(parameters);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Folio no válido, ingresa un número válido para continuar ", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public static javax.swing.JButton btnInventoryMaterialReport;
@@ -4842,6 +4872,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox cmb_hora_dos;
     private javax.swing.JComboBox<Tipo> cmb_tipo;
     private javax.swing.JButton jBtnAddOrderProvider;
+    private javax.swing.JButton jButton1;
     public static javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
