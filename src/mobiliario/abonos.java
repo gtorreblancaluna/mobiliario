@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
 import clases.sqlclass;
@@ -20,10 +15,6 @@ import model.Renta;
 import services.SaleService;
 import services.SystemService;
 
-/**
- *
- * @author Carlos Alberto
- */
 public class abonos extends java.awt.Dialog {
 
     sqlclass funcion = new sqlclass();
@@ -33,9 +24,6 @@ public class abonos extends java.awt.Dialog {
     private final SaleService saleService;
     private final SystemService systemService = SystemService.getInstance();
 
-    /**
-     * Creates new form abonos
-     */
     public abonos(java.awt.Frame parent, boolean modal) {        
         super(parent, modal);
          initComponents();
@@ -135,21 +123,21 @@ public class abonos extends java.awt.Dialog {
     public void total() {
         float total = 0;
         for (int i = 0; i < tabla_abonos.getRowCount(); i++) {
-            total = total + Float.parseFloat(EliminaCaracteres(tabla_abonos.getValueAt(i, 5).toString(), "$,"));
+            total = total + Float.parseFloat(EliminaCaracteres(tabla_abonos.getValueAt(i, 6).toString(), "$,"));
         }
         txt_totales.setValue(total);
     }
 
     public void formato_tabla() {
-        Object[][] data = {{"", "", "", "", "","","","",""}};
-        String[] columNames = {"Folio", "Cliente", "Descripción pedido", "Fecha pago", "Recibio", "Pago", "Comentario","Fecha pago","Tipo"};    
+        Object[][] data = {{"","", "", "", "", "","","","",""}};
+        String[] columNames = {"Id","Folio", "Cliente", "Descripción pedido", "Fecha pago", "Recibio", "Pago", "Comentario","Fecha pago","Tipo"};    
         DefaultTableModel TableModel = new DefaultTableModel(data, columNames);
         tabla_abonos.setModel(TableModel);
         
          TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(TableModel); 
         tabla_abonos.setRowSorter(ordenarTabla);
 
-         int[] anchos = {20,80, 80, 100, 100, 50, 80,80,80};
+         int[] anchos = {10,20,80, 80, 100, 100, 50, 80,80,80};
 
         for (int inn = 0; inn < tabla_abonos.getColumnCount(); inn++)
             tabla_abonos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);        
@@ -167,6 +155,10 @@ public class abonos extends java.awt.Dialog {
             ;
         }
         
+        tabla_abonos.getColumnModel().getColumn(0).setMaxWidth(0);
+        tabla_abonos.getColumnModel().getColumn(0).setMinWidth(0);
+        tabla_abonos.getColumnModel().getColumn(0).setPreferredWidth(0);
+        
         tabla_abonos.getColumnModel().getColumn(0).setCellRenderer(centrar);
         tabla_abonos.getColumnModel().getColumn(2).setCellRenderer(centrar);
         tabla_abonos.getColumnModel().getColumn(3).setCellRenderer(centrar);  
@@ -176,7 +168,7 @@ public class abonos extends java.awt.Dialog {
     
 
     public void tabla_abonos() {   // funcion para llenar al abrir la ventana  
-//        List<Renta> rentas = saleService.obtenerPedidosPorConsultaSql(consultar_abonos.SQL, funcion);
+
         List<Renta> rentas = saleService.obtenerAbonos(consultar_abonos.SQL, funcion);
         if(rentas == null || rentas.size() <= 0){
             JOptionPane.showMessageDialog(null, "No hay elementos a mostrar ", "Error", JOptionPane.INFORMATION_MESSAGE);
@@ -189,6 +181,7 @@ public class abonos extends java.awt.Dialog {
                   
                    Object fila[] = {
                             renta.getRentaId()+"",
+                            renta.getFolio(),
                             renta.getCliente().getNombre()+" "+renta.getCliente().getApellidos(),
                             renta.getDescripcion(),
                             abono.getFecha(),
@@ -202,52 +195,6 @@ public class abonos extends java.awt.Dialog {
             }        
         }
         
-        /*
-        funcion.conectate();
-        tabla_abonos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        String[] columNames = {"Id ", "Usuario", "Fecha", "Abono", "Comentario", "Descripcion", "Cliente"};
-        String[] colName = {"id_abonos", "usuario", "fecha", "abono", "comentario", "descripcion", "cliente"};
-        //nombre de columnas, tabla, instruccion sql        
-
-        dtconduc = funcion.GetTabla(colName, "abonos", consultar_abonos.SQL);
-
-        int filas = dtconduc.length;
-        String fecha, fecha2;
-
-        for (int i = 0; i < filas; i++) {
-            fecha = dtconduc[i][2].toString();
-            System.out.println("fecha" + " " + fecha);
-            fecha2 = dia_semana(fecha);
-            dtconduc[i][2] = fecha2;
-        }
-        for (int i = 0; i < dtconduc.length; i++) {
-            String valor = dtconduc[i][3].toString();
-            dtconduc[i][3] = conviertemoneda(valor).toString();
-
-        }
-
-        DefaultTableModel datos = new DefaultTableModel(dtconduc, columNames);
-        tabla_abonos.setModel(datos);
-
-        DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
-        centrar.setHorizontalAlignment(SwingConstants.CENTER);
-
-        int[] anchos = {10, 120, 250, 120, 250, 200, 250};
-
-        for (int inn = 0; inn < tabla_abonos.getColumnCount(); inn++) {
-            tabla_abonos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
-        }
-
-        tabla_abonos.getColumnModel().getColumn(0).setMaxWidth(0);
-        tabla_abonos.getColumnModel().getColumn(0).setMinWidth(0);
-        tabla_abonos.getColumnModel().getColumn(0).setPreferredWidth(0);
-
-        //tabla_abonos.getColumnModel().getColumn(1).setCellRenderer(centrar);
-        tabla_abonos.getColumnModel().getColumn(2).setCellRenderer(centrar);
-        tabla_abonos.getColumnModel().getColumn(3).setCellRenderer(centrar);      
-        funcion.desconecta();
-        */
-
     }
 
     /**
