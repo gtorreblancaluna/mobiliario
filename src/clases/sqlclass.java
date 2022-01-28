@@ -1,10 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package clases;
 
-import com.mysql.jdbc.MysqlDataTruncation;
 import java.awt.Component;
 import java.awt.Container;
 import java.sql.Connection;
@@ -16,7 +11,6 @@ import java.sql.Statement;
 import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.JOptionPane;
 
 
 public class sqlclass {
