@@ -10,7 +10,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import mobiliario.ApplicationConstants;
-import mobiliario.agregar_renta;
+import forms.rentas.AgregarRenta;
 import model.Cuenta;
 import services.AccountService;
 
@@ -251,7 +251,7 @@ public void formato_tabla(){
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-        agregar_renta.validad_tipo_abonos = true;
+        AgregarRenta.validad_tipo_abonos = true;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog

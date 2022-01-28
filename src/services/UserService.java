@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package services;
 
 import clases.sqlclass;
@@ -16,10 +12,6 @@ import model.Puesto;
 import model.Usuario;
 import org.apache.log4j.Logger;
 
-/**
- *
- * @author jerry
- */
 public class UserService {
     private static Logger log = Logger.getLogger(UserService.class.getName());
     UserDAO usuariosDao = new UserDAO();

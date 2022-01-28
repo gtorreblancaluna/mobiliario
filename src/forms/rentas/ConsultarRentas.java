@@ -1,4 +1,4 @@
-package mobiliario;
+package forms.rentas;
 
 import services.ItemService;
 import services.SaleService;
@@ -41,6 +41,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import mobiliario.ApplicationConstants;
+import mobiliario.VerFaltantes;
+import mobiliario.disponibilidad_articulos;
+import mobiliario.iniciar_sesion;
+import mobiliario.principal;
 import model.Abono;
 import model.Articulo;
 import model.AsignaCategoria;
@@ -64,11 +69,14 @@ import utilities.BuildEmailTemplate;
 import utilities.Utility;
 import model.EstadoEvento;
 import model.Tipo;
+import model.providers.OrdenProveedor;
+import parametersVO.ParameterOrderProvider;
 import services.TipoEventoService;
+import services.providers.OrderProviderService;
 
-public class consultar_renta extends javax.swing.JInternalFrame {
+public class ConsultarRentas extends javax.swing.JInternalFrame {
     private OrderProviderForm orderProviderForm;
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(consultar_renta.class.getName());
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ConsultarRentas.class.getName());
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
     // variable global para almacenar el id detalle de renta
     public static String g_idDetalleRenta;
@@ -84,7 +92,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     public static String fecha_inicial, fecha_final, validar_consultar = "0", id_renta;
     sqlclass funcion = new sqlclass();    
     private final ItemService itemService;
-    private final SaleService saleService;
+    private static SaleService saleService;
     private final UserService userService = UserService.getInstance();
     private final SystemService systemService = SystemService.getInstance();
     CategoryService categoryService = new CategoryService();
@@ -96,11 +104,10 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     float canti = 0;
     private final EstadoEventoService estadoEventoService = EstadoEventoService.getInstance();
     private final TipoEventoService tipoEventoService = TipoEventoService.getInstance();
+    private final OrderProviderService orderService = OrderProviderService.getInstance();
 
-    /**
-     * Creates new form consultar_renta
-     */
-    public consultar_renta() throws PropertyVetoException {
+
+    public ConsultarRentas() throws PropertyVetoException {
         
         funcion.conectate();
         initComponents();
@@ -108,23 +115,8 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         itemService = ItemService.getInstance();
         fecha_sistema();
         
-        new Thread(() -> {
-            llenar_combo_estado();
-        }).start();
-        
-        new Thread(() -> {
-            llenar_abonos();
-        }).start();
-        new Thread(() -> {
-            llenar_combo_chofer_buscar();
-        }).start();
         formato_tabla_detalles();
-        new Thread(() -> {
-            llenar_combo_limite();
-        }).start();
         
-
-        // lbl_aviso_resultados.setVisible(false);
         jTabbedPane1.setEnabledAt(1, false);
         jTabbedPane1.setEnabledAt(2, false);
         jbtn_guardar.setEnabled(false);
@@ -137,18 +129,9 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         txt_total.setEditable(false);
         txt_calculo.setEditable(false);
         jbtn_guardar_cliente.setEnabled(false);
-        new Thread(() -> {
-            tabla_clientes();
-        }).start();
-       
-        try {                   
-            buscar();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }
+      
         panel_articulos.setVisible(false);
         jbtn_disponible.setEnabled(false);
-        txt_buscar_folio.requestFocus();
         panel_conceptos.setVisible(true);
         panel_articulos.setVisible(false);
         check_nombre.setSelected(true);
@@ -156,9 +139,87 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         this.txt_editar_precio_unitario.setEnabled(false);
         this.txt_editar_porcentaje_descuento.setEnabled(false);
         
+        new Thread(() -> {
+            fillCmbUsers();
+        }).start();
+        initalData ();
+         
     }
     
-    private void disableButtonsActions () {
+       public void tableFormatOrderProvider() {
+        Object[][] data = {{"","","","","","","","","","","",""}};
+        String[] columnNames = {          
+                        "No orden",
+                        "Folio renta", 
+                        "Usuario",
+                        "Proveedor", 
+                        "Status",                        
+                        "Creado",
+                        "Actualizado",
+                        "Comentario",
+                        "id_renta",
+                        "Subtotal",
+                        "Pagos",
+                        "Total"
+        };
+        DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
+        tableOrdersProvider.setModel(tableModel);
+        
+        TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
+        tableOrdersProvider.setRowSorter(ordenarTabla);
+
+        int[] anchos = {20,20,80,40,40, 80,100,100,20,80,60,60};
+
+        for (int inn = 0; inn < tableOrdersProvider.getColumnCount(); inn++) {
+            tableOrdersProvider.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
+        }
+
+        try {
+            DefaultTableModel temp = (DefaultTableModel) tableOrdersProvider.getModel();
+            temp.removeRow(temp.getRowCount() - 1);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            ;
+        }
+        DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
+        centrar.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        DefaultTableCellRenderer right = new DefaultTableCellRenderer();
+        right.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        tableOrdersProvider.getColumnModel().getColumn(8).setMaxWidth(0);
+        tableOrdersProvider.getColumnModel().getColumn(8).setMinWidth(0);
+        tableOrdersProvider.getColumnModel().getColumn(8).setPreferredWidth(0);
+     
+        tableOrdersProvider.getColumnModel().getColumn(0).setCellRenderer(centrar);
+        tableOrdersProvider.getColumnModel().getColumn(1).setCellRenderer(centrar);
+        tableOrdersProvider.getColumnModel().getColumn(9).setCellRenderer(right);
+        tableOrdersProvider.getColumnModel().getColumn(10).setCellRenderer(right);
+        tableOrdersProvider.getColumnModel().getColumn(11).setCellRenderer(right);
+        
+    }
+    
+    private void initalData () {
+        Map<String, Object> map = new HashMap<>();
+        map.put("limit", 200);
+        map.put("applyDiff", ApplicationConstants.ESTADO_CANCELADO);
+        map.put("systemDate", fecha_sistema );
+        map.put("type", ApplicationConstants.ESTADO_APARTADO );
+        tabla_consultar_renta(map);
+    }
+    
+    private void fillCmbUsers () {
+        List<Usuario> users = userService.obtenerUsuarios(funcion);
+        cmbUsuarios.removeAllItems();
+        
+        cmbUsuarios.addItem(
+                new Usuario(0, ApplicationConstants.CMB_SELECCIONE)
+        );
+        users.stream().forEach(t -> {
+            cmbUsuarios.addItem(t);
+        });
+    }
+    
+    public static void disableButtonsActions () {
         
         jbtn_buscar.setEnabled(false);
         
@@ -174,7 +235,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         btnInventoryMaterialReport.setEnabled(false);
     }
     
-    private void enabledButtonsActions () {
+    public static void enabledButtonsActions () {
         
         jbtn_buscar.setEnabled(true);
         
@@ -226,9 +287,9 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         ventana_faltantes.setLocationRelativeTo(null);
     }
     
-     public void mostrar_agregar_orden_proveedor(String orderId) {
+     public void mostrar_agregar_orden_proveedor(String folio, String orderId, String rentaId) {
        if (Utility.verifyIfInternalFormIsOpen(orderProviderForm)) {
-            orderProviderForm = new OrderProviderForm(orderId);
+            orderProviderForm = new OrderProviderForm(folio, orderId, rentaId);
             orderProviderForm.setLocation(this.getWidth() / 2 - orderProviderForm.getWidth() / 2, this.getHeight() / 2 - orderProviderForm.getHeight() / 2 - 20);
             principal.jDesktopPane1.add(orderProviderForm);
             orderProviderForm.show();
@@ -259,9 +320,8 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 tabla_clientes();
                 res = true;
 
-//jbtn_agregar.setEnabled(false);
             } catch (SQLException ex) {
-                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog(null, "Error al insertar registro ", "Error", JOptionPane.ERROR);
             }
         }
@@ -290,7 +350,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             try {
                 renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
             } catch (Exception e) {
-                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
                 JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
                 return;
             }
@@ -431,15 +491,15 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         
         // funcion.conectate();
         String nombre, ap, apodo, tel1, tel2, email, dir, loc, rfc;
-        nombre = txt_nombre.getText().toString();
-        ap = txt_apellidos.getText().toString();
-        apodo = txt_apodo.getText().toString();
-        tel1 = txt_tel_movil.getText().toString();
+        nombre = txt_nombre.getText();
+        ap = txt_apellidos.getText();
+        apodo = txt_apodo.getText();
+        tel1 = txt_tel_movil.getText();
         tel2 = txt_tel_casa.getText();
-        email = txt_email.getText().toString();
-        dir = txt_direccion.getText().toString();
-        loc = txt_localidad.getText().toString();
-        rfc = txt_rfc.getText().toString();
+        email = txt_email.getText();
+        dir = txt_direccion.getText();
+        loc = txt_localidad.getText();
+        rfc = txt_rfc.getText();
         String datos[] = {nombre, ap, apodo, tel1, tel2, email, dir, loc, rfc, id_cliente};
         try {      
             funcion.UpdateRegistro(datos, "update clientes set nombre=?,apellidos=?,apodo=?,tel_movil=?,tel_fijo=?,email=?,direccion=?,localidad=?,rfc=? where id_clientes=? ");
@@ -571,15 +631,15 @@ public class consultar_renta extends javax.swing.JInternalFrame {
        
         
         String nombre, ap, apodo, tel1, tel2, email, dir, loc, rfc;
-        nombre = txt_nombre.getText().toString();
-        ap = txt_apellidos.getText().toString();
-        apodo = txt_apodo.getText().toString();
-        tel1 = txt_tel_movil.getText().toString();
+        nombre = txt_nombre.getText();
+        ap = txt_apellidos.getText();
+        apodo = txt_apodo.getText();
+        tel1 = txt_tel_movil.getText();
         tel2 = txt_tel_casa.getText();
-        email = txt_email.getText().toString();
-        dir = txt_direccion.getText().toString();
-        loc = txt_localidad.getText().toString();
-        rfc = txt_rfc.getText().toString();
+        email = txt_email.getText();
+        dir = txt_direccion.getText();
+        loc = txt_localidad.getText();
+        rfc = txt_rfc.getText();
         
         nombre = String.valueOf(datos_cliente[0][1].toString());
         ap = String.valueOf(datos_cliente[0][2].toString());
@@ -879,7 +939,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 total();
                 editar_abonos = false;
 //            } catch (SQLException ex) {
-//                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, ex);
+//                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, ex);
 //            }
         }
         
@@ -915,7 +975,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                       +iniciar_sesion.usuarioGlobal.getApellidos()+" intenta modificar el abono: "+txt_abono.getText().toString()+
                       " id_renta: "+this.id_renta);
             } catch (ParseException ex) {
-                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, ex);
             }
             
         } else {
@@ -1042,7 +1102,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                     subTotal();
                     total();
                 } catch (SQLException ex) {
-                    Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         } else {
@@ -1220,7 +1280,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 try {
                     renta = saleService.obtenerRentaPorId(Integer.parseInt(id_renta));
                 } catch (Exception e) {
-                    Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+                    Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
                     JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
                     return;
                 }
@@ -1468,25 +1528,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         
     }
     
-    public void llenar_combo_limite(){
-        this.cmb_limit.removeAllItems();
-        this.cmb_limit.addItem("100");
-        this.cmb_limit.addItem("1000");
-        this.cmb_limit.addItem("5000");
-        this.cmb_limit.addItem("todos");
-    }
-    
-    public void llenar_combo_estado() {
 
-        List<EstadoEvento> list = estadoEventoService.get();
-        cmb_estado.removeAllItems();
-        cmb_estado.addItem(
-                new EstadoEvento(0, ApplicationConstants.CMB_SELECCIONE)
-        );
-        list.stream().forEach(t -> {
-            cmb_estado.addItem(t);
-        });
-    }
     
     public void llenar_combo_tipo() {
         
@@ -1543,26 +1585,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     
     
     
-    public void llenar_combo_chofer_buscar() {
-        
-        // funcion.desconecta();
-        
-        if (cmb_chofer_buscar.getItemCount() > 0) {
-            return;
-        }
-
-        List<Usuario> users = userService.obtenerUsuarios(funcion);
-        cmb_chofer_buscar.removeAllItems();
-        
-        cmb_chofer_buscar.addItem(
-                new Usuario(0, ApplicationConstants.CMB_SELECCIONE)
-        );
-        users.stream().forEach(t -> {
-            cmb_chofer_buscar.addItem(t);
-        });
-        
-    }
-    
     public void llenar_combo_estado2() {
                
         if (cmb_estado1.getItemCount() > 1) {
@@ -1604,110 +1626,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         return nueva_cadena;
     }
     
-    public void buscar() throws Exception{
-
-        String tipoId = null;
-        EstadoEvento estadoEvento = null;
-        Usuario chofer = null;
-        try{
-            chofer = (Usuario) cmb_chofer_buscar.getSelectedItem();
-        } catch (NullPointerException e) {}
-        try {
-            estadoEvento = (EstadoEvento) cmb_estado.getSelectedItem();
-        } catch (NullPointerException e) {}
-        
-        Integer limit = 100;
-        try {
-            limit = Integer.parseInt(this.cmb_limit.getSelectedItem().toString());
-        } catch (Exception e) {
-            
-        }
-        
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("limit", limit);
-        
-        if (check_cliente.isSelected() == false && (estadoEvento == null || estadoEvento.getEstadoId() == 0) && 
-                check_fechas.isSelected() == false && (chofer == null || chofer.getUsuarioId() == 0) && 
-                check_fechas_evento.isSelected() == false
-                && check_cotizacion.isSelected() == false
-                && check_pedido.isSelected() == false                
-                ) {
-            sql = "SELECT r.id_renta, r.folio, c.nombre, c.apellidos, estado.id_estado, estado.descripcion, "
-                    + "r.fecha_pedido, r.fecha_evento, r.fecha_entrega, r.hora_entrega, r.descripcion, chofer.nombre, chofer.apellidos, "
-                    + "tipo.id_tipo, tipo.tipo, r.cantidad_descuento, r.iva, r.deposito_garantia, r.envio_recoleccion ,u.nombre AS nombre_usuario, u.apellidos AS apellidos_usuario "
-                    + "FROM renta r "
-                    + "INNER JOIN clientes c ON (r.id_clientes = c.id_clientes) "
-                    +" INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios) "
-                    + "INNER JOIN tipo tipo ON(tipo.id_tipo = r.id_tipo) "
-                    + "INNER JOIN estado estado ON (estado.id_estado = r.id_estado) "
-                    + "INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer) "
-                    + "WHERE STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') >= STR_TO_DATE(' "+ fecha_sistema +" ', '%d/%m/%Y' ) AND r.id_estado<> '"+ApplicationConstants.ESTADO_CANCELADO+"' "
-                    + "AND tipo.id_tipo = '"+ApplicationConstants.TIPO_PEDIDO+"' "
-                    + "ORDER BY STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') ";
-            parameters.put("applyDiff", ApplicationConstants.ESTADO_CANCELADO);
-            parameters.put("type", ApplicationConstants.TIPO_PEDIDO);
-            parameters.put("systemDate", fecha_sistema);
-
-        } else {
-           sql = "SELECT r.id_renta, r.folio, c.nombre, c.apellidos, estado.id_estado, estado.descripcion, "
-                    + "r.fecha_pedido, r.fecha_evento, r.fecha_entrega, r.hora_entrega, r.descripcion, chofer.nombre, chofer.apellidos, "
-                    + "tipo.id_tipo, tipo.tipo, r.cantidad_descuento, r.iva, r.deposito_garantia, r.envio_recoleccion,u.nombre AS nombre_usuario, u.apellidos AS apellidos_usuario "
-                    + "FROM renta r "
-                    + "INNER JOIN clientes c ON (r.id_clientes = c.id_clientes) "
-                    +" INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios) "
-                    + "INNER JOIN tipo tipo ON(tipo.id_tipo = r.id_tipo) "
-                    + "INNER JOIN estado estado ON (estado.id_estado = r.id_estado) "
-                    + "INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer) "
-                       + "";
-            if(check_cotizacion.isSelected() == true) {
-                sql = sql + " AND r.id_tipo = '"+ApplicationConstants.TIPO_COTIZACION+"' ";
-                parameters.put("type", ApplicationConstants.TIPO_COTIZACION);
-            }
-            if(check_pedido.isSelected() == true) {
-                sql = sql + " AND r.id_tipo = '"+ApplicationConstants.TIPO_PEDIDO+"' ";
-                parameters.put("type", ApplicationConstants.TIPO_COTIZACION);
-            }
-            if (check_cliente.isSelected() == true){
-                sql = sql + " AND CONCAT(c.nombre,\" \",c.apellidos) LIKE '%" + txt_cliente.getText().toString() + "%' ";
-                parameters.put("customer", txt_cliente.getText());
-            }
-            
-            
-            if (check_fechas.isSelected() == true) {
-                
-                fecha_inicial = new SimpleDateFormat("dd/MM/yyyy").format(txt_fecha_inicial.getDate());
-                fecha_final = new SimpleDateFormat("dd/MM/yyyy").format(this.txt_fecha_final.getDate());
-
-                System.out.println("Fecha inicial: " + fecha_inicial);
-                System.out.println("Fecha Final: " + fecha_final);
-                parameters.put("initDeliveryDate", fecha_inicial);
-                parameters.put("endDeliveryDate", fecha_final);
-                sql = sql + " AND STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE('" + fecha_inicial + "','%d/%m/%Y') AND STR_TO_DATE('" + fecha_final + "','%d/%m/%Y')  ";
-            }
-            
-            if (check_fechas_evento.isSelected() == true) {
-                // por fecha de evento
-                String fecha_inicial_evento = new SimpleDateFormat("dd/MM/yyyy").format(dateFechaEventoInicial.getDate());
-                String fecha_final_evento = new SimpleDateFormat("dd/MM/yyyy").format(dateFechaEventoFinal.getDate());
-                sql = sql + " AND STR_TO_DATE(r.fecha_evento,'%d/%m/%Y') BETWEEN STR_TO_DATE('" + fecha_inicial_evento + "','%d/%m/%Y') AND STR_TO_DATE('" + fecha_final_evento + "','%d/%m/%Y')  ";
-                parameters.put("initEventDate", fecha_inicial_evento);
-                parameters.put("endEventDate", fecha_final_evento);
-            }
-            if (estadoEvento != null && estadoEvento.getEstadoId() != 0) {
-                
-                sql = sql + " AND r.id_estado = " + estadoEvento.getEstadoId() + " ";
-                parameters.put("statusId", estadoEvento.getEstadoId());
-                
-            }
-            if (chofer != null && chofer.getUsuarioId() != 0) {
-                sql = sql + " AND r.id_usuario_chofer='" + chofer.getUsuarioId() + "'  ";
-                parameters.put("driverId", chofer.getUsuarioId());
-            }
-            
-            
-        }
-        tabla_consultar_renta(parameters);
-    }
+    
     
     public String dia_semana(String fecha) {
         //String fecha1[];  
@@ -1748,7 +1667,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         return fechafinal;
     }
     
-    public void tabla_consultar_renta(Map<String,Object> parameters) {   // funcion para llenar al abrir la ventana   
+    public static void tabla_consultar_renta(Map<String,Object> parameters) {   // funcion para llenar al abrir la ventana   
         Object[][] data = {{"","","","","","","", "", "", "", "", "","","","","","","",""}};
         String[] columNames = {
             "Id", 
@@ -1817,55 +1736,43 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             ;
         }
 
-        this.lblInformation.setText("Obteniendo resultados, porfavor espere ... "); 
-        this.disableButtonsActions();
-        new Thread(() -> {
-            JDialog dialog = Utility.showDialog("Esperando al servidor","Obteniendo resultados, por favor espere...", this);
-            try{
-                List<Renta> rentas = saleService.obtenerRentasPorParametros(parameters);
-                fillTable(rentas);
-                enabledButtonsActions();
-            } catch (Exception e) {
-                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
-                JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-                
-                return;
-            } finally {
-                dialog.dispose();
-            }
-            
-            
-        }).start();
+        lblInformation.setText("Obteniendo resultados, porfavor espere ... "); 
+        disableButtonsActions();
         
-    }
-    
-    
-    private void fillTable (List<Renta> rentas) {
-        if(rentas == null || rentas.size()<=0)
-    {
-        this.lblInformation.setText("No se obtuvieron resultados :( ");
-        return;
-    }else{
-        Toolkit.getDefaultToolkit().beep();
-        String limit = this.cmb_limit.getSelectedItem().toString();
-        
-        if(limit.equals("todos") || limit.toLowerCase().equals("item 1")){
-            if(rentas.size()>1){
-                this.lblInformation.setText("Se han obtenido "+rentas.size()+" resultados");
+        try{
+            List<Renta> rentas = saleService.obtenerRentasPorParametros(parameters);
+            fillTable(rentas);
+            if(rentas == null || rentas.size()<=0)
+            {
+                lblInformation.setText("No se obtuvieron resultados :( ");      
             }else{
-                this.lblInformation.setText("Se a obtenido "+rentas.size()+" resultado");
+                Toolkit.getDefaultToolkit().beep();
+
+                if(rentas.size()>1){
+                   lblInformation.setText("Se han obtenido "+rentas.size()+" resultados");  
+                }else{
+                  lblInformation.setText("Se a obtenido "+rentas.size()+" resultado");
+                }
             }
-            
-        }else{
-            if(rentas.size()>1){
-               this.lblInformation.setText("Se han obtenido "+rentas.size()+" resultados, con un limite de "+limit+" registros");  
-            }else{
-              this.lblInformation.setText("Se a obtenido "+rentas.size()+" resultado, con un limite de "+limit+" registros");
-            }
+        } catch (Exception e) {
+            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        } finally {
+            enabledButtonsActions();
         }
+            
+            
+        
         
     }
-        
+    
+    
+    public static void fillTable (List<Renta> rentas) {
+        if(rentas == null || rentas.size()<=0)
+        {
+            return;
+        }
         DefaultTableModel tableModel = (DefaultTableModel) tabla_prox_rentas.getModel();
         for(Renta renta : rentas){
             
@@ -2060,10 +1967,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         tabla_prox_rentas = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
         lblInformation = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        txt_cliente = new javax.swing.JTextField();
-        cmb_estado = new javax.swing.JComboBox<>();
-        check_cliente = new javax.swing.JCheckBox();
-        check_fechas = new javax.swing.JCheckBox();
         jToolBar1 = new javax.swing.JToolBar();
         jbtn_buscar = new javax.swing.JButton();
         jbtn_refrescar = new javax.swing.JButton();
@@ -2073,21 +1976,8 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jButton2 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         btnInventoryMaterialReport = new javax.swing.JButton();
-        jLabel30 = new javax.swing.JLabel();
-        txt_buscar_folio = new javax.swing.JFormattedTextField();
-        cmb_chofer_buscar = new javax.swing.JComboBox<>();
-        check_pedido = new javax.swing.JCheckBox();
-        check_cotizacion = new javax.swing.JCheckBox();
-        txt_fecha_inicial = new com.toedter.calendar.JDateChooser();
-        txt_fecha_final = new com.toedter.calendar.JDateChooser();
-        check_fechas_evento = new javax.swing.JCheckBox();
-        dateFechaEventoInicial = new com.toedter.calendar.JDateChooser();
-        dateFechaEventoFinal = new com.toedter.calendar.JDateChooser();
         cmbUsuarios = new javax.swing.JComboBox<>();
-        cmb_limit = new javax.swing.JComboBox();
-        jLabel49 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
         lbl_aviso_resultados = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         panel_datos_generales = new javax.swing.JPanel();
@@ -2197,6 +2087,10 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         jPanel11 = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
         txt_comentarios = new javax.swing.JTextPane();
+        jPanel5 = new javax.swing.JPanel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        tableOrdersProvider = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
+        lblInformationOrdersProvider = new javax.swing.JLabel();
         jToolBar5 = new javax.swing.JToolBar();
         jbtn_editar = new javax.swing.JButton();
         jbtn_guardar = new javax.swing.JButton();
@@ -2289,35 +2183,13 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
         jPanel2.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 1150, 450));
 
-        lblInformation.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jPanel2.add(lblInformation, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 370, 20));
+        lblInformation.setFont(new java.awt.Font("Arial", 3, 16)); // NOI18N
+        lblInformation.setForeground(new java.awt.Color(204, 0, 51));
+        jPanel2.add(lblInformation, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 590, 30));
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 1190, 500));
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 1190, 550));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Parametros"));
-        jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        txt_cliente.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jPanel3.add(txt_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 20, 181, 20));
-
-        cmb_estado.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_estado.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(cmb_estado, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 20, 140, -1));
-
-        check_cliente.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        check_cliente.setText("Cliente:");
-        check_cliente.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(check_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 70, -1));
-
-        check_fechas.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        check_fechas.setText("Por fecha entrega: ");
-        check_fechas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        check_fechas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                check_fechasActionPerformed(evt);
-            }
-        });
-        jPanel3.add(check_fechas, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 150, 20));
 
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
@@ -2430,122 +2302,43 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         });
         jToolBar1.add(btnInventoryMaterialReport);
 
-        jPanel3.add(jToolBar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 20, 340, -1));
-
-        jLabel30.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel30.setText("Limitar los resultados a:");
-        jPanel3.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 60, 140, 20));
-
-        txt_buscar_folio.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
-        txt_buscar_folio.setToolTipText("Busca por el folio del pedido (Enter)");
-        txt_buscar_folio.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_buscar_folio.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_buscar_folioKeyPressed(evt);
-            }
-        });
-        jPanel3.add(txt_buscar_folio, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 80, 54, -1));
-
-        cmb_chofer_buscar.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_chofer_buscar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(cmb_chofer_buscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 20, 150, -1));
-
-        buttonGroup1.add(check_pedido);
-        check_pedido.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        check_pedido.setText("Pedido");
-        check_pedido.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(check_pedido, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 50, -1, -1));
-
-        buttonGroup1.add(check_cotizacion);
-        check_cotizacion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        check_cotizacion.setText("Cotizacion");
-        check_cotizacion.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(check_cotizacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 50, -1, -1));
-
-        txt_fecha_inicial.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_fecha_inicial.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                txt_fecha_inicialMouseClicked(evt);
-            }
-        });
-        txt_fecha_inicial.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_fecha_inicialKeyPressed(evt);
-            }
-        });
-        jPanel3.add(txt_fecha_inicial, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 50, 160, 21));
-
-        txt_fecha_final.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_fecha_final.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                txt_fecha_finalMouseClicked(evt);
-            }
-        });
-        txt_fecha_final.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_fecha_finalKeyPressed(evt);
-            }
-        });
-        jPanel3.add(txt_fecha_final, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 50, 170, 21));
-
-        check_fechas_evento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        check_fechas_evento.setText("Por fecha evento: ");
-        check_fechas_evento.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        check_fechas_evento.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                check_fechas_eventoActionPerformed(evt);
-            }
-        });
-        jPanel3.add(check_fechas_evento, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 150, -1));
-
-        dateFechaEventoInicial.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        dateFechaEventoInicial.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                dateFechaEventoInicialMouseClicked(evt);
-            }
-        });
-        dateFechaEventoInicial.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                dateFechaEventoInicialKeyPressed(evt);
-            }
-        });
-        jPanel3.add(dateFechaEventoInicial, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 80, 160, 21));
-
-        dateFechaEventoFinal.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        dateFechaEventoFinal.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                dateFechaEventoFinalMouseClicked(evt);
-            }
-        });
-        dateFechaEventoFinal.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                dateFechaEventoFinalKeyPressed(evt);
-            }
-        });
-        jPanel3.add(dateFechaEventoFinal, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 80, 170, 21));
-
         cmbUsuarios.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmbUsuarios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(cmbUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 70, 170, -1));
 
-        cmb_limit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_limit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_limit.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel3.add(cmb_limit, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 80, 140, -1));
+        jButton1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jButton1.setText("Buscar por folio");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
-        jLabel49.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel49.setText("Buscar por folio:");
-        jPanel3.add(jLabel49, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 80, 100, 20));
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmbUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1)
+                .addContainerGap(523, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(2, 2, 2)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(cmbUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton1))
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(52, 52, 52))
+        );
 
-        jLabel2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel2.setText("Estado:");
-        jPanel3.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 20, 60, 20));
-
-        jLabel3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel3.setText("Chofer:");
-        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 20, 60, 20));
-
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, 1180, 120));
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, 1180, 70));
 
         lbl_aviso_resultados.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jPanel1.add(lbl_aviso_resultados, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 160, 510, 30));
@@ -3328,17 +3121,65 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 661, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(511, Short.MAX_VALUE))
+                .addContainerGap(502, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(180, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("Comentarios", jPanel11);
+
+        tableOrdersProvider.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        tableOrdersProvider.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tableOrdersProvider.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        tableOrdersProvider.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableOrdersProviderMouseClicked(evt);
+            }
+        });
+        jScrollPane8.setViewportView(tableOrdersProvider);
+
+        lblInformationOrdersProvider.setFont(new java.awt.Font("Arial", 3, 14)); // NOI18N
+        lblInformationOrdersProvider.setForeground(new java.awt.Color(204, 0, 51));
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 561, Short.MAX_VALUE))
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane2.addTab("Ordenes al proveedor", jPanel5);
 
         jPanel4.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 220, 1180, 400));
 
@@ -3723,6 +3564,37 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+   
+    private void fillOrdersProvider (Integer folioRenta) {
+        tableFormatOrderProvider();
+        ParameterOrderProvider parameter = new ParameterOrderProvider();
+        parameter.setFolioRenta(folioRenta);
+        parameter.setLimit(1000);
+        DefaultTableModel tableModel = (DefaultTableModel) tableOrdersProvider.getModel();
+        
+        try {
+            List<OrdenProveedor> list = orderService.getOrdersByParameters(parameter);
+            for(OrdenProveedor orden : list){      
+            Object fila[] = {                                          
+                orden.getId(),
+                orden.getRenta().getFolio(),
+                orden.getUsuario().getNombre()+" "+orden.getUsuario().getApellidos(),
+                orden.getProveedor().getNombre()+" "+orden.getProveedor().getApellidos(),
+                orden.getStatusDescription(),
+                orden.getCreado(),
+                orden.getActualizado(),
+                orden.getComentario(),
+                orden.getRenta().getRentaId(),             
+                decimalFormat.format(orden.getTotal()),
+                decimalFormat.format(orden.getAbonos()),
+                decimalFormat.format((orden.getTotal() - orden.getAbonos()))
+              };
+              tableModel.addRow(fila);
+            }
+        } catch (BusinessException e) {
+            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado al obtener las ordenes del proveedor\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+        }
+    }
     private void tabla_prox_rentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_prox_rentasMouseClicked
         // TODO add your handling code here:
         if (evt.getClickCount() == 2) {
@@ -3741,16 +3613,24 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             llenar_combo_chofer();
             tabla_articulos();
             tabla_detalle();
+            llenar_abonos();
+            tabla_clientes();
                        
             String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
             Renta renta = null;
             try {
                 renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
             } catch (Exception e) {
-                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
                 JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
                 return;
             }
+            
+            final int folioRenta = renta.getFolio();
+            new Thread(() -> {
+                 fillOrdersProvider(folioRenta);
+            }).start();
+            
             if(renta.getMostrarPreciosPdf().equals("1"))
                 this.check_mostrar_precios.setSelected(true);
             else
@@ -3781,7 +3661,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
                 cmb_fecha_devolucion.setDate((Date) formatoDelTexto.parse((String) renta.getFechaDevolucion()));
                 cmb_fecha_evento.setDate((Date) formatoDelTexto.parse((String) renta.getFechaEvento()));
             } catch (ParseException ex) {
-                Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, ex);
             }
             
             cmb_estado1.getModel().setSelectedItem(renta.getEstado());            
@@ -3844,26 +3724,8 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_tabla_prox_rentasMouseClicked
 
-    private void jbtn_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_buscarActionPerformed
-        try {                   
-            buscar();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }
-        
-
-    }//GEN-LAST:event_jbtn_buscarActionPerformed
-
     private void jbtn_refrescarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_refrescarActionPerformed
-        // TODO add your handling code here:
-
-        sql = "SELECT r.`id_renta`,r.`folio`,CONCAT(c.`nombre`,\" \", c.`apellidos`)AS cliente,e.`descripcion` as estado, r.`fecha_entrega`, r.`hora_entrega`, r.`descripcion`, CONCAT(u.`nombre`,\" \",u.`apellidos`)AS Chofer "
-                + "FROM renta r, estado e, clientes c, usuarios u "
-                + "WHERE r.id_estado=e.id_estado AND r.id_clientes=c.id_clientes AND r.id_usuario_chofer=u.id_usuarios AND STR_TO_DATE(r.`fecha_entrega`, '%d/%m/%Y') >= STR_TO_DATE('" + fecha_sistema + "', '%d/%m/%Y' ) AND r.`id_tipo`='" + id_tipo + "' AND r.`id_estado`<> '4' ORDER BY r.`folio`";
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("initEventDate", fecha_sistema);
-        parameters.put("type", id_tipo);
-        tabla_consultar_renta(parameters);
+       initalData();
     }//GEN-LAST:event_jbtn_refrescarActionPerformed
 
     private void txt_cantidadKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_cantidadKeyPressed
@@ -4101,29 +3963,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         funcion.setEnableContainer(panel_datos_cliente, true);
     }//GEN-LAST:event_jbtn_editar_clienteActionPerformed
 
-    private void txt_buscar_folioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_buscar_folioKeyPressed
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == 10) {
-
-              sql = "SELECT r.id_renta, r.folio, c.nombre, c.apellidos, estado.id_estado, estado.descripcion, "
-                    + "r.fecha_pedido, r.fecha_evento, r.fecha_entrega, r.hora_entrega, r.descripcion, chofer.nombre, chofer.apellidos, "
-                    + "tipo.id_tipo, tipo.tipo, r.cantidad_descuento, r.iva, r.deposito_garantia, r.envio_recoleccion ,u.nombre AS nombre_usuario, u.apellidos AS apellidos_usuario "
-                    + "FROM renta r "
-                    + "INNER JOIN clientes c ON (r.id_clientes = c.id_clientes) "
-                    +" INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios) "
-                    + "INNER JOIN tipo tipo ON(tipo.id_tipo = r.id_tipo) "
-                    + "INNER JOIN estado estado ON (estado.id_estado = r.id_estado) "
-                    + "INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer) "
-                    + "WHERE r.folio = ' "+this.txt_buscar_folio.getText().toString() +"' "
-                    + "";
-              
-            Map<String,Object> parameters = new HashMap<>();
-            parameters.put("folio", txt_buscar_folio.getText());
-              
-            tabla_consultar_renta(parameters);
-        }
-    }//GEN-LAST:event_txt_buscar_folioKeyPressed
-
     private void jTabbedPane2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTabbedPane2MouseClicked
         // TODO add your handling code here:
         txt_abono.requestFocus();
@@ -4263,26 +4102,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
 
     }//GEN-LAST:event_jbtn_generar_reporteActionPerformed
 
-    private void txt_fecha_inicialMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txt_fecha_inicialMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_fecha_inicialMouseClicked
-
-    private void txt_fecha_inicialKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_fecha_inicialKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_fecha_inicialKeyPressed
-
-    private void txt_fecha_finalMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txt_fecha_finalMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_fecha_finalMouseClicked
-
-    private void txt_fecha_finalKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_fecha_finalKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_fecha_finalKeyPressed
-
-    private void check_fechasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_check_fechasActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_check_fechasActionPerformed
-
     private void jbtn_disponibleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_disponibleActionPerformed
         // TODO add your handling code here:
         if (tabla_detalle.getRowCount() < 0 && cmb_fecha_entrega.getDate() == null && cmb_fecha_devolucion.getDate() == null) {
@@ -4348,7 +4167,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         try {
             renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
         } catch (Exception e) {
-            Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
             return;
         }
@@ -4406,26 +4225,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         systemService.exportarExcel(tabla_prox_rentas);
     }//GEN-LAST:event_jtbtnGenerateExcelActionPerformed
 
-    private void check_fechas_eventoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_check_fechas_eventoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_check_fechas_eventoActionPerformed
-
-    private void dateFechaEventoInicialMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dateFechaEventoInicialMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_dateFechaEventoInicialMouseClicked
-
-    private void dateFechaEventoInicialKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dateFechaEventoInicialKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_dateFechaEventoInicialKeyPressed
-
-    private void dateFechaEventoFinalMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dateFechaEventoFinalMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_dateFechaEventoFinalMouseClicked
-
-    private void dateFechaEventoFinalKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dateFechaEventoFinalKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_dateFechaEventoFinalKeyPressed
-
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
        
        
@@ -4470,7 +4269,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         try {
             rentas = saleService.obtenerPedidosPorConsultaSql(query, funcion);
         } catch (Exception e) {
-            Logger.getLogger(consultar_renta.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
             return;
         }
@@ -4794,281 +4593,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
             return;    
         }
       
-      
-        
-        
-        /*
-        String asunto;
-        StringBuilder mensaje = new StringBuilder();
-        fecha_sistema();
-        DatosGenerales generalData = systemService.getGeneralData();
-        asunto = generalData.getCompanyName()+" >>> Evento actualizado con éxito " + fecha_sistema;
-       
-        String fechaEntrega = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
-        String fechaDevolucion = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
-        String fechaEvento = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_evento.getDate());
-        String horaEntrega = cmb_hora.getSelectedItem().toString() +" a "+this.cmb_hora_dos.getSelectedItem()+"";
-        String horaDevolucion = this.cmb_hora_devolucion.getSelectedItem()+" a "+this.cmb_hora_devolucion_dos.getSelectedItem()+" horas";
-        
-        mensaje.append("<div id='container-message' style='width:700px; text-align:left; margin:16px;'>");
-        
-        mensaje.append("<font color='black'>Estimad@&nbsp;");
-            mensaje.append(lbl_cliente.getText());
-            mensaje.append(",&nbsp;");
-        mensaje.append(generalData.getCompanyName());
-        mensaje.append("&nbsp;le notifica que la actualizaci&oacute;n de su pedido a nuestros sistemas ha quedado guardado exitosamente, ");
-        mensaje.append("le recordamos que verifique todos los datos contenidos en el folio tanto datos personales y de env&iacute;o ");
-        mensaje.append("as&iacute; como los servicios contratados para su entera satisfacci&oacute;n </font>");
-        mensaje.append("<br/>");
-        mensaje.append("<br/>");
-        
-        mensaje.append("<table style='border-spacing: 4px;border: 1px solid #afadad; border-radius: 2px;'><caption>Datos del pedido</caption>");
-        mensaje.append("<thead><tr><th></th><th></th></tr></thead>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Folio");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(lbl_folio.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Fecha y hora de entrega");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(fechaEntrega);
-                mensaje.append(" ");
-                mensaje.append(horaEntrega);
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Fecha y hora devoluci&oacute;n");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(fechaDevolucion);
-                mensaje.append(" ");
-                mensaje.append(horaDevolucion);
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Fecha del evento");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(fechaEvento);
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Nombre del chofer");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(cmb_chofer.getSelectedItem().toString());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Direcci&oacute;n del evento");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(txt_descripcion.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Tipo registro");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(cmb_tipo.getSelectedItem().toString());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Atendi&oacute;");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(iniciar_sesion.usuarioGlobal.getNombre());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Registrado a");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(this.lbl_cliente.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append("");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append("");
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td colspan=2 style='text-align:center;font-weight:900;padding-top: 16px; border-top: 1px solid #afadad; '>");
-                mensaje.append("DATOS DE FACTURACI&Oacute;N");
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Subtotal");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_subtotal.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Descuento");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_descuento.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Envio y recolecci&oacute;n");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_envioRecoleccion.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-         mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Dep&oacute;sito en garant&iacute;a");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_depositoGarantia.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("IVA");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_total_iva.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Pagos");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_abonos.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Total");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_total.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("</tbody></table>");
-        
-        mensaje.append("<br/>");
-
-        
-            
-        mensaje.append("<table style='border-spacing: 4px;border: 1px solid #afadad; border-radius: 2px;'><caption>Detalle pedido</caption><thead><tr><th>cantidad</th><th>articulo</th><th>p. unitario</th><th>descuento</th><th>importe</th></tr></thead>");
-        mensaje.append("<tbody>");
-        
-        for (int i = 0; i < tabla_detalle.getRowCount() ; i++) {
-            items.add(new ModelTableItem(
-                    tabla_detalle.getValueAt(i, 1).toString(),
-                    tabla_detalle.getValueAt(i, 3).toString(),
-                    tabla_detalle.getValueAt(i, 4).toString(),
-                    tabla_detalle.getValueAt(i, 6).toString(),
-                    tabla_detalle.getValueAt(i, 7).toString()
-            ));
-            mensaje.append("<tr>");
-            
-            // CANTIDAD
-            mensaje.append("<td style='text-align:center;'>");
-            mensaje.append(tabla_detalle.getValueAt(i, 1).toString());
-            mensaje.append("</td>");
-            
-            // ARTICULO
-            mensaje.append("<td>");
-            mensaje.append(tabla_detalle.getValueAt(i, 3).toString());
-            mensaje.append("</td>");
-            
-            //P. UNITARIO
-            mensaje.append("<td style='text-align:right;'>");
-            mensaje.append(tabla_detalle.getValueAt(i, 4).toString());
-            mensaje.append("</td>");
-            
-            //DESCUENTO
-            mensaje.append("<td style='text-align:right;'>");
-            mensaje.append(tabla_detalle.getValueAt(i, 6).toString());
-            mensaje.append("</td>");
-            
-            //IMPORTE
-            mensaje.append("<td style='text-align:right;'>");
-            mensaje.append(tabla_detalle.getValueAt(i, 7).toString());
-            mensaje.append("</td>");
-            
-            mensaje.append("</tr>");
-        }
-        
-        mensaje.append("</tbody></table>");
-        
-        mensaje.append("<br/>");
-        mensaje.append("<br/>");
-        mensaje.append("<font color='black'>");
-                mensaje.append(generalData.getCompanyName());
-                mensaje.append("&nbsp;agradece tu preferencia...");
-                mensaje.append("</font>");
-        
-                mensaje.append("</div>");
-                
-                */
-       
-        
-//        mensaje = "<div id='container-message' style='width:700px; margin:16px;'>"
-//                + "<font color='black'>Estimad@ "+this.lbl_cliente.getText()+ ","
-//                + generalData.getCompanyName()+" le notifica que la actualizaci&oacute;n de su pedido a nuestros sistemas ha quedado guardado exitosamente, "
-//                + "le recordamos que verifique todos los datos contenidos en el folio tanto datos personales y de env&iacute;o "
-//                + "as&iacute; como los servicios contratados para su entera satisfacci&oacute;n </font>"
-//                + "<br/>"
-//                + "<br/>"
-//                + "<font color='black'><span style='font-weight:900;'>LOS DATOS SON: </span></font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Folio:  </span>" + this.lbl_folio.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Fecha y hora de entrega:  </span>" + fechaEntrega + " " + horaEntrega + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Fecha y hora devolucion:  </span>" + fechaDevolucion +" "+ horaDevolucion+ " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Fecha del evento:  </span>" + fechaEvento + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Nombre del chofer:  </span>" + cmb_chofer.getSelectedItem().toString() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Direcci&oacute;n del evento:  </span>" + txt_descripcion.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Tipo registro: </span>" + cmb_tipo.getSelectedItem().toString() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Atendi&oacute;:  </span>" + iniciar_sesion.usuarioGlobal.getNombre() + " " + iniciar_sesion.usuarioGlobal.getApellidos() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Registrado a nombre de:  </span>" + this.lbl_cliente.getText() + " </font>"
-//                + "<br/>"
-//                + "<br/>"
-//                + detalles
-//                + "<br/>"
-//                + "<br/>"
-//                + "<font color='black'><span style='font-weight:900;'>Subtotal: </span>" + txt_subtotal.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Descuento: </span>" + txt_descuento.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Envio y recolecci&oacute;n: </span>" + this.txt_envioRecoleccion.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Dep&oacute;sito en garant&iacute;a: </span>" + this.txt_depositoGarantia.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>IVA: </span>" + txt_total_iva.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Pagos: </span>" + txt_abonos.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Total: </span>" + txt_total.getText() + " </font><br>"
-//                + "<br/>"
-//                + "<br/>"
-//                + "<font color='black'>Agradecemos su preferencia... </font>"
-//                + "</div>";
         Mail mail = new Mail();
 //        mail.setFrom(cuenta_emisor); //cuenta emisor
 //        mail.setPassword(pass_emisor); //cuenta contraseña
@@ -5143,8 +4667,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
              JOptionPane.showMessageDialog(null, "Ocurrio un error, vuelve a cerrar todo y consultar de nuevo porfavor ...", "ERROR", JOptionPane.INFORMATION_MESSAGE);
              return;
         }
-        this.g_idRenta = id_renta;
-        mostrar_agregar_orden_proveedor(id_renta);
+        mostrar_agregar_orden_proveedor(lbl_folio.getText(),"",id_renta);
     }//GEN-LAST:event_jBtnAddOrderProviderActionPerformed
 
     private void jbtn_generar_reporte1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jbtn_generar_reporte1MouseClicked
@@ -5162,27 +4685,54 @@ public class consultar_renta extends javax.swing.JInternalFrame {
         
     }//GEN-LAST:event_btnInventoryMaterialReportActionPerformed
 
+    private void jbtn_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_buscarActionPerformed
+        FiltersConsultarRentas win = new FiltersConsultarRentas(null,true);
+        win.setLocationRelativeTo(this);
+        win.setVisible(true);
+
+    }//GEN-LAST:event_jbtn_buscarActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String folio = JOptionPane.showInputDialog("Ingresa el folio");
+        if (folio == null) {
+            return;
+        }
+        try {
+            Integer number = Integer.parseInt(folio);
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("folio", number);
+            parameters.put("limit", 1250);
+            tabla_consultar_renta(parameters);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Folio no válido, ingresa un número válido para continuar ", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void tableOrdersProviderMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableOrdersProviderMouseClicked
+        // TODO add your handling code here:
+        if (evt.getClickCount() == 2) {
+            String rentaId = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 8).toString();
+            String orderId = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 0).toString();
+            String folio = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 1).toString();
+        
+            mostrar_agregar_orden_proveedor(folio, orderId, rentaId);
+        }
+    }//GEN-LAST:event_tableOrdersProviderMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnInventoryMaterialReport;
+    public static javax.swing.JButton btnInventoryMaterialReport;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JCheckBox check_apellidos;
     private javax.swing.JCheckBox check_apodo;
-    private javax.swing.JCheckBox check_cliente;
-    private javax.swing.JCheckBox check_cotizacion;
     private javax.swing.JCheckBox check_enviar_email;
-    private javax.swing.JCheckBox check_fechas;
-    private javax.swing.JCheckBox check_fechas_evento;
     private javax.swing.JCheckBox check_mostrar_precios;
     private javax.swing.JCheckBox check_nombre;
-    private javax.swing.JCheckBox check_pedido;
     private javax.swing.JComboBox<TipoAbono> cmbTipoPago;
     private javax.swing.JComboBox<Usuario> cmbUsuarios;
     private javax.swing.JComboBox<Usuario> cmb_chofer;
-    private javax.swing.JComboBox<Usuario> cmb_chofer_buscar;
-    private javax.swing.JComboBox<EstadoEvento> cmb_estado;
     private javax.swing.JComboBox<EstadoEvento> cmb_estado1;
     private com.toedter.calendar.JDateChooser cmb_fecha_devolucion;
     private com.toedter.calendar.JDateChooser cmb_fecha_entrega;
@@ -5192,16 +4742,14 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox cmb_hora_devolucion;
     private javax.swing.JComboBox cmb_hora_devolucion_dos;
     private javax.swing.JComboBox cmb_hora_dos;
-    private javax.swing.JComboBox cmb_limit;
     private javax.swing.JComboBox<Tipo> cmb_tipo;
-    private com.toedter.calendar.JDateChooser dateFechaEventoFinal;
-    private com.toedter.calendar.JDateChooser dateFechaEventoInicial;
     private javax.swing.JButton jBtnAddOrderProvider;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton1;
+    public static javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
+    public static javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -5213,7 +4761,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
@@ -5224,8 +4771,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel33;
@@ -5244,7 +4789,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel46;
     private javax.swing.JLabel jLabel47;
     private javax.swing.JLabel jLabel48;
-    private javax.swing.JLabel jLabel49;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -5254,9 +4798,10 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel2;
+    public static javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
@@ -5267,6 +4812,7 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JToolBar jToolBar1;
@@ -5274,28 +4820,29 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.JToolBar jToolBar3;
     private javax.swing.JToolBar jToolBar4;
     private javax.swing.JToolBar jToolBar5;
-    private javax.swing.JButton jbtnGenerarReporteEntregas;
+    public static javax.swing.JButton jbtnGenerarReporteEntregas;
     private javax.swing.JButton jbtn_agregar_abono;
     private javax.swing.JButton jbtn_agregar_articulo;
     private javax.swing.JButton jbtn_agregar_articulos;
     private javax.swing.JButton jbtn_agregar_cliente;
-    private javax.swing.JButton jbtn_buscar;
+    public static javax.swing.JButton jbtn_buscar;
     private javax.swing.JButton jbtn_disponible;
     private javax.swing.JButton jbtn_editar;
     private javax.swing.JButton jbtn_editar_abonos;
     private javax.swing.JButton jbtn_editar_cliente;
     private javax.swing.JButton jbtn_editar_dinero;
-    private javax.swing.JButton jbtn_generar_reporte;
-    private javax.swing.JButton jbtn_generar_reporte1;
+    public static javax.swing.JButton jbtn_generar_reporte;
+    public static javax.swing.JButton jbtn_generar_reporte1;
     private javax.swing.JButton jbtn_guardar;
     private javax.swing.JButton jbtn_guardar_abonos;
     private javax.swing.JButton jbtn_guardar_cliente;
     private javax.swing.JButton jbtn_mostrar_articulos;
     private javax.swing.JButton jbtn_nuevo_cliente;
     private javax.swing.JButton jbtn_quitar_abono;
-    private javax.swing.JButton jbtn_refrescar;
-    private javax.swing.JButton jtbtnGenerateExcel;
-    private javax.swing.JLabel lblInformation;
+    public static javax.swing.JButton jbtn_refrescar;
+    public static javax.swing.JButton jtbtnGenerateExcel;
+    public static javax.swing.JLabel lblInformation;
+    public static javax.swing.JLabel lblInformationOrdersProvider;
     private javax.swing.JLabel lbl_atiende;
     private javax.swing.JLabel lbl_aviso_resultados;
     private javax.swing.JLabel lbl_cliente;
@@ -5311,7 +4858,8 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     public static javax.swing.JTable tabla_articulos;
     private javax.swing.JTable tabla_clientes;
     public static javax.swing.JTable tabla_detalle;
-    private javax.swing.JTable tabla_prox_rentas;
+    public static javax.swing.JTable tabla_prox_rentas;
+    public static javax.swing.JTable tableOrdersProvider;
     private javax.swing.JTextField txtEmailToSend;
     private javax.swing.JFormattedTextField txtPorcentajeDescuento;
     private javax.swing.JTextField txt_abono;
@@ -5320,10 +4868,8 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txt_apodo;
     private javax.swing.JTextField txt_buscar;
     private javax.swing.JTextField txt_buscar1;
-    private javax.swing.JFormattedTextField txt_buscar_folio;
     private javax.swing.JFormattedTextField txt_calculo;
     private javax.swing.JTextField txt_cantidad;
-    private javax.swing.JTextField txt_cliente;
     private javax.swing.JTextField txt_comentario;
     private javax.swing.JTextPane txt_comentarios;
     private javax.swing.JFormattedTextField txt_depositoGarantia;
@@ -5336,8 +4882,6 @@ public class consultar_renta extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txt_email;
     private javax.swing.JFormattedTextField txt_envioRecoleccion;
     private javax.swing.JFormattedTextField txt_faltantes;
-    private com.toedter.calendar.JDateChooser txt_fecha_final;
-    private com.toedter.calendar.JDateChooser txt_fecha_inicial;
     private javax.swing.JFormattedTextField txt_iva;
     private javax.swing.JTextField txt_localidad;
     private javax.swing.JTextField txt_nombre;

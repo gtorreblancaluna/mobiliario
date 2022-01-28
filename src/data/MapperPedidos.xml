@@ -159,6 +159,7 @@
         WHERE id_renta = #{id}
     </select>
     
+    <!--Esta consulta se ocupa en el formulario ConsultarRenta.java para mostrar rapido y resumido las rentas-->
     <select id="obtenerRentaPorParametros" resultMap="resultMapRenta" parameterType="java.util.Map">
         SELECT
             r.id_renta,
@@ -211,33 +212,34 @@
             INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios)
             INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer)
             INNER JOIN tipo t ON (t.id_tipo = r.id_tipo)
-         <if test="systemDate != null and systemDate != '' ">
-             
-                AND STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') <![CDATA[ >= ]]> STR_TO_DATE(#{systemDate}, '%d/%m/%Y' )
-            
+        <if test="folio != null and folio != '' ">
+            AND r.folio = #{folio}
+        </if>
+        <if test="systemDate != null and systemDate != '' ">
+            AND STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') <![CDATA[ >= ]]> STR_TO_DATE(#{systemDate}, '%d/%m/%Y' )
         </if>
         <if test="applyDiff != null and applyDiff != '' ">
             <![CDATA[
                 AND r.id_estado <> #{applyDiff}
             ]]>
         </if>
-        <if test="type != null and type != '' ">
+        <if test="type != null and type != '' and type != 0 ">
             AND t.id_tipo = #{type}
         </if>
         <if test="customer != null and customer != '' ">
             AND CONCAT(c.nombre," ",c.apellidos) LIKE '% #{customer} %'
         </if>
         <if test="initDeliveryDate != null and endDeliveryDate != null ">
-            AND STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE('#{initDeliveryDate}','%d/%m/%Y') AND STR_TO_DATE('#{endDeliveryDate}','%d/%m/%Y')
+            AND STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDeliveryDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDeliveryDate},'%d/%m/%Y')
         </if>
         
         <if test="initEventDate != null and endEventDate != null ">
-            AND STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE('#{initEventDate}','%d/%m/%Y') AND STR_TO_DATE('#{endEventDate}','%d/%m/%Y')
+            AND STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initEventDate},'%d/%m/%Y') AND STR_TO_DATE(#{endEventDate},'%d/%m/%Y')
         </if>
-        <if test="statusId != null and statusId != '' ">
+        <if test="statusId != null and statusId != '' and statusId != 0 ">
             AND r.id_estado = #{statusId}
         </if>
-        <if test="driverId != null and driverId != '' ">
+        <if test="driverId != null and driverId != '' and driverId != 0 ">
             AND r.id_usuario_chofer = #{driverId}
         </if>
         

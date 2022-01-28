@@ -88,12 +88,8 @@ public class consultar_abonos extends javax.swing.JInternalFrame {
                 + "INNER JOIN usuarios usuarios ON (usuarios.id_usuarios = abonos.id_usuario) "                
                 + "";
         
-//        SQL = "SELECT a.`id_abonos`,CONCAT(u.`nombre`,\" \",u.`apellidos`)As usuario, a.`fecha`, a.`abono`, a.`comentario`, r.`descripcion`, CONCAT(c.`nombre`,\" \",c.`apellidos`)As cliente FROM abonos a, usuarios u, renta r, clientes c\n"
-//                + "WHERE a.id_usuario=u.id_usuarios AND a.id_renta=r.id_renta AND r.id_clientes=c.id_clientes";
         if (check_usuario.isSelected() == true) {
-//            funcion.conectate();
             String id_user = funcion.GetData("id_usuarios", "select id_usuarios from usuarios u where CONCAT(u.`nombre`,\" \", u.`apellidos`)='" + cmb_usuario.getSelectedItem().toString() + "'");
-//            funcion.desconecta();
             SQL = SQL + " AND abonos.id_usuario='" + id_user + "'";
         }
         if (check_fechas.isSelected() == true) {

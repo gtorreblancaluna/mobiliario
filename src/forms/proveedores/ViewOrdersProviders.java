@@ -61,11 +61,12 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
     
      public void mostrar_agregar_orden_proveedor() {
          
-        g_idRenta = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 8).toString();
-        g_idOrder = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 0).toString();
+        String rentaId = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 8).toString();
+        String orderId = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 0).toString();
+        String folio = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 1).toString();
          
         if (Utility.verifyIfInternalFormIsOpen(orderProviderForm)) {
-            orderProviderForm = new OrderProviderForm(g_idRenta);
+            orderProviderForm = new OrderProviderForm(folio, orderId, rentaId);
             principal.jDesktopPane1.add(orderProviderForm);
             orderProviderForm.show();
         } else {
@@ -210,13 +211,13 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
      Integer folioRenta = null;
      Integer orderNumber = null;
      try{
-         folioRenta = new Integer(this.txtSearchFolioRenta.getText());
+         folioRenta = Integer.parseInt(this.txtSearchFolioRenta.getText());
      }catch(NumberFormatException e){
          System.out.println(e);
      }
      
      try{
-         orderNumber = new Integer(this.txtSearchOrderNumber.getText());
+         orderNumber = Integer.parseInt(this.txtSearchOrderNumber.getText());
      }catch(NumberFormatException e){
          System.out.println(e);
      }
@@ -237,7 +238,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
             parameter.setStatus(this.cmbStatus.getSelectedItem().toString());
         }
      }
-     parameter.setLimit(new Integer(this.cmbLimit.getSelectedItem().toString()));
+     parameter.setLimit(Integer.parseInt(this.cmbLimit.getSelectedItem().toString()));
      List<OrdenProveedor> list;
      try{
         list = orderService.getOrdersByParameters(parameter);
@@ -266,7 +267,6 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
               orden.getUsuario().getNombre()+" "+orden.getUsuario().getApellidos(),
               orden.getProveedor().getNombre()+" "+orden.getProveedor().getApellidos(),
               orden.getStatusDescription(),
-//              orden.getStatus(),
               orden.getCreado(),
               orden.getActualizado(),
               orden.getComentario(),
@@ -278,8 +278,6 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
             tableModel.addRow(fila);
      
      }
-     
-       
    }
 
     /**

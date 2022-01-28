@@ -1,10 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package forms.proveedores;
-
 
 import clases.sqlclass;
 import exceptions.BusinessException;
@@ -26,13 +20,7 @@ import services.SystemService;
 import services.providers.OrderProviderService;
 import services.providers.ProvidersPaymentsService;
 
-
-/**
- *
- * @author Gerardo Torreblanca
- */
 public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
-
     
     private final SystemService systemService = SystemService.getInstance();
     private final OrderProviderService orderService = OrderProviderService.getInstance();
@@ -54,9 +42,7 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
     private static final int HEADER_CREATED = 6;
     private static final int HEADER_UPDATED = 7;
     
-    /**
-     * Creates new form clientes
-     */
+
     public PaymentsProvidersForm() {
         funcion.conectate();
         initComponents();
@@ -65,18 +51,14 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
         tableFormat();
         fillPaymentsType();
         getPayments();
-        
-        
-        
     }
     
     public void getPayments(){
         
-        if(OrderProviderForm.g_order_provider_id != null){
+        if(!OrderProviderForm.orderId.equals("")){
             // viene de ver detalle orden
             try{
-                ordenProveedorGlobal = 
-                    orderService.getOrderById(OrderProviderForm.g_order_provider_id);
+                ordenProveedorGlobal = orderService.getOrderById(Long.parseLong(OrderProviderForm.orderId));
             }catch(BusinessException e){
                 JOptionPane.showMessageDialog(null, e.getMessage()+"\n"+e.getCause(), "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
