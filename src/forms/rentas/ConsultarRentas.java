@@ -69,7 +69,10 @@ import utilities.BuildEmailTemplate;
 import utilities.Utility;
 import model.EstadoEvento;
 import model.Tipo;
+import model.providers.OrdenProveedor;
+import parametersVO.ParameterOrderProvider;
 import services.TipoEventoService;
+import services.providers.OrderProviderService;
 
 public class ConsultarRentas extends javax.swing.JInternalFrame {
     private OrderProviderForm orderProviderForm;
@@ -101,6 +104,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     float canti = 0;
     private final EstadoEventoService estadoEventoService = EstadoEventoService.getInstance();
     private final TipoEventoService tipoEventoService = TipoEventoService.getInstance();
+    private final OrderProviderService orderService = OrderProviderService.getInstance();
 
 
     public ConsultarRentas() throws PropertyVetoException {
@@ -140,6 +144,58 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }).start();
         initalData ();
          
+    }
+    
+       public void tableFormatOrderProvider() {
+        Object[][] data = {{"","","","","","","","","","","",""}};
+        String[] columnNames = {          
+                        "No orden",
+                        "Folio renta", 
+                        "Usuario",
+                        "Proveedor", 
+                        "Status",                        
+                        "Creado",
+                        "Actualizado",
+                        "Comentario",
+                        "id_renta",
+                        "Subtotal",
+                        "Pagos",
+                        "Total"
+        };
+        DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
+        tableOrdersProvider.setModel(tableModel);
+        
+        TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
+        tableOrdersProvider.setRowSorter(ordenarTabla);
+
+        int[] anchos = {20,20,80,40,40, 80,100,100,20,80,60,60};
+
+        for (int inn = 0; inn < tableOrdersProvider.getColumnCount(); inn++) {
+            tableOrdersProvider.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
+        }
+
+        try {
+            DefaultTableModel temp = (DefaultTableModel) tableOrdersProvider.getModel();
+            temp.removeRow(temp.getRowCount() - 1);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            ;
+        }
+        DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
+        centrar.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        DefaultTableCellRenderer right = new DefaultTableCellRenderer();
+        right.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        tableOrdersProvider.getColumnModel().getColumn(8).setMaxWidth(0);
+        tableOrdersProvider.getColumnModel().getColumn(8).setMinWidth(0);
+        tableOrdersProvider.getColumnModel().getColumn(8).setPreferredWidth(0);
+     
+        tableOrdersProvider.getColumnModel().getColumn(0).setCellRenderer(centrar);
+        tableOrdersProvider.getColumnModel().getColumn(1).setCellRenderer(centrar);
+        tableOrdersProvider.getColumnModel().getColumn(9).setCellRenderer(right);
+        tableOrdersProvider.getColumnModel().getColumn(10).setCellRenderer(right);
+        tableOrdersProvider.getColumnModel().getColumn(11).setCellRenderer(right);
+        
     }
     
     private void initalData () {
@@ -231,9 +287,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         ventana_faltantes.setLocationRelativeTo(null);
     }
     
-     public void mostrar_agregar_orden_proveedor(String orderId) {
+     public void mostrar_agregar_orden_proveedor(String folio, String orderId, String rentaId) {
        if (Utility.verifyIfInternalFormIsOpen(orderProviderForm)) {
-            orderProviderForm = new OrderProviderForm(orderId);
+            orderProviderForm = new OrderProviderForm(folio, orderId, rentaId);
             orderProviderForm.setLocation(this.getWidth() / 2 - orderProviderForm.getWidth() / 2, this.getHeight() / 2 - orderProviderForm.getHeight() / 2 - 20);
             principal.jDesktopPane1.add(orderProviderForm);
             orderProviderForm.show();
@@ -2031,6 +2087,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jPanel11 = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
         txt_comentarios = new javax.swing.JTextPane();
+        jPanel5 = new javax.swing.JPanel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        tableOrdersProvider = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
+        lblInformationOrdersProvider = new javax.swing.JLabel();
         jToolBar5 = new javax.swing.JToolBar();
         jbtn_editar = new javax.swing.JButton();
         jbtn_guardar = new javax.swing.JButton();
@@ -3061,17 +3121,65 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 661, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(511, Short.MAX_VALUE))
+                .addContainerGap(502, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(180, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("Comentarios", jPanel11);
+
+        tableOrdersProvider.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        tableOrdersProvider.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tableOrdersProvider.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        tableOrdersProvider.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableOrdersProviderMouseClicked(evt);
+            }
+        });
+        jScrollPane8.setViewportView(tableOrdersProvider);
+
+        lblInformationOrdersProvider.setFont(new java.awt.Font("Arial", 3, 14)); // NOI18N
+        lblInformationOrdersProvider.setForeground(new java.awt.Color(204, 0, 51));
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 561, Short.MAX_VALUE))
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane2.addTab("Ordenes al proveedor", jPanel5);
 
         jPanel4.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 220, 1180, 400));
 
@@ -3456,6 +3564,37 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+   
+    private void fillOrdersProvider (Integer folioRenta) {
+        tableFormatOrderProvider();
+        ParameterOrderProvider parameter = new ParameterOrderProvider();
+        parameter.setFolioRenta(folioRenta);
+        parameter.setLimit(1000);
+        DefaultTableModel tableModel = (DefaultTableModel) tableOrdersProvider.getModel();
+        
+        try {
+            List<OrdenProveedor> list = orderService.getOrdersByParameters(parameter);
+            for(OrdenProveedor orden : list){      
+            Object fila[] = {                                          
+                orden.getId(),
+                orden.getRenta().getFolio(),
+                orden.getUsuario().getNombre()+" "+orden.getUsuario().getApellidos(),
+                orden.getProveedor().getNombre()+" "+orden.getProveedor().getApellidos(),
+                orden.getStatusDescription(),
+                orden.getCreado(),
+                orden.getActualizado(),
+                orden.getComentario(),
+                orden.getRenta().getRentaId(),             
+                decimalFormat.format(orden.getTotal()),
+                decimalFormat.format(orden.getAbonos()),
+                decimalFormat.format((orden.getTotal() - orden.getAbonos()))
+              };
+              tableModel.addRow(fila);
+            }
+        } catch (BusinessException e) {
+            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado al obtener las ordenes del proveedor\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+        }
+    }
     private void tabla_prox_rentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_prox_rentasMouseClicked
         // TODO add your handling code here:
         if (evt.getClickCount() == 2) {
@@ -3486,6 +3625,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
                 return;
             }
+            
+            final int folioRenta = renta.getFolio();
+            new Thread(() -> {
+                 fillOrdersProvider(folioRenta);
+            }).start();
+            
             if(renta.getMostrarPreciosPdf().equals("1"))
                 this.check_mostrar_precios.setSelected(true);
             else
@@ -3580,15 +3725,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_tabla_prox_rentasMouseClicked
 
     private void jbtn_refrescarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_refrescarActionPerformed
-        // TODO add your handling code here:
-
-        sql = "SELECT r.`id_renta`,r.`folio`,CONCAT(c.`nombre`,\" \", c.`apellidos`)AS cliente,e.`descripcion` as estado, r.`fecha_entrega`, r.`hora_entrega`, r.`descripcion`, CONCAT(u.`nombre`,\" \",u.`apellidos`)AS Chofer "
-                + "FROM renta r, estado e, clientes c, usuarios u "
-                + "WHERE r.id_estado=e.id_estado AND r.id_clientes=c.id_clientes AND r.id_usuario_chofer=u.id_usuarios AND STR_TO_DATE(r.`fecha_entrega`, '%d/%m/%Y') >= STR_TO_DATE('" + fecha_sistema + "', '%d/%m/%Y' ) AND r.`id_tipo`='" + id_tipo + "' AND r.`id_estado`<> '4' ORDER BY r.`folio`";
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("initEventDate", fecha_sistema);
-        parameters.put("type", id_tipo);
-        tabla_consultar_renta(parameters);
+       initalData();
     }//GEN-LAST:event_jbtn_refrescarActionPerformed
 
     private void txt_cantidadKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_cantidadKeyPressed
@@ -4456,281 +4593,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             return;    
         }
       
-      
-        
-        
-        /*
-        String asunto;
-        StringBuilder mensaje = new StringBuilder();
-        fecha_sistema();
-        DatosGenerales generalData = systemService.getGeneralData();
-        asunto = generalData.getCompanyName()+" >>> Evento actualizado con éxito " + fecha_sistema;
-       
-        String fechaEntrega = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
-        String fechaDevolucion = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
-        String fechaEvento = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_evento.getDate());
-        String horaEntrega = cmb_hora.getSelectedItem().toString() +" a "+this.cmb_hora_dos.getSelectedItem()+"";
-        String horaDevolucion = this.cmb_hora_devolucion.getSelectedItem()+" a "+this.cmb_hora_devolucion_dos.getSelectedItem()+" horas";
-        
-        mensaje.append("<div id='container-message' style='width:700px; text-align:left; margin:16px;'>");
-        
-        mensaje.append("<font color='black'>Estimad@&nbsp;");
-            mensaje.append(lbl_cliente.getText());
-            mensaje.append(",&nbsp;");
-        mensaje.append(generalData.getCompanyName());
-        mensaje.append("&nbsp;le notifica que la actualizaci&oacute;n de su pedido a nuestros sistemas ha quedado guardado exitosamente, ");
-        mensaje.append("le recordamos que verifique todos los datos contenidos en el folio tanto datos personales y de env&iacute;o ");
-        mensaje.append("as&iacute; como los servicios contratados para su entera satisfacci&oacute;n </font>");
-        mensaje.append("<br/>");
-        mensaje.append("<br/>");
-        
-        mensaje.append("<table style='border-spacing: 4px;border: 1px solid #afadad; border-radius: 2px;'><caption>Datos del pedido</caption>");
-        mensaje.append("<thead><tr><th></th><th></th></tr></thead>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Folio");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(lbl_folio.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Fecha y hora de entrega");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(fechaEntrega);
-                mensaje.append(" ");
-                mensaje.append(horaEntrega);
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Fecha y hora devoluci&oacute;n");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(fechaDevolucion);
-                mensaje.append(" ");
-                mensaje.append(horaDevolucion);
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Fecha del evento");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(fechaEvento);
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Nombre del chofer");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(cmb_chofer.getSelectedItem().toString());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Direcci&oacute;n del evento");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(txt_descripcion.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Tipo registro");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(cmb_tipo.getSelectedItem().toString());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Atendi&oacute;");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(iniciar_sesion.usuarioGlobal.getNombre());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Registrado a");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(this.lbl_cliente.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append("");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append("");
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td colspan=2 style='text-align:center;font-weight:900;padding-top: 16px; border-top: 1px solid #afadad; '>");
-                mensaje.append("DATOS DE FACTURACI&Oacute;N");
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Subtotal");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_subtotal.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Descuento");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_descuento.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Envio y recolecci&oacute;n");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_envioRecoleccion.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-         mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Dep&oacute;sito en garant&iacute;a");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_depositoGarantia.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("IVA");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_total_iva.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Pagos");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_abonos.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Total");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_total.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("</tbody></table>");
-        
-        mensaje.append("<br/>");
-
-        
-            
-        mensaje.append("<table style='border-spacing: 4px;border: 1px solid #afadad; border-radius: 2px;'><caption>Detalle pedido</caption><thead><tr><th>cantidad</th><th>articulo</th><th>p. unitario</th><th>descuento</th><th>importe</th></tr></thead>");
-        mensaje.append("<tbody>");
-        
-        for (int i = 0; i < tabla_detalle.getRowCount() ; i++) {
-            items.add(new ModelTableItem(
-                    tabla_detalle.getValueAt(i, 1).toString(),
-                    tabla_detalle.getValueAt(i, 3).toString(),
-                    tabla_detalle.getValueAt(i, 4).toString(),
-                    tabla_detalle.getValueAt(i, 6).toString(),
-                    tabla_detalle.getValueAt(i, 7).toString()
-            ));
-            mensaje.append("<tr>");
-            
-            // CANTIDAD
-            mensaje.append("<td style='text-align:center;'>");
-            mensaje.append(tabla_detalle.getValueAt(i, 1).toString());
-            mensaje.append("</td>");
-            
-            // ARTICULO
-            mensaje.append("<td>");
-            mensaje.append(tabla_detalle.getValueAt(i, 3).toString());
-            mensaje.append("</td>");
-            
-            //P. UNITARIO
-            mensaje.append("<td style='text-align:right;'>");
-            mensaje.append(tabla_detalle.getValueAt(i, 4).toString());
-            mensaje.append("</td>");
-            
-            //DESCUENTO
-            mensaje.append("<td style='text-align:right;'>");
-            mensaje.append(tabla_detalle.getValueAt(i, 6).toString());
-            mensaje.append("</td>");
-            
-            //IMPORTE
-            mensaje.append("<td style='text-align:right;'>");
-            mensaje.append(tabla_detalle.getValueAt(i, 7).toString());
-            mensaje.append("</td>");
-            
-            mensaje.append("</tr>");
-        }
-        
-        mensaje.append("</tbody></table>");
-        
-        mensaje.append("<br/>");
-        mensaje.append("<br/>");
-        mensaje.append("<font color='black'>");
-                mensaje.append(generalData.getCompanyName());
-                mensaje.append("&nbsp;agradece tu preferencia...");
-                mensaje.append("</font>");
-        
-                mensaje.append("</div>");
-                
-                */
-       
-        
-//        mensaje = "<div id='container-message' style='width:700px; margin:16px;'>"
-//                + "<font color='black'>Estimad@ "+this.lbl_cliente.getText()+ ","
-//                + generalData.getCompanyName()+" le notifica que la actualizaci&oacute;n de su pedido a nuestros sistemas ha quedado guardado exitosamente, "
-//                + "le recordamos que verifique todos los datos contenidos en el folio tanto datos personales y de env&iacute;o "
-//                + "as&iacute; como los servicios contratados para su entera satisfacci&oacute;n </font>"
-//                + "<br/>"
-//                + "<br/>"
-//                + "<font color='black'><span style='font-weight:900;'>LOS DATOS SON: </span></font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Folio:  </span>" + this.lbl_folio.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Fecha y hora de entrega:  </span>" + fechaEntrega + " " + horaEntrega + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Fecha y hora devolucion:  </span>" + fechaDevolucion +" "+ horaDevolucion+ " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Fecha del evento:  </span>" + fechaEvento + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Nombre del chofer:  </span>" + cmb_chofer.getSelectedItem().toString() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Direcci&oacute;n del evento:  </span>" + txt_descripcion.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Tipo registro: </span>" + cmb_tipo.getSelectedItem().toString() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Atendi&oacute;:  </span>" + iniciar_sesion.usuarioGlobal.getNombre() + " " + iniciar_sesion.usuarioGlobal.getApellidos() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Registrado a nombre de:  </span>" + this.lbl_cliente.getText() + " </font>"
-//                + "<br/>"
-//                + "<br/>"
-//                + detalles
-//                + "<br/>"
-//                + "<br/>"
-//                + "<font color='black'><span style='font-weight:900;'>Subtotal: </span>" + txt_subtotal.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Descuento: </span>" + txt_descuento.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Envio y recolecci&oacute;n: </span>" + this.txt_envioRecoleccion.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Dep&oacute;sito en garant&iacute;a: </span>" + this.txt_depositoGarantia.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>IVA: </span>" + txt_total_iva.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Pagos: </span>" + txt_abonos.getText() + " </font><br>"
-//                + "<font color='black'><span style='font-weight:900;'>Total: </span>" + txt_total.getText() + " </font><br>"
-//                + "<br/>"
-//                + "<br/>"
-//                + "<font color='black'>Agradecemos su preferencia... </font>"
-//                + "</div>";
         Mail mail = new Mail();
 //        mail.setFrom(cuenta_emisor); //cuenta emisor
 //        mail.setPassword(pass_emisor); //cuenta contraseña
@@ -4805,8 +4667,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
              JOptionPane.showMessageDialog(null, "Ocurrio un error, vuelve a cerrar todo y consultar de nuevo porfavor ...", "ERROR", JOptionPane.INFORMATION_MESSAGE);
              return;
         }
-        this.g_idRenta = id_renta;
-        mostrar_agregar_orden_proveedor(id_renta);
+        mostrar_agregar_orden_proveedor(lbl_folio.getText(),"",id_renta);
     }//GEN-LAST:event_jBtnAddOrderProviderActionPerformed
 
     private void jbtn_generar_reporte1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jbtn_generar_reporte1MouseClicked
@@ -4846,6 +4707,17 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "Folio no válido, ingresa un número válido para continuar ", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void tableOrdersProviderMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableOrdersProviderMouseClicked
+        // TODO add your handling code here:
+        if (evt.getClickCount() == 2) {
+            String rentaId = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 8).toString();
+            String orderId = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 0).toString();
+            String folio = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 1).toString();
+        
+            mostrar_agregar_orden_proveedor(folio, orderId, rentaId);
+        }
+    }//GEN-LAST:event_tableOrdersProviderMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -4929,6 +4801,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     public static javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
@@ -4939,6 +4812,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JToolBar jToolBar1;
@@ -4968,6 +4842,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     public static javax.swing.JButton jbtn_refrescar;
     public static javax.swing.JButton jtbtnGenerateExcel;
     public static javax.swing.JLabel lblInformation;
+    public static javax.swing.JLabel lblInformationOrdersProvider;
     private javax.swing.JLabel lbl_atiende;
     private javax.swing.JLabel lbl_aviso_resultados;
     private javax.swing.JLabel lbl_cliente;
@@ -4984,6 +4859,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JTable tabla_clientes;
     public static javax.swing.JTable tabla_detalle;
     public static javax.swing.JTable tabla_prox_rentas;
+    public static javax.swing.JTable tableOrdersProvider;
     private javax.swing.JTextField txtEmailToSend;
     private javax.swing.JFormattedTextField txtPorcentajeDescuento;
     private javax.swing.JTextField txt_abono;

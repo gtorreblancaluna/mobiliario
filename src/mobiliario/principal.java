@@ -236,7 +236,7 @@ public class principal extends javax.swing.JFrame {
             }
                 ventana_agregar_renta = new AgregarRenta();
                 ventana_agregar_renta.setLocation(this.getWidth() / 2 - ventana_agregar_renta.getWidth() / 2, this.getHeight() / 2 - ventana_agregar_renta.getHeight() / 2 - 20);
-                ventana_agregar_renta.setMaximum(true);
+//                ventana_agregar_renta.setMaximum(true);
                 jDesktopPane1.add(ventana_agregar_renta);
                 ventana_agregar_renta.show();
             
@@ -253,7 +253,7 @@ public class principal extends javax.swing.JFrame {
             }
             v_consultar_renta = new ConsultarRentas();
             v_consultar_renta.setLocation(this.getWidth() / 2 - v_consultar_renta.getWidth() / 2, this.getHeight() / 2 - v_consultar_renta.getHeight() / 2 - 20);
-            v_consultar_renta.setMaximum(true);
+//            v_consultar_renta.setMaximum(true);
             jDesktopPane1.add(v_consultar_renta);
             v_consultar_renta.show();
          

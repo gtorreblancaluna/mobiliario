@@ -19,7 +19,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import mobiliario.ApplicationConstants;
-import forms.rentas.ConsultarRentas;
 import mobiliario.iniciar_sesion;
 import mobiliario.principal;
 import model.Articulo;
@@ -51,16 +50,14 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     Object[][] dtconduc;      
     private final SaleService saleService;
     private final SystemService systemService;
-//    private final ItemService itemService = new ItemService();
     private final OrderProviderService orderProviderService = OrderProviderService.getInstance();
     public static String g_articuloId;
-    public static String g_rentaId;
+    public static String rentaId;
     public static String g_cantidadEnPedido;
     public static Long g_provider_id;
-    public static Long g_order_provider_id;
     private String navigation;
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
-    protected OrdenProveedor ordenProveedor = new OrdenProveedor();
+    protected OrdenProveedor ordenProveedor = null;
     private PaymentsProvidersForm paymentsProvidersForm;
     
     /** Encabezados de la tabla ARTICULOS ORDEN PROVEEDOR */
@@ -85,12 +82,15 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     
     public final static String UPDATE_ORDER = "update order";
     public final static String NEW_ORDER = "new order";
+    public static String orderId = "";
     private String folio = "";
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(OrderProviderForm.class.getName());
     
-   public OrderProviderForm(String folio) {
+   public OrderProviderForm(String folio, String orderId, String rentaId) {
         initComponents();
+        this.orderId = orderId;
         this.folio = folio;
+        this.rentaId = rentaId;
         funcion.conectate();
         systemService = SystemService.getInstance();
         saleService = SaleService.getInstance();
@@ -154,7 +154,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
        if(g_provider_id == null ){
            message.append("Falta proveedor, puedes elejir proveedor provisional\n");
        }
-       if(g_rentaId == null || g_rentaId.equals("")){
+       if(rentaId == null || rentaId.equals("")){
            message.append("No se obtuvo el folio de la renta, recarga la ventana nuevamente :(\n");
        }
        if(jTableOrderProvider.getRowCount() == 0){
@@ -212,7 +212,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
       
       orden.setDetalleOrdenProveedorList(list);
       Renta renta = new Renta();
-      renta.setRentaId(new Integer(g_rentaId));
+      renta.setRentaId(Integer.parseInt(rentaId));
       orden.setRenta(renta);
       orden.setUsuario(iniciar_sesion.usuarioGlobal);
       Proveedor proveedor = new Proveedor();
@@ -222,8 +222,8 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
       orden.setComentario(txtCommentOrder.getText());
       
       String confirmationMessage=null;
-      if(navigation.equals(UPDATE_ORDER)){
-          orden.setId(g_order_provider_id);
+      if(!orderId.equals("")){
+          orden.setId(Long.parseLong(orderId));
           try{
             orden.setStatus(orden.getStatusFromDescription(cmbStatusOrder.getSelectedItem().toString()));
             orderProviderService.updateOrder(orden);
@@ -232,7 +232,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
                 return;
           }
           confirmationMessage = ApplicationConstants.MESSAGE_UPDATE_SUCCESSFUL;
-          Utility.pushNotification("Se a actualizado orden al proveedor, orden número: "+g_order_provider_id);
+          Utility.pushNotification("Se a actualizado orden al proveedor, orden número: "+orderId);
       }else{
         try{
           orderProviderService.saveOrder(orden);
@@ -289,21 +289,13 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     
     public void llenar_tabla_articulos(){
         
-        List<OrdenProveedor> ordenProveedorList = new ArrayList<>();
-                
-        navigation = NEW_ORDER;
-        if(ConsultarRentas.g_idRenta == null || 
-                ConsultarRentas.g_idRenta.equals("") ||
-                ConsultarRentas.g_idRenta.isEmpty()){
-            // viene de ver ordenes proveedores
-            navigation = UPDATE_ORDER;
-            g_rentaId = ViewOrdersProviders.g_idRenta;
-          g_order_provider_id = new Long(ViewOrdersProviders.g_idOrder);
+                        
+        if (!orderId.equals("")){
           try{
-            ordenProveedor = orderProviderService.getOrderById(new Long(ViewOrdersProviders.g_idOrder));
-          }catch(BusinessException e){
-                JOptionPane.showMessageDialog(this, e.getMessage()+"\n"+e.getCause(), "ERROR", JOptionPane.ERROR_MESSAGE);
-                return;
+            ordenProveedor = orderProviderService.getOrderById(Long.parseLong(orderId));
+          } catch(BusinessException e){
+            JOptionPane.showMessageDialog(this, e.getMessage()+"\n"+e.getCause(), "ERROR", JOptionPane.ERROR_MESSAGE);
+            return;
           }
           
           if(ordenProveedor == null){
@@ -316,45 +308,14 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
            
             
         }else{
-            // viene desde consutar renta
+
             cmbStatusOrder.setEnabled(false);
             cmbStatusOrder.setSelectedItem(ApplicationConstants.DS_STATUS_ORDER_PROVIDER_ORDER);
-            g_rentaId = ConsultarRentas.g_idRenta;
-            try{
-                ordenProveedorList = orderProviderService.getOrdersByRentaId(new Integer(g_rentaId));
-            }catch(BusinessException e){
-                JOptionPane.showMessageDialog(this, e.getMessage()+"\n"+e.getCause(), "ERROR", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            
-            
-            if(ordenProveedorList != null && ordenProveedorList.size()==1 ){
-                Integer option =
-                        JOptionPane.showOptionDialog(this, "Existe una orden, Elija SI para continuar con esta orden o eliga NO para agregar nueva orden " ,"Confirme", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si");
-                if(option == 1){
-                 // elijio que NO, agregar nueva orden
-                    jMenuItem5.setEnabled(false);
-                }else{
-                    // elijio que SI, continuar con esta orden
-                    ordenProveedor = ordenProveedorList.get(0);
-                    this.lblInformacionInicial.setText("ORDEN: "+ordenProveedor.getId()+"  ");
-                    this.setTitle("Editar orden al proveedor");
-                    navigation = UPDATE_ORDER;
-                    g_order_provider_id = ordenProveedor.getId();
-                    
-                }  
-            }else if(ordenProveedorList != null && ordenProveedorList.size()>1 ){
-               JOptionPane.showMessageDialog(this, "ATENCI\u00D3N, existen varias ordenes para este folio, al continuar agregar\u00E1s una nueva orden ...", "ATENCI\u00D3N", JOptionPane.WARNING_MESSAGE);            
-            }else{
-                // no existe orden para este folio, inhabilitaremos el boton para ver los pagos al proveedor
-                jMenuItem5.setEnabled(false);
-            }
-            
-           
+
         }
         List<DetalleRenta> detail;
         try {
-            detail = saleService.getDetailByRentId(g_rentaId);
+            detail = saleService.getDetailByRentId(rentaId);
         } catch (DataOriginException e) {
             JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.WARNING_MESSAGE);            
             Toolkit.getDefaultToolkit().beep();
@@ -373,7 +334,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
                     tablaDetalle.addRow(fila);
             }
             
-        if(navigation.equals(UPDATE_ORDER)){
+        if(ordenProveedor != null){
             cmbStatusOrder.setSelectedItem(ordenProveedor.getStatusDescription());
             txtProviderName.setText(ordenProveedor.getProveedor().getNombre() + " "+ordenProveedor.getProveedor().getApellidos() );
             g_provider_id = ordenProveedor.getProveedor().getId();
@@ -400,10 +361,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
              }
             
         }
-        
         this.total();
-        ViewOrdersProviders.g_idRenta = null;
-        ConsultarRentas.g_idRenta = null;
          
     }
     
@@ -509,7 +467,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
            subTotal += (cantidad * precio);
         }
         
-        if(ordenProveedor.getPagosProveedor() != null && ordenProveedor.getPagosProveedor().size()>0){
+        if(ordenProveedor != null && ordenProveedor.getPagosProveedor() != null && ordenProveedor.getPagosProveedor().size()>0){
             for(PagosProveedor p : ordenProveedor.getPagosProveedor()){
                 pagos += p.getCantidad();
             }
@@ -1230,7 +1188,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
         // TODO add your handling code here:
         try {
-            reportPDF(g_order_provider_id+"");
+            reportPDF(orderId);
         } catch (Exception e) {
             LOGGER.error(e);
             System.out.println("Mensaje de Error:" + e.toString());
