@@ -125,7 +125,7 @@ public class UserService {
          
         Object[][] dtconduc = null;
         try {
-            dtconduc = sql.GetTabla(colName, "usuarios", "SELECT * FROM usuarios WHERE activo = 1 ORDER BY nombre");
+            dtconduc = sql.GetTabla(colName, "usuarios", "SELECT * FROM usuarios WHERE ORDER BY nombre");
         } catch (SQLNonTransientConnectionException e) {
             sql.conectate();
             JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 

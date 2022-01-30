@@ -63,6 +63,7 @@
         <result property="rentaId" column="id_renta"/>
         <result property="cantidad" column="cantidad"/>
         <result property="precioUnitario" column="p_unitario"/>
+        <result property="porcentajeDescuento" column="porcentaje_descuento"/>
      
         
         <result property="articulo.articuloId" column="item_id"/>
@@ -79,7 +80,8 @@
             a.descripcion AS item_description,
             a.precio_compra AS item_purchase_amount,
             c.color AS item_color,
-            a.codigo AS item_codigo
+            a.codigo AS item_codigo,
+            d.porcentaje_descuento
         FROM detalle_renta d
         INNER JOIN articulo a ON (a.id_articulo = d.id_articulo)
         INNER JOIN color c ON (c.id_color = a.id_color)
@@ -227,7 +229,7 @@
             AND t.id_tipo = #{type}
         </if>
         <if test="customer != null and customer != '' ">
-            AND CONCAT(c.nombre," ",c.apellidos) LIKE '% #{customer} %'
+            AND CONCAT(c.nombre," ",c.apellidos) LIKE CONCAT('%',#{customer},'%')
         </if>
         <if test="initDeliveryDate != null and endDeliveryDate != null ">
             AND STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDeliveryDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDeliveryDate},'%d/%m/%Y')
@@ -237,7 +239,7 @@
             AND STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initEventDate},'%d/%m/%Y') AND STR_TO_DATE(#{endEventDate},'%d/%m/%Y')
         </if>
         <if test="initCreatedDate != null and endCreatedDate != null ">
-            AND STR_TO_DATE(r.r.fecha_pedido,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initCreatedDate},'%d/%m/%Y') AND STR_TO_DATE(#{endCreatedDate},'%d/%m/%Y')
+            AND STR_TO_DATE(r.fecha_pedido,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initCreatedDate},'%d/%m/%Y') AND STR_TO_DATE(#{endCreatedDate},'%d/%m/%Y')
         </if>
         <if test="statusId != null and statusId != '' and statusId != 0 ">
             AND r.id_estado = #{statusId}

@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.MessagingException;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -1740,6 +1739,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         disableButtonsActions();
         
         try{
+            String limit = parameters.get("limit").toString();
             List<Renta> rentas = saleService.obtenerRentasPorParametros(parameters);
             fillTable(rentas);
             if(rentas == null || rentas.size()<=0)
@@ -1749,7 +1749,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 Toolkit.getDefaultToolkit().beep();
 
                 if(rentas.size()>1){
-                   lblInformation.setText("Se han obtenido "+rentas.size()+" resultados");  
+                   lblInformation.setText("Se han obtenido "+rentas.size()+" resultados con un límite de "+limit+" registros por consulta");  
                 }else{
                   lblInformation.setText("Se a obtenido "+rentas.size()+" resultado");
                 }
