@@ -468,7 +468,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             parametro.put("chofer", chofer);
             parametro.put("descuento", desc_rep);
             parametro.put("iva", iva_rep);
-            parametro.put("total_faltantes", g_totalFaltantes);
+            parametro.put("total_faltantes", g_totalFaltantes+"");
             parametro.put("mensaje_faltantes", g_mensajeFaltantes);  
             parametro.put("URL_SUB_REPORT_CONSULTA", pathLocation+ApplicationConstants.URL_SUB_REPORT_CONSULTA);
          
@@ -782,7 +782,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
              float porcentajeDescuento = 0f;
             if(!this.txt_porcentaje_descuento.getText().equals("") ){
                 try {
-                    porcentajeDescuento = new Float(this.txt_porcentaje_descuento.getText()+"");
+                    porcentajeDescuento = Float.parseFloat(this.txt_porcentaje_descuento.getText()+"");
                 } catch (NumberFormatException e) {
                     JOptionPane.showMessageDialog(null, "Ingresa un número valido para porcentaje descuento "+e, "Error", JOptionPane.INFORMATION_MESSAGE);
                     Toolkit.getDefaultToolkit().beep();
@@ -823,7 +823,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                       //2018.11.16
                       // si el estado actual del evento es igual a EN RENTA, 
                       // procedemos a aumentar los articulos del contador en inventario "en_renta"                         
-                    float cantidad = new Float(txt_cantidad.getText().toString());
+                    float cantidad = Float.parseFloat(txt_cantidad.getText().toString());
                     String[] datos3 = { (articulo.getEnRenta()+cantidad+""), articulo.getArticuloId()+""};
                     
                     try {
@@ -905,7 +905,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 }
                 
                 try {
-                    cantidadAbono = new Float(txt_abono.getText().trim());
+                    cantidadAbono = Float.parseFloat(txt_abono.getText().trim());
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Error con la cantidad de pago\n"+e, "Error", JOptionPane.ERROR);
                     return;
@@ -990,7 +990,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             mensaje.append("Ingresa un abono para continuar\n");
         else{
             try {
-                float f = new Float(txt_abono.getText()+"");
+                float f = Float.parseFloat(txt_abono.getText()+"");
             } catch (NumberFormatException e) {
                 mensaje.append("Ingresa solo números con formato válido\n");
             } catch (Exception e) {
@@ -1354,31 +1354,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }
     
     public void tabla_detalle() {
-        formato_tabla_detalles();       
-        // funcion.conectate();
-//        tabla_detalle.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//        String[] columNames = {"Id", "Cant", "Id art", "Articulo", "Precio", "Imp."};
-//        String[] colName = {"id_detalle_renta", "cantidad", "id_articulo", "Articulo", "p_unitario", "Importe"};
-//        //nombre de columnas, tabla, instruccion sql        
-//        dtconduc = funcion.GetTabla(colName, "detalle_cotizacion", "SELECT d.`id_detalle_renta`, d.`cantidad`,d.`id_articulo`, CONCAT(a.`descripcion`,\" \",c.`color`)As Articulo, d.`p_unitario`,(d.`cantidad`*d.`p_unitario`)As Importe FROM detalle_renta d, articulo a, color c\n"
-//                + "WHERE d.id_articulo=a.id_articulo AND a.id_color=c.id_color AND d.`id_renta` ='" + id_renta + "'");
-//         DefaultTableModel temp = (DefaultTableModel) tabla_detalle.getModel();        
-//         
-//         for (int j = 0; j < dtconduc.length; j++) {             
-//              
-//              Object nuevo[] = {
-//                            dtconduc[j][0].toString(), 
-//                            dtconduc[j][1].toString(),
-//                            dtconduc[j][2].toString(),
-//                            dtconduc[j][3].toString(),
-//                            conviertemoneda(dtconduc[j][4].toString()),
-//                            conviertemoneda(dtconduc[j][5].toString()),
-//                            "0"
-//                        };
-//                        temp.addRow(nuevo);
-//         }        
-
-        
+        formato_tabla_detalles();      
     }
     
     public void formato_tabla_abonos() {
@@ -1429,7 +1405,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             
             if (dia.length() == 1) {
                 auxDia = "0" + dia;
-                fecha_sistema = auxDia + "-" + auxMes + "/" + fecha.get(Calendar.YEAR);
+                fecha_sistema = auxDia + "/" + auxMes + "/" + fecha.get(Calendar.YEAR);
                 
             }
             
@@ -1454,27 +1430,27 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         try {
             
             if(!this.txtPorcentajeDescuento.getText().equals(""))
-                fPorcentaejeDescuento = new Float(this.txtPorcentajeDescuento.getText().toString().replaceAll(",", ""));
+                fPorcentaejeDescuento = Float.parseFloat(this.txtPorcentajeDescuento.getText().toString().replaceAll(",", ""));
             
             if(!this.txt_subtotal.getText().equals("") )
-                fSubtotal = new Float(this.txt_subtotal.getText().toString().replaceAll(",", ""));
+                fSubtotal = Float.parseFloat(this.txt_subtotal.getText().toString().replaceAll(",", ""));
             
             if(!this.txt_descuento.getText().equals(""))
-                fDescuento = new Float(this.txt_descuento.getText().toString().replaceAll(",", ""));
+                fDescuento = Float.parseFloat(this.txt_descuento.getText().toString().replaceAll(",", ""));
             
             if(!this.txt_envioRecoleccion.getText().equals(""))
-                fEnvioRecoleccion = new Float(this.txt_envioRecoleccion.getText().toString().replaceAll(",", ""));
+                fEnvioRecoleccion = Float.parseFloat(this.txt_envioRecoleccion.getText().toString().replaceAll(",", ""));
             
             if(!this.txt_depositoGarantia.getText().equals(""))
-                fDepositoGarantia = new Float (this.txt_depositoGarantia.getText().toString().replaceAll(",", ""));
+                fDepositoGarantia = Float.parseFloat(this.txt_depositoGarantia.getText().toString().replaceAll(",", ""));
             
             if(!this.txt_abonos.getText().equals(""))
-                fAbonos = new Float (this.txt_abonos.getText().toString().replaceAll(",", ""));      
+                fAbonos = Float.parseFloat(this.txt_abonos.getText().toString().replaceAll(",", ""));      
             
             if(fPorcentaejeDescuento == 0)
                 this.txt_descuento.setValue(0);
             if(!this.txt_faltantes.equals(""))
-                fFaltantes = new Float(this.txt_faltantes.getText().toString().replaceAll(",", ""));
+                fFaltantes = Float.parseFloat(this.txt_faltantes.getText().toString().replaceAll(",", ""));
             
           
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento;
@@ -1490,7 +1466,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento; 
             if(!this.txt_iva.getText().equals(""))
             {              
-                fIVA = new Float(this.txt_iva.getText().toString().replaceAll(",", ""));
+                fIVA = Float.parseFloat(this.txt_iva.getText().toString().replaceAll(",", ""));
                 fTotalIVA = (fCalculo * (fIVA / 100));              
 //                this.txt_total_iva.setValue(fTotalIVA);
                 this.txt_total_iva.setText(decimalFormat.format(fTotalIVA));
@@ -1500,7 +1476,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             this.txt_calculo.setValue(fCalculo);            
             
              if(!this.txt_total_iva.getText().equals(""))
-                fTotalIVA = new Float(this.txt_total_iva.getText().toString().replaceAll(",", ""));
+                fTotalIVA = Float.parseFloat(this.txt_total_iva.getText().toString().replaceAll(",", ""));
             
             
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento;
@@ -3574,6 +3550,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         try {
             List<OrdenProveedor> list = orderService.getOrdersByParameters(parameter);
+            if (list.isEmpty()) {
+                lblInformationOrdersProvider.setText("No se obtuvieron ordenes al proveedor");
+            } else if (list.size() == 1) {
+                lblInformationOrdersProvider.setText("Se obtuvo una orden al proveedor");
+            } else {
+                lblInformationOrdersProvider.setText("Se obtuvieron "+ list.size() +" ordenes al proveedor");
+            }
             for(OrdenProveedor orden : list){      
             Object fila[] = {                                          
                 orden.getId(),
@@ -3645,7 +3628,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             this.g_idTipoEvento = renta.getTipo().getTipoId()+""; // variable global
             id_renta = renta.getRentaId()+""; // variable global
             id_cliente = renta.getCliente().getClienteId()+""; // variable global
-            tabla_abonos(id_renta);
+            new Thread(() -> {
+                tabla_abonos(id_renta);
+            }).start();
 
                       
             SimpleDateFormat formatoDelTexto = new SimpleDateFormat("dd/MM/yyyy");
@@ -4465,9 +4450,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         String sPrecioU = this.txt_editar_precio_unitario.getText().toString().equals("") ? "0" : this.txt_editar_precio_unitario.getText().toString();
         String sDescuento = this.txt_editar_porcentaje_descuento.getText().toString().equals("") ? "0" : this.txt_editar_porcentaje_descuento.getText().toString();
         try {
-            cantidad = new Float(sCantidad);
-            precio = new Float(sPrecioU);
-            descuento = new Float(sDescuento);
+            cantidad = Float.parseFloat(sCantidad);
+            precio = Float.parseFloat(sPrecioU);
+            descuento = Float.parseFloat(sDescuento);
         } catch (NumberFormatException e) {
              JOptionPane.showMessageDialog(null, "Ingresa solo numeros "+e, "ERROR", JOptionPane.INFORMATION_MESSAGE);
              Toolkit.getDefaultToolkit().beep();
