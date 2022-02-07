@@ -70,7 +70,7 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
             // viene de ver ordenes en general
                     try{
                         ordenProveedorGlobal = 
-                            orderService.getOrderById(new Long(ViewOrdersProviders.g_idOrder));
+                            orderService.getOrderById(Long.parseLong(ViewOrdersProviders.g_idOrder));
                     }catch(BusinessException e){
                         JOptionPane.showMessageDialog(null, e.getMessage()+"\n"+e.getCause(), "ERROR", JOptionPane.ERROR_MESSAGE);
                         return;
@@ -113,7 +113,7 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
     public void total(){
         float total = 0f;
         for (int i = 0; i < tablePayments.getRowCount(); i++) {
-           total += new Float(tablePayments.getValueAt(i, HEADER_AMOUNT).toString());
+           total += Float.parseFloat(tablePayments.getValueAt(i, HEADER_AMOUNT).toString());
         }
         
         this.lblTotal.setText("Total: "+decimalFormat.format(total));
@@ -144,7 +144,7 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
         StringBuilder message = new StringBuilder();
         Float cantidad = 0f;
         try{
-            cantidad = new Float(txtCantidad.getText());
+            cantidad = Float.parseFloat(txtCantidad.getText());
         }catch(NumberFormatException e){
             message.append("Solo se permiten números\n");
         }

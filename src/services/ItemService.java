@@ -7,7 +7,6 @@ package services;
 
 import clases.sqlclass;
 import dao.ItemDAO;
-import dao.providers.OrderProviderDAO;
 import exceptions.BusinessException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
@@ -28,13 +27,8 @@ import model.providers.DetalleOrdenProveedor;
 import org.apache.log4j.Logger;
 import services.providers.OrderProviderService;
 
-/**
- *
- * @author jerry
- */
 public class ItemService {
-//    sqlclass funcion = new sqlclass();
-    // singlenton instance
+
     private static final ItemService SINGLE_INSTANCE = new ItemService();
     private ItemService(){}
     public static ItemService getInstance() {
@@ -48,9 +42,7 @@ public class ItemService {
     private static Logger LOGGER = Logger.getLogger(ItemService.class.getName());
     
     public Articulo obtenerArticuloPorId(sqlclass sql, int articuloId){
-//        Servicio para obtener un articulo con su id        
-       
-        //nombre de columnas, tabla, instruccion sql    
+
         
          String[] colName = {
                             "id_articulo", 
@@ -100,7 +92,7 @@ public class ItemService {
         articulo.setArticuloId(dtconduc[0][0] != null ? new Integer(dtconduc[0][0].toString()) : null);
         articulo.setCategoriaId(dtconduc[0][1] != null ?new Integer(dtconduc[0][1].toString()) : null);
         articulo.setUsuarioId(dtconduc[0][2] != null ?new Integer(dtconduc[0][2].toString()) : null);
-        articulo.setCantidad(dtconduc[0][3] != null ? new Float(dtconduc[0][3].toString()) : null);
+        articulo.setCantidad(dtconduc[0][3] != null ? Float.parseFloat(dtconduc[0][3].toString()) : null);
         articulo.setDescripcion(dtconduc[0][4] != null ? dtconduc[0][4].toString() : null);
         
         // COLOR
@@ -113,18 +105,18 @@ public class ItemService {
         articulo.setColor(color);
         
         articulo.setFechaIngreso(dtconduc[0][6] != null ? dtconduc[0][6].toString() : null);
-        articulo.setPrecioCompra(dtconduc[0][7] != null ? new Float(dtconduc[0][7].toString()) : null);
-        articulo.setPrecioRenta(dtconduc[0][8] != null ? new Float(dtconduc[0][8].toString()) : null);
+        articulo.setPrecioCompra(dtconduc[0][7] != null ? Float.parseFloat(dtconduc[0][7].toString()) : null);
+        articulo.setPrecioRenta(dtconduc[0][8] != null ? Float.parseFloat(dtconduc[0][8].toString()) : null);
         articulo.setActivo(dtconduc[0][9] != null ? dtconduc[0][6].toString() : null);
-//        articulo.setStock(dtconduc[0][10] != null ? new Float(dtconduc[0][10].toString()) : null );
+//        articulo.setStock(dtconduc[0][10] != null ? Float.parseFloat(dtconduc[0][10].toString()) : null );
 //        articulo.setCodigo(dtconduc[0][11] != null ? dtconduc[0][11].toString() : null);
         if(dtconduc[0][10] != null)
-            articulo.setStock(new Float(dtconduc[0][10].toString()));
+            articulo.setStock(Float.parseFloat(dtconduc[0][10].toString()));
         if(dtconduc[0][11] != null)
             articulo.setCodigo(dtconduc[0][11].toString());
          if(dtconduc[0][12] != null)
-            articulo.setEnRenta(new Float(dtconduc[0][12].toString()));
-//        articulo.setEnRenta(dtconduc[0][12] != null ? new Float(dtconduc[0][12].toString()) : null);
+            articulo.setEnRenta(Float.parseFloat(dtconduc[0][12].toString()));
+//        articulo.setEnRenta(dtconduc[0][12] != null ? Float.parseFloat(dtconduc[0][12].toString()) : null);
 
         CategoriaDTO categoria = new CategoriaDTO();
         if(dtconduc[0][16] != null)
@@ -160,7 +152,7 @@ public class ItemService {
         articulo.setArticuloId(dtconduc[i][0] != null ? new Integer(dtconduc[i][0].toString()) : null);
         articulo.setCategoriaId(dtconduc[i][1] != null ?new Integer(dtconduc[i][1].toString()) : null);
         articulo.setUsuarioId(dtconduc[i][2] != null ?new Integer(dtconduc[i][2].toString()) : null);
-        articulo.setCantidad(dtconduc[i][3] != null ? new Float(dtconduc[i][3].toString()) : null);
+        articulo.setCantidad(dtconduc[i][3] != null ? Float.parseFloat(dtconduc[i][3].toString()) : null);
         articulo.setDescripcion(dtconduc[i][4] != null ? dtconduc[i][4].toString() : null);
         
         // COLOR
@@ -173,18 +165,18 @@ public class ItemService {
         articulo.setColor(color);
         
         articulo.setFechaIngreso(dtconduc[i][6] != null ? dtconduc[i][6].toString() : null);
-        articulo.setPrecioCompra(dtconduc[i][7] != null ? new Float(dtconduc[i][7].toString()) : null);
-        articulo.setPrecioRenta(dtconduc[i][8] != null ? new Float(dtconduc[i][8].toString()) : null);
+        articulo.setPrecioCompra(dtconduc[i][7] != null ? Float.parseFloat(dtconduc[i][7].toString()) : null);
+        articulo.setPrecioRenta(dtconduc[i][8] != null ? Float.parseFloat(dtconduc[i][8].toString()) : null);
         articulo.setActivo(dtconduc[i][9] != null ? dtconduc[i][6].toString() : null);
-//        articulo.setStock(dtconduc[i][10] != null ? new Float(dtconduc[i][10].toString()) : null );
+//        articulo.setStock(dtconduc[i][10] != null ? Float.parseFloat(dtconduc[i][10].toString()) : null );
 //        articulo.setCodigo(dtconduc[i][11] != null ? dtconduc[i][11].toString() : null);
         if(dtconduc[i][10] != null)
-            articulo.setStock(new Float(dtconduc[i][10].toString()));
+            articulo.setStock(Float.parseFloat(dtconduc[i][10].toString()));
         if(dtconduc[i][11] != null)
             articulo.setCodigo(dtconduc[i][11].toString());
          if(dtconduc[i][12] != null)
-            articulo.setEnRenta(new Float(dtconduc[i][12].toString()));
-//        articulo.setEnRenta(dtconduc[i][12] != null ? new Float(dtconduc[i][12].toString()) : null);
+            articulo.setEnRenta(Float.parseFloat(dtconduc[i][12].toString()));
+//        articulo.setEnRenta(dtconduc[i][12] != null ? Float.parseFloat(dtconduc[i][12].toString()) : null);
             articulos.add(articulo);
         
         }// end for
@@ -214,7 +206,6 @@ public class ItemService {
     
     public List<Articulo> obtenerArticulosBusquedaInventario(sqlclass sql, String stringSql){
 //        Servicio para obtener un articulos por query armado desde la vista    
-        //nombre de columnas, tabla, instruccion sql 
         String[] colName = {"id_articulo","codigo","cantidad","en_renta","descripcion_categoria",
                       "descripcion","color","fecha_ingreso","precio_compra","precio_renta"};
         
@@ -240,9 +231,9 @@ public class ItemService {
         if(dtconduc[i][1] != null)
             articulo.setCodigo(dtconduc[i][1]+"");
         if(dtconduc[i][2] != null)
-            articulo.setStock(new Float(dtconduc[i][2]+""));
+            articulo.setStock(Float.parseFloat(dtconduc[i][2]+""));
         if(dtconduc[i][3] != null)
-         articulo.setEnRenta(new Float(dtconduc[i][3]+""));
+         articulo.setEnRenta(Float.parseFloat(dtconduc[i][3]+""));
         
         CategoriaDTO categoria = new CategoriaDTO();
         if(dtconduc[i][4] != null)
@@ -261,10 +252,10 @@ public class ItemService {
             articulo.setFechaIngreso(dtconduc[i][7]+"");
         
        if(dtconduc[i][8] != null)
-           articulo.setPrecioCompra(new Float(dtconduc[i][8]+""));
+           articulo.setPrecioCompra(Float.parseFloat(dtconduc[i][8]+""));
        
        if(dtconduc[i][9] != null)
-           articulo.setPrecioRenta(new Float(dtconduc[i][9]+""));
+           articulo.setPrecioRenta(Float.parseFloat(dtconduc[i][9]+""));
            articulos.add(articulo);
         
         }// end for
@@ -273,17 +264,38 @@ public class ItemService {
     }
     
     public List<Articulo> obtenerArticulosBusquedaInventario(Map<String,Object> map) throws Exception{
+        
+        
+       // neccesary for get total shop from provider
+       map.put("statusOrderFinish", ApplicationConstants.STATUS_ORDER_PROVIDER_FINISH);
+       map.put("statusOrder", ApplicationConstants.STATUS_ORDER_PROVIDER_ORDER);
+       map.put("typeOrderDetail", ApplicationConstants.TYPE_DETAIL_ORDER_SHOPPING);
+        
         List<Articulo> articulos = itemDao.obtenerArticulosBusquedaInventario(map);
         
-        if(articulos != null){
+        if(!articulos.isEmpty()){
             for(Articulo articulo : articulos){    
-              setUtiles(articulo);     
+                articulo.setUtiles(
+                                (
+                                    (articulo.getCantidad() != null ? articulo.getCantidad() : 0F)  -
+                                    (articulo.getFaltantes() != null ? articulo.getFaltantes() : 0F) -
+                                    (articulo.getReparacion() != null ? articulo.getReparacion() : 0F ) -
+                                    (articulo.getAccidenteTrabajo() != null ? articulo.getAccidenteTrabajo() : 0F )
+                                ) +
+                                        (articulo.getDevolucion() != null ? articulo.getDevolucion() : 0F ) + 
+                                        (articulo.getTotalCompras() != null ? articulo.getTotalCompras() : 0F  )+
+                                        (articulo.getTotalShopProvider() != null ? articulo.getTotalShopProvider() : 0F )
+                                        
+                );
+                articulo.setTotalCompras( (articulo.getTotalCompras() != null ? articulo.getTotalCompras() : 0F) + 
+                            (articulo.getTotalShopProvider() != null ? articulo.getTotalShopProvider() : 0F ));
             } // end for articulos
         }
          
         return articulos;
     }
     
+    @Deprecated
     private void setUtiles (Articulo item) throws Exception{
         
         
@@ -330,22 +342,22 @@ public class ItemService {
             System.out.println(e);
         }
         try{
-            faltantes = new Float(item.getFaltantes());
+            faltantes = item.getFaltantes();
         }catch (Exception e){
             System.out.println(e);
         }
         try{
-            reparacion = new Float(item.getReparacion());
+            reparacion = item.getReparacion();
         }catch (Exception e){
             System.out.println(e);
         }
         try{
-            accidenteTrabajo = new Float(item.getAccidenteTrabajo());
+            accidenteTrabajo = item.getAccidenteTrabajo();
         }catch (Exception e){
             System.out.println(e);
         }
         try{
-            devolucion = new Float(item.getDevolucion());
+            devolucion = item.getDevolucion();
         }catch (Exception e){
             System.out.println(e);
         }
@@ -416,7 +428,7 @@ public class ItemService {
                 articulo.setArticuloId(new Integer(dtconduc[i][1]+""));
             
              if(dtconduc[i][16] != null){
-                 articulo.setPrecioCompra(new Float(dtconduc[i][16]+""));
+                 articulo.setPrecioCompra(Float.parseFloat(dtconduc[i][16]+""));
              }
             
             Renta renta = new Renta();
@@ -431,7 +443,7 @@ public class ItemService {
                 faltante.setFechaRegistro(dtconduc[i][4].toString());
             
             if(dtconduc[i][5] != null)
-                faltante.setCantidad(new Float(dtconduc[i][5].toString()));
+                faltante.setCantidad(Float.parseFloat(dtconduc[i][5].toString()));
             
             if(dtconduc[i][6] != null)
                 faltante.setComentario(dtconduc[i][6].toString());
@@ -462,7 +474,7 @@ public class ItemService {
                 faltante.setFgAccidenteTrabajo(new Integer(dtconduc[i][14].toString()));
             
             if(dtconduc[i][15] != null){
-                faltante.setPrecioCobrar(new Float(dtconduc[i][15].toString()));
+                faltante.setPrecioCobrar(Float.parseFloat(dtconduc[i][15].toString()));
             }else{
                 faltante.setPrecioCobrar(0f);
             }
@@ -543,7 +555,7 @@ public class ItemService {
                 renta.setFolio(new Integer(dtconduc[i][1]+""));
             
             if(dtconduc[i][2] != null)
-                faltante.setCantidad(new Float(dtconduc[i][2]+""));
+                faltante.setCantidad(Float.parseFloat(dtconduc[i][2]+""));
             
             if(dtconduc[i][3] != null)
                 articulo.setArticuloId(new Integer(dtconduc[i][3]+""));

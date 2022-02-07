@@ -486,16 +486,16 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         try {
             
             if(!this.txtPorcentajeDescuento.getText().equals(""))
-                fPorcentaejeDescuento = new Float(this.txtPorcentajeDescuento.getText()+"".replace(",", "."));
+                fPorcentaejeDescuento = Float.parseFloat(this.txtPorcentajeDescuento.getText()+"".replace(",", "."));
             
             if(!this.txt_subtotal.getText().equals("") )
-                fSubtotal = new Float(this.txt_subtotal.getText()+"".replace(",", "."));
+                fSubtotal = Float.parseFloat(this.txt_subtotal.getText()+"".replace(",", "."));
             
             if(!this.txt_descuento.getText().equals(""))
-                fDescuento = new Float(this.txt_descuento.getText()+"".replace(",", "."));
+                fDescuento = Float.parseFloat(this.txt_descuento.getText()+"".replace(",", "."));
             
             if(!this.txt_envioRecoleccion.getText().equals(""))
-                fEnvioRecoleccion = new Float(this.txt_envioRecoleccion.getText()+"".replace(",", "."));
+                fEnvioRecoleccion = Float.parseFloat(this.txt_envioRecoleccion.getText()+"".replace(",", "."));
             
             if(!this.txt_depositoGarantia.getText().equals(""))
                 fDepositoGarantia = new Float (this.txt_depositoGarantia.getText()+"".replace(",", "."));
@@ -519,7 +519,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento; 
             if(!this.txt_iva.getText().equals(""))
             {              
-                fIVA = new Float(this.txt_iva.getText()+"".replace(",", "."));
+                fIVA = Float.parseFloat(this.txt_iva.getText()+"".replace(",", "."));
                 fTotalIVA = (fCalculo * (fIVA / 100));              
                 this.txt_total_iva.setValue(fTotalIVA);
             }            
@@ -528,7 +528,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             this.txt_calculo.setValue(fCalculo);            
             
              if(!this.txt_total_iva.getText().equals(""))
-                fTotalIVA = new Float(this.txt_total_iva.getText()+"".replace(",", "."));
+                fTotalIVA = Float.parseFloat(this.txt_total_iva.getText()+"".replace(",", "."));
             
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento;
             this.txt_calculo.setValue(fCalculo);
@@ -1124,7 +1124,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             float porcentajeDescuento = 0f;
             if(!this.txt_porcentaje_descuento.getText().equals("") ){
                 try {
-                    porcentajeDescuento = new Float(this.txt_porcentaje_descuento.getText()+"");
+                    porcentajeDescuento = Float.parseFloat(this.txt_porcentaje_descuento.getText()+"");
                 } catch (NumberFormatException e) {
                     JOptionPane.showMessageDialog(null, "Ingresa un número valido para porcentaje descuento "+e, "Error", JOptionPane.INFORMATION_MESSAGE);
                     Toolkit.getDefaultToolkit().beep();

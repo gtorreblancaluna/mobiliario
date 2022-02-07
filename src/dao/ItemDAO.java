@@ -32,19 +32,7 @@ public class ItemDAO {
     public List<Articulo> obtenerArticulosBusquedaInventario( Map<String,Object> map) {
         SqlSession session = sqlSessionFactory.openSession();
         try {
-            List<Articulo> articulos = (List<Articulo>) session.selectList("MapperArticulos.obtenerArticulosBusquedaInventario",map);
-            if(articulos == null || articulos.size()<=0)
-                return null;            
-           
-            for(Articulo articulo : articulos){                
-                map.put("articuloId", articulo.getArticuloId());
-                articulo.setRentados( (String) session.selectOne("MapperArticulos.obtenerEnRenta",map));
-                articulo.setFaltantes((String) session.selectOne("MapperArticulos.obtenerFaltantes",map));
-                articulo.setReparacion((String) session.selectOne("MapperArticulos.obtenerReparacion",map));
-                articulo.setAccidenteTrabajo((String) session.selectOne("MapperArticulos.obtenerAccidenteTrabajo",map));
-                articulo.setDevolucion((String) session.selectOne("MapperArticulos.obtenerDevolucion",map));
-            }
-            return articulos;
+            return (List<Articulo>) session.selectList("MapperArticulos.obtenerArticulosBusquedaInventario",map);
         }catch(Exception ex){
             log.error(ex);
             return null;
@@ -68,11 +56,11 @@ public class ItemDAO {
             }
             
             
-            item.setRentados( (String) session.selectOne("MapperArticulos.obtenerEnRenta",map));
-            item.setFaltantes((String) session.selectOne("MapperArticulos.obtenerFaltantes",map));
-            item.setReparacion((String) session.selectOne("MapperArticulos.obtenerReparacion",map));
-            item.setAccidenteTrabajo((String) session.selectOne("MapperArticulos.obtenerAccidenteTrabajo",map));
-            item.setDevolucion((String) session.selectOne("MapperArticulos.obtenerDevolucion",map));
+            item.setRentados( session.selectOne("MapperArticulos.obtenerEnRenta",map).toString());
+            item.setFaltantes(Float.parseFloat(session.selectOne("MapperArticulos.obtenerFaltantes",map).toString()));
+            item.setReparacion(Float.parseFloat(session.selectOne("MapperArticulos.obtenerReparacion",map).toString()));
+            item.setAccidenteTrabajo(Float.parseFloat(session.selectOne("MapperArticulos.obtenerAccidenteTrabajo",map).toString()));
+            item.setDevolucion(Float.parseFloat(session.selectOne("MapperArticulos.obtenerDevolucion",map).toString()));
          
             return item;
         }catch(Exception ex){

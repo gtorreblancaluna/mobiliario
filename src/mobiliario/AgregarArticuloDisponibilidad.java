@@ -5,6 +5,7 @@
  */
 package mobiliario;
 
+import forms.inventario.InventarioForm;
 import clases.conectate;
 import clases.sqlclass;
 import java.awt.Toolkit;
@@ -19,7 +20,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import static forms.rentas.AgregarRenta.tabla_articulos;
-import static mobiliario.inventario.cmb_color;
+import static forms.inventario.InventarioForm.cmb_color;
 import model.Articulo;
 import services.ItemService;
 
@@ -257,7 +258,7 @@ public class AgregarArticuloDisponibilidad extends java.awt.Dialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-//        inventario.validar_colores = true;
+//        InventarioForm.validar_colores = true;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog
@@ -279,7 +280,7 @@ public class AgregarArticuloDisponibilidad extends java.awt.Dialog {
                 JOptionPane.showMessageDialog(null, "Ocurrio un error inesperado, porfavor intentalo de nuevo, si el problema sigue, reinicia el sistema :P ", "Error", JOptionPane.INFORMATION_MESSAGE);
                 Toolkit.getDefaultToolkit().beep();
              }else{
-               if(inventario.agregarArticulo(idArticulo))
+               if(InventarioForm.agregarArticulo(idArticulo))
                    this.dispose();
                  
             }

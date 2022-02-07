@@ -281,8 +281,8 @@ public class AgregarCompraFormDialog extends java.awt.Dialog {
             compra.setIdArticulo(articulo.getArticuloId());
             compra.setArticulo(articulo);
             compra.setComentario(this.txtComentario.getText());
-            compra.setCantidad(new Float(this.txtCantidad.getText()));
-            compra.setPrecioCompra(new Float(this.txtPrecioCompra.getText()));
+            compra.setCantidad(Float.parseFloat(this.txtCantidad.getText()));
+            compra.setPrecioCompra(Float.parseFloat(this.txtPrecioCompra.getText()));
             comprasService.insertCompra(compra);
             
             JOptionPane.showMessageDialog(null, ApplicationConstants.MESSAGE_SAVE_SUCCESSFUL, "", JOptionPane.INFORMATION_MESSAGE);

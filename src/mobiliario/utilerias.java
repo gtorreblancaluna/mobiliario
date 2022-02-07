@@ -5,6 +5,7 @@
  */
 package mobiliario;
 
+import forms.inventario.InventarioForm;
 import clases.JCMail_enviar_prueba;
 import clases.conectate;
 import clases.sqlclass;
@@ -768,7 +769,7 @@ public class utilerias extends java.awt.Dialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-        inventario.validar_categorias = true;
+        InventarioForm.validar_categorias = true;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog

@@ -28,6 +28,15 @@
         <result property="categoria.categoriaId" column="id_categoria"/>        
         <result property="categoria.descripcion" column="descripcion_categoria"/>    
         <result property="fechaUltimaModificacion" column="fecha_ultima_modificacion"/>
+        
+        <result property="rentados" column="rentados" />
+        <result property="faltantes" column="faltantes" />
+        <result property="reparacion" column="reparacion" />
+        <result property="accidenteTrabajo" column="accidente_trabajo" />
+        <result property="devolucion" column="devolcion" />
+        
+        <result property="totalCompras" column="total_compras" />
+        <result property="totalShopProvider" column="total_shop_provider" />
 
     </resultMap>
     
@@ -56,19 +65,84 @@
   
     <select id="obtenerArticulosBusquedaInventario" resultMap="resultMapArticulo" parameterType="java.util.Map">
         SELECT articulo.*, 
-        categoria.descripcion AS descripcion_categoria, 
-        color.color        
+            categoria.descripcion AS descripcion_categoria, 
+            color.color,
+            (
+                SELECT
+                    SUM(detalle.cantidad) AS cantidad
+                FROM renta renta
+                    INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta)
+                WHERE detalle.id_articulo = articulo.id_articulo
+                AND renta.id_estado = #{estado_renta}
+                AND renta.id_tipo = #{tipo_pedido}
+            ) AS rentados,
+            (
+                SELECT 
+                    SUM(faltante.cantidad)
+                FROM faltantes faltante    
+                WHERE faltante.id_articulo = articulo.id_articulo
+                AND faltante.fg_faltante = '1'
+                AND faltante.fg_devolucion = '0'
+                AND faltante.fg_accidente_trabajo = '0'
+                AND faltante.fg_activo = '1'
+            ) AS faltantes,
+            (
+                SELECT 
+                    SUM(faltante.cantidad)
+                FROM faltantes faltante              
+                WHERE faltante.id_articulo = articulo.id_articulo
+                AND faltante.fg_faltante = '0'
+                AND faltante.fg_devolucion = '0'
+                AND faltante.fg_accidente_trabajo = '0'
+                AND faltante.fg_activo = '1'
+            ) AS reparacion,
+            (
+                SELECT 
+                    SUM(faltante.cantidad)
+                FROM faltantes faltante              
+                WHERE faltante.id_articulo = articulo.id_articulo
+                AND faltante.fg_faltante = '0'
+                AND faltante.fg_devolucion = '0'
+                AND faltante.fg_accidente_trabajo = '1'
+                AND faltante.fg_activo = '1'
+            ) AS accidente_trabajo,
+            (
+                SELECT
+                    SUM(faltante.cantidad)
+                FROM faltantes faltante         
+                WHERE faltante.id_articulo = articulo.id_articulo
+                AND faltante.fg_devolucion = '1'
+                AND faltante.fg_faltante = '0'
+                AND faltante.fg_activo = '1'
+            ) AS devolucion,
+            (
+                SELECT
+                    SUM(compras.cantidad)
+                FROM compras compras
+                WHERE compras.id_articulo = articulo.id_articulo
+                AND compras.fg_activo = '1' 
+            ) AS total_compras,
+            (
+                SELECT 
+                    SUM(detalle_orden_proveedor.cantidad)
+                FROM detalle_orden_proveedor detalle_orden_proveedor
+                    INNER JOIN orden_proveedor orden_proveedor ON (orden_proveedor.id = detalle_orden_proveedor.id_orden_proveedor)
+                WHERE detalle_orden_proveedor.fg_activo = '1'
+                AND detalle_orden_proveedor.id_articulo = articulo.id_articulo
+                AND orden_proveedor.status = #{statusOrder} OR orden_proveedor.status = #{statusOrderFinish}
+                AND detalle_orden_proveedor.tipo_orden = #{typeOrderDetail}
+            ) AS total_shop_provider
         FROM articulo articulo
-        INNER JOIN categoria categoria ON (categoria.id_categoria = articulo.id_categoria)
-        INNER JOIN color color ON (color.id_color = articulo.id_color )
+            INNER JOIN categoria categoria ON (categoria.id_categoria = articulo.id_categoria)
+            INNER JOIN color color ON (color.id_color = articulo.id_color )
         WHERE articulo.activo = 1
-        <if test="categoria != null ">
-            AND categoria.descripcion LIKE CONCAT('%',#{categoria},'%')
+        <if test="categoria != null and categoria.categoriaId != 0 ">
+            AND categoria.id_categoria = #{categoria.categoriaId}
         </if>
-        <if test="color != null ">
-            AND color.color LIKE CONCAT('%',#{color},'%')
+        <if test="color != null and color.colorId != 0 ">
+            AND color.id_color = #{color.colorId}
         </if>
-        <if test="descripcion != null ">
+        <if test="descripcion != null and descripcion != '' ">
             AND articulo.descripcion LIKE CONCAT('%',#{descripcion},'%')
         </if>
     </select>  

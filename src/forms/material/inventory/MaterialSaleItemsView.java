@@ -42,7 +42,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
             
             String id = table.getValueAt(table.getSelectedRow(), 0).toString();
             try {
-                materialInventoryService.delete(new MaterialSaleItem(new Long(id)));
+                materialInventoryService.delete(new MaterialSaleItem(Long.parseLong(id)));
                 getItems();
             } catch (Exception e) {
                 printLog(e);
@@ -77,8 +77,8 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
             }
             
             MaterialSaleItem materialSaleItem = new MaterialSaleItem();
-            materialSaleItem.setMaterialInventory(new MaterialInventory(new Long(gMaterialId)));
-            materialSaleItem.setProvider(new Proveedor(new Long(gProviderId)));
+            materialSaleItem.setMaterialInventory(new MaterialInventory(Long.parseLong(gMaterialId)));
+            materialSaleItem.setProvider(new Proveedor(Long.parseLong(gProviderId)));
             materialSaleItem.setItem(gItem);
             materialSaleItem.setAmount(new Float(amount));
             materialInventoryService.save(materialSaleItem);
@@ -119,7 +119,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
         List<MaterialSaleItem> list;
         
         try {
-            list = materialInventoryService.getMaterialSaleItemsByItemId(new Long(gItem.getArticuloId()));
+            list = materialInventoryService.getMaterialSaleItemsByItemId(Long.parseLong(gItem.getArticuloId()+""));
         } catch (Exception e) {
             printLog(e);
             return;

@@ -59,7 +59,7 @@ public class UserService {
         Usuario usuario = new Usuario();
         
         if(dtconduc[0][0] != null)
-            usuario.setUsuarioId(new Integer(dtconduc[0][0].toString()));
+            usuario.setUsuarioId(Integer.parseInt(dtconduc[0][0].toString()));
         if(dtconduc[0][1] != null)
             usuario.setNombre(dtconduc[0][1].toString());
         if(dtconduc[0][2] != null)
@@ -81,7 +81,7 @@ public class UserService {
          if(dtconduc[0][10] != null)
             usuario.setActivo(dtconduc[0][10].toString());
           if(dtconduc[0][11] != null)
-            usuario.setPuesto(this.obtenerPuestoPorId(sql, new Integer(dtconduc[0][11].toString())));
+            usuario.setPuesto(this.obtenerPuestoPorId(sql, Integer.parseInt(dtconduc[0][11].toString())));
         
         System.out.println("se obtuvo el usuario: "+usuario.toString());
         return usuario;
@@ -109,7 +109,7 @@ public class UserService {
         Puesto puesto = new Puesto();
         
         if(dtconduc[0][0] != null)
-            puesto.setPuestoId(new Integer(dtconduc[0][0].toString()));
+            puesto.setPuestoId(Integer.parseInt(dtconduc[0][0].toString()));
         if(dtconduc[0][1] != null)
             puesto.setDescripcion(dtconduc[0][1].toString());
         
@@ -142,7 +142,7 @@ public class UserService {
             Usuario usuario = new Usuario();
         
             if(dtconduc[i][0] != null)
-                usuario.setUsuarioId(new Integer(dtconduc[i][0].toString()));
+                usuario.setUsuarioId(Integer.parseInt(dtconduc[i][0].toString()));
             if(dtconduc[i][1] != null)
                 usuario.setNombre(dtconduc[i][1].toString());
             if(dtconduc[i][2] != null)
@@ -164,7 +164,7 @@ public class UserService {
             if(dtconduc[i][10] != null)
                 usuario.setActivo(dtconduc[i][10].toString());
             if(dtconduc[i][11] != null)
-                usuario.setPuesto(this.obtenerPuestoPorId(sql, new Integer(dtconduc[i][11].toString())));
+                usuario.setPuesto(this.obtenerPuestoPorId(sql, Integer.parseInt(dtconduc[i][11].toString())));
               
             usuarios.add(usuario);
         }
@@ -208,7 +208,7 @@ public class UserService {
         Usuario usuario = new Usuario();
         
         if(dtconduc[0][0] != null)
-            usuario.setUsuarioId(new Integer(dtconduc[0][0].toString()));
+            usuario.setUsuarioId(Integer.parseInt(dtconduc[0][0].toString()));
         if(dtconduc[0][1] != null)
             usuario.setNombre(dtconduc[0][1].toString());
         if(dtconduc[0][2] != null)
@@ -230,7 +230,7 @@ public class UserService {
          if(dtconduc[0][10] != null)
             usuario.setActivo(dtconduc[0][10].toString());
           if(dtconduc[0][11] != null)
-            usuario.setPuesto(this.obtenerPuestoPorId(sql, new Integer(dtconduc[0][11].toString())));
+            usuario.setPuesto(this.obtenerPuestoPorId(sql, Integer.parseInt(dtconduc[0][11].toString())));
         
         System.out.println("se obtuvo el usuario: "+usuario.toString());
         return usuario;

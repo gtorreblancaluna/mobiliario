@@ -5,6 +5,7 @@
  */
 package mobiliario;
 
+import forms.inventario.InventarioForm;
 import forms.rentas.AgregarRenta;
 import forms.rentas.ConsultarRentas;
 import forms.contabilidad.ContabilidadForm;
@@ -36,7 +37,7 @@ public class principal extends javax.swing.JFrame {
     utilerias ventana_utilerias;
     usuarios ventana_usuarios;
     ContabilidadForm ventana_contabilidad;
-    inventario ventana_inventario;
+    InventarioForm ventana_inventario;
     consultar_abonos ventana_abonos;
     AgregarRenta ventana_agregar_renta;
     ConsultarRentas v_consultar_renta;
@@ -162,7 +163,7 @@ public class principal extends javax.swing.JFrame {
 
     public void abrir_inventario() {
         if (Utility.verifyIfInternalFormIsOpen(ventana_inventario)) {
-            ventana_inventario = new inventario();
+            ventana_inventario = new InventarioForm();
             ventana_inventario.setLocation(this.getWidth() / 2 - ventana_inventario.getWidth() / 2, this.getHeight() / 2 - ventana_inventario.getHeight() / 2 - 20);
             jDesktopPane1.add(ventana_inventario);
             ventana_inventario.show();

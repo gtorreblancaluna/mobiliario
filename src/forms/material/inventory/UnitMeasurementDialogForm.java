@@ -30,7 +30,7 @@ public class UnitMeasurementDialogForm extends javax.swing.JDialog {
                 String id = table.getValueAt(table.getSelectedRow(), 0).toString();
                 try {
                     MeasurementUnit measurementUnit = new MeasurementUnit();
-                    measurementUnit.setId(new Long(id));
+                    measurementUnit.setId(Long.parseLong(id));
                     materialInventoryService.delete(measurementUnit);
                     MaterialInventoryView.loadComboBoxs();
                     fillTable();
@@ -67,7 +67,7 @@ public class UnitMeasurementDialogForm extends javax.swing.JDialog {
         try {
             MeasurementUnit measurementUnit = new MeasurementUnit();
             if (idToUpdate != null && !idToUpdate.isEmpty()) {
-                measurementUnit.setId(new Long(idToUpdate));
+                measurementUnit.setId(Long.parseLong(idToUpdate));
             }
             measurementUnit.setDescription(txtDescription.getText());
             materialInventoryService.save(measurementUnit);

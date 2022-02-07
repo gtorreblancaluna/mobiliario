@@ -12,7 +12,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import mobiliario.ApplicationConstants;
-import mobiliario.inventario;
+import forms.inventario.InventarioForm;
 import model.CategoriaContabilidad;
 import services.ContabilidadServices;
 
@@ -258,7 +258,7 @@ public class CategoriaContabilidadForm extends java.awt.Dialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-        inventario.validar_categorias = true;
+        InventarioForm.validar_categorias = true;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog
@@ -286,7 +286,7 @@ public class CategoriaContabilidadForm extends java.awt.Dialog {
         }
        
        CategoriaContabilidad categoriaContabilidad = new CategoriaContabilidad();
-       categoriaContabilidad.setCategoriaContabilidadId(new Integer(g_id_categoria));
+       categoriaContabilidad.setCategoriaContabilidadId(Integer.parseInt(g_id_categoria));
        categoriaContabilidad.setDescripcion(txt_categoria.getText().toString());
        
        contabilidadService.updateCategory(categoriaContabilidad);

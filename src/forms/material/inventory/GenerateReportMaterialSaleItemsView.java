@@ -93,7 +93,7 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
                 if ( table.getValueAt(i, Header.PROVIDER_ID.getColumn()).equals(providerId) ) {
                     MaterialSaleItemReport materialSaleItemReport = new MaterialSaleItemReport();
                     materialSaleItemReport.setDescriptionItem(table.getValueAt(i, Header.ITEM_DESCRIPTION.getColumn()).toString());
-                    materialSaleItemReport.setPurchaseAmountRound(new Float(table.getValueAt(i, Header.PURCHASE_AMOUNT_ROUND.getColumn()).toString()));
+                    materialSaleItemReport.setPurchaseAmountRound(Float.parseFloat(table.getValueAt(i, Header.PURCHASE_AMOUNT_ROUND.getColumn()).toString()));
                     materialSaleItemReport.setPurchaseMeasurementUnitDescription(table.getValueAt(i, Header.PURCHASE_MEASUREMENT_UNIT.getColumn()).toString());
                     materialSaleItemReport.setMaterialInventoryDescription(table.getValueAt(i, Header.MATERIAL_DESCRIPTION.getColumn()).toString());
                     materialSaleItemReport.setProviderId(

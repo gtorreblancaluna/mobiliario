@@ -14,7 +14,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import mobiliario.ApplicationConstants;
-import mobiliario.inventario;
+import forms.inventario.InventarioForm;
 import model.CategoriaContabilidad;
 import model.Cuenta;
 import model.SubCategoriaContabilidad;
@@ -337,7 +337,7 @@ public class SubCategoriaContabilidadForm extends java.awt.Dialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-        inventario.validar_categorias = true;
+        InventarioForm.validar_categorias = true;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog

@@ -5,6 +5,7 @@
  */
 package mobiliario;
 
+import forms.inventario.InventarioForm;
 import services.SaleService;
 import clases.sqlclass;
 import java.text.DecimalFormat;
@@ -193,7 +194,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
         "INNER JOIN articulo articulo ON (detalle.id_articulo = articulo.id_articulo) " +
         "INNER JOIN estado estado ON (estado.id_estado = renta.id_estado) " +
         "INNER JOIN tipo tipo ON (tipo.id_tipo = renta.id_tipo) " +
-        "WHERE articulo.id_articulo = "+inventario.g_articuloId+" " +
+        "WHERE articulo.id_articulo = "+InventarioForm.g_articuloId+" " +
         "ORDER BY renta.folio DESC " +
         "LIMIT 100 ";
          
@@ -225,7 +226,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
     
     public void llenar_tabla_articulos_faltantes(){
         this.formato_tabla_articulos_faltantes();
-        List<Faltante> faltantes = itemService.obtenerFaltantesPorArticuloId(funcion, inventario.g_articuloId);
+        List<Faltante> faltantes = itemService.obtenerFaltantesPorArticuloId(funcion, InventarioForm.g_articuloId);
         
         if(faltantes == null || faltantes.size()<= 0)
             return;
@@ -272,7 +273,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
             query.append("INNER JOIN articulo articulo ON (detalle.id_articulo = articulo.id_articulo) ");
             query.append("INNER JOIN estado estado ON (estado.id_estado = renta.id_estado) ");
             query.append("INNER JOIN tipo tipo ON (tipo.id_tipo = renta.id_tipo) ");
-            query.append("WHERE articulo.id_articulo = "+inventario.g_articuloId+" ");
+            query.append("WHERE articulo.id_articulo = "+InventarioForm.g_articuloId+" ");
             query.append("ORDER BY renta.folio DESC ");
             query.append("LIMIT "+limit+" ");
         }else{
@@ -293,7 +294,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
             query.append("INNER JOIN articulo articulo ON (detalle.id_articulo = articulo.id_articulo) ");
             query.append("INNER JOIN estado estado ON (estado.id_estado = renta.id_estado) ");
             query.append("INNER JOIN tipo tipo ON (tipo.id_tipo = renta.id_tipo) ");
-            query.append("WHERE articulo.id_articulo = "+inventario.g_articuloId+" ");
+            query.append("WHERE articulo.id_articulo = "+InventarioForm.g_articuloId+" ");
             if(estadoEvento != null)
                 query.append("AND estado.descripcion = '"+estadoEvento+"' ");
             if(tipoEvento != null)
@@ -515,7 +516,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-//        inventario.validar_colores = true;
+//        InventarioForm.validar_colores = true;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog
@@ -546,7 +547,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
         // TODO add your handling code here:
         if (evt.getClickCount() == 2) {
             this.g_rentaId = tablaArticulosFaltantes.getValueAt(tablaArticulosFaltantes.getSelectedRow(), 0).toString();
-            g_articuloId = new Integer (tablaArticulosFaltantes.getValueAt(tablaArticulosFaltantes.getSelectedRow(), 1).toString());
+            g_articuloId = Integer.parseInt(tablaArticulosFaltantes.getValueAt(tablaArticulosFaltantes.getSelectedRow(), 1).toString());
             this.mostrar_faltantes();
         }
     }//GEN-LAST:event_tablaArticulosFaltantesMouseClicked

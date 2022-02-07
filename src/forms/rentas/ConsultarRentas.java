@@ -817,7 +817,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     
                 
                  String estadoActualPedido = funcion.GetData("id_estado", "SELECT id_estado FROM renta WHERE id_renta=" + id_renta + "");
-                  Articulo articulo = itemService.obtenerArticuloPorId(funcion, new Integer(id_articulo)); 
+                  Articulo articulo = itemService.obtenerArticuloPorId(funcion, Integer.parseInt(id_articulo)); 
                  if( (ApplicationConstants.ESTADO_EN_RENTA.equals(estadoActualPedido )
                   ) ){         
                       //2018.11.16
@@ -834,11 +834,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                  }
                     
                     String datos[] = {id_renta, txt_cantidad.getText().toString(), id_articulo, txt_precio_unitario.getText().toString(),porcentajeDescuento+""};
-//                    funcion.InsertarRegistro(datos, "INSERT INTO detalle_renta (id_renta,cantidad,id_articulo,p_unitario) values (?,?,?,?)");
+
                    int lastId = saleService.insertarDetalleRenta(datos, funcion);
-                    // funcion.desconecta();
-//                    tabla_detalle();
-                    //String[] columnNames = {"id_detalle_renta", "cantidad", "id_articulo", "descripcion","precio u.", "importe","esNuevo"};
+
                     DefaultTableModel temp = (DefaultTableModel) tabla_detalle.getModel();              
                      float cantidad = Float.parseFloat(txt_cantidad.getText().toString());
                     float precio = Float.parseFloat(txt_precio_unitario.getText().toString());
@@ -872,9 +870,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     panel = true;
                     
                 }
-//            } else {
-//                JOptionPane.showMessageDialog(null, "Agrega otra cantidad menor a la del inventario...", "Actualizacion", JOptionPane.INFORMATION_MESSAGE);
-//            }
         }
         
     }
@@ -914,32 +909,28 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 
                 Abono abono = new Abono();
                 abono.setAbono(cantidadAbono);
-                abono.setComentario(txt_comentario.getText().toString());
+                abono.setComentario(txt_comentario.getText());
                 abono.setFechaPago(fechaPago);
                 abono.setTipoAbono(tipoAbono);
-                abono.setAbonoId(new Integer(id_abonos));
+                abono.setAbonoId(Integer.parseInt(id_abonos));
                 saleService.actualizarAbonoPorId(abono);
                 
-//                funcion.UpdateRegistro(datos, "UPDATE abonos set abono=?,comentario=?,fecha_pago=? where id_abonos=?");
                 log.debug("el usuario: "+iniciar_sesion.usuarioGlobal.getNombre()+" "
-                        +iniciar_sesion.usuarioGlobal.getApellidos()+" a modificado el abono a: "+txt_abono.getText().toString()+
+                        +iniciar_sesion.usuarioGlobal.getApellidos()+" a modificado el abono a: "+txt_abono.getText()+
                         " id_renta: "+this.id_renta);
                 
                 // funcion.desconecta();
-                JOptionPane.showMessageDialog(null, "Se actualizo con exito el abono...", "Actualizacion", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Se actualizo con exito el abono...", "Actualización", JOptionPane.INFORMATION_MESSAGE);
                 txt_abono.setText("0");
                 txt_comentario.setText("");
                 cmb_fecha_pago.setDate(null);
                 this.cmb_fecha_pago.setDate(null);
                 this.cmbTipoPago.setSelectedIndex(0);
                 tabla_abonos(id_renta);
-                abonos();
+                calcularAbonos();
                 
                 total();
                 editar_abonos = false;
-//            } catch (SQLException ex) {
-//                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, ex);
-//            }
         }
         
     }
@@ -1026,7 +1017,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                
                 // funcion.desconecta();
                 tabla_abonos(id_renta);
-                abonos();
+                calcularAbonos();
                 
                 subTotal();
                 total();
@@ -1097,7 +1088,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     funcion.DeleteRegistro("abonos", "id_abonos", tabla_abonos.getValueAt(tabla_abonos.getSelectedRow(), 0).toString());
                     // funcion.desconecta();
                     tabla_abonos(id_renta);
-                    abonos();
+                    calcularAbonos();
                     subTotal();
                     total();
                 } catch (SQLException ex) {
@@ -1231,16 +1222,20 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
     };
     
-    public void abonos() {
+    public void calcularAbonos() {
+        
         String aux;
         float abonos = 0;
+        txt_abonos.setText(decimalFormat.format(abonos));
+        System.err.println(tabla_abonos.getRowCount());
+        if (tabla_abonos.getRowCount() <= 0) {
+            return;
+        }
         for (int i = 0; i < tabla_abonos.getRowCount(); i++) {
             aux = EliminaCaracteres(((String) tabla_abonos.getValueAt(i, 3).toString()), "$,");
             abonos = Float.parseFloat(aux) + abonos;
             System.out.println("Abono es: " + abonos);
-            
         }
-//        txt_abonos.setValue(abonos);
         txt_abonos.setText(decimalFormat.format(abonos));
         
     }
@@ -1921,7 +1916,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         tabla_abonos.getColumnModel().getColumn(3).setCellRenderer(TablaRenderer);
         
-        // funcion.desconecta();
+        calcularAbonos();
     }
 
     /**
@@ -3699,7 +3694,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
             this.txt_faltantes.setText(decimalFormat.format(renta.getTotalFaltantes()));
             subTotal();
-            abonos();
             total();
             
             datos_cliente(renta.getCliente().getClienteId());
@@ -4225,7 +4219,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
          String usuarioId = funcion.GetData("id_usuarios", "SELECT id_usuarios FROM usuarios WHERE CONCAT(nombre,\" \",apellidos)='" + this.cmbUsuarios.getSelectedItem().toString() + "'");
          String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
-         List<AsignaCategoria> categoriasPorUsuario = categoryService.obtenerCategoriasAsignadasPorUsuarioId(funcion, new Integer(usuarioId));
+         List<AsignaCategoria> categoriasPorUsuario = categoryService.obtenerCategoriasAsignadasPorUsuarioId(funcion, Integer.parseInt(usuarioId));
            
          if(categoriasPorUsuario == null || categoriasPorUsuario.size()<=0){
             JOptionPane.showMessageDialog(null, "Agrega por lo menos una categoria al usuario seleccionado ", "Reporte", JOptionPane.INFORMATION_MESSAGE);

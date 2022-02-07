@@ -10,11 +10,23 @@ package model;
  * @author jerry
  */
 public class Color {
+
+    public Color() {
+    }
+    
+    
     
     private int colorId;
     private String color;
     private String tono;
     private String comentario;
+
+    public Color(int colorId, String color) {
+        this.colorId = colorId;
+        this.color = color;
+    }
+    
+    
 
     public int getColorId() {
         return colorId;
@@ -47,6 +59,12 @@ public class Color {
     public void setComentario(String comentario) {
         this.comentario = comentario;
     }
+
+    @Override
+    public String toString() {
+        return color;
+    }
+    
     
     
 }

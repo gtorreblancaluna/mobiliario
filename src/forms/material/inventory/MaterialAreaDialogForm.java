@@ -29,7 +29,7 @@ public class MaterialAreaDialogForm extends javax.swing.JDialog {
             if (opcion == JOptionPane.YES_OPTION) {
                 String id = table.getValueAt(table.getSelectedRow(), 0).toString();
                 try {
-                    materialInventoryService.delete(new MaterialArea(new Long(id)));
+                    materialInventoryService.delete(new MaterialArea(Long.parseLong(id)));
                     MaterialInventoryView.loadComboBoxs();
                     fillTable();
                 } catch (Exception e) {
@@ -65,7 +65,7 @@ public class MaterialAreaDialogForm extends javax.swing.JDialog {
         try {
             MaterialArea materialArea = new MaterialArea(txtDescription.getText());
             if (idToUpdate != null && !idToUpdate.isEmpty()) {
-                materialArea.setId(new Long(idToUpdate));
+                materialArea.setId(Long.parseLong(idToUpdate));
             }
             materialInventoryService.save(materialArea);
         } catch (Exception e) {

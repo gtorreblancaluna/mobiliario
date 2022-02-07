@@ -5,6 +5,7 @@
  */
 package mobiliario;
 
+import forms.inventario.InventarioForm;
 import clases.conectate;
 import clases.sqlclass;
 import java.sql.SQLException;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import static mobiliario.inventario.cmb_color;
+import static forms.inventario.InventarioForm.cmb_color;
 
 /**
  *
@@ -315,7 +316,7 @@ public class Categoria extends java.awt.Dialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-        inventario.validar_categorias = true;
+        InventarioForm.validar_categorias = true;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog

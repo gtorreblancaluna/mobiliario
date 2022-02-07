@@ -5,6 +5,7 @@
  */
 package mobiliario;
 
+import forms.inventario.InventarioForm;
 import forms.rentas.ConsultarRentas;
 import services.SaleService;
 import clases.sqlclass;
@@ -21,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import model.Articulo;
-//import static mobiliario.inventario.funcion;
+//import static mobiliario.InventarioForm.funcion;
 import model.DetalleRenta;
 import model.Renta;
 import services.ItemService;
@@ -76,7 +77,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         formato_tabla_unicos();
       
         try {
-        if(inventario.jcheckIncluirTodos.isSelected())
+        if(InventarioForm.jcheckIncluirTodos.isSelected())
             mostrarDisponibilidadTodos();
         else
             mostrarDisponibilidad();
@@ -90,12 +91,12 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
    
     public void mostrarDisponibilidadTodos(){       
         StringBuilder mensaje = new StringBuilder();
-        String fechaInicial = new SimpleDateFormat("dd/MM/yyyy").format(inventario.txtDisponibilidadFechaInicial.getDate());
-        String fechaFinal = new SimpleDateFormat("dd/MM/yyyy").format(inventario.txtDisponibilidadFechaFinal.getDate());
+        String fechaInicial = new SimpleDateFormat("dd/MM/yyyy").format(InventarioForm.txtDisponibilidadFechaInicial.getDate());
+        String fechaFinal = new SimpleDateFormat("dd/MM/yyyy").format(InventarioForm.txtDisponibilidadFechaFinal.getDate());
         
         String stringSql = null;
         
-        if(inventario.radioBtnTodos.isSelected()){
+        if(InventarioForm.radioBtnTodos.isSelected()){
         mensaje.append("Se incluyen todos los traslapes - ");
             // MOSTRAREMOS TODOS
         stringSql = "SELECT * FROM renta renta "
@@ -132,7 +133,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                 +"";
         }
         
-        if(inventario.radioBtnFechaEntrega.isSelected()){
+        if(InventarioForm.radioBtnFechaEntrega.isSelected()){
             // MOSTRAR POR FECHA DE ENTREGA
             mensaje.append("Se incluyen por fecha de entrega - ");
              stringSql = "SELECT * FROM renta renta "
@@ -145,7 +146,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                 +"";
         }
         
-        if(inventario.radioBtnFechaDevolucion.isSelected()){
+        if(InventarioForm.radioBtnFechaDevolucion.isSelected()){
             // MOSTRAR POR FECHA DE DEVOLUCION
             mensaje.append("Se incluyen por fecha de devolucion - ");
              stringSql = "SELECT * FROM renta renta "
@@ -252,7 +253,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                 
            }
           
-           if(inventario.check_solo_negativos.isSelected()) {
+           if(InventarioForm.check_solo_negativos.isSelected()) {
                 mensaje.append("Mostrando solo los negativos - ");
                 mostrarSoloNegativosTablaUnicos();
            }
@@ -276,13 +277,13 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
     }
 
     public void mostrarDisponibilidad(){       
-        String fechaInicial = new SimpleDateFormat("dd/MM/yyyy").format(inventario.txtDisponibilidadFechaInicial.getDate());
-        String fechaFinal = new SimpleDateFormat("dd/MM/yyyy").format(inventario.txtDisponibilidadFechaFinal.getDate());
+        String fechaInicial = new SimpleDateFormat("dd/MM/yyyy").format(InventarioForm.txtDisponibilidadFechaInicial.getDate());
+        String fechaFinal = new SimpleDateFormat("dd/MM/yyyy").format(InventarioForm.txtDisponibilidadFechaFinal.getDate());
         StringBuilder mensaje = new StringBuilder();
         
         String stringSql = null;
         
-        if(inventario.radioBtnTodos.isSelected()){
+        if(InventarioForm.radioBtnTodos.isSelected()){
             // MOSTRAREMOS TODOS
              mensaje.append("Se incluyen todos los traslapes - ");
         stringSql = "SELECT * FROM renta renta "
@@ -319,7 +320,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                 +"";
         }
         
-        if(inventario.radioBtnFechaEntrega.isSelected()){
+        if(InventarioForm.radioBtnFechaEntrega.isSelected()){
             // MOSTRAR POR FECHA DE ENTREGA
              mensaje.append("Se incluyen por fecha de entrega - ");
              stringSql = "SELECT * FROM renta renta "
@@ -332,7 +333,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                 +"";
         }
         
-        if(inventario.radioBtnFechaDevolucion.isSelected()){
+        if(InventarioForm.radioBtnFechaDevolucion.isSelected()){
             // MOSTRAR POR FECHA DE DEVOLUCION
              mensaje.append("Se incluyen por fecha devolucion - ");
              stringSql = "SELECT * FROM renta renta "
@@ -365,10 +366,10 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
           for(Renta renta : rentas){        
             for(DetalleRenta detalle : renta.getDetalleRenta()){
                  
-              for (int i = 0; i < inventario.tablaDisponibilidadArticulos.getRowCount(); i++) { 
+              for (int i = 0; i < InventarioForm.tablaDisponibilidadArticulos.getRowCount(); i++) { 
                   // recorremos la tabla para identificar los articulos 
                   String id = detalle.getArticulo().getArticuloId()+"";
-                  if (id.equals(inventario.tablaDisponibilidadArticulos.getValueAt(i, 0).toString())) {
+                  if (id.equals(InventarioForm.tablaDisponibilidadArticulos.getValueAt(i, 0).toString())) {
                     Articulo availabeItem = null;
                     try {
                         availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
@@ -451,7 +452,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                 
            }
           
-          if(inventario.check_solo_negativos.isSelected()) {
+          if(InventarioForm.check_solo_negativos.isSelected()) {
                 mensaje.append("Mostrando solo los negativos - ");
                 mostrarSoloNegativosTablaUnicos();
            }
@@ -646,7 +647,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-//        inventario.validar_colores = true;
+//        InventarioForm.validar_colores = true;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog

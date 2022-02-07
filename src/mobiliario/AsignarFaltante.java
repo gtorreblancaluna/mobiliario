@@ -5,6 +5,7 @@
  */
 package mobiliario;
 
+import forms.inventario.InventarioForm;
 import services.SaleService;
 import clases.sqlclass;
 import java.text.DecimalFormat;
@@ -57,8 +58,8 @@ public class AsignarFaltante extends java.awt.Dialog {
         funcion.conectate();
         this.setLocationRelativeTo(null);        
         this.setTitle("Asignar faltante ");   
-        this.g_articuloId = inventario.g_articuloId;
-        this.txtDescripcionArticulo.setText(inventario.g_descripcionArticulo);
+        this.g_articuloId = InventarioForm.g_articuloId;
+        this.txtDescripcionArticulo.setText(InventarioForm.g_descripcionArticulo);
       
     }
      
@@ -176,7 +177,7 @@ public class AsignarFaltante extends java.awt.Dialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-//        inventario.validar_colores = true;
+//        InventarioForm.validar_colores = true;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog

@@ -172,7 +172,7 @@ public class ViewProviderForm extends javax.swing.JDialog {
          }
         
         try{
-            providersService.deleteById(new Long(id));
+            providersService.deleteById(Long.parseLong(id));
             this.fillTable();
         }catch(BusinessException e){
             JOptionPane.showMessageDialog(this, e.getCause()+"\n"+e.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
@@ -191,7 +191,7 @@ public class ViewProviderForm extends javax.swing.JDialog {
         String id = this.tableProviders.getValueAt(tableProviders.getSelectedRow(), 0).toString();
         Proveedor proveedor;
         try{
-            proveedor = providersService.getById(new Long(id));
+            proveedor = providersService.getById(Long.parseLong(id));
             this.btnUpdate.setEnabled(true);
             g_idProvider = proveedor.getId();
         }catch(BusinessException e){

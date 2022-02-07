@@ -57,7 +57,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
     private void getInfo () {
         
         try {
-            new Float(txtPurchaseAmount.getText());
+            Float.parseFloat(txtPurchaseAmount.getText());
         } catch (NumberFormatException e) {
             System.out.println(e);
             return;
@@ -84,7 +84,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
                 String id = table.getValueAt(table.getSelectedRow(), 0).toString();
                 try {
                     MaterialInventory materialInventory = new MaterialInventory();
-                    materialInventory.setId(new Long(id));
+                    materialInventory.setId(Long.parseLong(id));
                     materialInventoryService.delete(materialInventory);
                     MaterialInventoryView.loadComboBoxs();
                     getItems();
@@ -106,7 +106,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
             
             final String id = table.getValueAt(table.getSelectedRow(), 0).toString();
             try {
-                MaterialInventory materialInventory = materialInventoryService.getById(new Long(id));
+                MaterialInventory materialInventory = materialInventoryService.getById(Long.parseLong(id));
                 
                 if (materialInventory == null) {
                     throw new Exception("No data found");
@@ -186,15 +186,15 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         
         MaterialInventory materialInventory = new MaterialInventory();
         materialInventory.setDescription(description);
-        materialInventory.setPurchaseAmount(new Float(purchaseAmount));
-        materialInventory.setStock(new Float(stock));
+        materialInventory.setPurchaseAmount(Float.parseFloat(purchaseAmount));
+        materialInventory.setStock(Float.parseFloat(stock));
         materialInventory.setMeasurementUnit(measurementUnit);
         materialInventory.setMeasurementUnitPurchase(measurementUnitPurchase);
         materialInventory.setArea(materialArea);
         
         try {
             if (!idToUpdate.isEmpty()) {
-                materialInventory.setId(new Long(idToUpdate));
+                materialInventory.setId(Long.parseLong(idToUpdate));
             }
             materialInventoryService.save(materialInventory);
             cleanForm();

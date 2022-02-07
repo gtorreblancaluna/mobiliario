@@ -234,7 +234,7 @@ public class SelectProviderToOrder extends javax.swing.JDialog {
                    MaterialSaleItemsView.txtAmount.requestFocus();
                    break;
                case "ORDER_PROVIDER":
-                    OrderProviderForm.g_provider_id = new Long(id);
+                    OrderProviderForm.g_provider_id = Long.parseLong(id);
                     OrderProviderForm.txtProviderName.setText(name + " " + lastName);
                    break;
            }

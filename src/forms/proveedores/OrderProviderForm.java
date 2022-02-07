@@ -201,8 +201,8 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
            articulo.setArticuloId(new Integer(articuloId));
            
            detail.setArticulo(articulo);
-           detail.setCantidad(new Float(cantidad));
-           detail.setPrecio(new Float(precio));
+           detail.setCantidad(Float.parseFloat(cantidad));
+           detail.setPrecio(Float.parseFloat(precio));
            detail.setTipoOrden(tipoFinal);
            detail.setComentario(comentario);
            
@@ -462,8 +462,8 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         
                 
         for (int i = 0; i < jTableOrderProvider.getRowCount(); i++) {
-           cantidad = new Float(jTableOrderProvider.getValueAt(i, HD_ORDEN_PROVEEDOR_CANTIDAD).toString());
-           precio = new Float(jTableOrderProvider.getValueAt(i, HD_ORDEN_PROVEEDOR_PRECIO).toString());
+           cantidad = Float.parseFloat(jTableOrderProvider.getValueAt(i, HD_ORDEN_PROVEEDOR_CANTIDAD).toString());
+           precio = Float.parseFloat(jTableOrderProvider.getValueAt(i, HD_ORDEN_PROVEEDOR_PRECIO).toString());
            subTotal += (cantidad * precio);
         }
         
@@ -1045,7 +1045,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         
         
         try {
-            cantidad = new Float(this.txtCantidad.getText());
+            cantidad = Float.parseFloat(this.txtCantidad.getText());
            
             
         } catch (NumberFormatException e) {
@@ -1056,7 +1056,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         
          try {
            
-            precio = new Float(this.txtPrecioCobrar.getText());
+            precio = Float.parseFloat(this.txtPrecioCobrar.getText());
             
         } catch (NumberFormatException e) {
             mensaje.append(++cont + ". Error al ingresar el precio\n");

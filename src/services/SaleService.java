@@ -588,11 +588,11 @@ public class SaleService {
            for (int i = 0; i < dtconduc.length; i++) {
                Abono abono = new Abono();
                if(dtconduc[i][0] != null)
-                   abono.setAbonoId(new Integer (dtconduc[i][0].toString()) );
+                   abono.setAbonoId(Integer.parseInt(dtconduc[i][0].toString()) );
                if(dtconduc[i][1] != null)
-                    abono.setRentaId(new Integer (dtconduc[i][1].toString()) );
+                    abono.setRentaId(Integer.parseInt(dtconduc[i][1].toString()) );
                if(dtconduc[i][2] != null)
-                    abono.setUsuarioId(new Integer (dtconduc[i][2].toString()) );
+                    abono.setUsuarioId(Integer.parseInt(dtconduc[i][2].toString()) );
                if(dtconduc[i][3] != null)
                     abono.setFecha(dtconduc[i][3].toString() );
                if(dtconduc[i][4] != null)
@@ -869,7 +869,7 @@ public class SaleService {
            for (int i = 0; i < dtconduc.length; i++) {
                TipoAbono tipo = new TipoAbono();
                if(dtconduc[i][0] != null)
-                   tipo.setTipoAbonoId(new Integer (dtconduc[i][0].toString()) );
+                   tipo.setTipoAbonoId(Integer.parseInt(dtconduc[i][0].toString()) );
                if(dtconduc[i][1] != null)
                     tipo.setDescripcion(dtconduc[i][1]+"");
                if(dtconduc[i][2] != null)

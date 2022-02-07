@@ -9,7 +9,7 @@ public class Articulo {
     private int categoriaId;
     private int usuarioId;
     private Color color;
-    private float cantidad;
+    private Float cantidad;
     private String descripcion;
     private String fechaIngreso;
     private float precioCompra;
@@ -21,15 +21,28 @@ public class Articulo {
     private CategoriaDTO categoria;
     
     private String rentados;
-    private String faltantes;
-    private String reparacion;
-    private String accidenteTrabajo;
-    private String devolucion;
+    private Float faltantes;
+    private Float reparacion;
+    private Float accidenteTrabajo;
+    private Float devolucion;
     // dato para actualizar la ultima fecha de modificacion
     private Timestamp fechaUltimaModificacion;
     
+    // estos datos solo son para realizar calculos en la vista
     private Float totalCompras;
+    private Float totalShopProvider;
+    
     private Float utiles;
+
+    public Float getTotalShopProvider() {
+        return totalShopProvider;
+    }
+
+    public void setTotalShopProvider(Float totalShopProvider) {
+        this.totalShopProvider = totalShopProvider;
+    }
+    
+    
 
     public Float getTotalCompras() {
         return totalCompras;
@@ -45,6 +58,14 @@ public class Articulo {
 
     public void setUtiles(Float utiles) {
         this.utiles = utiles;
+    }
+
+    public Float getFaltantes() {
+        return faltantes;
+    }
+
+    public void setFaltantes(Float faltantes) {
+        this.faltantes = faltantes;
     }
     
     
@@ -63,41 +84,34 @@ public class Articulo {
         this.rentados = rentados;
     }
 
-    public String getFaltantes() {
-        return faltantes;
-    }
-
-    public void setFaltantes(String faltantes) {
-        this.faltantes = faltantes;
-    }
-
-    public String getReparacion() {
+    public Float getReparacion() {
         return reparacion;
     }
 
-    public void setReparacion(String reparacion) {
+    public void setReparacion(Float reparacion) {
         this.reparacion = reparacion;
     }
 
-    public String getAccidenteTrabajo() {
+    public Float getAccidenteTrabajo() {
         return accidenteTrabajo;
     }
 
-    public void setAccidenteTrabajo(String accidenteTrabajo) {
+    public void setAccidenteTrabajo(Float accidenteTrabajo) {
         this.accidenteTrabajo = accidenteTrabajo;
     }
 
-    public String getDevolucion() {
+    
+    
+
+    public Float getDevolucion() {
         return devolucion;
     }
 
-    public void setDevolucion(String devolucion) {
+    public void setDevolucion(Float devolucion) {
         this.devolucion = devolucion;
     }
 
-    
-    
-    
+       
 
     public CategoriaDTO getCategoria() {
         return categoria;
@@ -143,13 +157,15 @@ public class Articulo {
     public void setUsuarioId(int usuarioId) {
         this.usuarioId = usuarioId;
     }
-    public float getCantidad() {
+
+    public Float getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(float cantidad) {
+    public void setCantidad(Float cantidad) {
         this.cantidad = cantidad;
     }
+    
 
     public String getDescripcion() {
         return descripcion;
