@@ -126,7 +126,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     
     public static boolean agregarArticulo(String id){
         
-        Articulo articulo = itemService.obtenerArticuloPorId(new Integer(id));
+        Articulo articulo = itemService.obtenerArticuloPorId(Integer.parseInt(id));
         
         if(articulo == null)
             return false;
@@ -331,7 +331,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     }
     
      public void mostrarVentanaFoliosPorArticulos() {
-        g_articuloId = new Integer(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString());
+        g_articuloId = Integer.parseInt(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString());
         VerFoliosPorArticulo ventana = new VerFoliosPorArticulo(null, true);
         ventana.setVisible(true);
         ventana.setLocationRelativeTo(null);
@@ -355,8 +355,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 || txt_descripcion.getText().equals("") 
                 || txt_precio_renta.getText().equals("") 
                 || txtCodigo.getText().equals("")
-                || cmb_categoria.getSelectedIndex() == -1 
-                || cmb_color.getSelectedIndex() == -1) {
+                || cmb_categoria.getSelectedIndex() == 0 
+                || cmb_color.getSelectedIndex() == 0) {
             
             JOptionPane.showMessageDialog(null, "Faltan parametros", "Error", JOptionPane.INFORMATION_MESSAGE);
         } else {            
@@ -364,8 +364,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             float cant = 0f;
             float precioRenta = 0f;
             try {
-                cant = new Float(txt_cantidad.getText());
-                precioRenta = new Float(txt_precio_renta.getText());
+                cant = Float.parseFloat(txt_cantidad.getText());
+                precioRenta = Float.parseFloat(txt_precio_renta.getText());
             } catch (NumberFormatException e) {
                 message.append(++cont + "Error al formatear numero, porfavor verifica que cantidades numericas esten correctas\n");
             }
@@ -383,103 +383,56 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             }
             log.debug("validaci\u00F3n exitosa para agregar articulo ");
                 
-            
-//            try {
-                
-                
-                Articulo articulo = new Articulo();
-                CategoriaDTO categoria = itemService.obtenerCategoriaPorDescripcion(cmb_categoria.getSelectedItem().toString());
-                Color color = itemService.obtenerColorPorDescripcion(cmb_color.getSelectedItem().toString());
-                articulo.setColor(color);
-                articulo.setCategoria(categoria);
-                articulo.setUsuarioId(iniciar_sesion.usuarioGlobal.getUsuarioId());
-                articulo.setCantidad(new Float(txt_cantidad.getText().toString()));
-                articulo.setDescripcion(txt_descripcion.getText().toString());
-                articulo.setPrecioCompra(new Float(txt_precio_compra.getText().toString()));
-                articulo.setPrecioRenta(new Float(txt_precio_renta.getText().toString()));
-                articulo.setCodigo(txtCodigo.getText().toString());
-                 fecha_sistema();
-                articulo.setFechaIngreso(fecha_sistema);
-                articulo.setActivo("1");
-                itemService.insertarArticulo(articulo);
-                log.debug("se a insertado con \u00E9xito el articulo: "+articulo.getDescripcion());
-                JOptionPane.showMessageDialog(null, "se a insertado con \u00E9xito el articulo: "+articulo.getDescripcion(), "Error", JOptionPane.INFORMATION_MESSAGE);
-                // funcion.conectate();
-//                String id_categoria = funcion.GetData("id_categoria", "select id_categoria from categoria where descripcion = '" + cmb_categoria.getSelectedItem().toString() + "' ");
-//                String id_color = funcion.GetData("id_color", "select id_color from color where color = '" + cmb_color.getSelectedItem().toString() + "' ");
-//                fecha_sistema();
-//                String datos[] = {id_categoria, iniciar_sesion.id_usuario_global,
-//                    txt_cantidad.getText().toString(),
-//                    txt_descripcion.getText().toString(),
-//                    id_color, fecha_sistema,
-//                    txt_precio_compra.getText().toString(),
-//                    txt_precio_renta.getText().toString(), "1",
-//                    txtCodigo.getText().toString()
-//                };
-                
-//                funcion.InsertarRegistro(datos, "insert into articulo (id_categoria,id_usuario,cantidad,descripcion,id_color,fecha_ingreso,precio_compra,precio_renta,activo,codigo) values(?,?,?,?,?,?,?,?,?,?)");
-                this.formato_tabla_articulos();
-                limpiar();
-//                tabla_articulos();
-//                buscar();
-                // funcion.desconecta();
-                
-                //jbtn_agregar.setEnabled(false);
-//            } catch (SQLException ex) {
-//                Logger.getLogger(InventarioForm.class.getName()).log(Level.SEVERE, null, ex);
-//                JOptionPane.showMessageDialog(null, "Error al insertar registro ", "Error", JOptionPane.ERROR);
-//            }
+            Articulo articulo = new Articulo();
+            CategoriaDTO categoria = (CategoriaDTO) cmb_categoria.getModel().getSelectedItem();
+            Color color = (Color) cmb_color.getModel().getSelectedItem();
+            articulo.setColor(color);
+            articulo.setCategoria(categoria);
+            articulo.setUsuarioId(iniciar_sesion.usuarioGlobal.getUsuarioId());
+            articulo.setCantidad(Float.parseFloat(txt_cantidad.getText()));
+            articulo.setDescripcion(txt_descripcion.getText());
+            articulo.setPrecioCompra(Float.parseFloat(txt_precio_compra.getText()));
+            articulo.setPrecioRenta(Float.parseFloat(txt_precio_renta.getText()));
+            articulo.setCodigo(txtCodigo.getText().trim());
+            fecha_sistema();
+            articulo.setFechaIngreso(fecha_sistema);
+            articulo.setActivo("1");
+            itemService.insertarArticulo(articulo);
+            log.debug("se a insertado con \u00E9xito el articulo: "+articulo.getDescripcion());
+            JOptionPane.showMessageDialog(null, "se a insertado con \u00E9xito el articulo: "+articulo.getDescripcion(), "Error", JOptionPane.INFORMATION_MESSAGE);
+
+            this.formato_tabla_articulos();
+            limpiar();
+
         }
     }
 
     public void guardar() {
-        if (txt_cantidad.getText().equals("") || txt_descripcion.getText().equals("") || txt_precio_compra.getText().equals("") || txt_precio_renta.getText().equals("") || cmb_categoria.getSelectedIndex() == -1 || cmb_color.getSelectedIndex() == -1) {
+        if (txt_cantidad.getText().equals("") || txt_descripcion.getText().equals("") || txt_precio_compra.getText().equals("") || txt_precio_renta.getText().equals("") || cmb_categoria.getSelectedIndex() == 0 || cmb_color.getSelectedIndex() == 0 ) {
             JOptionPane.showMessageDialog(null, "Faltan parametros", "Error", JOptionPane.INFORMATION_MESSAGE);
         } else {
-                Articulo articuloAnterior = itemService.obtenerArticuloPorId(new Integer(id_articulo));
-                log.debug("articulo antes de editar es: "+articuloAnterior.toString());
-                
-                Articulo articulo = new Articulo();
-                CategoriaDTO categoria = itemService.obtenerCategoriaPorDescripcion(cmb_categoria.getSelectedItem().toString());
-                Color color = itemService.obtenerColorPorDescripcion(cmb_color.getSelectedItem().toString());
-                articulo.setArticuloId(new Integer(id_articulo));
-                articulo.setColor(color);
-                articulo.setCategoria(categoria);
-                articulo.setCantidad(new Float(txt_cantidad.getText().toString()));
-                articulo.setDescripcion(txt_descripcion.getText().toString());
-                articulo.setPrecioCompra(new Float(txt_precio_compra.getText().toString()));
-                articulo.setPrecioRenta(new Float(txt_precio_renta.getText().toString()));
-                articulo.setCodigo(txtCodigo.getText().toString());
-                articulo.setFechaUltimaModificacion(new Timestamp(System.currentTimeMillis()));
-                itemService.actualizarArticulo(articulo);
-                log.debug("articulo despues de actualizar: "+articulo.toString());
-                JOptionPane.showMessageDialog(null, "se a actualizado con \u00E9xito el articulo: "+articulo.getDescripcion(), "Error", JOptionPane.INFORMATION_MESSAGE);
-                log.debug("el usuario: "+iniciar_sesion.usuarioGlobal.getNombre()+" "+iniciar_sesion.usuarioGlobal.getApellidos()+" a modificado el articulo: "+articulo.getDescripcion()+" con id: "+articulo.getArticuloId());
-                
-            // funcion.conectate();            
-//            String id_categoria = funcion.GetData("id_categoria", "select id_categoria from categoria where descripcion = '" + cmb_categoria.getSelectedItem().toString() + "' ");
-//            String id_color = funcion.GetData("id_color", "select id_color from color where color = '" + cmb_color.getSelectedItem().toString() + "' ");
-//            fecha_sistema();
-            
-//            String datos[] = {id_categoria, txtCodigo.getText().toString(),txt_cantidad.getText().toString(), txt_descripcion.getText().toString(), id_color, txt_precio_compra.getText().toString(), txt_precio_renta.getText().toString(), id_articulo};
-//        try {
-//          funcion.UpdateRegistro(datos, "update articulo set id_categoria=?, codigo=?, cantidad=?,descripcion=?,id_color=?,precio_compra=?, precio_renta=? where id_articulo=?");
-//        } catch (SQLNonTransientConnectionException e) {
-//            funcion.conectate();
-//            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-//        } catch (SQLException e) {
-//            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-//        } catch (Exception e) {
-//            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-//        } 
-            
+            Articulo articuloAnterior = itemService.obtenerArticuloPorId(Integer.parseInt(id_articulo));
+            log.debug("articulo antes de editar es: "+articuloAnterior.toString());
+
+            Articulo articulo = new Articulo();
+            CategoriaDTO categoria = (CategoriaDTO) cmb_categoria.getModel().getSelectedItem();
+            Color color = (Color) cmb_color.getModel().getSelectedItem();
+            articulo.setArticuloId(Integer.parseInt(id_articulo));
+            articulo.setColor(color);
+            articulo.setCategoria(categoria);
+            articulo.setCantidad(Float.parseFloat(txt_cantidad.getText()));
+            articulo.setDescripcion(txt_descripcion.getText());
+            articulo.setPrecioCompra(Float.parseFloat(txt_precio_compra.getText()));
+            articulo.setPrecioRenta(Float.parseFloat(txt_precio_renta.getText()));
+            articulo.setCodigo(txtCodigo.getText());
+            articulo.setFechaUltimaModificacion(new Timestamp(System.currentTimeMillis()));
+            itemService.actualizarArticulo(articulo);
+            log.debug("articulo despues de actualizar: "+articulo.toString());
+            JOptionPane.showMessageDialog(null, "se a actualizado con \u00E9xito el articulo: "+articulo.getDescripcion(), "Error", JOptionPane.INFORMATION_MESSAGE);
+            log.debug("el usuario: "+iniciar_sesion.usuarioGlobal.getNombre()+" "+iniciar_sesion.usuarioGlobal.getApellidos()+" a modificado el articulo: "+articulo.getDescripcion()+" con id: "+articulo.getArticuloId());
+
             this.formato_tabla_articulos();
             limpiar();
-//            tabla_articulos();
-//            buscar();
-            // funcion.desconecta();
-
-            //jbtn_agregar.setEnabled(false);
         }
     }
 
@@ -1347,7 +1300,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
              
             String itemId = tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString();
             
-            Articulo articulo = itemService.obtenerArticuloPorId(new Integer(itemId));
+            Articulo articulo = itemService.obtenerArticuloPorId(Integer.parseInt(itemId));
              
             if (articulo == null)
             {
@@ -1460,7 +1413,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 
                 Articulo articulo = new Articulo();
                 String artId = tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString();
-                articulo.setArticuloId(new Integer(artId));
+                articulo.setArticuloId(Integer.parseInt(artId));
                 articulo.setActivo("0");
                 itemService.actualizarArticulo(articulo);
 //                String datos[] = {"0", tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString()};
