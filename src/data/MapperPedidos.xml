@@ -139,7 +139,11 @@
             chofer.apellidos AS chofer_apellidos,
             e.id_estado,
             e.descripcion AS estado_descripcion,
-            (SELECT SUM(a.abono) FROM abonos a WHERE a.id_renta = #{id})  AS total_abonos,
+            (
+                SELECT SUM(a.abono)
+                FROM abonos a 
+                WHERE a.id_renta = #{id}
+            ) AS total_abonos,
             (
                 SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) )AS total
                 FROM faltantes f
@@ -195,7 +199,11 @@
             chofer.apellidos AS chofer_apellidos,
             e.id_estado,
             e.descripcion AS estado_descripcion,
-            (SELECT SUM(a.abono) FROM abonos a WHERE a.id_renta = r.id_renta)  AS total_abonos,
+            (
+                SELECT SUM(a.abono)
+                FROM abonos a 
+                WHERE a.id_renta = r.id_renta
+            ) AS total_abonos,
             (
                 SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) )AS total
                 FROM faltantes f

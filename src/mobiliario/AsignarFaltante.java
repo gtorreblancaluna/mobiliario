@@ -10,6 +10,9 @@ import services.SaleService;
 import clases.sqlclass;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import model.DetalleRenta;
 import model.Renta;
@@ -194,7 +197,12 @@ public class AsignarFaltante extends java.awt.Dialog {
         
         if(!folio.equals("") && !this.checkAccidenteLaboral.isSelected()){           
             try {
-                 renta = saleService.obtenerRentaPorFolio(new Integer ( folio ), funcion);            
+                Map<String, Object> parameters = new HashMap<>();
+                parameters.put("folio", folio);
+                List<Renta> rentas = saleService.obtenerRentasPorParametros(parameters);
+                if (!rentas.isEmpty()) {
+                    renta = rentas.get(0);
+                }    
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Ingresa solo n\u00FAmeros\n"+e, "Error", JOptionPane.INFORMATION_MESSAGE);
                 return;

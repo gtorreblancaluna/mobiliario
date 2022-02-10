@@ -359,7 +359,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 return;
             }
             
-            Double fAbonos = renta.getTotalAbonos();
+            Float fAbonos = renta.getTotalAbonos();
             float fSubTotal = 0f;
             float fCalculo = 0f;
             
@@ -799,7 +799,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             
             
             existe = false;
-//            if (Float.parseFloat(txt_cantidad.getText().toString()) <= canti) {
                 for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
                     System.out.println("lbl: " + lbl_eleccion.getText() + "  tabla: " + tabla_detalle.getValueAt(i, 3).toString());
                     if (lbl_eleccion.getText().toString().equals(tabla_detalle.getValueAt(i, 3).toString())) {
@@ -860,8 +859,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     temp.addRow(nuevo);
                     subTotal();
                     total();
-
-                    //JOptionPane.showMessageDialog(null, "Agrega otra cantidad menor a la del inventario...", "Actualizacion", JOptionPane.INFORMATION_MESSAGE);
                     Toolkit.getDefaultToolkit().beep();
                     
                     panel_conceptos.setVisible(true);
@@ -1410,6 +1407,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }
     
     public void total() {
+        
         float fSubtotal = 0f;
         float fDescuento = 0f;
         float fEnvioRecoleccion = 0f;
@@ -1453,7 +1451,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             
             if(fPorcentaejeDescuento > 0){
                 fDescuento = (fSubtotal * (fPorcentaejeDescuento / 100));
-//                this.txt_descuento.setValue(fDescuento);
                 this.txt_descuento.setText(decimalFormat.format(fDescuento));
             
             }            
@@ -1463,7 +1460,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             {              
                 fIVA = Float.parseFloat(this.txt_iva.getText().toString().replaceAll(",", ""));
                 fTotalIVA = (fCalculo * (fIVA / 100));              
-//                this.txt_total_iva.setValue(fTotalIVA);
                 this.txt_total_iva.setText(decimalFormat.format(fTotalIVA));
             }
             
@@ -1475,7 +1471,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             
             
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento;
-//            this.txt_calculo.setValue((fCalculo));
             this.txt_calculo.setText(decimalFormat.format(fCalculo));
             
             
@@ -1484,8 +1479,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
            
             if(fTotal < 0)
                 fTotal = 0f;
-        
-//            txt_total.setValue((fTotal));
             this.txt_total.setText(decimalFormat.format(fTotal));
             
         } catch (NumberFormatException e) {
@@ -1761,12 +1754,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     decimalFormat.format(renta.getSubTotal()),
                     decimalFormat.format(renta.getDepositoGarantia()),
                     decimalFormat.format(renta.getEnvioRecoleccion()),
-                    decimalFormat.format(renta.getIva()),
+                    decimalFormat.format(renta.getCalculoIVA()),
                     decimalFormat.format(renta.getTotalFaltantes()),
                     decimalFormat.format(renta.getTotalFaltantesPorCubrir()),
                     decimalFormat.format(renta.getTotalAbonos()),
                     decimalFormat.format(renta.getTotal()),
-                    decimalFormat.format(renta.getSubTotal() - renta.getCantidadDescuento())
+                    decimalFormat.format(renta.getSubTotal() - renta.getCalculoDescuento())
                          
                 };
                 tableModel.addRow(fila);
@@ -3650,11 +3643,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             txt_comentarios.setText(renta.getComentario());            
 
             cmb_tipo.getModel().setSelectedItem(renta.getTipo());
-            this.txtPorcentajeDescuento.setValue(renta.getDescuento());
-            txt_descuento.setText(decimalFormat.format(renta.getCantidadDescuento()));
-            txt_iva.setValue(renta.getIva());
-            txt_iva.setValue(renta.getIva());
-            txt_total_iva.setValue(0);            
+                  
             String[] horaSplit = renta.getHoraEntrega().split("a");            
 
             String hora_devolucion = renta.getHoraDevolucion();
@@ -3665,10 +3654,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             cmb_hora_dos.setSelectedItem(horaSplit[1].replaceAll(" ", ""));
             
             lbl_atiende.setText("Atendio: " + renta.getUsuario().getNombre()+" "+renta.getUsuario().getApellidos());
-            
-            this.txt_envioRecoleccion.setText(decimalFormat.format(renta.getEnvioRecoleccion()));
-            this.txt_depositoGarantia.setText(decimalFormat.format(renta.getDepositoGarantia()));
-            
+               
             // agregamos los articulos de esta renta
             DefaultTableModel tablaDetalle = (DefaultTableModel) tabla_detalle.getModel();
             for(DetalleRenta detalle : renta.getDetalleRenta()){
@@ -3692,9 +3678,25 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     };
                     tablaDetalle.addRow(fila);
             }
-            this.txt_faltantes.setText(decimalFormat.format(renta.getTotalFaltantes()));
-            subTotal();
-            total();
+           
+            // TOTALES
+            txt_subtotal.setText(decimalFormat.format(renta.getSubTotal()));
+            txtPorcentajeDescuento.setText(decimalFormat.format(renta.getDescuento()));
+            txt_descuento.setText(decimalFormat.format(renta.getCalculoDescuento()));
+            txt_envioRecoleccion.setText(decimalFormat.format(renta.getEnvioRecoleccion()));
+            txt_depositoGarantia.setText(decimalFormat.format(renta.getDepositoGarantia()));
+            txt_iva.setText(renta.getIva()+"");
+            txt_total_iva.setText(decimalFormat.format(renta.getCalculoIVA()));
+            txt_calculo.setText(decimalFormat.format(renta.getTotalCalculo()));
+            txt_abonos.setText(decimalFormat.format(renta.getTotalAbonos()));
+            txt_faltantes.setText(decimalFormat.format(renta.getTotalFaltantes()));     
+            txt_total.setText(decimalFormat.format(renta.getTotal()));
+            // FIN TOTALES
+            
+            
+            
+              subTotal();
+//            total();
             
             datos_cliente(renta.getCliente().getClienteId());
             jbtn_agregar_cliente.setEnabled(false);

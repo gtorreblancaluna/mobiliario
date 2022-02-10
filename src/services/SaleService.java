@@ -8,7 +8,6 @@ import java.sql.SQLNonTransientConnectionException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.apache.log4j.Logger;
 import javax.swing.JOptionPane;
 import mobiliario.ApplicationConstants;
@@ -560,6 +559,7 @@ public class SaleService {
         
         Renta renta = salesDao.obtenerRentaPorId(rentaId);
         renta.setDetalleRenta(this.obtenerDetalleRenta(renta.getRentaId()));
+        calcularTotalesPorRenta(renta);
         return renta;
                 
     } // renta por id
@@ -702,93 +702,54 @@ public class SaleService {
      
      
  }
- public List<Renta> obtenerPedidosPorConsultaSqlSinDetalle(String querySql,sqlclass sql)throws Exception{
-        
-        List<Renta> rentas = new ArrayList<>();
-       String[] columnas = {
-         ColumnRenta.ID_RENTA.getSqlColumnName(),
-           ColumnRenta.FOLIO.getSqlColumnName(),
-           ColumnRenta.CUSTOMER_NAME.getSqlColumnName(),
-           ColumnRenta.CUSTOMER_LAST_NAME.getSqlColumnName(),
-           ColumnRenta.STATUS_ID.getSqlColumnName(),
-           ColumnRenta.STATUS_DESCRIPTION.getSqlColumnName(),
-           ColumnRenta.CREATED_AT.getSqlColumnName(),
-           ColumnRenta.EVENT_DATE.getSqlColumnName(),
-           ColumnRenta.DELIVERY_DATE.getSqlColumnName(),
-           ColumnRenta.DELIVERY_HOUR.getSqlColumnName(),
-           ColumnRenta.EVENT_DESCRIPTION.getSqlColumnName(),
-           ColumnRenta.DRIVER_NAME.getSqlColumnName(),
-           ColumnRenta.DRIVER_LAST_NAME.getSqlColumnName(),
-           ColumnRenta.EVENT_TYPE_ID.getSqlColumnName(),
-           ColumnRenta.EVENT_TYPE_DESCRIPTION.getSqlColumnName(),
-           ColumnRenta.DISCOUNT_AMOUNT.getSqlColumnName(),
-           ColumnRenta.IVA.getSqlColumnName(),
-           ColumnRenta.GUARANTEE_DEPOSIT.getSqlColumnName(),
-           ColumnRenta.SHIPPING_RECOLECTION.getSqlColumnName(),
-           ColumnRenta.USER_NAME.getSqlColumnName(),
-           ColumnRenta.USER_LAST_NAME.getSqlColumnName()
-           
-       };
-        //nombre de columnas, tabla, instruccion sql
-        Object[][] dtconduc = null;
-        try {
-            dtconduc = sql.GetTabla(columnas, "renta", querySql);
-        } catch (SQLNonTransientConnectionException e) {
-            sql.conectate();
-            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }    
-        
-         if(dtconduc == null || dtconduc.length <= 0)
-            return null;
-        
-         for (int i = 0; i < dtconduc.length; i++) {
-             Renta renta = obtenerRentaPorId(Integer.parseInt(dtconduc[i][0].toString()));
-             
-            Double fAbonos = renta.getTotalAbonos();
-            float fSubTotal = 0f;
-                      
-                 
-             Float fTotal =  (renta.getEnvioRecoleccion() + renta.getDepositoGarantia() + renta.getIva() + renta.getSubTotal());
-             fTotal -= renta.getDescuento();
-             Float fTotalIva = fTotal * ( renta.getIva()/100 );
-             renta.setIva(fTotalIva);
-             fTotal =  (renta.getEnvioRecoleccion() + renta.getDepositoGarantia() + fTotalIva + fSubTotal);
-             fTotal -= renta.getDescuento();
-             fTotal -= Float.parseFloat(fAbonos+"");
-             if(fTotal >0 && fTotal<1)
-                 fTotal = 0F;
-             
-            if(renta.getTotalFaltantes() > 0 && renta.getDepositoGarantia()>0){
-                // el pedido tiene pago pendiente por faltante 
-                    // a dejado deposito en garantia
-                    renta.setTotalFaltantes(renta.getTotalFaltantes() - renta.getDepositoGarantia());
-                
-            }
-            // fin calcular faltantes
-             
-             fTotal += renta.getTotalFaltantes();
-             renta.setTotalFaltantesPorCubrir(renta.getTotalFaltantes());
-             if(fTotal <= 0){
-                 fTotal = 0F;
-                 renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_PAGADO);
-             }
-             else if(fTotal > 0 && fAbonos == 0)
-                 renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_NO_PAGADO);
-             else if (fTotal > 0 && fAbonos > 0)
-                 renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_PARCIAL_PAGADO);   
-             
-             renta.setTotal(fTotal);
-             
-             rentas.add(renta);
-         }
-        
-        return rentas;
-                
-    } // fin renta sin detalle
+ 
+ 
+ private void calcularTotalesPorRenta (Renta renta) {
+    
+   
+    Float totalCalculo = 0F;
+
+    if (renta.getDescuento() != null && renta.getDescuento() > 0) {
+        renta.setCalculoDescuento((renta.getSubTotal() * (renta.getDescuento() / 100)));
+    } else {
+        renta.setCalculoDescuento(0F);
+    }
+
+    if (renta.getIva() != null && renta.getIva() > 0) {
+        renta.setCalculoIVA(renta.getSubTotal() * (renta.getIva() / 100));
+    } else {
+        renta.setCalculoIVA(0F);
+    }
+
+    if(renta.getTotalFaltantes() > 0 && renta.getDepositoGarantia()>0){
+            // el pedido tiene pago pendiente por faltante 
+           // a dejado deposito en garantia
+           renta.setTotalFaltantesPorCubrir(renta.getTotalFaltantes() - renta.getDepositoGarantia());
+
+   }
+    
+    if (renta.getTotalAbonos() == null) {
+        renta.setTotalAbonos(0F);
+    }
+    
+    totalCalculo = (renta.getSubTotal() +
+                    (renta.getEnvioRecoleccion() != null ? renta.getEnvioRecoleccion() : 0F) +
+                    (renta.getDepositoGarantia() != null ? renta.getDepositoGarantia() : 0F) +
+                    renta.getCalculoIVA()) - renta.getCalculoDescuento();
+    
+    renta.setTotalCalculo(totalCalculo);
+    
+    renta.setTotal( (totalCalculo - renta.getTotalAbonos()) + renta.getTotalFaltantes());
+    if(renta.getTotal() <= 0){
+        renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_PAGADO);
+    }else if(renta.getTotal() > 0 && renta.getTotalAbonos() == 0){
+        renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_NO_PAGADO);
+    }else if (renta.getTotal() > 0 && renta.getTotalAbonos() > 0){
+        renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_PARCIAL_PAGADO);
+    }
+
+     
+ }
  
  public List<Renta> obtenerRentasPorParametros(Map<String,Object> parameters)throws Exception{
         
@@ -796,48 +757,7 @@ public class SaleService {
        
         
          for (Renta renta : rentas) {
-             
-             Double fAbonos = 0D;
-            
-             if (renta.getTotalAbonos() != null){
-                fAbonos = renta.getTotalAbonos();
-             } else{
-                 renta.setTotalAbonos(fAbonos);
-             }
-            float fSubTotal = 0f;
-                      
-                 
-             Float fTotal =  (renta.getEnvioRecoleccion() + renta.getDepositoGarantia() + renta.getIva() + renta.getSubTotal());
-             fTotal -= renta.getDescuento();
-             Float fTotalIva = fTotal * ( renta.getIva()/100 );
-             renta.setIva(fTotalIva);
-             fTotal =  (renta.getEnvioRecoleccion() + renta.getDepositoGarantia() + fTotalIva + fSubTotal);
-             fTotal -= renta.getDescuento();
-             fTotal -= Float.parseFloat(fAbonos+"");
-             if(fTotal >0 && fTotal<1)
-                 fTotal = 0F;
-             
-            if(renta.getTotalFaltantes() > 0 && renta.getDepositoGarantia()>0){
-                // el pedido tiene pago pendiente por faltante 
-                    // a dejado deposito en garantia
-                    renta.setTotalFaltantes(renta.getTotalFaltantes() - renta.getDepositoGarantia());
-                
-            }
-            // fin calcular faltantes
-             
-             fTotal += renta.getTotalFaltantes();
-             renta.setTotalFaltantesPorCubrir(renta.getTotalFaltantes());
-             if(fTotal <= 0){
-                 fTotal = 0F;
-                 renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_PAGADO);
-             }
-             else if(fTotal > 0 && fAbonos == 0)
-                 renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_NO_PAGADO);
-             else if (fTotal > 0 && fAbonos > 0)
-                 renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_PARCIAL_PAGADO);   
-             
-             renta.setTotal(fTotal);
-             
+             calcularTotalesPorRenta(renta);
          }
         
         return rentas;
@@ -943,118 +863,6 @@ public class SaleService {
         return rentas;
                 
     } // fin folios por articulo
-  
-  public Renta obtenerRentaPorFolio(int folio,sqlclass sql) throws Exception {
-        
-        Renta renta = new Renta();
-        
-        //nombre de columnas, tabla, instruccion sql
-         Object[][] dtconduc = null;
-        try {
-            dtconduc = sql.GetTabla(this.obtenerColumnasRenta(), "renta", "SELECT * FROM renta renta "
-                +"WHERE renta.folio = '"+folio+"' " );
-        } catch (SQLNonTransientConnectionException e) {
-            sql.conectate();
-            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }    
-       
-         if(dtconduc == null || dtconduc.length <= 0)
-            return null;
-         
-         // servicio para los clientes
-        CustomerService customerService = new CustomerService();
-        // serivcio para los usuarios
-        
-             renta.setRentaId(Integer.parseInt(dtconduc[0][0].toString()));
-             if(dtconduc[0][1] != null)
-                renta.setEstadoId(Integer.parseInt(dtconduc[0][1].toString()));
-             
-             if(dtconduc[0][2] != null)
-                renta.setCliente(customerService.obtenerClientePorId(sql, Integer.parseInt(dtconduc[0][2].toString()))); 
-             
-             if(dtconduc[0][3] != null)
-                renta.setUsuario(userService.obtenerUsuarioPorId(sql, Integer.parseInt(dtconduc[0][3].toString())));  
-             
-             if(dtconduc[0][4] != null)
-                 renta.setFechaPedido(dtconduc[0][4].toString());
-             
-             if(dtconduc[0][5] != null)
-                 renta.setFechaEntrega(dtconduc[0][5].toString());
-             
-             if(dtconduc[0][6] != null)
-                 renta.setHoraEntrega(dtconduc[0][6].toString());
-             
-             if(dtconduc[0][7] != null)
-                 renta.setFechaDevolucion(dtconduc[0][7].toString());
-             
-             if(dtconduc[0][8] != null)
-                 renta.setDescripcion(dtconduc[0][8].toString());
-             
-             if(dtconduc[0][9] == null)
-                 renta.setDescuento(0f);
-             else if(dtconduc[0][9].toString().equals(""))
-                 renta.setDescuento(0f);
-             else
-                 renta.setDescuento(Float.parseFloat(dtconduc[0][9].toString()));
-             
-             if(dtconduc[0][10] != null)
-                 renta.setCantidadDescuento(Float.parseFloat(dtconduc[0][10].toString()));
-             
-             if(dtconduc[0][11] != null)
-                 renta.setIva(Float.parseFloat(dtconduc[0][11].toString()));
-             else
-                 renta.setIva(0f);
-             
-             if(dtconduc[0][12] != null)
-                 renta.setComentario(dtconduc[0][12].toString());
-             
-             if(dtconduc[0][13] != null)
-                 renta.setUsuarioChoferId(Integer.parseInt(dtconduc[0][13].toString()));
-             
-             if(dtconduc[0][14] != null)
-                 renta.setFolio(Integer.parseInt(dtconduc[0][14].toString()));
-             
-             if(dtconduc[0][15] != null)
-                 renta.setStock(dtconduc[0][15].toString());
-              
-             if(dtconduc[0][16] != null)
-                 renta.setTipo(this.obtenerTipoPorId(sql,Integer.parseInt(dtconduc[0][16].toString())));
-             
-             if(dtconduc[0][17] != null)
-                 renta.setHoraDevolucion(dtconduc[0][17].toString());
-             
-             if(dtconduc[0][18] != null)
-                 renta.setFechaEvento(dtconduc[0][18].toString());
-              
-             if(dtconduc[0][19] == null)
-                 renta.setDepositoGarantia(0f);
-             else
-                 renta.setDepositoGarantia(Float.parseFloat(dtconduc[0][19].toString()));
-             
-             if(dtconduc[0][20] == null)
-                 renta.setEnvioRecoleccion(0f);
-             else
-                 renta.setEnvioRecoleccion(Float.parseFloat(dtconduc[0][20].toString()));
-             
-             if(dtconduc[0][21] == null)
-                 renta.setMostrarPreciosPdf("0");
-             else
-                 renta.setMostrarPreciosPdf(dtconduc[0][21]+"");
-             
-             
-             renta.setEstado(this.obtenerEstadoEventoPorId(sql, renta.getEstadoId()));
-             renta.setChofer(userService.obtenerUsuarioPorId(sql,renta.getUsuarioChoferId()));
-             // obtenemos el detalle de la renta
-             renta.setDetalleRenta(this.obtenerDetalleRenta(Integer.parseInt(dtconduc[0][0].toString())));
-             renta.setAbonos(this.obtenerAbonosPorRentaId(sql,Integer.parseInt(dtconduc[0][0].toString())));
-        
-        return renta;
-                
-    } // renta por folio
   
   public TipoAbono obtenerTipoAbonoPorDescripcion(String descripcion){
       return salesDao.obtenerTipoAbonoPorDescripcion(descripcion);      

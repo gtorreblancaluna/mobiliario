@@ -23,21 +23,21 @@ public class Renta {
     private String horaEntrega;
     private String fechaDevolucion;
     private String descripcion;
-    private float descuento;
+    private Float descuento;
     private float cantidadDescuento;
-    private float iva;
+    private Float iva;
     private String comentario;
     private int usuarioChoferId;
     private int folio;
     private String stock;
     private Tipo tipo;
-    private Double totalAbonos;
+    private Float totalAbonos;
     private List<DetalleRenta> detalleRenta;
     private List<Abono> abonos;
     private String horaDevolucion;
     private String fechaEvento;
-    private float depositoGarantia;
-    private float envioRecoleccion;
+    private Float depositoGarantia;
+    private Float envioRecoleccion;
     private Usuario chofer;
     private EstadoEvento estado;
     private String mostrarPreciosPdf;
@@ -49,15 +49,50 @@ public class Renta {
     private float totalFaltantes;
     // dato del faltante por cubrir
     private float totalFaltantesPorCubrir;
+    
+    private Float calculoDescuento;
+    private Float calculoIVA;
+    private Float totalCalculo;
 
-    public Double getTotalAbonos() {
+    public Float getTotalCalculo() {
+        return totalCalculo;
+    }
+
+    public void setTotalCalculo(Float totalCalculo) {
+        this.totalCalculo = totalCalculo;
+    }
+
+    
+    
+    
+
+    public Float getCalculoDescuento() {
+        return calculoDescuento;
+    }
+
+    public void setCalculoDescuento(Float calculoDescuento) {
+        this.calculoDescuento = calculoDescuento;
+    }
+
+    public Float getCalculoIVA() {
+        return calculoIVA;
+    }
+
+    public void setCalculoIVA(Float calculoIVA) {
+        this.calculoIVA = calculoIVA;
+    }
+    
+    
+
+    public Float getTotalAbonos() {
         return totalAbonos;
     }
 
-    public void setTotalAbonos(Double totalAbonos) {
+    public void setTotalAbonos(Float totalAbonos) {
         this.totalAbonos = totalAbonos;
     }
-    
+
+   
     
 
     public float getTotalFaltantesPorCubrir() {
@@ -156,27 +191,21 @@ public class Renta {
         this.fechaEvento = fechaEvento;
     }
 
-    public float getDepositoGarantia() {
+    public Float getDepositoGarantia() {
         return depositoGarantia;
     }
 
-    public void setDepositoGarantia(float depositoGarantia) {
+    public void setDepositoGarantia(Float depositoGarantia) {
         this.depositoGarantia = depositoGarantia;
     }
 
-    public float getEnvioRecoleccion() {
+    public Float getEnvioRecoleccion() {
         return envioRecoleccion;
     }
 
-    public void setEnvioRecoleccion(float envioRecoleccion) {
+    public void setEnvioRecoleccion(Float envioRecoleccion) {
         this.envioRecoleccion = envioRecoleccion;
     }
-
-   
-    
-
-    
-    
 
     public List<Abono> getAbonos() {
         return abonos;
@@ -271,15 +300,13 @@ public class Renta {
         this.descripcion = descripcion;
     }
 
-    public float getDescuento() {
+    public Float getDescuento() {
         return descuento;
     }
 
-    public void setDescuento(float descuento) {
+    public void setDescuento(Float descuento) {
         this.descuento = descuento;
     }
-
-   
 
     public float getCantidadDescuento() {
         return cantidadDescuento;
@@ -289,13 +316,15 @@ public class Renta {
         this.cantidadDescuento = cantidadDescuento;
     }
 
-    public float getIva() {
+    public Float getIva() {
         return iva;
     }
 
-    public void setIva(float iva) {
+    public void setIva(Float iva) {
         this.iva = iva;
     }
+
+   
 
     public String getComentario() {
         return comentario;
