@@ -29,17 +29,24 @@ import services.providers.OrderProviderService;
 
 public class ItemService {
 
-    private static final ItemService SINGLE_INSTANCE = new ItemService();
+    private static final ItemService SINGLE_INSTANCE = null;
     private ItemService(){}
     public static ItemService getInstance() {
-      return SINGLE_INSTANCE;
+      if (SINGLE_INSTANCE == null) {
+            return new ItemService();
+        }
+        return SINGLE_INSTANCE;
     }
     
   
-    private ItemDAO itemDao = new ItemDAO();
-    private ComprasService comprasService = new ComprasService();
-    private OrderProviderService orderProviderService = OrderProviderService.getInstance();
-    private static Logger LOGGER = Logger.getLogger(ItemService.class.getName());
+    private final ItemDAO itemDao = ItemDAO.getInstance();
+    private final ComprasService comprasService = new ComprasService();
+    private final OrderProviderService orderProviderService = OrderProviderService.getInstance();
+    private final static Logger LOGGER = Logger.getLogger(ItemService.class.getName());
+    
+    public List<Articulo> obtenerArticulosActivos() {
+        return itemDao.obtenerArticulosActivos();
+    }
     
     public Articulo obtenerArticuloPorId(sqlclass sql, int articuloId){
 

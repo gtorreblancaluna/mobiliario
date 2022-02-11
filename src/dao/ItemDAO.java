@@ -16,16 +16,33 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
-/**
- *
- * @author jerry
- */
 public class ItemDAO {
     private static Logger log = Logger.getLogger(ItemDAO.class.getName());
     private SqlSessionFactory sqlSessionFactory;
+    private static final ItemDAO SINGLE_INSTANCE = null;
  
-    public ItemDAO() {
+    private ItemDAO() {
         sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();
+    }
+    
+    public static ItemDAO getInstance(){
+        if (SINGLE_INSTANCE == null) {
+            return new ItemDAO();
+        }
+        return SINGLE_INSTANCE;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Articulo> obtenerArticulosActivos() {
+        SqlSession session = sqlSessionFactory.openSession();
+        try {
+            return (List<Articulo>) session.selectList("MapperArticulos.obtenerArticulosActivos");
+        }catch(Exception ex){
+            log.error(ex);
+            return null;
+        } finally {
+            session.close();
+        }
     }
     
     @SuppressWarnings("unchecked")

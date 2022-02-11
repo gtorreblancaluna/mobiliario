@@ -104,6 +104,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private final EstadoEventoService estadoEventoService = EstadoEventoService.getInstance();
     private final TipoEventoService tipoEventoService = TipoEventoService.getInstance();
     private final OrderProviderService orderService = OrderProviderService.getInstance();
+    // listado de articulos que se llenaran de manera asincrona, y se utilizara para realizar busquedas por descripcion
+    private List<Articulo> articulos = new ArrayList<>();
 
 
     public ConsultarRentas() throws PropertyVetoException {
@@ -143,6 +145,16 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }).start();
         initalData ();
          
+    }
+    
+    private void obtenerArticulosGlobalesAsincrono () {
+        
+        if (!articulos.isEmpty()) {
+            return;
+        }
+        new Thread(() -> {
+            articulos = itemService.obtenerArticulosActivos();
+        }).start();
     }
     
        public void tableFormatOrderProvider() {
@@ -1795,55 +1807,25 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }
     
     public void tabla_articulos_like() {
-        // funcion.conectate();
-        tabla_articulos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        String[] columNames = {"Id", "Categoria", "Descripcion", "Color", "P.Unitario", "Stock"};
-        String[] colName = {"id_articulo", "categoria", "descripcion", "color", "precio_renta", "cantidad"};
-        //nombre de columnas, tabla, instruccion sql   
-        try {       
-            dtconduc = funcion.GetTabla(colName, "articulo", "SELECT a.`id_articulo`, ca.`descripcion` as categoria, a.`descripcion`, c.`color`, a.`precio_renta`,a.`cantidad` FROM articulo a, color c, categoria ca\n"
-                + "WHERE a.id_color=c.id_color and activo =1 AND a.id_categoria=ca.id_categoria AND a.`descripcion` like '%" + txt_buscar.getText().toString() + "%' ");
+        tabla_articulos();
         
-        } catch (SQLNonTransientConnectionException e) {
-            funcion.conectate();
-            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }
+        List<Articulo> filterArticulos = articulos.stream()
+			.filter(articulo -> (articulo.getDescripcion().trim().toLowerCase() + " " + articulo.getColor().getColor().trim().toLowerCase()).contains(txt_buscar.getText().toLowerCase().trim()))
+                        .toList();
         
-        for (int i = 0; i < dtconduc.length; i++) {
-            String valor = dtconduc[i][4].toString();
-            dtconduc[i][4] = conviertemoneda(valor).toString();
-            System.out.println(conviertemoneda(valor));
-            
-        }
+        DefaultTableModel tableModel = (DefaultTableModel) tabla_articulos.getModel();
         
-        DefaultTableModel datos = new DefaultTableModel(dtconduc, columNames);
-        DefaultTableCellRenderer TablaRenderer = new DefaultTableCellRenderer();
-        TablaRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
-        
-        DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
-        centrar.setHorizontalAlignment(SwingConstants.CENTER);
-        
-        tabla_articulos.setModel(datos);
-        
-        int[] anchos = {10, 120, 250, 100, 90, 90};
-        
-        for (int inn = 0; inn < tabla_articulos.getColumnCount(); inn++) {
-            tabla_articulos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
-        }
-        
-        tabla_articulos.getColumnModel().getColumn(0).setMaxWidth(0);
-        tabla_articulos.getColumnModel().getColumn(0).setMinWidth(0);
-        tabla_articulos.getColumnModel().getColumn(0).setPreferredWidth(0);
-
-        //tabla_articulos.getColumnModel().getColumn(4).setCellRenderer(TablaRenderer);
-        tabla_articulos.getColumnModel().getColumn(5).setCellRenderer(centrar);
-        tabla_articulos.getColumnModel().getColumn(4).setCellRenderer(centrar);
-        
-        // funcion.desconecta();
+        filterArticulos.forEach(articulo -> {
+            Object fila[] = {                                          
+                articulo.getArticuloId(),
+                articulo.getCategoria().getDescripcion(),
+                articulo.getDescripcion(),
+                articulo.getColor().getColor(),
+                articulo.getPrecioRenta(),
+                decimalFormat.format(articulo.getStock())
+              };
+              tableModel.addRow(fila);
+        });
     }
     
     public void tabla_abonos(String rentaId) {
@@ -3586,6 +3568,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             tabla_detalle();
             llenar_abonos();
             tabla_clientes();
+            obtenerArticulosGlobalesAsincrono();
                        
             String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
             Renta renta = null;

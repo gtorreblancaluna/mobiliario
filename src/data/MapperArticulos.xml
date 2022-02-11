@@ -62,6 +62,17 @@
         WHERE articulo.activo = 1   
         AND articulo.id_articulo = #{id}     
     </select> 
+    
+    <select id="obtenerArticulosActivos" resultMap="resultMapArticulo">
+        SELECT articulo.*, 
+            categoria.descripcion AS descripcion_categoria, 
+            color.color
+        FROM articulo articulo
+            INNER JOIN categoria categoria ON (categoria.id_categoria = articulo.id_categoria)
+            INNER JOIN color color ON (color.id_color = articulo.id_color )
+        WHERE articulo.activo = 1
+        ORDER BY articulo.descripcion
+    </select>  
   
     <select id="obtenerArticulosBusquedaInventario" resultMap="resultMapArticulo" parameterType="java.util.Map">
         SELECT articulo.*, 
