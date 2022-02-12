@@ -114,9 +114,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         initComponents();
         saleService = SaleService.getInstance();
         itemService = ItemService.getInstance();
-        fecha_sistema();
-        
-        formato_tabla_detalles();
+       
         
         jTabbedPane1.setEnabledAt(1, false);
         jTabbedPane1.setEnabledAt(2, false);
@@ -210,12 +208,16 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }
     
     private void initalData () {
+        fecha_sistema();
+        formato_tabla_detalles();
+        
         Map<String, Object> map = new HashMap<>();
         map.put("limit", 200);
         map.put("applyDiff", ApplicationConstants.ESTADO_CANCELADO);
         map.put("systemDate", fecha_sistema );
         map.put("type", ApplicationConstants.ESTADO_APARTADO );
         tabla_consultar_renta(map);
+        
     }
     
     private void fillCmbUsers () {
@@ -1665,8 +1667,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             "Saldo",
             "SubTotal/Descuentos"
         };
-        DefaultTableModel tableModel = new DefaultTableModel(data, columNames);
-        tabla_prox_rentas.setModel(tableModel);
+            DefaultTableModel tableModel = new DefaultTableModel(data, columNames);
+            tabla_prox_rentas.setModel(tableModel);
 
             TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
             tabla_prox_rentas.setRowSorter(ordenarTabla);
@@ -1738,9 +1740,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             enabledButtonsActions();
         }
             
-            
-        
-        
     }
     
     
@@ -3598,7 +3597,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             
             this.g_idTipoEvento = renta.getTipo().getTipoId()+""; // variable global
             id_renta = renta.getRentaId()+""; // variable global
-            id_cliente = renta.getCliente().getClienteId()+""; // variable global
+            id_cliente = renta.getCliente().getId()+""; // variable global
             new Thread(() -> {
                 tabla_abonos(id_renta);
             }).start();
@@ -3681,7 +3680,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
               subTotal();
 //            total();
             
-            datos_cliente(renta.getCliente().getClienteId());
+            datos_cliente(Integer.parseInt(renta.getCliente().getId().toString()));
             jbtn_agregar_cliente.setEnabled(false);
             jbtn_guardar_cliente.setEnabled(false);
             

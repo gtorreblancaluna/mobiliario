@@ -6,6 +6,7 @@ import clases.Mail;
 import clases.conectate;
 import clases.sqlclass;
 import com.mysql.jdbc.MysqlDataTruncation;
+import exceptions.BusinessException;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.sql.SQLNonTransientConnectionException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -27,9 +29,13 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import mobiliario.ApplicationConstants;
 import mobiliario.disponibilidad_articulos;
 import mobiliario.iniciar_sesion;
+import model.Articulo;
+import model.Cliente;
 import model.DatosGenerales;
 import model.TipoAbono;
 import model.Usuario;
@@ -39,6 +45,8 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
+import services.CustomerService;
+import services.ItemService;
 import services.SaleService;
 import services.SystemService;
 import utilities.Utility;
@@ -61,21 +69,21 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     String fecha_entrega, fecha_devolucion, hora_entrega,fecha_evento, hora_devolucion;
     public static boolean utiliza_conexion_TLS = false, utiliza_autenticacion = false, status,validad_tipo_abonos;
     private final UserService userService = UserService.getInstance();
-    private SaleService saleService;
+    private final SaleService saleService;
     private final SystemService systemService = SystemService.getInstance();
+    // listado de articulos que se llenaran de manera asincrona, y se utilizara para realizar busquedas por descripcion
+    private List<Articulo> articulos = new ArrayList<>();
+    private final ItemService itemService;
+    private final CustomerService customerService;
+    private List<Cliente> customers = new ArrayList<>();
 
     public AgregarRenta() {
         
         funcion.conectate();
         initComponents();
         saleService = SaleService.getInstance();
-        tabla_clientes();
-        llenar_combo_estado();
-        llenar_combo_tipo();
-        llenar_chofer();
-        llenar_abonos();
-        formato_tabla_detalles();
-        formato_tabla_abonos();
+        customerService = CustomerService.getInstance();
+        
         txt_precio_unitario.setEditable(false);
         txt_subtotal.setEditable(false);
         txt_abonos.setEditable(false);
@@ -94,7 +102,51 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jTabbedPane1.setEnabledAt(1, false);
         lbl_atiende.setText("Atiende: " + iniciar_sesion.nombre_usuario_global.toString() + " " + iniciar_sesion.apellidos_usuario_global.toString());
         jTabbedPane1.setSelectedIndex(0);
+        itemService = ItemService.getInstance();
+        
+        initData();
+    }
+    
+    private void initData () {
+        customerTableFormat();
+        getCustomers();
+        llenar_combo_estado();
+        llenar_combo_tipo();
+        llenar_chofer();
+        llenar_abonos();
+        formato_tabla_detalles();
+        formato_tabla_abonos();
         nombre_focus();
+    }
+    
+    private void fillTableCustomers (List<Cliente> list) {
+        customerTableFormat();
+        DefaultTableModel tableModel = (DefaultTableModel) tabla_clientes.getModel();
+            
+            list.forEach(customer -> {
+                Object row[] = {
+                    customer.getId(),
+                    customer.getNombre() + " " + customer.getApellidos(),
+                    customer.getApodo(),
+                    customer.getTelMovil(),
+                    customer.getTelFijo(),
+                    customer.getEmail(),
+                    customer.getDireccion(),
+                    customer.getLocalidad(),
+                    customer.getRfc().toUpperCase()
+                };
+                
+                tableModel.addRow(row);
+            });
+    }
+    
+    private void getCustomers() {
+        try {
+            customers = customerService.obtenerClientesActivos();
+            fillTableCustomers(customers);
+        } catch (BusinessException e) {
+            JOptionPane.showMessageDialog(this, "Error al obtener los clientes de la base de datos " + e,"ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public void conectar() {
@@ -448,7 +500,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                     id_cliente = funcion.ultimoid();
                     // funcion.desconecta();
                     
-                    tabla_clientes();
+                    customerTableFormat();
                     res = true;
                 } catch (SQLException ex) {
                     Logger.getLogger(AgregarRenta.class.getName()).log(Level.SEVERE, null, ex);
@@ -955,23 +1007,15 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         }
     }
 
-    public void tabla_clientes() {
-        tabla_clientes.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        String[] columNames = {"Id", "Cliente ", "Apodo", "Tel Cel", "Tel Fijo", "Email ", "Direccion", "Localidad", "RFC"};
-        String[] colName = {"id_clientes", "nombre", "apodo", "tel_movil", "tel_fijo", "email", "direccion", "localidad", "rfc"};
+    private void customerTableFormat() {
+        Object[][] data = {{"","","","","","","", "", ""}};
+        String[] columNames = {"Id", "Cliente ", "Apodo", "Tel Cel", "Tel Fijo", "Email ", "Dirección", "Localidad", "RFC"};       
+
         
-        try {       
-           dtconduc = funcion.GetTabla(colName, "clientes", "SELECT c.id_clientes, CONCAT(c.nombre,\" \",c.apellidos)as nombre, c.apodo, c.tel_movil, c.tel_fijo, c.email, c.direccion, c.localidad, c.rfc FROM clientes c where c.activo = 1 ORDER BY c.nombre ;");
-        } catch (SQLNonTransientConnectionException e) {
-            funcion.conectate();
-            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "ocurrion un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ocurrion un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }
-        DefaultTableModel datos = new DefaultTableModel(dtconduc, columNames);
-        tabla_clientes.setModel(datos);
+        DefaultTableModel tableModel = new DefaultTableModel(data, columNames);
+        tabla_clientes.setModel(tableModel);
+        TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
+        tabla_clientes.setRowSorter(ordenarTabla);
 
         int[] anchos = {10, 190, 100, 80, 80, 200, 100, 80, 80};
 
@@ -982,72 +1026,33 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         tabla_clientes.getColumnModel().getColumn(0).setMaxWidth(0);
         tabla_clientes.getColumnModel().getColumn(0).setMinWidth(0);
         tabla_clientes.getColumnModel().getColumn(0).setPreferredWidth(0);
-
-    }
-
-    public void tabla_clientes_nombre() {
-
-        tabla_clientes.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        String[] columNames = {"Id", "Cliente ", "Apodo", "Tel Cel", "Tel Fijo", "Email ", "Direccion", "Localidad", "RFC"};
-        String[] colName = {"id_clientes", "nombre", "apodo", "tel_movil", "tel_fijo", "email", "direccion", "localidad", "rfc"};
-  
-        try {       
-           dtconduc = funcion.GetTabla(colName, "clientes", "SELECT c.`id_clientes`, CONCAT(c.`nombre`,\" \",c.`apellidos`)as nombre, c.`apodo`, c.`tel_movil`, c.`tel_fijo`, c.`email`, c.`direccion`, c.`localidad`, c.`rfc` FROM clientes c where c.`activo` = 1 AND c.`nombre` LIKE '%"+ txt_nombre.getText() +"%' ORDER BY c.`nombre` ;");
-        } catch (SQLNonTransientConnectionException e) {
-            funcion.conectate();
-            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "ocurrion un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ocurrion un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }
         
-        DefaultTableModel datos = new DefaultTableModel(dtconduc, columNames);
-        tabla_clientes.setModel(datos);
-
-        int[] anchos = {10, 190, 100, 80, 80, 200, 100, 80, 80};
-
-        for (int inn = 0; inn < tabla_clientes.getColumnCount(); inn++) {
-            tabla_clientes.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
+        try {
+            tableModel.removeRow(tableModel.getRowCount() - 1);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            ;
         }
-
-        tabla_clientes.getColumnModel().getColumn(0).setMaxWidth(0);
-        tabla_clientes.getColumnModel().getColumn(0).setMinWidth(0);
-        tabla_clientes.getColumnModel().getColumn(0).setPreferredWidth(0);
 
     }
 
-    public void tabla_clientes_apellidos() {
-
-        tabla_clientes.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        String[] columNames = {"Id", "Cliente ", "Apodo", "Tel Cel", "Tel Fijo", "Email ", "Direccion", "Localidad", "RFC"};
-        String[] colName = {"id_clientes", "nombre", "apodo", "tel_movil", "tel_fijo", "email", "direccion", "localidad", "rfc"};
- 
-        try {       
-             dtconduc = funcion.GetTabla(colName, "clientes", "SELECT c.`id_clientes`, CONCAT(c.`nombre`,\" \",c.`apellidos`)as nombre, c.`apodo`, c.`tel_movil`, c.`tel_fijo`, c.`email`, c.`direccion`, c.`localidad`, c.`rfc` FROM clientes c where c.`activo` = 1 AND c.`apellidos` LIKE '%"+ txt_apellidos.getText() +"%' ORDER BY c.`apellidos` ;");
-        } catch (SQLNonTransientConnectionException e) {
-            funcion.conectate();
-            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "ocurrion un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ocurrion un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }
+    
+    private void searchAndFillTableCustomers () {
+        StringBuilder customerToSearch = new StringBuilder();
         
-        DefaultTableModel datos = new DefaultTableModel(dtconduc, columNames);
-        tabla_clientes.setModel(datos);
-
-        int[] anchos = {10, 190, 100, 80, 80, 200, 100, 80, 80};
-
-        for (int inn = 0; inn < tabla_clientes.getColumnCount(); inn++) {
-            tabla_clientes.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
+        customerToSearch.append(txt_nombre.getText().toLowerCase().trim());
+        if (!txt_apellidos.getText().isEmpty()) {
+            customerToSearch.append(" ");
+            customerToSearch.append(txt_apellidos.getText().toLowerCase().trim());
         }
-
-        tabla_clientes.getColumnModel().getColumn(0).setMaxWidth(0);
-        tabla_clientes.getColumnModel().getColumn(0).setMinWidth(0);
-        tabla_clientes.getColumnModel().getColumn(0).setPreferredWidth(0);
-
+        List<Cliente> filterCustomers =
+                customers.stream()
+                        .filter(customer -> customer.getNombre().toLowerCase().trim().contains(txt_nombre.getText().toLowerCase().trim()))
+                        .filter(customer -> customer.getApellidos().toLowerCase().trim().contains(txt_apellidos.getText().toLowerCase().trim()))
+                        .toList();
+        
+        fillTableCustomers(filterCustomers);
     }
+    
 
     public void formato_tabla_detalles() {
         Object[][] data = {{"", "", "", "", ""}};
@@ -1760,7 +1765,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         });
         jScrollPane4.setViewportView(tabla_articulos);
 
-        panel_articulos.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, 810, 290));
+        panel_articulos.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, 1000, 290));
 
         txt_porcentaje_descuento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         txt_porcentaje_descuento.addActionListener(new java.awt.event.ActionListener() {
@@ -2670,13 +2675,11 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txtPorcentajeDescuentoFocusLost
 
     private void txt_nombreKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_nombreKeyReleased
-        // TODO add your handling code here:
-        tabla_clientes_nombre();
+        searchAndFillTableCustomers();
     }//GEN-LAST:event_txt_nombreKeyReleased
 
     private void txt_apellidosKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_apellidosKeyReleased
-        // TODO add your handling code here:
-        tabla_clientes_apellidos();
+        searchAndFillTableCustomers();
     }//GEN-LAST:event_txt_apellidosKeyReleased
 
     private void tabla_abonosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_abonosMouseClicked

@@ -112,7 +112,7 @@ public class SaleService {
             return null;
          
         List<Renta> rentas = new ArrayList<>();
-        CustomerService customerService = new CustomerService();
+        CustomerService customerService = CustomerService.getInstance();
          
          for (int i = 0; i < dtconduc.length; i++) {
              Renta renta = new Renta();
@@ -121,7 +121,7 @@ public class SaleService {
                 renta.setEstadoId(Integer.parseInt(dtconduc[i][1].toString()));
              
              if(dtconduc[i][2] != null)
-                renta.setCliente(customerService.obtenerClientePorId(sql, Integer.parseInt(dtconduc[i][2].toString()))); 
+                renta.setCliente(customerService.obtenerClientePorId(Long.parseLong(dtconduc[i][2].toString()))); 
              
              if(dtconduc[i][3] != null)
                 renta.setUsuario(userService.obtenerUsuarioPorId(sql, Integer.parseInt(dtconduc[i][3].toString())));  
@@ -225,7 +225,7 @@ public class SaleService {
             return null;
          
         List<Renta> rentas = new ArrayList<>();
-        CustomerService customerService = new CustomerService();
+        CustomerService customerService = CustomerService.getInstance();
         
          for (int i = 0; i < dtconduc.length; i++) {
              Renta renta = new Renta();
@@ -234,7 +234,7 @@ public class SaleService {
                 renta.setEstadoId(Integer.parseInt(dtconduc[i][1].toString()));
              
              if(dtconduc[i][2] != null)
-                renta.setCliente(customerService.obtenerClientePorId(sql, Integer.parseInt(dtconduc[i][2].toString()))); 
+                renta.setCliente(customerService.obtenerClientePorId(Long.parseLong(dtconduc[i][2].toString()))); 
              
              if(dtconduc[i][3] != null)
                 renta.setUsuario(userService.obtenerUsuarioPorId(sql, Integer.parseInt(dtconduc[i][3].toString())));  
@@ -341,7 +341,7 @@ public class SaleService {
          if(dtconduc == null || dtconduc.length <= 0)
             return null;
          
-        CustomerService customerService = new CustomerService();
+        CustomerService customerService = CustomerService.getInstance();
         
          for (int i = 0; i < dtconduc.length; i++) {
              Renta renta = new Renta();
@@ -350,7 +350,7 @@ public class SaleService {
                 renta.setEstadoId(Integer.parseInt(dtconduc[i][1].toString()));
              
              if(dtconduc[i][2] != null)
-                renta.setCliente(customerService.obtenerClientePorId(sql, Integer.parseInt(dtconduc[i][2].toString()))); 
+                renta.setCliente(customerService.obtenerClientePorId(Long.parseLong(dtconduc[i][2].toString()))); 
              
              if(dtconduc[i][3] != null)
                 renta.setUsuario(userService.obtenerUsuarioPorId(sql, Integer.parseInt(dtconduc[i][3].toString())));  

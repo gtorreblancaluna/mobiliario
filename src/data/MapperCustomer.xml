@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperUsuarios">
+  
+    <resultMap id="resultMapCustomer" type="model.Cliente">        
+        
+        <result property="id" column="id_clientes"/>
+        <result property="nombre" column="nombre"/>
+        <result property="apellidos" column="apellidos"/>
+        <result property="apodo" column="apodo"/>        
+        <result property="telMovil" column="tel_movil"/>
+        <result property="telFijo" column="tel_fijo"/>
+        <result property="email" column="email"/>
+        <result property="direccion" column="direccion"/>        
+        <result property="localidad" column="localidad"/>
+        <result property="rfc" column="rfc"/>
+        <result property="activo" column="activo"/>
+        
+    </resultMap>
+  
+    <select id="getAllCustomers" resultMap="resultMapCustomer" >
+        SELECT *      
+        FROM clientes c
+        WHERE c.activo = 1
+        ORDER BY CONCAT(c.nombre,' ',c.apellidos)
+    </select> 
+    
+    <select id="getByIdCustomer" resultMap="resultMapCustomer" parameterType="java.lang.Long" >
+        SELECT * 
+        FROM clientes c
+        WHERE c.id_cliente = #{id} 
+        AND c.activo = 1
+    </select>  
+  
+</mapper>

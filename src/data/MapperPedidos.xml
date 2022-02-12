@@ -9,7 +9,7 @@
         <result property="rentaId" column="id_renta"/>
         <result property="detalleRenta" column="detalle_renta"/>
         <!-- customer info-->
-        <result property="cliente.clienteId" column="cliente_id"/>
+        <result property="cliente.id" column="cliente_id"/>
         <result property="cliente.nombre" column="cliente_nombre"/>
         <result property="cliente.apellidos" column="cliente_apellidos"/>
         <!--user info-->
