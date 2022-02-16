@@ -117,6 +117,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         formato_tabla_detalles();
         formato_tabla_abonos();
         nombre_focus();
+        
     }
     
     private void fillTableCustomers (List<Cliente> list) {
@@ -1037,13 +1038,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     
     private void searchAndFillTableCustomers () {
-        StringBuilder customerToSearch = new StringBuilder();
-        
-        customerToSearch.append(txt_nombre.getText().toLowerCase().trim());
-        if (!txt_apellidos.getText().isEmpty()) {
-            customerToSearch.append(" ");
-            customerToSearch.append(txt_apellidos.getText().toLowerCase().trim());
-        }
+      
         List<Cliente> filterCustomers =
                 customers.stream()
                         .filter(customer -> customer.getNombre().toLowerCase().trim().contains(txt_nombre.getText().toLowerCase().trim()))
@@ -1227,41 +1222,23 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         
 
     }
-
-    public void tabla_articulos() {
-
+    
+    
+    private void formatItemsTable () {
+        
         tabla_articulos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         String[] columNames = {"Id","Código", "Categoría", "Descripción", "Color", "P. Unitario"};
-        String[] colName = {"id_articulo","codigo", "categoria", "descripcion", "color", "precio_renta"};
-        try {       
-             dtconduc = funcion.GetTabla(colName, "articulo", "SELECT a.id_articulo,a.codigo, ca.descripcion as categoria, a.descripcion, c.color, a.precio_renta "
-                + "FROM articulo a, color c, categoria ca\n"
-                + "WHERE a.id_color=c.id_color and activo =1 AND a.id_categoria=ca.id_categoria;");
-        } catch (SQLNonTransientConnectionException e) {
-            funcion.conectate();
-            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "ocurrion un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ocurrion un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }
+        Object[][] data = {{"","","","","","","", "", ""}};
         
 
-        for (int i = 0; i < dtconduc.length; i++) {
-            String valor = dtconduc[i][5].toString();
-            dtconduc[i][5] = conviertemoneda(valor).toString();
-            System.out.println(conviertemoneda(valor));
-
-        }
-
-        DefaultTableModel datos = new DefaultTableModel(dtconduc, columNames);
+        DefaultTableModel tableModel = new DefaultTableModel(data, columNames);
         DefaultTableCellRenderer TablaRenderer = new DefaultTableCellRenderer();
         TablaRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
 
         DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
         centrar.setHorizontalAlignment(SwingConstants.CENTER);
 
-        tabla_articulos.setModel(datos);
+        tabla_articulos.setModel(tableModel);
 
         int[] anchos = {10,40, 120, 250, 100, 90};
 
@@ -1273,54 +1250,55 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         tabla_articulos.getColumnModel().getColumn(0).setMinWidth(0);
         tabla_articulos.getColumnModel().getColumn(0).setPreferredWidth(0);
         tabla_articulos.getColumnModel().getColumn(5).setCellRenderer(centrar);
+        
+        try {
+            tableModel.removeRow(tableModel.getRowCount() - 1);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            ;
+        }
+    }
+    
+    private void fillTableItems (List<Articulo> list) {
+        formatItemsTable();
+        DefaultTableModel tableModel = (DefaultTableModel) tabla_articulos.getModel();
+            list.forEach(articulo -> {
+                Object row[] = {
+                    articulo.getArticuloId(),
+                    articulo.getCodigo(),
+                    articulo.getCategoria().getDescripcion(),
+                    articulo.getDescripcion(),
+                    articulo.getColor().getColor(),
+                    articulo.getPrecioRenta()
+                };
+                tableModel.addRow(row);
+            });
+    }
 
+    private void tabla_articulos() {
+        
+        if (!articulos.isEmpty()) {
+            return;
+        }
+
+        try {
+            articulos = itemService.obtenerArticulosActivos();
+            fillTableItems(articulos);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog( this ,"Ocurrió un error grave al obtener los articulos de la base de datos"+e,"ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        
     }
 
     public void tabla_articulos_like() {
         
-        tabla_articulos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        String[] columNames = {"Id", "Código","Categoría", "Descripción", "Color", "P. Unitario"};
-        String[] colName = {"id_articulo","codigo", "categoria", "descripcion", "color", "precio_renta"};      
-        try {       
-         dtconduc = funcion.GetTabla(colName, "articulo", "SELECT a.id_articulo,a.codigo, ca.descripcion as categoria, a.descripcion, c.color, a.precio_renta "
-                + "FROM articulo a, color c, categoria ca\n"
-                + "WHERE a.id_color=c.id_color and activo =1 AND a.id_categoria=ca.id_categoria AND a.descripcion like '%" + txt_buscar.getText().toString() + "%'");
-
-        } catch (SQLNonTransientConnectionException e) {
-            funcion.conectate();
-            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "ocurrion un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ocurrion un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }
-       
-        for (int i = 0; i < dtconduc.length; i++) {
-            String valor = dtconduc[i][5].toString();
-            dtconduc[i][5] = conviertemoneda(valor).toString();
-            System.out.println(conviertemoneda(valor));
-
-        }
-
-        DefaultTableModel datos = new DefaultTableModel(dtconduc, columNames);
-        DefaultTableCellRenderer TablaRenderer = new DefaultTableCellRenderer();
-        TablaRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
-
-        DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
-        centrar.setHorizontalAlignment(SwingConstants.CENTER);
-
-        tabla_articulos.setModel(datos);
-
-        int[] anchos = {10,40, 120, 250, 100, 90};
-
-        for (int inn = 0; inn < tabla_articulos.getColumnCount(); inn++) {
-            tabla_articulos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
-        }
-
-        tabla_articulos.getColumnModel().getColumn(0).setMaxWidth(0);
-        tabla_articulos.getColumnModel().getColumn(0).setMinWidth(0);
-        tabla_articulos.getColumnModel().getColumn(0).setPreferredWidth(0);
-        tabla_articulos.getColumnModel().getColumn(5).setCellRenderer(centrar);
+        List<Articulo> filterItems =
+                articulos.stream()
+                        .filter(item -> 
+                                (item.getDescripcion().toLowerCase().trim() + " " + item.getColor().getColor().toLowerCase().trim())
+                                        .contains(txt_buscar.getText().toLowerCase().trim()))
+                .toList();
+        
+        fillTableItems(filterItems);
     }
 
     /**
@@ -2551,7 +2529,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             panel_articulos.setVisible(true);
             panel_conceptos.setVisible(false);
 
-            id_cliente = (String) tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 0);
+            id_cliente = tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 0).toString();
             //lbl_aviso.setText("Has elegido al cliente con exito.. Continua con los datos del evento...");
             this.lbl_cliente.setText((String) tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 1) + " " + (String) tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 2));
 

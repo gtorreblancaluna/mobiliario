@@ -1318,8 +1318,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     public void formato_tabla_detalles() {
         Object[][] data = {{"", "", "", "", "","","","",""}};
         String[] columnNames = {"id_detalle_renta", "cantidad", "id_articulo", "descripcion","precio u.", "descuento %","descuento","importe","esNuevo"};
-        DefaultTableModel TableModel = new DefaultTableModel(data, columnNames);
-        tabla_detalle.setModel(TableModel);
+        DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
+        tabla_detalle.setModel(tableModel);
         
         int[] anchos = {70, 100, 100, 300,70,70 ,70,70,60};
         
@@ -1333,8 +1333,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         centrar.setHorizontalAlignment(SwingConstants.CENTER);
         
         try {
-            DefaultTableModel temp = (DefaultTableModel) tabla_detalle.getModel();
-            temp.removeRow(temp.getRowCount() - 1);
+            tableModel.removeRow(tableModel.getRowCount() - 1);
         } catch (ArrayIndexOutOfBoundsException e) {
             ;
         }
@@ -1356,6 +1355,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         tabla_detalle.getColumnModel().getColumn(5).setCellRenderer(alignCenter);
         tabla_detalle.getColumnModel().getColumn(6).setCellRenderer(alignCenter);
         tabla_detalle.getColumnModel().getColumn(7).setCellRenderer(alignCenter);
+        
         
     }
     
