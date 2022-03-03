@@ -78,6 +78,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private final CustomerService customerService;
     private List<Cliente> customers = new ArrayList<>();
     private static final DecimalFormat decimalFormat = new DecimalFormat( "$#,###,###,##0.00" );
+    // valor de la fila a editar
+    private Integer rowSelectedToEdit = null;
 
     public AgregarRenta() {
         
@@ -105,7 +107,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         lbl_atiende.setText("Atiende: " + iniciar_sesion.nombre_usuario_global.toString() + " " + iniciar_sesion.apellidos_usuario_global.toString());
         jTabbedPane1.setSelectedIndex(0);
         itemService = ItemService.getInstance();
-        
+        disableInputsEditItem();
         initData();
     }
     
@@ -887,7 +889,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         Utility.pushNotification(iniciar_sesion.usuarioGlobal.getNombre()+ " registró un evento de tipo "+cmb_tipo.getSelectedItem().toString()
                 +" con status "+cmb_estado.getSelectedItem().toString()
         );
-        // funcion.desconecta();
+
         seleccion = JOptionPane.showOptionDialog(this, "¿Deseas agregar otro evento?", "Evento nuevo ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "No");
         if (seleccion == 0) {//presiono que si
             nuevo_evento();
@@ -945,12 +947,24 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     }
 
     public void subTotal() {
+        String characterToDelete = "$,";
         String aux;
-        float subTotal = 0, total = 0;
+        float subTotal = 0F, total = 0;
         for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
-            aux = EliminaCaracteres(((String) tabla_detalle.getValueAt(i, 6).toString()), "$,");
-            subTotal = Float.parseFloat(aux);
-            total = subTotal + total;
+            Float amount = Float.parseFloat(EliminaCaracteres((tabla_detalle.getValueAt(i, 0).toString()), characterToDelete).toString());
+            Float unitPrice = Float.parseFloat(EliminaCaracteres((tabla_detalle.getValueAt(i,3).toString()), characterToDelete).toString());
+            Float discountRate = Float.parseFloat(EliminaCaracteres((tabla_detalle.getValueAt(i,4).toString()), characterToDelete).toString());
+            Float discountTotal = 0F;
+            Float importe = amount * unitPrice;
+            if (discountRate > 0) {
+                discountTotal = importe * (discountRate / 100);
+                importe = importe - discountTotal;
+            }
+            // total descuento
+            tabla_detalle.setValueAt(decimalFormat.format(discountTotal), i, 5);
+            // importe
+            tabla_detalle.setValueAt(decimalFormat.format(importe), i, 6);
+            total = total + importe;
         }
         txt_subtotal.setValue(total);
 
@@ -1174,6 +1188,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                     panel_articulos.setVisible(false);
                     jbtn_mostrar_articulos.setEnabled(true);
                     panel = true;
+                    disableInputsEditItem();
 
                 }
 
@@ -1357,6 +1372,12 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tabla_detalle = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
         lbl_sel = new javax.swing.JLabel();
+        jLabel22 = new javax.swing.JLabel();
+        txtAmountEdit = new javax.swing.JTextField();
+        txtUnitPriceEdit = new javax.swing.JTextField();
+        jLabel38 = new javax.swing.JLabel();
+        jLabel41 = new javax.swing.JLabel();
+        txtDiscountRateEdit = new javax.swing.JTextField();
         jToolBar3 = new javax.swing.JToolBar();
         jbtn_agregar_articulo = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -1763,31 +1784,31 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_articulosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jScrollPane4)
+                .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 981, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panel_articulosLayout.createSequentialGroup()
                         .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panel_articulosLayout.createSequentialGroup()
                                 .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lbl_eleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(lbl_eleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(panel_articulosLayout.createSequentialGroup()
                                 .addComponent(txt_buscar, javax.swing.GroupLayout.PREFERRED_SIZE, 317, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(btnGetItemsFromFolio)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txt_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10, 10, 10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txt_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10, 10, 10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel37, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10, 10, 10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txt_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(154, 154, 154))
+                .addGap(113, 113, 113))
         );
         panel_articulosLayout.setVerticalGroup(
             panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1795,13 +1816,13 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(panel_articulosLayout.createSequentialGroup()
                         .addGap(33, 33, 33)
-                        .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txt_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txt_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel37, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txt_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txt_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txt_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txt_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(10, 10, 10))
                     .addGroup(panel_articulosLayout.createSequentialGroup()
                         .addContainerGap()
@@ -1842,25 +1863,78 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         lbl_sel.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
 
+        jLabel22.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel22.setText("Cantidad:");
+
+        txtAmountEdit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtAmountEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtAmountEditActionPerformed(evt);
+            }
+        });
+        txtAmountEdit.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtAmountEditKeyPressed(evt);
+            }
+        });
+
+        txtUnitPriceEdit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtUnitPriceEdit.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtUnitPriceEditKeyPressed(evt);
+            }
+        });
+
+        jLabel38.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel38.setText("Precio:");
+
+        jLabel41.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel41.setText("Descuento %:");
+
+        txtDiscountRateEdit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtDiscountRateEdit.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtDiscountRateEditKeyPressed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panel_conceptosLayout = new javax.swing.GroupLayout(panel_conceptos);
         panel_conceptos.setLayout(panel_conceptosLayout);
         panel_conceptosLayout.setHorizontalGroup(
             panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_conceptosLayout.createSequentialGroup()
-                .addGap(45, 45, 45)
-                .addComponent(lbl_sel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(295, 295, 295))
             .addGroup(panel_conceptosLayout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 883, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 908, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(panel_conceptosLayout.createSequentialGroup()
+                        .addComponent(lbl_sel, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel22)
+                        .addGap(15, 15, 15)
+                        .addComponent(txtAmountEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(20, 20, 20)
+                        .addComponent(jLabel38)
+                        .addGap(7, 7, 7)
+                        .addComponent(txtUnitPriceEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(jLabel41, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDiscountRateEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 90, Short.MAX_VALUE))
         );
         panel_conceptosLayout.setVerticalGroup(
             panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_conceptosLayout.createSequentialGroup()
-                .addComponent(lbl_sel, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lbl_sel, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtAmountEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel38, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtUnitPriceEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel41, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtDiscountRateEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE))
         );
 
         jPanel6.add(panel_conceptos, new org.netbeans.lib.awtextra.AbsoluteConstraints(55, 0, 1010, 387));
@@ -2586,7 +2660,21 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     private void tabla_detalleMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_detalleMouseClicked
         // TODO add your handling code here:
-        lbl_sel.setText((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 2));
+        String itemSelected = (tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 2)).toString();
+        String characterToDelete = "$,";
+        lbl_sel.setText(itemSelected);
+        if (evt.getClickCount() == 2) {
+            rowSelectedToEdit = tabla_detalle.getSelectedRow();
+            Float amount = Float.parseFloat(EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 0).toString(),characterToDelete));
+            Float price = Float.parseFloat(EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 3).toString(),characterToDelete));
+            Float discountRate = Float.parseFloat(EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 4).toString(),characterToDelete));
+            
+            txtAmountEdit.setText(amount.toString());
+            txtDiscountRateEdit.setText(discountRate.toString());
+            txtUnitPriceEdit.setText(price.toString());
+            enabledInputsEditItem();
+            
+        }
     }//GEN-LAST:event_tabla_detalleMouseClicked
 
     private void jbtn_agregar_articuloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_agregar_articuloActionPerformed
@@ -2949,6 +3037,99 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btnGetItemsFromFolioActionPerformed
 
+    private void txtAmountEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAmountEditActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAmountEditActionPerformed
+
+    private void editItemTable () {
+        
+        if (rowSelectedToEdit == null) {
+            return;
+        }
+        try {
+            
+            if (txtAmountEdit.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Cantidad es requerida", "ERROR", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (txtUnitPriceEdit.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Precio es requerido", "ERROR", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            Float amount = Float.parseFloat(txtAmountEdit.getText());
+            Float price = Float.parseFloat(txtUnitPriceEdit.getText());
+            Float discountRate = Float.parseFloat(txtDiscountRateEdit.getText().isEmpty() ? "0" : txtDiscountRateEdit.getText());
+            
+            if (amount <= 0) {
+                JOptionPane.showMessageDialog(null, "Ingresa una cantidad mayor a cero.", "ERROR", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (price < 0) {
+                JOptionPane.showMessageDialog(null, "Ingresa un precio mayor a cero.", "ERROR", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (discountRate < 0) {
+                JOptionPane.showMessageDialog(null, "Ingresa un porcentaje de descuento mayor a cero.", "ERROR", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            if (discountRate > 100) {
+                JOptionPane.showMessageDialog(null, "Ingresa un porcentaje de descuento menor a cien.", "ERROR", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            tabla_detalle.setValueAt(amount, rowSelectedToEdit , 0);
+            tabla_detalle.setValueAt(decimalFormat.format(price), rowSelectedToEdit , 3);
+            tabla_detalle.setValueAt(discountRate, rowSelectedToEdit , 4);
+            
+            subTotal();
+            total();
+            
+            rowSelectedToEdit = null;
+            
+            disableInputsEditItem();
+            
+        } catch (NumberFormatException e) {
+           JOptionPane.showMessageDialog(null, "Número invalido, revisa que las cantidades ingresadas sean solo números y mayores a cero ", "ERROR", JOptionPane.ERROR_MESSAGE); 
+        }
+    }
+    private void disableInputsEditItem () {
+        txtAmountEdit.setText("");
+        txtUnitPriceEdit.setText("");
+        txtDiscountRateEdit.setText("");
+            
+        txtAmountEdit.setEnabled(false);
+        txtUnitPriceEdit.setEnabled(false);
+        txtDiscountRateEdit.setEnabled(false);
+    }
+    private void enabledInputsEditItem () {
+      
+        txtAmountEdit.setEnabled(true);
+        txtUnitPriceEdit.setEnabled(true);
+        txtDiscountRateEdit.setEnabled(true);
+    }
+    private void txtAmountEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtAmountEditKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == 10) {
+            editItemTable();
+        }
+    }//GEN-LAST:event_txtAmountEditKeyPressed
+
+    private void txtUnitPriceEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUnitPriceEditKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == 10) {
+            editItemTable();
+
+        }
+    }//GEN-LAST:event_txtUnitPriceEditKeyPressed
+
+    private void txtDiscountRateEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountRateEditKeyPressed
+        if (evt.getKeyCode() == 10) {
+            editItemTable();
+
+        }
+    }//GEN-LAST:event_txtDiscountRateEditKeyPressed
+
     private void fillTableFromItemsFolio (Renta renta) {
         DefaultTableModel tableModel = (DefaultTableModel) tabla_detalle.getModel();
         
@@ -3025,6 +3206,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
@@ -3041,9 +3223,11 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel36;
     private javax.swing.JLabel jLabel37;
+    private javax.swing.JLabel jLabel38;
     private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel40;
+    private javax.swing.JLabel jLabel41;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -3091,8 +3275,11 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     public static javax.swing.JTable tabla_articulos;
     private javax.swing.JTable tabla_clientes;
     public static javax.swing.JTable tabla_detalle;
+    private javax.swing.JTextField txtAmountEdit;
+    private javax.swing.JTextField txtDiscountRateEdit;
     private javax.swing.JTextField txtEmailToSend;
     private javax.swing.JFormattedTextField txtPorcentajeDescuento;
+    private javax.swing.JTextField txtUnitPriceEdit;
     private javax.swing.JTextField txt_abono;
     private javax.swing.JFormattedTextField txt_abonos;
     private javax.swing.JTextField txt_apellidos;
