@@ -78,6 +78,17 @@ public class SalesDAO {
         }
     }
     
+    public Renta obtenerRentaPorFolio (Integer folio) throws DataOriginException {
+        SqlSession session = sqlSessionFactory.openSession();
+        try {
+           return (Renta) session.selectOne("MapperPedidos.obtenerRentaPorFolio",folio);       
+        } catch (Exception e) {
+            throw new DataOriginException(e.getMessage(),e);
+        } finally {
+            session.close();
+        }
+    }
+    
     public List<Renta> obtenerRentasPorParametros (Map<String,Object> parameters) throws Exception {
         SqlSession session = sqlSessionFactory.openSession();
         try {

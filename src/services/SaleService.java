@@ -2,6 +2,7 @@ package services;
 
 import clases.sqlclass;
 import dao.SalesDAO;
+import exceptions.BusinessException;
 import exceptions.DataOriginException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
@@ -561,6 +562,20 @@ public class SaleService {
         renta.setDetalleRenta(this.obtenerDetalleRenta(renta.getRentaId()));
         calcularTotalesPorRenta(renta);
         return renta;
+                
+    } // renta por id
+     
+     public Renta obtenerRentaPorFolio(Integer folio) throws BusinessException { 
+        try {
+            Renta renta = salesDao.obtenerRentaPorFolio(folio);
+            if (renta == null) {
+              return null;
+            }
+            renta.setDetalleRenta(this.obtenerDetalleRenta(renta.getRentaId()));
+            return renta;
+        } catch (Exception e) {
+            throw new BusinessException(e.getMessage(),e);
+        }
                 
     } // renta por id
      

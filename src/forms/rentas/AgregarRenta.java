@@ -37,6 +37,7 @@ import mobiliario.iniciar_sesion;
 import model.Articulo;
 import model.Cliente;
 import model.DatosGenerales;
+import model.Renta;
 import model.TipoAbono;
 import model.Usuario;
 import net.sf.jasperreports.engine.JRException;
@@ -76,6 +77,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private final ItemService itemService;
     private final CustomerService customerService;
     private List<Cliente> customers = new ArrayList<>();
+    private static final DecimalFormat decimalFormat = new DecimalFormat( "$#,###,###,##0.00" );
 
     public AgregarRenta() {
         
@@ -1140,7 +1142,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             }
                 existe = false;
                 for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
-                    if (lbl_eleccion.getText().toString().equals(tabla_detalle.getValueAt(i, 2).toString())) {
+                    if (lbl_eleccion.getText().equals(tabla_detalle.getValueAt(i, 2).toString())) {
                         existe = true;
                         break;
                     }
@@ -1150,7 +1152,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                     Toolkit.getDefaultToolkit().beep();
 
                 } else {
-                    //{"cantidad","id_articulo", "P.Unitario", "Importe"};
                     DefaultTableModel temp = (DefaultTableModel) tabla_detalle.getModel();
                     float cantidad = Float.parseFloat(txt_cantidad.getText().toString());
                     float precio = Float.parseFloat(txt_precio_unitario.getText().toString());
@@ -1164,7 +1165,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                     String xprecio = conviertemoneda(Float.toString(precio));
                     String ximporte = conviertemoneda(Float.toString(importe));
 
-                    Object nuevo1[] = {txt_cantidad.getText().toString(), id_articulo, lbl_eleccion.getText().toString(), xprecio,porcentajeDescuento+"", conviertemoneda(totalDescuento+"") , ximporte};
+                    Object nuevo1[] = {txt_cantidad.getText().toString(), id_articulo, lbl_eleccion.getText(), xprecio,porcentajeDescuento+"", conviertemoneda(totalDescuento+"") , ximporte};
                     temp.addRow(nuevo1);
                     subTotal();
                     total();
@@ -1345,13 +1346,13 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         txt_precio_unitario = new javax.swing.JTextField();
         jLabel21 = new javax.swing.JLabel();
         txt_buscar = new javax.swing.JTextField();
-        jLabel22 = new javax.swing.JLabel();
         lbl_eleccion = new javax.swing.JLabel();
         jLabel23 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tabla_articulos = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
         txt_porcentaje_descuento = new javax.swing.JTextField();
         jLabel37 = new javax.swing.JLabel();
+        btnGetItemsFromFolio = new javax.swing.JButton();
         panel_conceptos = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabla_detalle = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
@@ -1634,7 +1635,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1671,7 +1672,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         panel_articulos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Elije un servicio", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
-        panel_articulos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         txt_cantidad.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         txt_cantidad.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -1679,11 +1679,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 txt_cantidadKeyPressed(evt);
             }
         });
-        panel_articulos.add(txt_cantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 50, 60, -1));
 
         jLabel20.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel20.setText("Cantidad:");
-        panel_articulos.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 50, 60, 20));
 
         txt_precio_unitario.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         txt_precio_unitario.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -1691,11 +1689,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 txt_precio_unitarioKeyPressed(evt);
             }
         });
-        panel_articulos.add(txt_precio_unitario, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 50, 70, -1));
 
         jLabel21.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel21.setText("Precio:");
-        panel_articulos.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 50, 50, 20));
 
         txt_buscar.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         txt_buscar.addActionListener(new java.awt.event.ActionListener() {
@@ -1711,17 +1707,11 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 txt_buscarKeyReleased(evt);
             }
         });
-        panel_articulos.add(txt_buscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 17, 296, -1));
-
-        jLabel22.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/search-icon.png"))); // NOI18N
-        panel_articulos.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(16, 17, -1, -1));
 
         lbl_eleccion.setFont(new java.awt.Font("Microsoft Sans Serif", 1, 12)); // NOI18N
-        panel_articulos.add(lbl_eleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 50, 380, 21));
 
         jLabel23.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jLabel23.setText("Elección:");
-        panel_articulos.add(jLabel23, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 50, 60, 20));
 
         tabla_articulos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         tabla_articulos.setModel(new javax.swing.table.DefaultTableModel(
@@ -1743,8 +1733,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         });
         jScrollPane4.setViewportView(tabla_articulos);
 
-        panel_articulos.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, 1000, 290));
-
         txt_porcentaje_descuento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         txt_porcentaje_descuento.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1756,13 +1744,79 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 txt_porcentaje_descuentoKeyPressed(evt);
             }
         });
-        panel_articulos.add(txt_porcentaje_descuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 50, 80, -1));
 
         jLabel37.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel37.setText("Descuento %");
-        panel_articulos.add(jLabel37, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 50, 80, 20));
 
-        jPanel6.add(panel_articulos, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 0, 1070, 380));
+        btnGetItemsFromFolio.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnGetItemsFromFolio.setText("Obtener articulos de un folio");
+        btnGetItemsFromFolio.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnGetItemsFromFolio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGetItemsFromFolioActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panel_articulosLayout = new javax.swing.GroupLayout(panel_articulos);
+        panel_articulos.setLayout(panel_articulosLayout);
+        panel_articulosLayout.setHorizontalGroup(
+            panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_articulosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jScrollPane4)
+                    .addGroup(panel_articulosLayout.createSequentialGroup()
+                        .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel_articulosLayout.createSequentialGroup()
+                                .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lbl_eleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panel_articulosLayout.createSequentialGroup()
+                                .addComponent(txt_buscar, javax.swing.GroupLayout.PREFERRED_SIZE, 317, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnGetItemsFromFolio)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(txt_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(txt_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(jLabel37, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(txt_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(154, 154, 154))
+        );
+        panel_articulosLayout.setVerticalGroup(
+            panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_articulosLayout.createSequentialGroup()
+                .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(panel_articulosLayout.createSequentialGroup()
+                        .addGap(33, 33, 33)
+                        .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txt_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txt_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel37, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txt_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(10, 10, 10))
+                    .addGroup(panel_articulosLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txt_buscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnGetItemsFromFolio))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbl_eleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        jPanel6.add(panel_articulos, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 0, 1010, 380));
 
         panel_conceptos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Conceptos del evento", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
@@ -1798,7 +1852,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 .addGap(295, 295, 295))
             .addGroup(panel_conceptosLayout.createSequentialGroup()
                 .addGap(25, 25, 25)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 1027, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 883, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panel_conceptosLayout.setVerticalGroup(
@@ -1809,7 +1863,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
         );
 
-        jPanel6.add(panel_conceptos, new org.netbeans.lib.awtextra.AbsoluteConstraints(55, 0, 1070, 387));
+        jPanel6.add(panel_conceptos, new org.netbeans.lib.awtextra.AbsoluteConstraints(55, 0, 1010, 387));
 
         jToolBar3.setFloatable(false);
         jToolBar3.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -1917,14 +1971,14 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 715, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
                 .addGap(12, 12, 12)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -2002,34 +2056,28 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jPanel10Layout.setHorizontalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel10Layout.createSequentialGroup()
+                    .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(txt_abono, javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txt_comentario)
-                                .addComponent(txt_abono)
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
-                                    .addComponent(jLabel39)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(lblTipoAbono))
+                            .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel25)
+                            .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addGroup(jPanel10Layout.createSequentialGroup()
-                                    .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel25))
-                                    .addGap(0, 0, Short.MAX_VALUE)))
-                            .addComponent(cmbTipoPago, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 61, Short.MAX_VALUE))
-                    .addGroup(jPanel10Layout.createSequentialGroup()
-                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmb_fecha_pago, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addComponent(jLabel39)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 129, Short.MAX_VALUE)
+                                    .addComponent(lblTipoAbono))
+                                .addComponent(txt_comentario, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(cmbTipoPago, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addComponent(cmb_fecha_pago, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addComponent(jToolBar4, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel10Layout.setVerticalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jToolBar4, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
+            .addComponent(jToolBar4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel10Layout.createSequentialGroup()
                 .addGap(18, 18, 18)
                 .addComponent(jLabel24)
@@ -2041,14 +2089,15 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 .addComponent(txt_comentario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblTipoAbono)
-                    .addComponent(jLabel39))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbTipoPago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel40)
-                .addGap(7, 7, 7)
-                .addComponent(cmb_fecha_pago, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel10Layout.createSequentialGroup()
+                        .addComponent(jLabel39)
+                        .addGap(10, 10, 10)
+                        .addComponent(cmbTipoPago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel40)
+                        .addGap(7, 7, 7)
+                        .addComponent(cmb_fecha_pago, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblTipoAbono))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -2059,18 +2108,16 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(97, 97, 97)
+                .addGap(18, 18, 18)
                 .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(206, Short.MAX_VALUE))
+                .addContainerGap(128, Short.MAX_VALUE))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel8Layout.createSequentialGroup()
-                        .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 83, Short.MAX_VALUE))
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -2086,8 +2133,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 632, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(536, Short.MAX_VALUE))
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 1060, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(128, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2458,7 +2505,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))
+                        .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE))
                     .addComponent(panel_datos_generales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -2542,33 +2589,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         lbl_sel.setText((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 2));
     }//GEN-LAST:event_tabla_detalleMouseClicked
 
-    private void tabla_articulosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_articulosMouseClicked
-        // TODO add your handling code here:
-        if (evt.getClickCount() == 2) {
-
-            lbl_eleccion.setText((String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 3).toString() + " " + (String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 4).toString());
-            txt_precio_unitario.setText(EliminaCaracteres((String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 5).toString(), "$,"));
-            txt_cantidad.setText("");
-            txt_cantidad.requestFocus();
-            this.txt_porcentaje_descuento.setText("");
-            id_articulo = (String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString();
-            txt_precio_unitario.setEditable(false);
-
-        }
-    }//GEN-LAST:event_tabla_articulosMouseClicked
-
     private void jbtn_agregar_articuloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_agregar_articuloActionPerformed
         // TODO add your handling code here:
         agregar_articulos();
     }//GEN-LAST:event_jbtn_agregar_articuloActionPerformed
-
-    private void txt_cantidadKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_cantidadKeyPressed
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == 10) {
-            agregar_articulos();
-
-        }
-    }//GEN-LAST:event_txt_cantidadKeyPressed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
@@ -2603,11 +2627,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             ;
         }
     }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void txt_buscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_buscarKeyReleased
-        // TODO add your handling code here:
-        tabla_articulos_like();
-    }//GEN-LAST:event_txt_buscarKeyReleased
 
     private void txt_descuentoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_descuentoKeyPressed
         // TODO add your handling code here:
@@ -2699,10 +2718,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         reporte();
     }//GEN-LAST:event_jbtn_reporteActionPerformed
 
-    private void txt_buscarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_buscarKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_buscarKeyPressed
-
     private void jbtn_disponibleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_disponibleActionPerformed
         // TODO add your handling code here:
         if (tabla_detalle.getRowCount() <= 0)
@@ -2753,21 +2768,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         //jbtn_mostrar_articulos.setEnabled(false);
     }//GEN-LAST:event_jbtn_mostrar_articulosActionPerformed
 
-    private void txt_precio_unitarioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_precio_unitarioKeyPressed
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == 10) {
-            agregar_articulos();
-
-        }
-    }//GEN-LAST:event_txt_precio_unitarioKeyPressed
-
     private void txt_totalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_totalActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_totalActionPerformed
-
-    private void txt_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_buscarActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_buscarActionPerformed
 
     private void txt_abonoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_abonoKeyPressed
         if (evt.getKeyCode() == 10)
@@ -2816,17 +2819,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private void txt_calculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_calculoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_calculoActionPerformed
-
-    private void txt_porcentaje_descuentoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_porcentaje_descuentoKeyPressed
-         if (evt.getKeyCode() == 10) {
-            agregar_articulos();
-
-        }
-    }//GEN-LAST:event_txt_porcentaje_descuentoKeyPressed
-
-    private void txt_porcentaje_descuentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_porcentaje_descuentoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_porcentaje_descuentoActionPerformed
 
     private void txt_ivaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_ivaFocusLost
         // TODO add your handling code here:
@@ -2878,8 +2870,129 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtEmailToSendActionPerformed
 
+    private void txt_porcentaje_descuentoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_porcentaje_descuentoKeyPressed
+        if (evt.getKeyCode() == 10) {
+            agregar_articulos();
+
+        }
+    }//GEN-LAST:event_txt_porcentaje_descuentoKeyPressed
+
+    private void txt_porcentaje_descuentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_porcentaje_descuentoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_porcentaje_descuentoActionPerformed
+
+    private void tabla_articulosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_articulosMouseClicked
+        // TODO add your handling code here:
+        if (evt.getClickCount() == 2) {
+
+            lbl_eleccion.setText((String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 3).toString() + " " + (String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 4).toString());
+            txt_precio_unitario.setText(EliminaCaracteres((String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 5).toString(), "$,"));
+            txt_cantidad.setText("");
+            txt_cantidad.requestFocus();
+            this.txt_porcentaje_descuento.setText("");
+            id_articulo = (String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString();
+            txt_precio_unitario.setEditable(false);
+
+        }
+    }//GEN-LAST:event_tabla_articulosMouseClicked
+
+    private void txt_buscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_buscarKeyReleased
+        // TODO add your handling code here:
+        tabla_articulos_like();
+    }//GEN-LAST:event_txt_buscarKeyReleased
+
+    private void txt_buscarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_buscarKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_buscarKeyPressed
+
+    private void txt_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_buscarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_buscarActionPerformed
+
+    private void txt_precio_unitarioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_precio_unitarioKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == 10) {
+            agregar_articulos();
+
+        }
+    }//GEN-LAST:event_txt_precio_unitarioKeyPressed
+
+    private void txt_cantidadKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_cantidadKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == 10) {
+            agregar_articulos();
+
+        }
+    }//GEN-LAST:event_txt_cantidadKeyPressed
+
+    private void btnGetItemsFromFolioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGetItemsFromFolioActionPerformed
+        String folio = JOptionPane.showInputDialog("Ingresa el folio");
+        if (folio == null) {
+            return;
+        }
+        
+        try {
+            Renta renta = saleService.obtenerRentaPorFolio(Integer.parseInt(folio));
+            if (renta == null) {
+                JOptionPane.showMessageDialog(null, "No se encontró el evento con el folio ingresado ", "ERROR", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (renta.getDetalleRenta().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No se encontraron articulos en el evento con el folio ingresado ", "ERROR", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            fillTableFromItemsFolio(renta);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Folio no válido, ingresa un número válido para continuar ", "ERROR", JOptionPane.ERROR_MESSAGE);
+        } catch (BusinessException e) {
+            JOptionPane.showMessageDialog(null, "Ocurrio un error inesperado "+ e, "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnGetItemsFromFolioActionPerformed
+
+    private void fillTableFromItemsFolio (Renta renta) {
+        DefaultTableModel tableModel = (DefaultTableModel) tabla_detalle.getModel();
+        
+        renta.getDetalleRenta().stream().forEach(detail -> {
+            
+            // verificar duplicados
+            for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
+                if ( (detail.getArticulo().getArticuloId()+"").equals(tabla_detalle.getValueAt(i, 1).toString())) {
+                    return;
+                }
+            }
+            
+            Float cantidad = detail.getCantidad();
+            Float precio = detail.getPrecioUnitario();
+            Float importe = (cantidad * precio);
+            Float totalDescuento = 0F;
+            
+            if (detail.getPorcentajeDescuento() > 0) {
+                totalDescuento = importe * (detail.getPorcentajeDescuento() / 100);
+                importe = importe - totalDescuento;
+            }
+            
+            Object fila[] = {                                          
+                cantidad,
+                detail.getArticulo().getArticuloId(),
+                detail.getArticulo().getDescripcion() + " " + detail.getArticulo().getColor().getColor(),
+                decimalFormat.format(precio),
+                detail.getPorcentajeDescuento(),
+                decimalFormat.format(totalDescuento),
+                decimalFormat.format(importe)
+              };
+              tableModel.addRow(fila);
+        });
+        subTotal();
+        total();
+        jbtn_disponible.setEnabled(true);
+        panel_conceptos.setVisible(true);
+        panel_articulos.setVisible(false);
+        jbtn_mostrar_articulos.setEnabled(true);
+        panel = true;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnGetItemsFromFolio;
     private javax.swing.JCheckBox check_enviar_email;
     private javax.swing.JCheckBox check_generar_reporte;
     private javax.swing.JCheckBox check_mostrar_precios;
@@ -2912,7 +3025,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;

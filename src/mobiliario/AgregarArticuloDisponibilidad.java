@@ -6,22 +6,17 @@
 package mobiliario;
 
 import forms.inventario.InventarioForm;
-import clases.conectate;
 import clases.sqlclass;
 import java.awt.Toolkit;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import static forms.rentas.AgregarRenta.tabla_articulos;
-import static forms.inventario.InventarioForm.cmb_color;
-import model.Articulo;
 import services.ItemService;
 
 /**
