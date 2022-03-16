@@ -559,8 +559,11 @@ public class SaleService {
      public Renta obtenerRentaPorId(int rentaId) throws Exception { 
         
         Renta renta = salesDao.obtenerRentaPorId(rentaId);
-        renta.setDetalleRenta(this.obtenerDetalleRenta(renta.getRentaId()));
-        calcularTotalesPorRenta(renta);
+        if (renta != null) {
+            renta.setDetalleRenta(this.obtenerDetalleRenta(renta.getRentaId()));
+            calcularTotalesPorRenta(renta);
+        }
+        
         return renta;
                 
     } // renta por id
@@ -568,10 +571,9 @@ public class SaleService {
      public Renta obtenerRentaPorFolio(Integer folio) throws BusinessException { 
         try {
             Renta renta = salesDao.obtenerRentaPorFolio(folio);
-            if (renta == null) {
-              return null;
+            if (renta != null) {
+              renta.setDetalleRenta(this.obtenerDetalleRenta(renta.getRentaId()));
             }
-            renta.setDetalleRenta(this.obtenerDetalleRenta(renta.getRentaId()));
             return renta;
         } catch (Exception e) {
             throw new BusinessException(e.getMessage(),e);

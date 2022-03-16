@@ -21,8 +21,10 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.mail.MessagingException;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -53,7 +55,7 @@ import services.SystemService;
 import utilities.Utility;
 
 public class AgregarRenta extends javax.swing.JInternalFrame {
-    
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AgregarRenta.class.getName());
     sqlclass funcion = new sqlclass();
     conectate conexion = new conectate();
     Object[][] dtconduc;
@@ -1054,14 +1056,22 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     
     private void searchAndFillTableCustomers () {
-      
-        List<Cliente> filterCustomers =
-                customers.stream()
-                        .filter(customer -> customer.getNombre().toLowerCase().trim().contains(txt_nombre.getText().toLowerCase().trim()))
-                        .filter(customer -> customer.getApellidos().toLowerCase().trim().contains(txt_apellidos.getText().toLowerCase().trim()))
-                        .toList();
+        try {
+            List<Cliente> filterCustomers =
+                    customers.stream()
+                            .filter(customer -> Objects.nonNull(customer))
+                            .filter(customer -> Objects.nonNull(customer.getNombre()))
+                            .filter(customer -> Objects.nonNull(customer.getApellidos()))
+                            .filter(customer -> customer.getNombre().toLowerCase().trim().contains(txt_nombre.getText().toLowerCase().trim()))
+                            .filter(customer -> customer.getApellidos().toLowerCase().trim().contains(txt_apellidos.getText().toLowerCase().trim()))
+                            .collect(Collectors.toList());
+            fillTableCustomers(filterCustomers);
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.INFORMATION_MESSAGE);
+            log.error(e.getMessage(),e);
+        }
         
-        fillTableCustomers(filterCustomers);
+        
     }
     
 
@@ -1309,10 +1319,13 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         
         List<Articulo> filterItems =
                 articulos.stream()
-                        .filter(item -> 
-                                (item.getDescripcion().toLowerCase().trim() + " " + item.getColor().getColor().toLowerCase().trim())
-                                        .contains(txt_buscar.getText().toLowerCase().trim()))
-                .toList();
+                    .filter(item -> Objects.nonNull(item))
+                    .filter(item -> Objects.nonNull(item.getDescripcion()))
+                    .filter(item -> Objects.nonNull(item.getColor()))
+                    .filter(item -> 
+                        (item.getDescripcion().toLowerCase().trim() + " " + item.getColor().getColor().toLowerCase().trim())
+                                .contains(txt_buscar.getText().toLowerCase().trim()))
+                .collect(Collectors.toList());
         
         fillTableItems(filterItems);
     }
@@ -1488,6 +1501,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         txt_nombre.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         txt_nombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_nombreKeyPressed(evt);
+            }
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txt_nombreKeyReleased(evt);
             }
@@ -3129,6 +3145,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         }
     }//GEN-LAST:event_txtDiscountRateEditKeyPressed
+
+    private void txt_nombreKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_nombreKeyPressed
+        
+    }//GEN-LAST:event_txt_nombreKeyPressed
 
     private void fillTableFromItemsFolio (Renta renta) {
         DefaultTableModel tableModel = (DefaultTableModel) tabla_detalle.getModel();

@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 
 public class Articulo {
     
-    private int articuloId;
+    private Integer articuloId;
     private int categoriaId;
     private int usuarioId;
     private Color color;
@@ -40,6 +40,14 @@ public class Articulo {
 
     public void setTotalShopProvider(Float totalShopProvider) {
         this.totalShopProvider = totalShopProvider;
+    }
+
+    public Integer getArticuloId() {
+        return articuloId;
+    }
+
+    public void setArticuloId(Integer articuloId) {
+        this.articuloId = articuloId;
     }
     
     
@@ -131,16 +139,7 @@ public class Articulo {
         this.color = color;
     }
 
-   
-    
-
-    public int getArticuloId() {
-        return articuloId;
-    }
-
-    public void setArticuloId(int articuloId) {
-        this.articuloId = articuloId;
-    }
+  
 
     public int getCategoriaId() {
         return categoriaId;
