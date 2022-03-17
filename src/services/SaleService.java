@@ -553,9 +553,7 @@ public class SaleService {
          return tipo;
          
      }
-     
-         
-     
+          
      public Renta obtenerRentaPorId(int rentaId) throws Exception { 
         
         Renta renta = salesDao.obtenerRentaPorId(rentaId);

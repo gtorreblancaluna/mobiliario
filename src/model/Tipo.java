@@ -12,7 +12,7 @@ package model;
  * 2018.11.21
  */
 public class Tipo {
-    private int tipoId;
+    private Integer tipoId;
     private String tipo;
 
     public Tipo(int tipoId, String tipo) {
@@ -22,17 +22,15 @@ public class Tipo {
 
     public Tipo() {
     }
-    
-    
 
-    public int getTipoId() {
+    public Integer getTipoId() {
         return tipoId;
     }
 
-    public void setTipoId(int tipoId) {
+    public void setTipoId(Integer tipoId) {
         this.tipoId = tipoId;
     }
-
+    
     public String getTipo() {
         return tipo;
     }

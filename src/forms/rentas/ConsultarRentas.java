@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -76,6 +75,7 @@ import services.TipoEventoService;
 import services.providers.OrderProviderService;
 
 public class ConsultarRentas extends javax.swing.JInternalFrame {
+    
     private OrderProviderForm orderProviderForm;
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ConsultarRentas.class.getName());
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
@@ -110,6 +110,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private List<Articulo> articulos = new ArrayList<>();
     private final String NEW_ITEM = "1";
     private final String ITEM_ALREADY = "0";
+    private Renta globalRenta = null;
 
     
     private enum ColumnTableDetail {
@@ -890,11 +891,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                                   txt_cantidad.getText().toString(),
                                   articulo.getArticuloId()+"",
                                   articulo.getDescripcion()+" "+articulo.getColor().getColor(),
-                                  conviertemoneda(txt_precio_unitario.getText()),
+                                  decimalFormat.format(Float.parseFloat(txt_precio_unitario.getText())),
                                   porcentajeDescuento+"",
                                   totalDescuento+"",
-                                  conviertemoneda(importe+""),
-                                  NEW_ITEM
+                                  decimalFormat.format(importe),
+                                  ITEM_ALREADY
                     };
                     temp.addRow(nuevo);
                     subTotal();
@@ -1204,7 +1205,14 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
     }
     
-    public void actualizar() throws Exception{
+    public void actualizar() throws Exception {
+        
+        // variable debe ser inicializada cuando se elige una renta a visualizar
+        if (globalRenta == null) {
+            JOptionPane.showMessageDialog(null, "Ocurrio un error inesperado, contacta a soporte tecnico.", "Error", JOptionPane.ERROR_MESSAGE);
+            log.error("Variable global renta es null, debe ser inicializada cuando se elige una renta a visualizar");
+            return;
+        }
         
         if (check_enviar_email.isSelected() == true){
            try{
@@ -1221,9 +1229,32 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         String fecha_evento = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_evento.getDate());
        
         final EstadoEvento estadoEventoSelected = (EstadoEvento) cmb_estado1.getModel().getSelectedItem();
+        final Tipo tipoSelected = (Tipo) cmb_tipo.getModel().getSelectedItem();
+        
+        if (!estadoEventoSelected.getEstadoId().equals(globalRenta.getEstado().getEstadoId())) {
+            String msg = String.format("Folio: %s, Usuario %s,  Realizó el cambio de Estado [%s] a [%s]",
+                globalRenta.getFolio()+"",
+                iniciar_sesion.nombre_usuario_global + " " + iniciar_sesion.apellidos_usuario_global,
+                globalRenta.getEstado().getDescripcion(),
+                estadoEventoSelected.getDescripcion()
+            );
+            log.info(msg);
+            Utility.pushNotification(msg);
+        }
+        
+        if (!tipoSelected.getTipoId().equals(globalRenta.getTipo().getTipoId())) {
+            String msg = String.format("Folio: %s, Usuario %s,  Realizó el cambio de Tipo [%s] a [%s]", 
+                globalRenta.getFolio()+"",
+                iniciar_sesion.nombre_usuario_global + " " + iniciar_sesion.apellidos_usuario_global,
+                globalRenta.getTipo().getTipo(),
+                tipoSelected.getTipo()
+            );
+            log.info(msg);
+            Utility.pushNotification(msg);
+        }
         
         String id_chofer = ((Usuario) cmb_chofer.getModel().getSelectedItem()).getUsuarioId()+"";
-        String id_tipo = ((Tipo) cmb_tipo.getModel().getSelectedItem()).getTipoId()+"";
+        
         String porcentajeDescuentoRenta;
         String cantidadDescuento;
         if (!txt_descuento.getText().toString().equals("") && !txtPorcentajeDescuento.getText().toString().equals("")) {
@@ -1246,7 +1277,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         String envioRecoleccion = this.txt_envioRecoleccion.getText().equals("") ? "0" : this.txt_envioRecoleccion.getText().toString().replaceAll(",", "");
         String depositoGarantia = this.txt_depositoGarantia.getText().equals("") ? "0" : this.txt_depositoGarantia.getText().toString().replaceAll(",", "");; 
         String hora_devolucion = this.cmb_hora_devolucion.getSelectedItem()+" a "+this.cmb_hora_devolucion_dos.getSelectedItem();
-        String datos[] = {estadoEventoSelected.getEstadoId()+"", fecha_entrega, hora_entrega, fecha_devolucion, txt_descripcion.getText().toString(),porcentajeDescuentoRenta,cantidadDescuento, txt_comentarios.getText().toString(), id_chofer, id_tipo, hora_devolucion,fecha_evento,depositoGarantia,envioRecoleccion,iva,mostrarPrecios,id_renta};
+        String datos[] = {estadoEventoSelected.getEstadoId()+"", fecha_entrega, hora_entrega, fecha_devolucion, txt_descripcion.getText().toString(),porcentajeDescuentoRenta,cantidadDescuento, txt_comentarios.getText().toString(), id_chofer, tipoSelected.getTipoId()+"", hora_devolucion,fecha_evento,depositoGarantia,envioRecoleccion,iva,mostrarPrecios,id_renta};
         funcion.UpdateRegistro(datos, "update renta set id_estado=?,fecha_entrega=?,hora_entrega=?,fecha_devolucion=?,descripcion=?,descuento=?,cantidad_descuento=?,comentario=?,id_usuario_chofer=?,id_tipo=?,hora_devolucion=?,fecha_evento=?,deposito_garantia=?,envio_recoleccion=?,iva=?,mostrar_precios_pdf=? where id_renta=?");
         String messageLogInfo = iniciar_sesion.usuarioGlobal.getNombre() + " actualizó con éxito el folio "+this.lbl_folio.getText();
         Utility.pushNotification(messageLogInfo);
@@ -1260,6 +1291,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         if (check_enviar_email.isSelected() == true){
            enviar_email();                
         }
+        
+        // actualizamos la renta
+        globalRenta = saleService.obtenerRentaPorId(globalRenta.getRentaId());
     }
     
     private void checkNewItemsAndUpdateRenta () {
@@ -1301,26 +1335,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
     }
     
-    public String conviertemoneda(String valor) {
-        
-        DecimalFormatSymbols simbolo = new DecimalFormatSymbols();
-        simbolo.setDecimalSeparator('.');
-        simbolo.setGroupingSeparator(',');
-        
-        float entero = Float.parseFloat(valor);
-        DecimalFormat formateador = new DecimalFormat("###,###.##", simbolo);
-        String entero2 = formateador.format(entero);
-        
-        if (entero2.contains(".")) {
-            entero2 = "$" + entero2;
-            
-        } else {
-            entero2 = "$" + entero2 + ".00";
-        }
-        
-        return entero2;
-        
-    }
+    
     
     public void modificar_detalle() {
         cant = ((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 1).toString());
@@ -1359,10 +1374,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     detalle.getCantidad()+"",
                     detalle.getArticulo().getArticuloId()+"",                                                      
                     detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor(),
-                    conviertemoneda(detalle.getPrecioUnitario()+""),
+                    decimalFormat.format(detalle.getPrecioUnitario()),
                     detalle.getPorcentajeDescuento()+"",
                     descuento+"",                        
-                    conviertemoneda(importe+""),
+                    decimalFormat.format(importe),
                     isNew
                 };
                 tablaDetalle.addRow(fila);
@@ -1914,7 +1929,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         for (int i = 0; i < dtconduc.length; i++) {
             String valor = dtconduc[i][3].toString();
-            dtconduc[i][3] = conviertemoneda(valor).toString();
+            dtconduc[i][3] = decimalFormat.format(Float.parseFloat(valor));
             
         }
         for (int i = 0; i < dtconduc.length; i++) {
@@ -3684,34 +3699,34 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             obtenerArticulosGlobalesAsincrono();
                        
             String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
-            Renta renta = null;
+            globalRenta = null;
             try {
-                renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
+                globalRenta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
             } catch (Exception e) {
                 Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
                 JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
                 return;
             }
             
-            final int folioRenta = renta.getFolio();
+            final int folioRenta = globalRenta.getFolio();
             new Thread(() -> {
                  fillOrdersProvider(folioRenta);
             }).start();
             
-            if(renta.getMostrarPreciosPdf().equals("1"))
+            if(globalRenta.getMostrarPreciosPdf().equals("1"))
                 this.check_mostrar_precios.setSelected(true);
             else
                 this.check_mostrar_precios.setSelected(false);
             
-            if(renta.getCliente().getEmail() != null && !renta.getCliente().getEmail().equals("")){
-                this.txtEmailToSend.setText(renta.getCliente().getEmail());
+            if(globalRenta.getCliente().getEmail() != null && !globalRenta.getCliente().getEmail().equals("")){
+                this.txtEmailToSend.setText(globalRenta.getCliente().getEmail());
             }else{
                 this.txtEmailToSend.setText("");
             }
             
-            this.g_idTipoEvento = renta.getTipo().getTipoId()+""; // variable global
-            id_renta = renta.getRentaId()+""; // variable global
-            id_cliente = renta.getCliente().getId()+""; // variable global
+            this.g_idTipoEvento = globalRenta.getTipo().getTipoId()+""; // variable global
+            id_renta = globalRenta.getRentaId()+""; // variable global
+            id_cliente = globalRenta.getCliente().getId()+""; // variable global
             new Thread(() -> {
                 tabla_abonos(id_renta);
             }).start();
@@ -3722,60 +3737,60 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jTabbedPane1.setSelectedIndex(1);
             jTabbedPane1.setEnabledAt(2, true);
             
-            lbl_cliente.setText(renta.getCliente().getNombre()+" "+renta.getCliente().getApellidos());
-            lbl_folio.setText(renta.getFolio()+"");            
+            lbl_cliente.setText(globalRenta.getCliente().getNombre()+" "+globalRenta.getCliente().getApellidos());
+            lbl_folio.setText(globalRenta.getFolio()+"");            
           
             try {
-                cmb_fecha_entrega.setDate((Date) formatoDelTexto.parse((String) renta.getFechaEntrega()));
-                cmb_fecha_devolucion.setDate((Date) formatoDelTexto.parse((String) renta.getFechaDevolucion()));
-                cmb_fecha_evento.setDate((Date) formatoDelTexto.parse((String) renta.getFechaEvento()));
+                cmb_fecha_entrega.setDate((Date) formatoDelTexto.parse((String) globalRenta.getFechaEntrega()));
+                cmb_fecha_devolucion.setDate((Date) formatoDelTexto.parse((String) globalRenta.getFechaDevolucion()));
+                cmb_fecha_evento.setDate((Date) formatoDelTexto.parse((String) globalRenta.getFechaEvento()));
             } catch (ParseException ex) {
                 Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            cmb_estado1.getModel().setSelectedItem(renta.getEstado());            
-            cmb_chofer.getModel().setSelectedItem(renta.getChofer());          
-            txt_descripcion.setText(renta.getDescripcion());            
-            txt_comentarios.setText(renta.getComentario());            
+            cmb_estado1.getModel().setSelectedItem(globalRenta.getEstado());            
+            cmb_chofer.getModel().setSelectedItem(globalRenta.getChofer());          
+            txt_descripcion.setText(globalRenta.getDescripcion());            
+            txt_comentarios.setText(globalRenta.getComentario());            
 
-            cmb_tipo.getModel().setSelectedItem(renta.getTipo());
+            cmb_tipo.getModel().setSelectedItem(globalRenta.getTipo());
                   
-            String[] horaSplit = renta.getHoraEntrega().split("a");            
+            String[] horaSplit = globalRenta.getHoraEntrega().split("a");            
 
-            String hora_devolucion = renta.getHoraDevolucion();
+            String hora_devolucion = globalRenta.getHoraDevolucion();
             String[] horaDevolucionSplit = hora_devolucion.split("a");
             this.cmb_hora_devolucion.setSelectedItem(horaDevolucionSplit[0].replaceAll(" ", ""));
             this.cmb_hora_devolucion_dos.setSelectedItem(horaDevolucionSplit[1].replaceAll(" ", ""));
             cmb_hora.setSelectedItem(horaSplit[0].replaceAll(" ", ""));
             cmb_hora_dos.setSelectedItem(horaSplit[1].replaceAll(" ", ""));
             
-            lbl_atiende.setText("Atendio: " + renta.getUsuario().getNombre()+" "+renta.getUsuario().getApellidos());
+            lbl_atiende.setText("Atendio: " + globalRenta.getUsuario().getNombre()+" "+globalRenta.getUsuario().getApellidos());
                
             // agregamos los articulos de esta renta
-            llenarTablaDetalle(renta,ITEM_ALREADY);
+            llenarTablaDetalle(globalRenta,ITEM_ALREADY);
             panel_conceptos.setVisible(true);
             panel_articulos.setVisible(false);
             jbtn_mostrar_articulos.setEnabled(true);
             panel = true;
            
             // TOTALES
-            txt_subtotal.setText(decimalFormat.format(renta.getSubTotal()));
-            txtPorcentajeDescuento.setText(decimalFormat.format(renta.getDescuento()));
-            txt_descuento.setText(decimalFormat.format(renta.getCalculoDescuento()));
-            txt_envioRecoleccion.setText(decimalFormat.format(renta.getEnvioRecoleccion()));
-            txt_depositoGarantia.setText(decimalFormat.format(renta.getDepositoGarantia()));
-            txt_iva.setText(renta.getIva()+"");
-            txt_total_iva.setText(decimalFormat.format(renta.getCalculoIVA()));
-            txt_calculo.setText(decimalFormat.format(renta.getTotalCalculo()));
-            txt_abonos.setText(decimalFormat.format(renta.getTotalAbonos()));
-            txt_faltantes.setText(decimalFormat.format(renta.getTotalFaltantes()));     
-            txt_total.setText(decimalFormat.format(renta.getTotal()));
+            txt_subtotal.setText(decimalFormat.format(globalRenta.getSubTotal()));
+            txtPorcentajeDescuento.setText(decimalFormat.format(globalRenta.getDescuento()));
+            txt_descuento.setText(decimalFormat.format(globalRenta.getCalculoDescuento()));
+            txt_envioRecoleccion.setText(decimalFormat.format(globalRenta.getEnvioRecoleccion()));
+            txt_depositoGarantia.setText(decimalFormat.format(globalRenta.getDepositoGarantia()));
+            txt_iva.setText(globalRenta.getIva()+"");
+            txt_total_iva.setText(decimalFormat.format(globalRenta.getCalculoIVA()));
+            txt_calculo.setText(decimalFormat.format(globalRenta.getTotalCalculo()));
+            txt_abonos.setText(decimalFormat.format(globalRenta.getTotalAbonos()));
+            txt_faltantes.setText(decimalFormat.format(globalRenta.getTotalFaltantes()));     
+            txt_total.setText(decimalFormat.format(globalRenta.getTotal()));
             // FIN TOTALES
 
               subTotal();
 //            total();
             
-            datos_cliente(Integer.parseInt(renta.getCliente().getId().toString()));
+            datos_cliente(Integer.parseInt(globalRenta.getCliente().getId().toString()));
             jbtn_agregar_cliente.setEnabled(false);
             jbtn_guardar_cliente.setEnabled(false);
             

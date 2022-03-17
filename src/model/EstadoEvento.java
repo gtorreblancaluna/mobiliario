@@ -2,7 +2,7 @@ package model;
 
 public class EstadoEvento {
     
-    private int estadoId;
+    private Integer estadoId;
     private String descripcion;
 
     public EstadoEvento(int estadoId, String descripcion) {
@@ -12,17 +12,16 @@ public class EstadoEvento {
 
     public EstadoEvento() {
     }
-    
-    
-    
 
-    public int getEstadoId() {
+    public Integer getEstadoId() {
         return estadoId;
     }
 
-    public void setEstadoId(int estadoId) {
+    public void setEstadoId(Integer estadoId) {
         this.estadoId = estadoId;
     }
+    
+    
 
     public String getDescripcion() {
         return descripcion;

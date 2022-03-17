@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package utilities;
 
 import java.awt.Component;
@@ -30,13 +25,30 @@ import mobiliario.principal;
 import static mobiliario.principal.jDesktopPane1;
 
 
-/**
- *
- * @author idscomercial
- */
 public abstract class Utility {
     
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    
+    public String conviertemoneda(String valor) {
+        
+        DecimalFormatSymbols simbolo = new DecimalFormatSymbols();
+        simbolo.setDecimalSeparator('.');
+        simbolo.setGroupingSeparator(',');
+        
+        float entero = Float.parseFloat(valor);
+        DecimalFormat formateador = new DecimalFormat("###,###.##", simbolo);
+        String entero2 = formateador.format(entero);
+        
+        if (entero2.contains(".")) {
+            entero2 = "$" + entero2;
+            
+        } else {
+            entero2 = "$" + entero2 + ".00";
+        }
+        
+        return entero2;
+        
+    }
     
      public static boolean verifyIfInternalFormIsOpen(Object obj) {
         JInternalFrame[] activos = jDesktopPane1.getAllFrames();
