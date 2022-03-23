@@ -305,7 +305,7 @@
         </if>
         
         <if test="initEventDate != null and endEventDate != null ">
-            AND STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initEventDate},'%d/%m/%Y') AND STR_TO_DATE(#{endEventDate},'%d/%m/%Y')
+            AND STR_TO_DATE(r.fecha_evento,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initEventDate},'%d/%m/%Y') AND STR_TO_DATE(#{endEventDate},'%d/%m/%Y')
         </if>
         <if test="initCreatedDate != null and endCreatedDate != null ">
             AND STR_TO_DATE(r.fecha_pedido,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initCreatedDate},'%d/%m/%Y') AND STR_TO_DATE(#{endCreatedDate},'%d/%m/%Y')
