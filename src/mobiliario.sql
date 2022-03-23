@@ -491,6 +491,7 @@ CREATE TABLE material_sale_items (
 -- almacena la info cuando detecta cambio en el tipo de pedido
 CREATE TABLE order_type_changes (
   id INT(11) NOT NULL AUTO_INCREMENT,
+  renta_id INT(11) NOT NULL,
   user_id INT(11) NOT NULL,
   current_type_id INT(10) UNSIGNED NOT NULL,
   change_type_id INT(10) UNSIGNED NOT NULL,
@@ -498,6 +499,11 @@ CREATE TABLE order_type_changes (
   updated_at TIMESTAMP NULL DEFAULT NULL,
   fg_active ENUM('1','0') NOT NULL DEFAULT '1',
   PRIMARY KEY (id),
+  CONSTRAINT fk_order_type_changes_renta
+    FOREIGN KEY (renta_id)
+    REFERENCES renta (id_renta)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
   CONSTRAINT fk_order_type_changes_users
     FOREIGN KEY (user_id)
     REFERENCES usuarios (id_usuarios)
@@ -518,6 +524,7 @@ CREATE TABLE order_type_changes (
 -- almacena la info cuando detecta cambio en el estado del pedido
 CREATE TABLE order_status_changes (
   id INT(11) NOT NULL AUTO_INCREMENT,
+  renta_id INT(11) NOT NULL,
   user_id INT(11) NOT NULL,
   current_status_id INT(11) NOT NULL,
   change_status_id INT(11) NOT NULL,
@@ -525,6 +532,11 @@ CREATE TABLE order_status_changes (
   updated_at TIMESTAMP NULL DEFAULT NULL,
   fg_active ENUM('1','0') NOT NULL DEFAULT '1',
   PRIMARY KEY (id),
+  CONSTRAINT fk_order_status_changes_renta
+    FOREIGN KEY (renta_id)
+    REFERENCES renta (id_renta)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
   CONSTRAINT fk_order_status_changes_users
     FOREIGN KEY (user_id)
     REFERENCES usuarios (id_usuarios)

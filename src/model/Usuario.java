@@ -2,7 +2,7 @@ package model;
 
 public class Usuario {
     
-    private int usuarioId;
+    private Integer usuarioId;
     private String nombre;
     private String apellidos;
     private String telMovil;
@@ -15,25 +15,31 @@ public class Usuario {
     private String activo;
     private Puesto puesto;
 
-    public Usuario(int usuarioId, String nombre) {
+    public Usuario(Integer usuarioId, String nombre) {
         this.usuarioId = usuarioId;
         this.nombre = nombre;
         this.apellidos = "";
     }
+    
+    public Usuario(Integer usuarioId) {
+        this.usuarioId = usuarioId;
+    }
 
     public Usuario() {
     }
-    
-    
-    
 
-    public int getUsuarioId() {
+    public Integer getUsuarioId() {
         return usuarioId;
     }
 
-    public void setUsuarioId(int usuarioId) {
+    public void setUsuarioId(Integer usuarioId) {
         this.usuarioId = usuarioId;
     }
+    
+    
+    
+
+   
 
     public String getNombre() {
         return nombre;

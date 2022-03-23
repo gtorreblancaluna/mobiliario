@@ -19,6 +19,10 @@ public class Tipo {
         this.tipoId = tipoId;
         this.tipo = tipo;
     }
+    
+    public Tipo(int tipoId) {
+        this.tipoId = tipoId;
+    }
 
     public Tipo() {
     }

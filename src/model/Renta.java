@@ -54,6 +54,15 @@ public class Renta {
     private Float calculoIVA;
     private Float totalCalculo;
 
+    public Renta(int rentaId) {
+        this.rentaId = rentaId;
+    }
+
+    public Renta() {
+    }
+    
+    
+
     public Float getTotalCalculo() {
         return totalCalculo;
     }

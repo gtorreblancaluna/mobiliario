@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperOrderStatusChanges">
+  
+    <resultMap id="resultMapOrderStatusChange" type="model.OrderStatusChange">        
+        
+        <result property="id" column="id"/>
+        <result property="renta.id" column="renta_id"/>
+        <result property="user.id" column="user_id"/>
+        <result property="user.nombre" column="user_name"/>
+        <result property="user.apellidos" column="user_lastname"/>
+      
+        <result property="currentStatus.estadoId" column="current_status_id"/>
+        <result property="currentStatus.descripcion" column="current_status_description"/>
+        
+        <result property="changeStatus.estadoId" column="change_status_id"/>
+        <result property="changeStatus.descripcion" column="change_status_description"/>
+        
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="fgActive" column="fg_active"/>
+        
+    </resultMap>
+     
+    <insert id="insertOrderStatusChange" parameterType="model.OrderStatusChange">
+        INSERT INTO order_status_changes
+        (
+            user_id,
+            renta_id,
+            current_status_id,
+            change_status_id,
+            created_at,
+            updated_at,
+            fg_active
+        )
+        VALUES
+        (
+            #{user.usuarioId},
+            #{renta.rentaId},
+            #{currentStatus.estadoId},
+            #{changeStatus.estadoId},
+            #{createdAt},
+            #{updatedAt},
+            #{fgActive}
+        )
+    </insert>
+    
+  
+</mapper>

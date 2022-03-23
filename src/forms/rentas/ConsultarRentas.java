@@ -71,6 +71,8 @@ import model.EstadoEvento;
 import model.Tipo;
 import model.providers.OrdenProveedor;
 import parametersVO.ParameterOrderProvider;
+import services.OrderStatusChangeService;
+import services.OrderTypeChangeService;
 import services.TipoEventoService;
 import services.providers.OrderProviderService;
 
@@ -106,6 +108,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private final EstadoEventoService estadoEventoService = EstadoEventoService.getInstance();
     private final TipoEventoService tipoEventoService = TipoEventoService.getInstance();
     private final OrderProviderService orderService = OrderProviderService.getInstance();
+    private final OrderStatusChangeService orderStatusChangeService = OrderStatusChangeService.getInstance();
+    private final OrderTypeChangeService orderTypeChangeService = OrderTypeChangeService.getInstance();
     // listado de articulos que se llenaran de manera asincrona, y se utilizara para realizar busquedas por descripcion
     private List<Articulo> articulos = new ArrayList<>();
     private final String NEW_ITEM = "1";
@@ -1238,8 +1242,17 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 globalRenta.getEstado().getDescripcion(),
                 estadoEventoSelected.getDescripcion()
             );
-            log.info(msg);
-            Utility.pushNotification(msg);
+            
+            new Thread(() -> {
+                try {
+                    orderStatusChangeService.insert(globalRenta.getRentaId(), globalRenta.getEstado().getEstadoId() , estadoEventoSelected.getEstadoId(),iniciar_sesion.usuarioGlobal.getUsuarioId());
+                    log.info(msg);
+                    Utility.pushNotification(msg);
+                } catch (BusinessException e) {
+                    log.error(e.getMessage(),e);
+                    Utility.pushNotification(e.getMessage());
+                }
+            }).start();
         }
         
         if (!tipoSelected.getTipoId().equals(globalRenta.getTipo().getTipoId())) {
@@ -1249,8 +1262,17 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 globalRenta.getTipo().getTipo(),
                 tipoSelected.getTipo()
             );
-            log.info(msg);
-            Utility.pushNotification(msg);
+           
+            new Thread(() -> {
+                try {
+                    orderTypeChangeService.insert(globalRenta.getRentaId(), globalRenta.getTipo().getTipoId() , tipoSelected.getTipoId(),iniciar_sesion.usuarioGlobal.getUsuarioId());
+                     log.info(msg);
+                     Utility.pushNotification(msg);
+                } catch (BusinessException e) {
+                    log.error(e.getMessage(),e);
+                    Utility.pushNotification(e.getMessage());
+                }
+            }).start();
         }
         
         String id_chofer = ((Usuario) cmb_chofer.getModel().getSelectedItem()).getUsuarioId()+"";

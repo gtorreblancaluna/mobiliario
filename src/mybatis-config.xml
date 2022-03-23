@@ -41,6 +41,8 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         <mapper resource="data/MapperEstadoEvento.xml"/>
         <mapper resource="data/MapperTipoEvento.xml"/>
         <mapper resource="data/MapperCustomer.xml"/>
+        <mapper resource="data/MapperOrderTypeChanges.xml"/>
+        <mapper resource="data/MapperOrderStatusChanges.xml"/>
         
     </mappers>
     

@@ -12,7 +12,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import javax.swing.JOptionPane;
 import mobiliario.ApplicationConstants;
-import mobiliario.iniciar_sesion;
 import model.Abono;
 import model.Articulo;
 import model.Cliente;
@@ -24,7 +23,7 @@ import model.TipoAbono;
 import model.Usuario;
 
 public class SaleService {
-    private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
+    private static Logger log = Logger.getLogger(SaleService.class.getName());
     private final SalesDAO salesDao;
     private final UserService userService = UserService.getInstance();
     
