@@ -486,3 +486,58 @@ CREATE TABLE material_sale_items (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- almacena la info cuando detecta cambio en el tipo de pedido
+CREATE TABLE order_type_changes (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  user_id INT(11) NOT NULL,
+  current_type_id INT(10) UNSIGNED NOT NULL,
+  change_type_id INT(10) UNSIGNED NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id),
+  CONSTRAINT fk_order_type_changes_users
+    FOREIGN KEY (user_id)
+    REFERENCES usuarios (id_usuarios)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_order_type_changes_current
+    FOREIGN KEY (current_type_id)
+    REFERENCES tipo (id_tipo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_order_type_changes_change
+    FOREIGN KEY (change_type_id)
+    REFERENCES tipo (id_tipo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- almacena la info cuando detecta cambio en el estado del pedido
+CREATE TABLE order_status_changes (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  user_id INT(11) NOT NULL,
+  current_status_id INT(11) NOT NULL,
+  change_status_id INT(11) NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id),
+  CONSTRAINT fk_order_status_changes_users
+    FOREIGN KEY (user_id)
+    REFERENCES usuarios (id_usuarios)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_order_status_changes_current
+    FOREIGN KEY (current_status_id)
+    REFERENCES estado (id_estado)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_order_status_changes_change
+    FOREIGN KEY (change_status_id)
+    REFERENCES estado (id_estado)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
