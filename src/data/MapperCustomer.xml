@@ -31,7 +31,7 @@
     <select id="getByIdCustomer" resultMap="resultMapCustomer" parameterType="java.lang.Long" >
         SELECT * 
         FROM clientes c
-        WHERE c.id_cliente = #{id} 
+        WHERE c.id_clientes = #{id} 
         AND c.activo = 1
     </select>  
   
