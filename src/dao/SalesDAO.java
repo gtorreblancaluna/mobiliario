@@ -98,4 +98,13 @@ public class SalesDAO {
         }
     }
     
+    public List<Renta> obtenerDisponibilidadRentaPorConsulta (Map<String,Object> parameters) throws DataOriginException{
+        SqlSession session = sqlSessionFactory.openSession();
+        try {
+           return (List<Renta>) session.selectList("MapperPedidos.obtenerRentaPorDisponibilidad",parameters);       
+        } finally {
+            session.close();
+        }
+    }
+    
 }

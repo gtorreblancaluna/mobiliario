@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
 import forms.inventario.InventarioForm;
@@ -12,7 +7,9 @@ import clases.sqlclass;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -22,16 +19,11 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import model.Articulo;
-//import static mobiliario.InventarioForm.funcion;
 import model.DetalleRenta;
 import model.Renta;
 import services.ItemService;
 import services.SystemService;
 
-/**
- *
- * @author Carlos Alberto
- */
 public class VerDisponibilidadArticulos extends java.awt.Dialog {
 
     sqlclass funcion = new sqlclass();
@@ -160,9 +152,14 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         }
         
         List<Renta> rentas = null;
-        
+        Map<String,Object> parameters = new HashMap<>();
+        parameters.put("typePedido", ApplicationConstants.TIPO_PEDIDO);
+        parameters.put("statusApartado", ApplicationConstants.ESTADO_APARTADO);
+        parameters.put("statusEnRenta", ApplicationConstants.ESTADO_EN_RENTA);
+        parameters.put("initDate", fechaInicial);
+        parameters.put("endDate", fechaFinal);
          try {
-            rentas = saleService.obtenerDisponibilidadRentaPorConsulta(stringSql, funcion);
+            rentas = saleService.obtenerDisponibilidadRentaPorConsulta(parameters);
         } catch (Exception e) {
             Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
@@ -180,14 +177,13 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
               System.out.println("RENTAS COUNT "+ rentasCount++);
             for(DetalleRenta detalle : renta.getDetalleRenta()){  
                  System.out.println("DETALLE RENTAS COUNT "+ detalleRentasCount++);
-                 //Articulo availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
+                 
                       // vamos agregar el articulo encontrado en la tabla detalle
                     DefaultTableModel temp = (DefaultTableModel) tablaArticulos.getModel();
                      Object nuevo[] = {
                             detalle.getArticulo().getArticuloId()+"",
                             detalle.getCantidad()+"",
                             // mostrar utiles
-                            //availabeItem.getUtiles(),
                             detalle.getArticulo().getUtiles(),
                             detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor(),
                             renta.getFechaEvento(),
@@ -347,9 +343,15 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         }
         
         List<Renta> rentas = null;
+        Map<String,Object> parameters = new HashMap<>();
+        parameters.put("typePedido", ApplicationConstants.TIPO_PEDIDO);
+        parameters.put("statusApartado", ApplicationConstants.ESTADO_APARTADO);
+        parameters.put("statusEnRenta", ApplicationConstants.ESTADO_EN_RENTA);
+        parameters.put("initDate", fechaInicial);
+        parameters.put("endDate", fechaFinal);
         
         try {
-            rentas = saleService.obtenerDisponibilidadRentaPorConsulta(stringSql, funcion);
+            rentas = saleService.obtenerDisponibilidadRentaPorConsulta(parameters);
         } catch (Exception e) {
             Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
@@ -370,14 +372,14 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                   // recorremos la tabla para identificar los articulos 
                   String id = detalle.getArticulo().getArticuloId()+"";
                   if (id.equals(InventarioForm.tablaDisponibilidadArticulos.getValueAt(i, 0).toString())) {
-                    Articulo availabeItem = null;
-                    try {
-                        availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
-                    } catch (Exception e) {
-                        Logger.getLogger(VerDisponibilidadArticulos.class.getName()).log(Level.SEVERE, null, e);
-                        JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-                        return;
-                    }
+                    Articulo availabeItem = detalle.getArticulo();
+//                    try {
+//                        availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
+//                    } catch (Exception e) {
+//                        Logger.getLogger(VerDisponibilidadArticulos.class.getName()).log(Level.SEVERE, null, e);
+//                        JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+//                        return;
+//                    }
                       // vamos agregar el articulo encontrado en la tabla detalle
                     DefaultTableModel temp = (DefaultTableModel) tablaArticulos.getModel();
                      Object nuevo[] = {

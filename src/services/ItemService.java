@@ -270,6 +270,19 @@ public class ItemService {
         return articulos;
     }
     
+    public Float utilesCalculate (Articulo articulo) {
+    
+        return (
+                                    (articulo.getCantidad() != null ? articulo.getCantidad() : 0F)  -
+                                    (articulo.getFaltantes() != null ? articulo.getFaltantes() : 0F) -
+                                    (articulo.getReparacion() != null ? articulo.getReparacion() : 0F ) -
+                                    (articulo.getAccidenteTrabajo() != null ? articulo.getAccidenteTrabajo() : 0F )
+                                ) +
+                                        (articulo.getDevolucion() != null ? articulo.getDevolucion() : 0F ) + 
+                                        (articulo.getTotalCompras() != null ? articulo.getTotalCompras() : 0F  )+
+                                        (articulo.getTotalShopProvider() != null ? articulo.getTotalShopProvider() : 0F );
+    }
+    
     public List<Articulo> obtenerArticulosBusquedaInventario(Map<String,Object> map) throws Exception{
         
         
@@ -282,18 +295,7 @@ public class ItemService {
         
         if(!articulos.isEmpty()){
             for(Articulo articulo : articulos){    
-                articulo.setUtiles(
-                                (
-                                    (articulo.getCantidad() != null ? articulo.getCantidad() : 0F)  -
-                                    (articulo.getFaltantes() != null ? articulo.getFaltantes() : 0F) -
-                                    (articulo.getReparacion() != null ? articulo.getReparacion() : 0F ) -
-                                    (articulo.getAccidenteTrabajo() != null ? articulo.getAccidenteTrabajo() : 0F )
-                                ) +
-                                        (articulo.getDevolucion() != null ? articulo.getDevolucion() : 0F ) + 
-                                        (articulo.getTotalCompras() != null ? articulo.getTotalCompras() : 0F  )+
-                                        (articulo.getTotalShopProvider() != null ? articulo.getTotalShopProvider() : 0F )
-                                        
-                );
+                articulo.setUtiles(utilesCalculate(articulo));
                 articulo.setTotalCompras( (articulo.getTotalCompras() != null ? articulo.getTotalCompras() : 0F) + 
                             (articulo.getTotalShopProvider() != null ? articulo.getTotalShopProvider() : 0F ));
             } // end for articulos
@@ -305,12 +307,15 @@ public class ItemService {
     @Deprecated
     private void setUtiles (Articulo item) throws Exception{
         
+        List<Compra> compras = new ArrayList<>();
         
-        List<Compra> compras = comprasService.obtenerComprasPorArticuloId(false, item.getArticuloId(), null);
+        if (item != null) {
+            compras = comprasService.obtenerComprasPorArticuloId(false, item.getArticuloId(), null);
+        }
         float totalCompras = 0f;
 
 
-       if(compras != null && compras.size()>0){
+       if(!compras.isEmpty()){
            for(Compra compra : compras){
                totalCompras += compra.getCantidad();
            } // end for compras
@@ -319,7 +324,7 @@ public class ItemService {
        // get all shop from provider
        float totalShopFromProvider = 0f;
        Map<String,Object> parameters = new HashMap<>();
-       parameters.put("articuloId", item.getArticuloId());
+       parameters.put("articuloId", item != null ? item.getArticuloId() : 0);
        parameters.put("statusOrderFinish", ApplicationConstants.STATUS_ORDER_PROVIDER_FINISH);
        parameters.put("statusOrder", ApplicationConstants.STATUS_ORDER_PROVIDER_ORDER);
        parameters.put("typeOrderDetail", ApplicationConstants.TYPE_DETAIL_ORDER_SHOPPING);
@@ -328,7 +333,7 @@ public class ItemService {
            List<DetalleOrdenProveedor> detalleOrdenProveedor =
                    orderProviderService.getDetailProvider(parameters);
 
-           if(detalleOrdenProveedor != null && detalleOrdenProveedor.size()>0){
+           if(!detalleOrdenProveedor.isEmpty()){
                for(DetalleOrdenProveedor detalle : detalleOrdenProveedor){
                    totalShopFromProvider += detalle.getCantidad();
                }
@@ -369,8 +374,11 @@ public class ItemService {
             System.out.println(e);
         }
 
-        item.setUtiles( (item.getCantidad() - faltantes - reparacion - accidenteTrabajo ) + devolucion + totalCompras + totalShopFromProvider);
-        item.setTotalCompras(totalCompras+totalShopFromProvider);
+        if (item != null) {
+            item.setUtiles( (item.getCantidad() - faltantes - reparacion - accidenteTrabajo ) + devolucion + totalCompras + totalShopFromProvider);
+            item.setTotalCompras(totalCompras+totalShopFromProvider);
+        } 
+        
 
     }
     

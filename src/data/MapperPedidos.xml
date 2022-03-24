@@ -283,6 +283,39 @@
             INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios)
             INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer)
             INNER JOIN tipo t ON (t.id_tipo = r.id_tipo)
+        
+        <if test="currentTypeId != null and currentTypeId != '' and currentTypeId != 0 
+                and changeTypeId != null and changeTypeId != '' and changeTypeId != 0 ">   
+            AND r.id_renta IN (
+                SELECT order_type_changes.renta_id 
+                FROM order_type_changes order_type_changes 
+                WHERE order_type_changes.current_type_id = #{currentTypeId} AND order_type_changes.change_type_id = #{changeTypeId}  
+                AND order_type_changes.fg_active = '1'
+                <if test="orderTypeChangeInitDate != null and orderTypeChangeInitDate != ''
+                            and orderTypeChangeEndDate != null and orderTypeChangeEndDate != ''">
+                        AND order_status_changes.created_at <![CDATA[ >= ]]> #{orderTypeChangeInitDate}
+                        AND order_status_changes.created_at <![CDATA[ <= ]]> #{orderTypeChangeEndDate}
+                </if>
+                GROUP BY order_type_changes.renta_id
+            )
+            
+        </if>
+        <if test="currentStatusId != null and currentStatusId != '' and currentStatusId != 0 
+                and changeStatusId != null and changeStatusId != '' and changeStatusId != 0 ">   
+            AND r.id_renta IN (
+                SELECT order_status_changes.renta_id 
+                FROM order_status_changes order_status_changes 
+                WHERE order_status_changes.current_status_id = #{currentStatusId} AND order_status_changes.change_status_id = #{changeStatusId}  
+                AND order_status_changes.fg_active = '1'
+                <if test="orderStatusChangeInitDate != null and orderStatusChangeInitDate != ''
+                            and orderStatusChangeEndDate != null and orderStatusChangeEndDate != ''">
+                        AND order_status_changes.created_at <![CDATA[ >= ]]> #{orderStatusChangeInitDate}
+                        AND order_status_changes.created_at <![CDATA[ <= ]]> #{orderStatusChangeEndDate}
+                </if>
+                GROUP BY order_status_changes.renta_id
+            )
+            
+        </if>
         <if test="folio != null and folio != '' ">
             AND r.folio = #{folio}
         </if>
@@ -319,6 +352,189 @@
         
         ORDER BY STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') LIMIT #{limit}
         
+    </select>
+    
+    <!-- Esta consulta se ocupa en disponibilidad -->
+    <select id="obtenerRentaPorDisponibilidad" resultMap="resultMapRenta" parameterType="java.util.Map">
+        SELECT
+            r.id_renta,
+            c.id_clientes AS cliente_id,
+            c.nombre AS cliente_nombre,
+            c.apellidos AS cliente_apellidos,
+            u.id_usuarios AS usuario_id,
+            u.nombre AS usuario_nombre,
+            u.apellidos AS usuario_apellidos,
+            r.fecha_pedido,
+            r.fecha_entrega,
+            r.hora_entrega,
+            r.fecha_devolucion,
+            r.descripcion,
+            r.descuento,
+            r.cantidad_descuento,
+            r.iva,
+            r.comentario,
+            r.folio,
+            r.stock,
+            t.id_tipo AS tipo_id,
+            t.tipo AS tipo_tipo,
+            r.hora_devolucion,
+            r.fecha_evento,
+            r.deposito_garantia,
+            r.envio_recoleccion,
+            r.mostrar_precios_pdf,
+            chofer.id_usuarios AS chofer_id,
+            chofer.nombre AS chofer_nombre,
+            chofer.apellidos AS chofer_apellidos,
+            e.id_estado,
+            e.descripcion AS estado_descripcion,
+            (
+                SELECT SUM(a.abono)
+                FROM abonos a 
+                WHERE a.id_renta = r.id_renta
+            ) AS total_abonos,
+            (
+                SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) )AS total
+                FROM faltantes f
+                INNER JOIN articulo a ON (f.id_articulo = a.id_articulo)
+                WHERE f.id_renta = r.id_renta
+                AND f.fg_activo = '1'
+            ) AS total_faltantes,
+            (
+                SELECT IF(porcentaje_descuento >= 0,
+                (SUM( (cantidad*p_unitario) - ((cantidad*p_unitario) * (porcentaje_descuento / 100) ))),
+                (SUM( (cantidad*p_unitario) ))) AS suma
+                FROM detalle_renta WHERE id_renta = r.id_renta
+            ) AS sub_total
+        FROM renta r
+            INNER JOIN estado e ON (e.id_estado = r.id_estado)
+            INNER JOIN clientes c ON (c.id_clientes = r.id_clientes)
+            INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios)
+            INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer)
+            INNER JOIN tipo t ON (t.id_tipo = r.id_tipo)
+        WHERE
+            STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
+            AND r.id_tipo = #{typePedido}
+            AND r.id_estado IN (#{statusApartado},#{statusEnRenta})
+        UNION
+        SELECT
+            r.id_renta,
+            c.id_clientes AS cliente_id,
+            c.nombre AS cliente_nombre,
+            c.apellidos AS cliente_apellidos,
+            u.id_usuarios AS usuario_id,
+            u.nombre AS usuario_nombre,
+            u.apellidos AS usuario_apellidos,
+            r.fecha_pedido,
+            r.fecha_entrega,
+            r.hora_entrega,
+            r.fecha_devolucion,
+            r.descripcion,
+            r.descuento,
+            r.cantidad_descuento,
+            r.iva,
+            r.comentario,
+            r.folio,
+            r.stock,
+            t.id_tipo AS tipo_id,
+            t.tipo AS tipo_tipo,
+            r.hora_devolucion,
+            r.fecha_evento,
+            r.deposito_garantia,
+            r.envio_recoleccion,
+            r.mostrar_precios_pdf,
+            chofer.id_usuarios AS chofer_id,
+            chofer.nombre AS chofer_nombre,
+            chofer.apellidos AS chofer_apellidos,
+            e.id_estado,
+            e.descripcion AS estado_descripcion,
+            (
+                SELECT SUM(a.abono)
+                FROM abonos a 
+                WHERE a.id_renta = r.id_renta
+            ) AS total_abonos,
+            (
+                SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) )AS total
+                FROM faltantes f
+                INNER JOIN articulo a ON (f.id_articulo = a.id_articulo)
+                WHERE f.id_renta = r.id_renta
+                AND f.fg_activo = '1'
+            ) AS total_faltantes,
+            (
+                SELECT IF(porcentaje_descuento >= 0,
+                (SUM( (cantidad*p_unitario) - ((cantidad*p_unitario) * (porcentaje_descuento / 100) ))),
+                (SUM( (cantidad*p_unitario) ))) AS suma
+                FROM detalle_renta WHERE id_renta = r.id_renta
+            ) AS sub_total
+        FROM renta r
+            INNER JOIN estado e ON (e.id_estado = r.id_estado)
+            INNER JOIN clientes c ON (c.id_clientes = r.id_clientes)
+            INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios)
+            INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer)
+            INNER JOIN tipo t ON (t.id_tipo = r.id_tipo)
+        WHERE
+            STR_TO_DATE(r.fecha_devolucion,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
+            AND r.id_tipo = #{typePedido}
+            AND r.id_estado IN (#{statusApartado},#{statusEnRenta})
+        UNION
+        SELECT
+            r.id_renta,
+            c.id_clientes AS cliente_id,
+            c.nombre AS cliente_nombre,
+            c.apellidos AS cliente_apellidos,
+            u.id_usuarios AS usuario_id,
+            u.nombre AS usuario_nombre,
+            u.apellidos AS usuario_apellidos,
+            r.fecha_pedido,
+            r.fecha_entrega,
+            r.hora_entrega,
+            r.fecha_devolucion,
+            r.descripcion,
+            r.descuento,
+            r.cantidad_descuento,
+            r.iva,
+            r.comentario,
+            r.folio,
+            r.stock,
+            t.id_tipo AS tipo_id,
+            t.tipo AS tipo_tipo,
+            r.hora_devolucion,
+            r.fecha_evento,
+            r.deposito_garantia,
+            r.envio_recoleccion,
+            r.mostrar_precios_pdf,
+            chofer.id_usuarios AS chofer_id,
+            chofer.nombre AS chofer_nombre,
+            chofer.apellidos AS chofer_apellidos,
+            e.id_estado,
+            e.descripcion AS estado_descripcion,
+            (
+                SELECT SUM(a.abono)
+                FROM abonos a 
+                WHERE a.id_renta = r.id_renta
+            ) AS total_abonos,
+            (
+                SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) )AS total
+                FROM faltantes f
+                INNER JOIN articulo a ON (f.id_articulo = a.id_articulo)
+                WHERE f.id_renta = r.id_renta
+                AND f.fg_activo = '1'
+            ) AS total_faltantes,
+            (
+                SELECT IF(porcentaje_descuento >= 0,
+                (SUM( (cantidad*p_unitario) - ((cantidad*p_unitario) * (porcentaje_descuento / 100) ))),
+                (SUM( (cantidad*p_unitario) ))) AS suma
+                FROM detalle_renta WHERE id_renta = r.id_renta
+            ) AS sub_total
+        FROM renta r
+            INNER JOIN estado e ON (e.id_estado = r.id_estado)
+            INNER JOIN clientes c ON (c.id_clientes = r.id_clientes)
+            INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios)
+            INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer)
+            INNER JOIN tipo t ON (t.id_tipo = r.id_tipo)
+        WHERE
+            STR_TO_DATE(#{endDate},'%d/%m/%Y') BETWEEN STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') AND STR_TO_DATE(r.fecha_devolucion,'%d/%m/%Y')
+            AND r.id_tipo = #{typePedido}
+            AND r.id_estado IN (#{statusApartado},#{statusEnRenta})
     </select>
   
 </mapper>
