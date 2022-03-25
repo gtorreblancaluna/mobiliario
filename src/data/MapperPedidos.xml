@@ -67,27 +67,119 @@
         <result property="porcentajeDescuento" column="porcentaje_descuento"/>
      
         
+        <result property="articulo.cantidad" column="item_cantidad"/>
         <result property="articulo.articuloId" column="item_id"/>
         <result property="articulo.descripcion" column="item_description"/>
         <result property="articulo.color.color" column="item_color"/>
         <result property="articulo.codigo" column="item_codigo"/>
         <result property="articulo.precioCompra" column="item_purchase_amount"/>
+        
+        <result property="articulo.rentados" column="rentados" />
+        <result property="articulo.faltantes" column="faltantes" />
+        <result property="articulo.reparacion" column="reparacion" />
+        <result property="articulo.accidenteTrabajo" column="accidente_trabajo" />
+        <result property="articulo.devolucion" column="devolcion" />
+        
+        <result property="articulo.totalCompras" column="total_compras" />
+        <result property="articulo.totalShopProvider" column="total_shop_provider" />
       
     </resultMap> 
     
+    <select id="getDetailByRentIdWithDetailItems" resultMap="resultMapDetalleRenta" parameterType="java.util.Map">
+        SELECT d.*,
+            articulo.id_articulo AS item_id,
+            articulo.cantidad AS item_cantidad,
+            articulo.descripcion AS item_description,
+            articulo.precio_compra AS item_purchase_amount,
+            c.color AS item_color,
+            articulo.codigo AS item_codigo,
+            d.porcentaje_descuento,
+            d.p_unitario AS p_unitario,
+            (
+                SELECT
+                    SUM(d.cantidad) AS cantidad
+                FROM renta renta
+                    INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta)
+                WHERE d.id_articulo = articulo.id_articulo
+                AND renta.id_estado = #{estado_renta}
+                AND renta.id_tipo = #{tipo_pedido}
+            ) AS rentados,
+            (
+                SELECT 
+                    SUM(faltante.cantidad)
+                FROM faltantes faltante
+                WHERE faltante.id_articulo = articulo.id_articulo
+                AND faltante.fg_faltante = '1'
+                AND faltante.fg_devolucion = '0'
+                AND faltante.fg_accidente_trabajo = '0'
+                AND faltante.fg_activo = '1'
+            ) AS faltantes,
+            (
+                SELECT 
+                    SUM(faltante.cantidad)
+                FROM faltantes faltante              
+                WHERE faltante.id_articulo = articulo.id_articulo
+                AND faltante.fg_faltante = '0'
+                AND faltante.fg_devolucion = '0'
+                AND faltante.fg_accidente_trabajo = '0'
+                AND faltante.fg_activo = '1'
+            ) AS reparacion,
+            (
+                SELECT 
+                    SUM(faltante.cantidad)
+                FROM faltantes faltante              
+                WHERE faltante.id_articulo = articulo.id_articulo
+                AND faltante.fg_faltante = '0'
+                AND faltante.fg_devolucion = '0'
+                AND faltante.fg_accidente_trabajo = '1'
+                AND faltante.fg_activo = '1'
+            ) AS accidente_trabajo,
+            (
+                SELECT
+                    SUM(faltante.cantidad)
+                FROM faltantes faltante         
+                WHERE faltante.id_articulo = articulo.id_articulo
+                AND faltante.fg_devolucion = '1'
+                AND faltante.fg_faltante = '0'
+                AND faltante.fg_activo = '1'
+            ) AS devolucion,
+            (
+                SELECT
+                    SUM(compras.cantidad)
+                FROM compras compras
+                WHERE compras.id_articulo = articulo.id_articulo
+                AND compras.fg_activo = '1' 
+            ) AS total_compras,
+            (
+                SELECT 
+                    SUM(detalle_orden_proveedor.cantidad)
+                FROM detalle_orden_proveedor detalle_orden_proveedor
+                    INNER JOIN orden_proveedor orden_proveedor ON (orden_proveedor.id = detalle_orden_proveedor.id_orden_proveedor)
+                WHERE detalle_orden_proveedor.fg_activo = '1'
+                AND detalle_orden_proveedor.id_articulo = articulo.id_articulo
+                AND orden_proveedor.status = #{statusOrder} OR orden_proveedor.status = #{statusOrderFinish}
+                AND detalle_orden_proveedor.tipo_orden = #{typeOrderDetail}
+            ) AS total_shop_provider
+        FROM detalle_renta d
+        INNER JOIN articulo articulo ON (articulo.id_articulo = d.id_articulo)
+        INNER JOIN color c ON (c.id_color = articulo.id_color)
+        INNER JOIN categoria categoria ON (categoria.id_categoria = articulo.id_categoria)
+        WHERE d.id_renta = #{id_renta}
+    </select>   
+    
     <select id="getDetailByRentId" resultMap="resultMapDetalleRenta" parameterType="java.lang.String">
         SELECT d.*,
-            a.id_articulo AS item_id,
-            a.descripcion AS item_description,
-            a.precio_compra AS item_purchase_amount,
+            articulo.id_articulo AS item_id,
+            articulo.descripcion AS item_description,
+            articulo.precio_compra AS item_purchase_amount,
             c.color AS item_color,
-            a.codigo AS item_codigo,
+            articulo.codigo AS item_codigo,
             d.porcentaje_descuento,
             d.p_unitario AS p_unitario
         FROM detalle_renta d
-        INNER JOIN articulo a ON (a.id_articulo = d.id_articulo)
-        INNER JOIN color c ON (c.id_color = a.id_color)
-        WHERE d.id_renta = #{d.id}
+        INNER JOIN articulo articulo ON (articulo.id_articulo = d.id_articulo)
+        INNER JOIN color c ON (c.id_color = articulo.id_color)
+        WHERE d.id_renta = #{id}
     </select>    
    
     

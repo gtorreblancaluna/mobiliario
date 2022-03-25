@@ -7,6 +7,7 @@ import exceptions.DataOriginException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -57,7 +58,17 @@ public class SaleService {
     }
     
     public List<DetalleRenta> getDetailByRentId (String rentId) throws DataOriginException{
-        return salesDao.getDetailByRentId(rentId);
+      return salesDao.getDetailByRentId(rentId);
+    }
+    
+    public List<DetalleRenta> getDetailByRentIdWithDetailItems (String rentId) throws DataOriginException{
+       Map<String,Object> map = new HashMap<>();
+       map.put("statusOrderFinish", ApplicationConstants.STATUS_ORDER_PROVIDER_FINISH);
+       map.put("statusOrder", ApplicationConstants.STATUS_ORDER_PROVIDER_ORDER);
+       map.put("typeOrderDetail", ApplicationConstants.TYPE_DETAIL_ORDER_SHOPPING);
+       map.put("id_renta", rentId);
+       
+       return salesDao.getDetailByRentIdWithDetailItems(map);
     }
     
     // obtener la disponibilidad de articulos en un rango de fechas
@@ -214,7 +225,7 @@ public class SaleService {
         try {
             List<Renta> rentas = salesDao.obtenerDisponibilidadRentaPorConsulta(parameters);
             for (Renta renta : rentas) {
-                renta.setDetalleRenta(getDetailByRentId(renta.getRentaId()+""));
+                renta.setDetalleRenta(getDetailByRentIdWithDetailItems(renta.getRentaId()+""));
                 if (!renta.getDetalleRenta().isEmpty()) {
                     for (DetalleRenta detail : renta.getDetalleRenta()) {
                         detail.getArticulo().setUtiles(itemService.utilesCalculate(detail.getArticulo()));

@@ -30,10 +30,23 @@ public class SalesDAO {
     }
     
     @SuppressWarnings("unchecked")
-    public List<DetalleRenta> getDetailByRentId( String rentId) throws DataOriginException{
+    public List<DetalleRenta> getDetailByRentId(String rentId) throws DataOriginException{
         SqlSession session = sqlSessionFactory.openSession();
         try {
            return (List<DetalleRenta>) session.selectList("MapperPedidos.getDetailByRentId",rentId);
+        }catch(Exception ex){
+            log.error(ex);
+            throw new DataOriginException(ex.getMessage(),ex);
+        } finally {
+            session.close();
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<DetalleRenta> getDetailByRentIdWithDetailItems(Map<String,Object> map) throws DataOriginException{
+        SqlSession session = sqlSessionFactory.openSession();
+        try {
+           return (List<DetalleRenta>) session.selectList("MapperPedidos.getDetailByRentIdWithDetailItems",map);
         }catch(Exception ex){
             log.error(ex);
             throw new DataOriginException(ex.getMessage(),ex);
