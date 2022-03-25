@@ -59,6 +59,7 @@ public class ItemDAO {
     }
     
     @SuppressWarnings("unchecked")
+    @Deprecated
     public Articulo getItemAvailable( Integer id) {
         SqlSession session = sqlSessionFactory.openSession();
         try {

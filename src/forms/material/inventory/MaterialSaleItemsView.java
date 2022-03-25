@@ -104,7 +104,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
         txtProvider.setEnabled(false);
        
         try {
-            gItem = itemService.getItemAvailable(new Integer(itemId));
+            gItem = itemService.obtenerArticuloPorId(Integer.parseInt(itemId));
             getItems();
         } catch (Exception e) {
             printLog(e);

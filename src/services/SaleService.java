@@ -66,6 +66,8 @@ public class SaleService {
        map.put("statusOrderFinish", ApplicationConstants.STATUS_ORDER_PROVIDER_FINISH);
        map.put("statusOrder", ApplicationConstants.STATUS_ORDER_PROVIDER_ORDER);
        map.put("typeOrderDetail", ApplicationConstants.TYPE_DETAIL_ORDER_SHOPPING);
+       map.put("estado_renta", ApplicationConstants.ESTADO_EN_RENTA);
+       map.put("tipo_pedido", ApplicationConstants.TIPO_PEDIDO);
        map.put("id_renta", rentId);
        
        return salesDao.getDetailByRentIdWithDetailItems(map);

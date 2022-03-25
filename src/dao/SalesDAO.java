@@ -46,7 +46,8 @@ public class SalesDAO {
     public List<DetalleRenta> getDetailByRentIdWithDetailItems(Map<String,Object> map) throws DataOriginException{
         SqlSession session = sqlSessionFactory.openSession();
         try {
-           return (List<DetalleRenta>) session.selectList("MapperPedidos.getDetailByRentIdWithDetailItems",map);
+           List<DetalleRenta> detalle = session.selectList("MapperPedidos.getDetailByRentIdWithDetailItems",map);
+           return detalle;
         }catch(Exception ex){
             log.error(ex);
             throw new DataOriginException(ex.getMessage(),ex);

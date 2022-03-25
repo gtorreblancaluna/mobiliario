@@ -65,8 +65,7 @@
         <result property="cantidad" column="cantidad"/>
         <result property="precioUnitario" column="p_unitario"/>
         <result property="porcentajeDescuento" column="porcentaje_descuento"/>
-     
-        
+
         <result property="articulo.cantidad" column="item_cantidad"/>
         <result property="articulo.articuloId" column="item_id"/>
         <result property="articulo.descripcion" column="item_description"/>
@@ -96,19 +95,17 @@
             d.porcentaje_descuento,
             d.p_unitario AS p_unitario,
             (
-                SELECT
-                    SUM(d.cantidad) AS cantidad
+                SELECT SUM(detalle.cantidad) AS cantidad
                 FROM renta renta
                     INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta)
-                WHERE d.id_articulo = articulo.id_articulo
+                WHERE detalle.id_articulo = d.id_articulo
                 AND renta.id_estado = #{estado_renta}
                 AND renta.id_tipo = #{tipo_pedido}
             ) AS rentados,
             (
-                SELECT 
-                    SUM(faltante.cantidad)
+                SELECT SUM(faltante.cantidad)
                 FROM faltantes faltante
-                WHERE faltante.id_articulo = articulo.id_articulo
+                WHERE faltante.id_articulo = d.id_articulo
                 AND faltante.fg_faltante = '1'
                 AND faltante.fg_devolucion = '0'
                 AND faltante.fg_accidente_trabajo = '0'
@@ -118,7 +115,7 @@
                 SELECT 
                     SUM(faltante.cantidad)
                 FROM faltantes faltante              
-                WHERE faltante.id_articulo = articulo.id_articulo
+                WHERE faltante.id_articulo = d.id_articulo
                 AND faltante.fg_faltante = '0'
                 AND faltante.fg_devolucion = '0'
                 AND faltante.fg_accidente_trabajo = '0'
@@ -128,7 +125,7 @@
                 SELECT 
                     SUM(faltante.cantidad)
                 FROM faltantes faltante              
-                WHERE faltante.id_articulo = articulo.id_articulo
+                WHERE faltante.id_articulo = d.id_articulo
                 AND faltante.fg_faltante = '0'
                 AND faltante.fg_devolucion = '0'
                 AND faltante.fg_accidente_trabajo = '1'
@@ -138,7 +135,7 @@
                 SELECT
                     SUM(faltante.cantidad)
                 FROM faltantes faltante         
-                WHERE faltante.id_articulo = articulo.id_articulo
+                WHERE faltante.id_articulo = d.id_articulo
                 AND faltante.fg_devolucion = '1'
                 AND faltante.fg_faltante = '0'
                 AND faltante.fg_activo = '1'
@@ -147,7 +144,7 @@
                 SELECT
                     SUM(compras.cantidad)
                 FROM compras compras
-                WHERE compras.id_articulo = articulo.id_articulo
+                WHERE compras.id_articulo = d.id_articulo
                 AND compras.fg_activo = '1' 
             ) AS total_compras,
             (
@@ -163,7 +160,6 @@
         FROM detalle_renta d
         INNER JOIN articulo articulo ON (articulo.id_articulo = d.id_articulo)
         INNER JOIN color c ON (c.id_color = articulo.id_color)
-        INNER JOIN categoria categoria ON (categoria.id_categoria = articulo.id_categoria)
         WHERE d.id_renta = #{id_renta}
     </select>   
     
