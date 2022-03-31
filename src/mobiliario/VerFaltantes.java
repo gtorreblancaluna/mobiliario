@@ -108,14 +108,14 @@ public class VerFaltantes extends java.awt.Dialog {
         else{
              g_rentaId = AsignarFaltante.g_rentaId+"";
         }
-            Renta renta = null;
-            try{
-                renta = saleService.obtenerRentaPorId(Integer.parseInt(g_rentaId));
-            } catch (Exception e) {
-               Logger.getLogger(VerFaltantes.class.getName()).log(Level.SEVERE, null, e);
-               JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-               return;
-           }
+        Renta renta = null;
+        try{
+            renta = saleService.obtenerRentaPorIdSinSumas(Integer.parseInt(g_rentaId));
+        } catch (Exception e) {
+           Logger.getLogger(VerFaltantes.class.getName()).log(Level.SEVERE, null, e);
+           JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+           return;
+       }
          DefaultTableModel tablaDetalle = (DefaultTableModel) tablaArticulos.getModel();
          this.lblInformacionInicial.setText("FOLIO: "+renta.getFolio());
          int itemId = 0;

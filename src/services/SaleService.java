@@ -598,6 +598,18 @@ public class SaleService {
                 
     } // renta por id
      
+     public Renta obtenerRentaPorIdSinSumas(int rentaId) throws Exception { 
+        
+        Renta renta = salesDao.obtenerRentaPorIdSinSumas(rentaId);
+        if (renta != null) {
+            renta.setDetalleRenta(this.obtenerDetalleRenta(renta.getRentaId()));
+            calcularTotalesPorRenta(renta);
+        }
+        
+        return renta;
+                
+    } // renta por id
+     
      public Renta obtenerRentaPorFolio(Integer folio) throws BusinessException { 
         try {
             Renta renta = salesDao.obtenerRentaPorFolio(folio);

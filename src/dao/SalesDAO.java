@@ -92,6 +92,15 @@ public class SalesDAO {
         }
     }
     
+    public Renta obtenerRentaPorIdSinSumas (Integer id) throws Exception {
+        SqlSession session = sqlSessionFactory.openSession();
+        try {
+           return (Renta) session.selectOne("MapperPedidos.obtenerRentaPorIdSinSumas",id);       
+        } finally {
+            session.close();
+        }
+    }
+    
     public Renta obtenerRentaPorFolio (Integer folio) throws DataOriginException {
         SqlSession session = sqlSessionFactory.openSession();
         try {

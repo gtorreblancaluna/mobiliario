@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
+import static mobiliario.iniciar_sesion.usuarioGlobal;
 import model.DatosGenerales;
 import services.SystemService;
 import utilities.Utility;
@@ -74,7 +75,8 @@ public class principal extends javax.swing.JFrame {
             DatosGenerales d = systemService.getGeneralData();
             log.info(">>> datos generales obtenidos: "+d);
             this.setTitle(d.getCompanyName().toUpperCase());
-          Utility.pushNotification("NOTIFICACIONES\n");
+          Utility.pushNotification("NOTIFICACIONES");
+          Utility.pushNotification("Inicio sesión: " + usuarioGlobal.getNombre() + " " + usuarioGlobal.getApellidos() );
             
         
     }

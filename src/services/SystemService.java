@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package services;
 
 import com.google.zxing.BarcodeFormat;
@@ -37,28 +32,26 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.IndexedColors;
 
-/**
- *
- * @author jerry
- */
+
 public class SystemService {
     
-    private SystemService(){
-        contaFila = 1;
-    }
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(SystemService.class.getName());
+    private int contaFila;
     
-    private static final SystemService SINGLE_INSTANCE = new SystemService();
+    private SystemService(){}
+    
+    private static final SystemService SINGLE_INSTANCE = null;
     
     public static SystemService getInstance(){
+        
+        if (SINGLE_INSTANCE == null) {
+            return new SystemService();
+        }
         return SINGLE_INSTANCE;
     } 
     
     private final SystemDAO systemDao = SystemDAO.getInstance();
-    
-    HSSFWorkbook workbook = new HSSFWorkbook();
-    HSSFSheet sheet = workbook.createSheet();
-    int contaFila;
-    
+
     public String getDataConfigurationByKey(String key)throws BusinessException{
         String result;
         try{
@@ -128,8 +121,10 @@ public class SystemService {
     
     public void exportarExcel(JTable tabla){
           // TODO add your handling code here:this.workbook = new HSSFWorkbook();
-        workbook = new HSSFWorkbook();
-        sheet = this.workbook.createSheet();
+        contaFila = 1;
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet();
+          
         int guardarArchivo = 0;       
         // obtenemos los encabezados de la tabla
         List<String> encabezados = new ArrayList<>();
@@ -142,7 +137,7 @@ public class SystemService {
           JOptionPane.showMessageDialog(null, "ERROR: Tabla esta vacia ", "Error", JOptionPane.ERROR_MESSAGE);
           return;
         }
-        crearEsqueleto(encabezados);
+        crearEsqueleto(encabezados,workbook,sheet);
             try {
                 JFileChooser chooser = new JFileChooser();
 //                FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivo Excel", new String[]{"xsl"});
@@ -156,7 +151,7 @@ public class SystemService {
                         for(int col=0;col<encabezados.size();col++)
                             fila.add(tabla.getValueAt(contador, col)+"");
                         
-                        generarFilaXLS(encabezados,fila, chooser.getSelectedFile().getPath() + ".xls");
+                        generarFilaXLS(encabezados,fila, chooser.getSelectedFile().getPath() + ".xls",workbook,sheet);
                         contador++;
                     }                    
                     Toolkit.getDefaultToolkit().beep();
@@ -170,13 +165,13 @@ public class SystemService {
     
     }
     
-    public void generarFilaXLS(List<String> encabezados,List<String> fila,String pathXLS){
+    public void generarFilaXLS(List<String> encabezados,List<String> fila,String pathXLS,HSSFWorkbook workbook,HSSFSheet sheet){
     
-     try {
-         for(int i=0;i<=encabezados.size();i++)
-             this.sheet.autoSizeColumn(i);
+        try {
+            for(int i=0;i<=encabezados.size();i++)
+                sheet.autoSizeColumn(i);
         
-        agregarFila(fila);
+            agregarFila(fila,workbook,sheet);
 
         } catch (Exception fos) {
             JOptionPane.showMessageDialog(null, "Error: " + fos.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -185,8 +180,9 @@ public class SystemService {
             FileOutputStream fos = null;
             try {
                 fos = new FileOutputStream(new File(pathXLS));
-                this.workbook.write(fos);
+                workbook.write(fos);
             } catch (IOException e) {
+                LOG.error(e.getMessage(),e);
                 JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             } finally {
                 if (fos != null) {
@@ -194,6 +190,7 @@ public class SystemService {
                         fos.flush();
                         fos.close();
                     } catch (IOException e) {
+                        LOG.error(e.getMessage(),e);
                         JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -201,33 +198,33 @@ public class SystemService {
         }
     }
     
-    private void crearEsqueleto(List<String> encabezados) {
-        HSSFCellStyle style = this.workbook.createCellStyle();
-        HSSFFont font = this.workbook.createFont();
+    private void crearEsqueleto(List<String> encabezados,HSSFWorkbook workbook,HSSFSheet sheet) {
+        HSSFCellStyle style = workbook.createCellStyle();
+        HSSFFont font = workbook.createFont();
         font.setFontName("Impact");
         style.setFont(font);
-        HSSFRow row2 = this.sheet.createRow(1);
+        HSSFRow row2 = sheet.createRow(1);
         HSSFCell cell = row2.createCell(0);
         cell.setCellStyle(style);
         HSSFCell celltot = row2.createCell(1);
         celltot.setCellStyle(style);
 
-        crearTitulosConceptos(encabezados);
+        crearTitulosConceptos(encabezados,workbook,sheet);
     }
     
-     private void crearTitulosConceptos(List<String> encabezados) {
-        HSSFCellStyle styleTituloConcepto = this.workbook.createCellStyle();
+     private void crearTitulosConceptos(List<String> encabezados,HSSFWorkbook workbook,HSSFSheet sheet) {
+        HSSFCellStyle styleTituloConcepto = workbook.createCellStyle();
         styleTituloConcepto.setWrapText(true);
         styleTituloConcepto.setFillForegroundColor(new HSSFColor.WHITE().getIndex());
-        org.apache.poi.ss.usermodel.Font hlink_font = this.workbook.createFont();
+        org.apache.poi.ss.usermodel.Font hlink_font = workbook.createFont();
         hlink_font.setColor(IndexedColors.WHITE.getIndex());
         styleTituloConcepto.setFont(hlink_font);
         styleTituloConcepto.setFont(hlink_font);
-        HSSFFont fontTituloConcepto = this.workbook.createFont();
+        HSSFFont fontTituloConcepto = workbook.createFont();
         fontTituloConcepto.setFontName("Arial");
         styleTituloConcepto.setFont(fontTituloConcepto);
         styleTituloConcepto.setWrapText(true);
-        HSSFRow row14 = this.sheet.createRow(0);
+        HSSFRow row14 = sheet.createRow(0);
         
         int contador = 0;
         for(String encabezado : encabezados){
@@ -240,12 +237,13 @@ public class SystemService {
 
     }
      
-      private void agregarFila(List<String> fila) {
-        HSSFCellStyle styleNumero = this.workbook.createCellStyle();
-        HSSFCellStyle styleCentrado = this.workbook.createCellStyle();
-        HSSFFont font = this.workbook.createFont();
+      private void agregarFila(List<String> fila,HSSFWorkbook workbook,HSSFSheet sheet) {
+        
+        HSSFCellStyle styleNumero = workbook.createCellStyle();
+        HSSFCellStyle styleCentrado = workbook.createCellStyle();
+        HSSFFont font = workbook.createFont();
 
-        HSSFRow row = this.sheet.createRow(contaFila);
+        HSSFRow row = sheet.createRow(contaFila);
         font.setFontName("Arial");
 
         styleCentrado.setFont(font);
@@ -260,17 +258,18 @@ public class SystemService {
                f = f.replace("$", "").replace(",", "");
             
             try {            
-                float numero = new Float(f);   
+                Float numero = Float.parseFloat(f);   
                 cell = row.createCell(contador);
                 cell.setCellValue(numero);
                 cell.setCellStyle(styleNumero);
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 // este no es un numero
                 cell = row.createCell(contador);   
-                if(f.equals("null"))
+                if(f.equals("null")){
                     cell.setCellValue("");
-                else
-                    cell.setCellValue(f);                        
+                }else{
+                    cell.setCellValue(f);
+                }
                 cell.setCellStyle(styleCentrado);
             }
             contador ++ ;

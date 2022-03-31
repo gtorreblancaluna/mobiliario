@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -17,11 +12,8 @@ import model.Usuario;
 import org.apache.log4j.Logger;
 import org.jvnet.substance.SubstanceLookAndFeel;
 import services.UserService;
+import utilities.Utility;
 
-/**
- *
- * @author Carlos Alberto
- */
 public class iniciar_sesion extends javax.swing.JFrame {
 //initializing the logger
 private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
@@ -118,7 +110,6 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
         tiempo = new Timer(TWO_SECOND, new TimerListener());
         activar();
         this.txt_contraseña.setText("");
-        
        
     }
     
@@ -126,7 +117,9 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
         
         Usuario user = userService.obtenerUsuarioPorPassword(password);
         if(user != null && !user.getNombre().equals("")){
-            log.debug("actualizacion sesion del usuario "+user.getNombre()+" "+user.getApellidos());
+            String msgUpdateSession = "Actualización sesión: "+user.getNombre()+" "+user.getApellidos();
+            log.info(msgUpdateSession);
+            Utility.pushNotification(msgUpdateSession);
             usuarioGlobal = user;
             id_usuario_global = user.getUsuarioId()+"";    
             nombre_usuario_global = user.getNombre();
