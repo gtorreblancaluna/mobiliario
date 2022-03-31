@@ -8,7 +8,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 public class TipoEventoDao {
     
     private static TipoEventoDao INSTANCE = null;
-    private SqlSessionFactory sqlSessionFactory;
+    private final SqlSessionFactory sqlSessionFactory;
     
     // Private constructor suppresses 
     private TipoEventoDao(){

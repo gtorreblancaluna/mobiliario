@@ -9,6 +9,7 @@ import clases.Mail;
 import clases.sqlclass;
 import com.mysql.jdbc.MysqlDataTruncation;
 import exceptions.BusinessException;
+import exceptions.DataOriginException;
 import forms.material.inventory.GenerateReportMaterialSaleItemsView;
 import forms.proveedores.OrderProviderForm;
 import java.awt.Desktop;
@@ -115,6 +116,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private final String NEW_ITEM = "1";
     private final String ITEM_ALREADY = "0";
     private Renta globalRenta = null;
+    
+    // variables gloables para reutilizar en los filtros y combos
+    private List<Tipo> typesGlobal = new ArrayList<>();
+    private List<EstadoEvento> statusListGlobal = new ArrayList<>();
+    private List<Usuario> choferes = new ArrayList<>();
 
     
     private enum ColumnTableDetail {
@@ -170,9 +176,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         this.txt_editar_precio_unitario.setEnabled(false);
         this.txt_editar_porcentaje_descuento.setEnabled(false);
         
-        new Thread(() -> {
-            fillCmbUsers();
-        }).start();
+        new Thread(this::fillCmbUsers).start();
         initalData ();
          
     }
@@ -807,12 +811,15 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     public void subTotal() {
         String aux;
         float subTotal = 0, total = 0;
+        int count = 0;
         for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
             aux = EliminaCaracteres(((String) tabla_detalle.getValueAt(i, 7).toString()), "$,");
             subTotal = Float.parseFloat(aux);
             total = subTotal + total;
+            count++;
         }
         txt_subtotal.setText(decimalFormat.format(total));
+        lbl_infoItems.setText("Total de articulos: "+count);
         
     }
     
@@ -1597,21 +1604,20 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
     }
     
-
     
-    public void llenar_combo_tipo() {
+    private void llenar_combo_tipo() {
         
-        if (cmb_tipo.getItemCount() > 0) {
-            return;
+        if (typesGlobal.isEmpty()) {
+            typesGlobal = tipoEventoService.get();
         }
 
-        List<Tipo> list = tipoEventoService.get();
+        
         cmb_tipo.removeAllItems();
         
         cmb_tipo.addItem(
                 new Tipo(0, ApplicationConstants.CMB_SELECCIONE)
         );
-        list.stream().forEach(t -> {
+        typesGlobal.stream().forEach(t -> {
             cmb_tipo.addItem(t);
         });
         
@@ -1635,36 +1641,35 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     public void llenar_combo_chofer() {
         
         
-        if (cmb_chofer.getItemCount() > 0) {
-            return;
+        if (choferes.isEmpty()) {
+            try {
+                choferes = userService.getChoferes();
+            } catch (DataOriginException e){
+              JOptionPane.showMessageDialog(null, "Ocurrió un error inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE);  
+            }
         }
 
-        List<Usuario> users = userService.obtenerUsuarios(funcion);
         cmb_chofer.removeAllItems();
-        
         cmb_chofer.addItem(
                 new Usuario(0, ApplicationConstants.CMB_SELECCIONE)
         );
-        users.stream().forEach(t -> {
+        choferes.stream().forEach(t -> {
             cmb_chofer.addItem(t);
         });
-       
         
     }
     
-    
-    
     public void llenar_combo_estado2() {
                
-        if (cmb_estado1.getItemCount() > 1) {
-            return;
+        if (statusListGlobal.isEmpty()) {
+            statusListGlobal = estadoEventoService.get();
         }
-        final List<EstadoEvento> list = estadoEventoService.get();
+        
         cmb_estado1.removeAllItems();
         cmb_estado1.addItem(
                 new EstadoEvento(0, ApplicationConstants.CMB_SELECCIONE)
         );
-        list.stream().forEach(t -> {
+        statusListGlobal.stream().forEach(t -> {
             cmb_estado1.addItem(t);
         });
         
@@ -1827,7 +1832,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         } catch (Exception e) {
             Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE);
-            return;
         } finally {
             enabledButtonsActions();
         }
@@ -2091,13 +2095,14 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         panel_conceptos = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         tabla_detalle = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
-        lbl_sel = new javax.swing.JLabel();
+        lbl_infoItems = new javax.swing.JLabel();
         jLabel40 = new javax.swing.JLabel();
         txt_editar_cantidad = new javax.swing.JTextField();
         jLabel44 = new javax.swing.JLabel();
         txt_editar_precio_unitario = new javax.swing.JTextField();
         jLabel45 = new javax.swing.JLabel();
         txt_editar_porcentaje_descuento = new javax.swing.JTextField();
+        lbl_sel = new javax.swing.JLabel();
         jToolBar3 = new javax.swing.JToolBar();
         jbtn_agregar_articulo = new javax.swing.JButton();
         jbtn_editar_dinero = new javax.swing.JButton();
@@ -2861,8 +2866,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         panel_conceptos.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 1040, 220));
 
-        lbl_sel.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
-        panel_conceptos.add(lbl_sel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 250, 20));
+        lbl_infoItems.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        panel_conceptos.add(lbl_infoItems, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 280, 250, 20));
 
         jLabel40.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel40.setText("Cantidad:");
@@ -2904,6 +2909,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
         });
         panel_conceptos.add(txt_editar_porcentaje_descuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 20, 70, -1));
+
+        lbl_sel.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        panel_conceptos.add(lbl_sel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 250, 20));
 
         jPanel6.add(panel_conceptos, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 10, 1080, 310));
 
@@ -3200,7 +3208,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(panel_abonos, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
+                    .addComponent(panel_abonos, javax.swing.GroupLayout.PREFERRED_SIZE, 315, Short.MAX_VALUE)
                     .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(73, Short.MAX_VALUE))
         );
@@ -3632,7 +3640,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel13, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jPanel13, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(jPanel9Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(panel_datos_cliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -3653,7 +3661,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 664, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -4791,8 +4799,25 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
     }//GEN-LAST:event_btnInventoryMaterialReportActionPerformed
 
+    
+    
     private void jbtn_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_buscarActionPerformed
-        FiltersConsultarRentas win = new FiltersConsultarRentas(null,true);
+        
+        if (typesGlobal.isEmpty()) {
+            typesGlobal = tipoEventoService.get();
+        }
+        if (statusListGlobal.isEmpty()) {
+            statusListGlobal = estadoEventoService.get();
+        }
+        if (choferes.isEmpty()) {
+            try {
+                choferes = userService.getChoferes();
+            } catch (DataOriginException e) {
+                JOptionPane.showMessageDialog(null, "Ocurrió un error inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE);  
+            }
+        }
+        
+        FiltersConsultarRentas win = new FiltersConsultarRentas(null,true,typesGlobal,statusListGlobal,choferes);
         win.setLocationRelativeTo(this);
         win.setVisible(true);
 
@@ -4985,6 +5010,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lbl_cliente;
     private javax.swing.JLabel lbl_eleccion;
     private javax.swing.JLabel lbl_folio;
+    public static javax.swing.JLabel lbl_infoItems;
     public static javax.swing.JLabel lbl_sel;
     private javax.swing.JPanel panel_abonos;
     private javax.swing.JPanel panel_articulos;

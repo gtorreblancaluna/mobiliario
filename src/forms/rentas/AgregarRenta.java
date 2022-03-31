@@ -7,6 +7,7 @@ import clases.conectate;
 import clases.sqlclass;
 import com.mysql.jdbc.MysqlDataTruncation;
 import exceptions.BusinessException;
+import exceptions.DataOriginException;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.io.File;
@@ -641,18 +642,20 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     public void llenar_chofer() {
 
-        List<Usuario> usuarios =  userService.obtenerUsuarios(funcion);
-        cmb_chofer.removeAllItems();
-
-        if(usuarios != null && usuarios.size()>0){
-            for(Usuario usuario : usuarios){
-               if(usuario.getPuesto().getPuestoId() == ApplicationConstants.PUESTO_CHOFER)
-                   cmb_chofer.addItem(usuario.getNombre()+" "+usuario.getApellidos());
+        try {
+            List<Usuario> choferes =  userService.getChoferes();
+            cmb_chofer.removeAllItems();
+            cmb_chofer.addItem(ApplicationConstants.CMB_SELECCIONE);
+            
+            for(Usuario usuario : choferes){
+              cmb_chofer.addItem(usuario.getNombre()+" "+usuario.getApellidos());
             }
+            
+            cmb_chofer.setSelectedItem(ApplicationConstants.CMB_SELECCIONE);
+        } catch (DataOriginException e) {
+            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
         }
         
-        cmb_chofer.addItem("-sel-");
-        cmb_chofer.setSelectedItem("-sel-");
 
     }
     

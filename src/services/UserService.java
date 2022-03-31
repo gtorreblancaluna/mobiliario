@@ -3,6 +3,7 @@ package services;
 
 import clases.sqlclass;
 import dao.UserDAO;
+import exceptions.DataOriginException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.ArrayList;
@@ -13,13 +14,15 @@ import model.Usuario;
 import org.apache.log4j.Logger;
 
 public class UserService {
-    private static Logger log = Logger.getLogger(UserService.class.getName());
-    UserDAO usuariosDao = new UserDAO();
+    private final static Logger log = Logger.getLogger(UserService.class.getName());
     
+    private final UserDAO usuariosDao;
     private static UserService INSTANCE = null;
    
     // Private constructor suppresses 
-    private UserService(){}
+    private UserService(){
+        usuariosDao = UserDAO.getInstance();
+    }
 
     // creador sincronizado para protegerse de posibles problemas  multi-hilo
     // otra prueba para evitar instanciación múltiple 
@@ -116,6 +119,8 @@ public class UserService {
         return puesto;
     }
       
+    
+      
     public List<Usuario> obtenerUsuarios(sqlclass sql){
         List<Usuario> usuarios = new ArrayList<>();
         
@@ -184,6 +189,9 @@ public class UserService {
         return false;
     }
     
+    public List<Usuario> getChoferes () throws DataOriginException {
+        return usuariosDao.getChoferes();
+    }
     public Usuario obtenerUsuarioPorPassword(sqlclass sql, String psw){
          String[] colName = {"id_usuarios", 
             "nombre", "apellidos", "tel_movil", "tel_fijo", 

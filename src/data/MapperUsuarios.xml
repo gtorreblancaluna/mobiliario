@@ -29,4 +29,12 @@
         AND activo = 1
     </select>  
   
+  <select id="getChoferes" resultMap="resultUsuario" parameterType="java.lang.Integer">
+        SELECT u.*, p.id_puesto, p.descripcion        
+        FROM usuarios u 
+        INNER JOIN puesto p ON (p.id_puesto = u.id_puesto)
+        WHERE p.id_puesto = #{idPuesto}
+        AND u.activo = 1
+        ORDER BY u.nombre
+    </select>  
 </mapper>

@@ -228,24 +228,24 @@
             chofer.apellidos AS chofer_apellidos,
             e.id_estado,
             e.descripcion AS estado_descripcion,
-            (
-                SELECT SUM(a.abono)
-                FROM abonos a 
-                WHERE a.id_renta = #{id}
-            ) AS total_abonos,
-            (
-                SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) )AS total
-                FROM faltantes f
-                INNER JOIN articulo a ON (f.id_articulo = a.id_articulo)
-                WHERE f.id_renta=#{id}
-                AND f.fg_activo = '1'
-            ) AS total_faltantes,
-            (
-                SELECT IF(porcentaje_descuento >= 0,
-                (SUM( (cantidad*p_unitario) - ((cantidad*p_unitario) * (porcentaje_descuento / 100) ))),
-                (SUM( (cantidad*p_unitario) ))) AS suma
-                FROM detalle_renta WHERE id_renta = #{id}
-            ) AS sub_total
+               (
+                   SELECT COALESCE(SUM(a.abono),0)
+                   FROM abonos a 
+                   WHERE a.id_renta = #{id}
+               ) AS total_abonos,
+               (
+                   SELECT COALESCE(SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) ),0)AS total
+                   FROM faltantes f
+                   INNER JOIN articulo a ON (f.id_articulo = a.id_articulo)
+                   WHERE f.id_renta=#{id}
+                   AND f.fg_activo = '1'
+               ) AS total_faltantes,
+               (
+                   SELECT COALESCE(IF(porcentaje_descuento >= 0,
+                   (SUM( (cantidad*p_unitario) - ((cantidad*p_unitario) * (porcentaje_descuento / 100) ))),
+                   (SUM( (cantidad*p_unitario) ))),0) AS suma
+                   FROM detalle_renta WHERE id_renta = #{id}
+               ) AS sub_total
         FROM renta r
             INNER JOIN estado e ON (e.id_estado = r.id_estado)
             INNER JOIN clientes c ON (c.id_clientes = r.id_clientes)
@@ -253,6 +253,10 @@
             INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer)
             INNER JOIN tipo t ON (t.id_tipo = r.id_tipo)
         WHERE id_renta = #{id}
+    </select>
+    
+    <select id="obtenerRentaPorIdSinSumas" resultMap="resultMapRenta" parameterType="java.lang.Integer">
+        SELECT r.* FROM renta r WHERE r.id_renta = #{id}
     </select>
     
     <select id="obtenerRentaPorFolio" resultMap="resultMapRenta" parameterType="java.lang.Integer">
@@ -375,18 +379,17 @@
         <if test="currentTypeId != null and currentTypeId != '' and currentTypeId != 0 
                 and changeTypeId != null and changeTypeId != '' and changeTypeId != 0 ">   
             AND r.id_renta IN (
-                SELECT order_type_changes.renta_id 
-                FROM order_type_changes order_type_changes 
-                WHERE order_type_changes.current_type_id = #{currentTypeId} AND order_type_changes.change_type_id = #{changeTypeId}  
-                AND order_type_changes.fg_active = '1'
-                <if test="orderTypeChangeInitDate != null and orderTypeChangeInitDate != ''
-                            and orderTypeChangeEndDate != null and orderTypeChangeEndDate != ''">
-                        AND order_status_changes.created_at <![CDATA[ >= ]]> #{orderTypeChangeInitDate}
-                        AND order_status_changes.created_at <![CDATA[ <= ]]> #{orderTypeChangeEndDate}
-                </if>
-                GROUP BY order_type_changes.renta_id
-            )
-            
+                    SELECT order_type_changes.renta_id 
+                    FROM order_type_changes order_type_changes 
+                    WHERE order_type_changes.current_type_id = #{currentTypeId} AND order_type_changes.change_type_id = #{changeTypeId}  
+                    AND order_type_changes.fg_active = '1'
+                    <if test="orderTypeChangeInitDate != null and orderTypeChangeInitDate != ''
+                                and orderTypeChangeEndDate != null and orderTypeChangeEndDate != ''">
+                            AND order_type_changes.created_at <![CDATA[ >= ]]> #{orderTypeChangeInitDate}
+                            AND order_type_changes.created_at <![CDATA[ <= ]]> #{orderTypeChangeEndDate}
+                    </if>
+                    GROUP BY order_type_changes.renta_id
+                )   
         </if>
         <if test="currentStatusId != null and currentStatusId != '' and currentStatusId != 0 
                 and changeStatusId != null and changeStatusId != '' and changeStatusId != 0 ">   
@@ -411,9 +414,7 @@
             AND STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') <![CDATA[ >= ]]> STR_TO_DATE(#{systemDate}, '%d/%m/%Y' )
         </if>
         <if test="applyDiff != null and applyDiff != '' ">
-            <![CDATA[
-                AND r.id_estado <> #{applyDiff}
-            ]]>
+            AND r.id_estado <![CDATA[ <> ]]> #{applyDiff}   
         </if>
         <if test="type != null and type != '' and type != 0 ">
             AND t.id_tipo = #{type}

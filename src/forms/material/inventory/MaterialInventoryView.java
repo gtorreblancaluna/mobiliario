@@ -29,17 +29,14 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
     
     public MaterialInventoryView() {
         initComponents();
-        cmbMeasurementUnit.addActionListener (new ActionListener () {
-            public void actionPerformed(ActionEvent e) {
-                getInfo();
-            }
+        cmbMeasurementUnit.addActionListener ((ActionEvent e) -> {
+            getInfo();
         });
-        cmbMeasurementPurchaseUnit.addActionListener (new ActionListener () {
-            public void actionPerformed(ActionEvent e) {
-                getInfo();
-            }
+        cmbMeasurementPurchaseUnit.addActionListener ((ActionEvent e) -> {
+            getInfo();
         });
         txtPurchaseAmount.addKeyListener (new KeyAdapter() {
+            @Override
             public void keyReleased(KeyEvent e) {
                 getInfo();
             }
