@@ -18,9 +18,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import model.Articulo;
-import model.DetalleRenta;
-import model.Renta;
+import model.querys.AvailabilityItemResult;
 import services.ItemService;
 import services.SystemService;
 
@@ -34,7 +32,6 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
     float cant = 0; 
     private final SaleService saleService;
     private final SystemService systemService = SystemService.getInstance();
-    private final ItemService itemService = ItemService.getInstance();
     
     public String conviertemoneda(String valor) {
 
@@ -56,6 +53,55 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         return entero2;
 
     }
+    
+    private enum HeaderTableUnicos {
+    
+        ITEM_ID(0),
+        ORDER_AMOUNT(1),
+        ITEM_UTILES(2),
+        ITEM_DISPONIBLE(3),
+        ITEM_DESCRIPTION(4);
+        
+        private final Integer column;
+
+        public Integer getColumn() {
+            return column;
+        }
+
+        private HeaderTableUnicos(Integer column) {
+            this.column = column;
+        }
+        
+    }
+    
+    private enum HeaderTable {
+    
+        ITEM_ID(0),
+        ORDER_AMOUNT(1),
+        ITEM_UTILES(2),
+        ITEM_DESCRIPTION(3),
+        ORDER_DELIVERY_DATE(4),
+        ORDER_DELIVERY_HOUR(5),
+        ORDER_RETURN_DATE(6),
+        ORDER_RETURN_HOUR(7),
+        ORDER_CUSTOMER(8),
+        ORDER_FOLIO(9),
+        ORDER_DESCRIPTION(10),
+        ORDER_TYPE(11),
+        ORDER_STATUS(12);
+        
+        private final Integer column;
+
+        public Integer getColumn() {
+            return column;
+        }
+
+        private HeaderTable(Integer column) {
+            this.column = column;
+        }
+        
+    }
+    
     public VerDisponibilidadArticulos(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         
@@ -69,10 +115,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         formato_tabla_unicos();
       
         try {
-        if(InventarioForm.jcheckIncluirTodos.isSelected())
-            mostrarDisponibilidadTodos();
-        else
-            mostrarDisponibilidad();
+           mostrarDisponibilidad();
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -81,189 +124,12 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         
     }
    
-    public void mostrarDisponibilidadTodos(){       
-        StringBuilder mensaje = new StringBuilder();
-        String fechaInicial = new SimpleDateFormat("dd/MM/yyyy").format(InventarioForm.txtDisponibilidadFechaInicial.getDate());
-        String fechaFinal = new SimpleDateFormat("dd/MM/yyyy").format(InventarioForm.txtDisponibilidadFechaFinal.getDate());
-        
-        String stringSql = null;
-        
-        if(InventarioForm.radioBtnTodos.isSelected()){
-        mensaje.append("Se incluyen todos los traslapes - ");
-            // MOSTRAREMOS TODOS
-        stringSql = "SELECT * FROM renta renta "
-                +"WHERE "
-                +"STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') "
-                +"BETWEEN STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y') "
-                +"AND STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y') "
-                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-                +"UNION "
-                +"SELECT * FROM renta renta "
-                +"WHERE "
-                +"STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') "
-                +"BETWEEN STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y') "
-                +"AND STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y') "
-                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-                +"UNION "
-                +"SELECT * FROM renta renta "
-                +"WHERE "
-                +"STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y') "
-                +"BETWEEN STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') "
-                +"AND STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') "
-                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-                +"UNION "
-                +"SELECT * FROM renta renta "
-                +"WHERE "
-                +"STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y') "
-                +"BETWEEN STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') "
-                +"AND STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') "
-                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-                +"";
-        }
-        
-        if(InventarioForm.radioBtnFechaEntrega.isSelected()){
-            // MOSTRAR POR FECHA DE ENTREGA
-            mensaje.append("Se incluyen por fecha de entrega - ");
-             stringSql = "SELECT * FROM renta renta "
-                +"WHERE "
-                +"STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') "
-                +"BETWEEN STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y') "
-                +"AND STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y') "
-                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-                +"";
-        }
-        
-        if(InventarioForm.radioBtnFechaDevolucion.isSelected()){
-            // MOSTRAR POR FECHA DE DEVOLUCION
-            mensaje.append("Se incluyen por fecha de devolucion - ");
-             stringSql = "SELECT * FROM renta renta "
-                +"WHERE "
-                +"STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') "
-                +"BETWEEN STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y') "
-                +"AND STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y') "
-                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-                +"";
-        }
-        
-        List<Renta> rentas = null;
-        Map<String,Object> parameters = new HashMap<>();
-        parameters.put("typePedido", ApplicationConstants.TIPO_PEDIDO);
-        parameters.put("statusApartado", ApplicationConstants.ESTADO_APARTADO);
-        parameters.put("statusEnRenta", ApplicationConstants.ESTADO_EN_RENTA);
-        parameters.put("initDate", fechaInicial);
-        parameters.put("endDate", fechaFinal);
-         try {
-            rentas = saleService.obtenerDisponibilidadRentaPorConsulta(parameters);
-        } catch (Exception e) {
-            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
-            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-            return;
-        }
-        
-        if(rentas == null || rentas.size()<=0){
-            lblEncontrados.setText("No se obtuvieron resultados :(");
-            return;
-        }
-        mensaje.append("Total de folios "+rentas.size()+" - ");
-        int rentasCount = 1;
-        int detalleRentasCount = 1;
-          for(Renta renta : rentas){
-              System.out.println("RENTAS COUNT "+ rentasCount++);
-            for(DetalleRenta detalle : renta.getDetalleRenta()){  
-                 System.out.println("DETALLE RENTAS COUNT "+ detalleRentasCount++);
-                 
-                      // vamos agregar el articulo encontrado en la tabla detalle
-                    DefaultTableModel temp = (DefaultTableModel) tablaArticulos.getModel();
-                     Object nuevo[] = {
-                            detalle.getArticulo().getArticuloId()+"",
-                            detalle.getCantidad()+"",
-                            // mostrar utiles
-                            detalle.getArticulo().getUtiles(),
-                            detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor(),
-                            renta.getFechaEvento(),
-                            renta.getFechaEntrega(),
-                            renta.getHoraEntrega(),
-                            renta.getFechaDevolucion(),
-                            renta.getHoraDevolucion(),
-                            renta.getCliente().getNombre()+" "+renta.getCliente().getApellidos(),
-                            renta.getFolio()+"",
-                            renta.getDescripcion(),
-                            renta.getTipo().getTipo(),
-                            renta.getEstado().getDescripcion()
-                        };
-                        temp.addRow(nuevo);                        
-                        
-                        if(this.tablaArticulosUnicos.getRowCount() == 0){                            
-                            
-                            // es la primer agregado, procedemos a agregar
-                            DefaultTableModel tablaUnicosModel = (DefaultTableModel) tablaArticulosUnicos.getModel();
-                            Object unico[] = {
-                                detalle.getArticulo().getArticuloId()+"", // 0
-                                detalle.getCantidad()+"", // 1
-                                detalle.getArticulo().getUtiles(), // 2
-                                //availabeItem.getUtiles(), // 2
-                                "", // 3
-                                detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor() //4
-                            };
-                            tablaUnicosModel.addRow(unico);
-                        }else{
-                            // recorremos la tabla para encontrar algun articulo y sumar y calcular la disponibilidad
-                                                                                    
-                            boolean encontrado = false;
-                            for(int j=0 ; j < tablaArticulosUnicos.getRowCount() ; j++){
-                                System.out.println("ART UNICOS "+ j);
-                                if(tablaArticulosUnicos.getValueAt(j, 0).toString().equals(detalle.getArticulo().getArticuloId()+"") ){
-                                    // articulo encontrado :)
-                                    float cantidadPedido = new Float(tablaArticulosUnicos.getValueAt(j, 1).toString());
-                                    tablaArticulosUnicos.setValueAt((cantidadPedido + detalle.getCantidad()), j, 1);
-                                    encontrado = true;
-                                }
-                                
-                            } // end for tablaArticulosUnicos, para realizar la busqueda
-                            
-                            if(!encontrado){
-                                // si no se encontro en la tabla, procedemos a agregar el articulo
-                                DefaultTableModel tablaUnicosModel = (DefaultTableModel) tablaArticulosUnicos.getModel();
-                                Object unico1[] = {
-                                    detalle.getArticulo().getArticuloId()+"",
-                                    detalle.getCantidad()+"",
-                                    detalle.getArticulo().getUtiles(), // 2
-                                    "",                           
-                                    detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor()
-                                };
-                                tablaUnicosModel.addRow(unico1);
-                             } // fin if, encontrado!                        
-                  } // end if, comparativa ids articulos           
-              } // end for detalle rentas
-          
-          for(int j=0 ; j < tablaArticulosUnicos.getRowCount() ; j++){
-                float pedidos = new Float(tablaArticulosUnicos.getValueAt(j, 1).toString());
-                float utiles = new Float(tablaArticulosUnicos.getValueAt(j, 2).toString());
-                tablaArticulosUnicos.setValueAt( ( utiles - pedidos ), j, 3);
-                
-           }
-          
-           if(InventarioForm.check_solo_negativos.isSelected()) {
-                mensaje.append("Mostrando solo los negativos - ");
-                mostrarSoloNegativosTablaUnicos();
-           }
-               
-           this.lblEncontrados.setText(mensaje.toString());
-              
-          } // end for rentas
-          System.out.println("ACABO");
-    } // en funcion mostrarDisponibilidadTodos
+    
     
     public void mostrarSoloNegativosTablaUnicos(){
         
          for(int j=tablaArticulosUnicos.getRowCount() - 1 ; j >=0 ; j--){
-             float disponible = new Float(tablaArticulosUnicos.getValueAt(j, 5).toString());
+             float disponible = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ITEM_DISPONIBLE.getColumn()).toString());
              if(disponible >= 0){
                  DefaultTableModel temp = (DefaultTableModel) tablaArticulosUnicos.getModel();
                  temp.removeRow(j);
@@ -273,77 +139,26 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
     }
 
     public void mostrarDisponibilidad(){       
+        
         String fechaInicial = new SimpleDateFormat("dd/MM/yyyy").format(InventarioForm.txtDisponibilidadFechaInicial.getDate());
         String fechaFinal = new SimpleDateFormat("dd/MM/yyyy").format(InventarioForm.txtDisponibilidadFechaFinal.getDate());
         StringBuilder mensaje = new StringBuilder();
-        
-        String stringSql = null;
-        
-        if(InventarioForm.radioBtnTodos.isSelected()){
-            // MOSTRAREMOS TODOS
-             mensaje.append("Se incluyen todos los traslapes - ");
-        stringSql = "SELECT * FROM renta renta "
-                +"WHERE "
-                +"STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') "
-                +"BETWEEN STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y') "
-                +"AND STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y') "
-                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-                +"UNION "
-                +"SELECT * FROM renta renta "
-                +"WHERE "
-                +"STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') "
-                +"BETWEEN STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y') "
-                +"AND STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y') "
-                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-                +"UNION "
-                +"SELECT * FROM renta renta "
-                +"WHERE "
-                +"STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y') "
-                +"BETWEEN STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') "
-                +"AND STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') "
-                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-                +"UNION "
-                +"SELECT * FROM renta renta "
-                +"WHERE "
-                +"STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y') "
-                +"BETWEEN STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') "
-                +"AND STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') "
-                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-                +"";
-        }
+        Map<String,Object> parameters = new HashMap<>();
         
         if(InventarioForm.radioBtnFechaEntrega.isSelected()){
             // MOSTRAR POR FECHA DE ENTREGA
+            parameters.put("showByDeliveryDate", true);
              mensaje.append("Se incluyen por fecha de entrega - ");
-             stringSql = "SELECT * FROM renta renta "
-                +"WHERE "
-                +"STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') "
-                +"BETWEEN STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y') "
-                +"AND STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y') "
-                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-                +"";
         }
         
         if(InventarioForm.radioBtnFechaDevolucion.isSelected()){
             // MOSTRAR POR FECHA DE DEVOLUCION
-             mensaje.append("Se incluyen por fecha devolucion - ");
-             stringSql = "SELECT * FROM renta renta "
-                +"WHERE "
-                +"STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') "
-                +"BETWEEN STR_TO_DATE('"+fechaInicial+"','%d/%m/%Y') "
-                +"AND STR_TO_DATE('"+fechaFinal+"','%d/%m/%Y') "
-                +"AND renta.id_tipo = "+ApplicationConstants.TIPO_PEDIDO+" "
-                +"AND renta.id_estado IN ("+ApplicationConstants.ESTADO_APARTADO+","+ApplicationConstants.ESTADO_EN_RENTA+") "
-                +"";
+            parameters.put("showByReturnDate", true);
+            mensaje.append("Se incluyen por fecha devolucion - ");
         }
         
-        List<Renta> rentas = null;
-        Map<String,Object> parameters = new HashMap<>();
+        List<AvailabilityItemResult> availabilityItemResults;
+        
         parameters.put("typePedido", ApplicationConstants.TIPO_PEDIDO);
         parameters.put("statusApartado", ApplicationConstants.ESTADO_APARTADO);
         parameters.put("statusEnRenta", ApplicationConstants.ESTADO_EN_RENTA);
@@ -351,7 +166,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         parameters.put("endDate", fechaFinal);
         
         try {
-            rentas = saleService.obtenerDisponibilidadRentaPorConsulta(parameters);
+            availabilityItemResults = saleService.obtenerDisponibilidadRentaPorConsulta(parameters);
         } catch (Exception e) {
             Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
@@ -359,46 +174,52 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         }
         
         
-        if(rentas == null || rentas.size()<=0){
+        if(availabilityItemResults == null || availabilityItemResults.size()<=0){
             lblEncontrados.setText("No se obtuvieron resultados :(");
             return;
         }
         
-         mensaje.append("Total de folios "+rentas.size()+" - ");
-          for(Renta renta : rentas){        
-            for(DetalleRenta detalle : renta.getDetalleRenta()){
-                 
-              for (int i = 0; i < InventarioForm.tablaDisponibilidadArticulos.getRowCount(); i++) { 
-                  // recorremos la tabla para identificar los articulos 
-                  String id = detalle.getArticulo().getArticuloId()+"";
-                  if (id.equals(InventarioForm.tablaDisponibilidadArticulos.getValueAt(i, 0).toString())) {
-                    Articulo availabeItem = detalle.getArticulo();
-//                    try {
-//                        availabeItem = itemService.getItemAvailable(detalle.getArticulo().getArticuloId());
-//                    } catch (Exception e) {
-//                        Logger.getLogger(VerDisponibilidadArticulos.class.getName()).log(Level.SEVERE, null, e);
-//                        JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-//                        return;
-//                    }
-                      // vamos agregar el articulo encontrado en la tabla detalle
+        
+        
+         mensaje.append("Total de folios "+availabilityItemResults.size()+" - ");
+          for(AvailabilityItemResult availabilityItemResult : availabilityItemResults){
+            
+              String id = availabilityItemResult.getItem().getArticuloId()+"";
+                
+              boolean itemFound = false;
+                if (!InventarioForm.jcheckIncluirTodos.isSelected() ) {
+                    for (int i = 0; i < InventarioForm.tablaDisponibilidadArticulos.getRowCount(); i++) {
+                        if (id.equals(InventarioForm.tablaDisponibilidadArticulos.getValueAt(i, 0).toString())) {
+                            itemFound = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!InventarioForm.jcheckIncluirTodos.isSelected() && !itemFound) {
+                    continue;
+                }
+                                    
+                  
+                    // vamos agregar el articulo encontrado en la tabla detalle
                     DefaultTableModel temp = (DefaultTableModel) tablaArticulos.getModel();
                      Object nuevo[] = {
                          
-                            detalle.getArticulo().getArticuloId()+"",
-                            detalle.getCantidad()+"",
+                            availabilityItemResult.getItem().getArticuloId()+"",
+                            availabilityItemResult.getNumberOfItems(),
                             // mostrar utiles
-                            availabeItem.getUtiles(),
-                            detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor(),
-                            renta.getFechaEvento(),
-                            renta.getFechaEntrega(),
-                            renta.getHoraEntrega(),
-                            renta.getFechaDevolucion(),
-                            renta.getHoraDevolucion(),
-                            renta.getCliente().getNombre()+" "+renta.getCliente().getApellidos(),
-                            renta.getFolio()+"",
-                            renta.getDescripcion(),
-                            renta.getTipo().getTipo(),
-                            renta.getEstado().getDescripcion()
+                            availabilityItemResult.getItem().getUtiles(),
+                            availabilityItemResult.getItem().getDescripcion()+" "+availabilityItemResult.getItem().getColor().getColor(),
+                            availabilityItemResult.getEventDateOrder(),
+                            availabilityItemResult.getDeliveryDateOrder(),
+                            availabilityItemResult.getDeliveryHourOrder(),
+                            availabilityItemResult.getReturnDateOrder(),
+                            availabilityItemResult.getReturnHourOrder(),
+                            availabilityItemResult.getCustomerName(),
+                            availabilityItemResult.getFolioOrder(),
+                            availabilityItemResult.getDescriptionOrder(),
+                            availabilityItemResult.getTypeOrder(),
+                            availabilityItemResult.getStatusOrder()
                         };
                         temp.addRow(nuevo);
 
@@ -407,11 +228,11 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                             
                             DefaultTableModel tablaUnicosModel = (DefaultTableModel) tablaArticulosUnicos.getModel();
                             Object unico[] = {
-                                detalle.getArticulo().getArticuloId()+"", // 0
-                                detalle.getCantidad()+"", // 1
-                                availabeItem.getUtiles(), // 2
+                                availabilityItemResult.getItem().getArticuloId()+"", // 0
+                                availabilityItemResult.getNumberOfItems(), // 1
+                                availabilityItemResult.getItem().getUtiles(), // 2
                                 "", // 3
-                                detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor() //4
+                                availabilityItemResult.getItem().getDescripcion()+" "+availabilityItemResult.getItem().getColor().getColor() //4
                             };
                             tablaUnicosModel.addRow(unico);
                         }else{
@@ -419,10 +240,10 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                             boolean encontrado = false;
                             for(int j=0 ; j < tablaArticulosUnicos.getRowCount() ; j++){
                                 
-                                if(tablaArticulosUnicos.getValueAt(j, 0).toString().equals(detalle.getArticulo().getArticuloId()+"") ){
+                                if(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ITEM_ID.getColumn()).toString().equals(availabilityItemResult.getItem().getArticuloId()+"") ){
                                     // articulo encontrado :)
-                                    float cantidadPedido = new Float(tablaArticulosUnicos.getValueAt(j, 1).toString());
-                                    tablaArticulosUnicos.setValueAt((cantidadPedido + detalle.getCantidad()), j, 1);
+                                    float cantidadPedido = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ORDER_AMOUNT.getColumn()).toString());
+                                    tablaArticulosUnicos.setValueAt((cantidadPedido + availabilityItemResult.getNumberOfItems()), j, HeaderTableUnicos.ORDER_AMOUNT.getColumn());
                                     encontrado = true;
                                 }
                             } // end for tablaArticulosUnicos, para realizar la busqueda
@@ -431,26 +252,26 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                                 // si no se encontro en la tabla, procedemos a agregar el articulo
                                 DefaultTableModel tablaUnicosModel = (DefaultTableModel) tablaArticulosUnicos.getModel();
                                 Object unico1[] = {
-                                    detalle.getArticulo().getArticuloId()+"",
-                                    detalle.getCantidad()+"",
-                                    availabeItem.getUtiles(),
+                                    availabilityItemResult.getItem().getArticuloId()+"",
+                                    availabilityItemResult.getNumberOfItems(),
+                                    availabilityItemResult.getItem().getUtiles(),
                                     "",                           
-                                    detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor()
+                                    availabilityItemResult.getItem().getDescripcion()+" "+availabilityItemResult.getItem().getColor().getColor()
                                 };
                                 tablaUnicosModel.addRow(unico1);
                              } // fin if, encontrado!
-                        }
-                  } // end if, comparativa ids articulos
+                        
+                  
               }               
-            } // end for detalle renta
+          
         }    // en for renta  
           
            
           // calculando la disponibilidad para la tabla unicos
           for(int j=0 ; j < tablaArticulosUnicos.getRowCount() ; j++){
-                float pedidos = new Float(tablaArticulosUnicos.getValueAt(j, 1).toString());
-                float utiles = new Float(tablaArticulosUnicos.getValueAt(j, 2).toString());
-                tablaArticulosUnicos.setValueAt( ( utiles - pedidos ), j, 3);
+                float pedidos = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ORDER_AMOUNT.getColumn()).toString());
+                float utiles = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ITEM_UTILES.getColumn()).toString());
+                tablaArticulosUnicos.setValueAt( ( utiles - pedidos ), j, HeaderTableUnicos.ITEM_DISPONIBLE.getColumn());
                 
            }
           
@@ -462,7 +283,8 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
             this.lblEncontrados.setText(mensaje.toString());
           
     }// en funcion mostrarDisponibilidad
-     public void formato_tabla() {
+     
+    public void formato_tabla() {
         Object[][] data = {{"","","", "", "", "", "", "", "","","","",""}};
         String[] columnNames = {"id_articulo", "cantidad pedido", "Utiles", "articulo", "fecha evento","fecha entrega","hora entrega", "fecha_devolucion","hora devoluci\u00F3n" ,"cliente","folio","descripci\u00F3n evento","tipo","estado"};
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
@@ -496,7 +318,8 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
     }
      
      public void formato_tabla_unicos() {
-        Object[][] data = {{"", "", "", "", ""}};
+        
+         Object[][] data = {{"", "", "", "", ""}};
         String[] columnNames = {"id_articulo", "Cantidad pedido", "Utiles","disponible", "articulo"};
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
         tablaArticulosUnicos.setModel(tableModel);

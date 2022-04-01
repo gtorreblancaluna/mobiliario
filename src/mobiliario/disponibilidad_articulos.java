@@ -36,9 +36,6 @@ public class disponibilidad_articulos extends java.awt.Dialog {
     boolean es_consultar = false, es_agregar = false;
     int cant_filas = 0;
 
-    /**
-     * Creates new form disponibilidad_articulos
-     */
     public disponibilidad_articulos(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();

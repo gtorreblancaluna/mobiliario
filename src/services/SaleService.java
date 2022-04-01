@@ -7,7 +7,6 @@ import exceptions.DataOriginException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -22,6 +21,7 @@ import model.Renta;
 import model.Tipo;
 import model.TipoAbono;
 import model.Usuario;
+import model.querys.AvailabilityItemResult;
 
 public class SaleService {
     private static Logger log = Logger.getLogger(SaleService.class.getName());
@@ -61,17 +61,6 @@ public class SaleService {
       return salesDao.getDetailByRentId(rentId);
     }
     
-    public List<DetalleRenta> getDetailByRentIdWithDetailItems (String rentId) throws DataOriginException{
-       Map<String,Object> map = new HashMap<>();
-       map.put("statusOrderFinish", ApplicationConstants.STATUS_ORDER_PROVIDER_FINISH);
-       map.put("statusOrder", ApplicationConstants.STATUS_ORDER_PROVIDER_ORDER);
-       map.put("typeOrderDetail", ApplicationConstants.TYPE_DETAIL_ORDER_SHOPPING);
-       map.put("estado_renta", ApplicationConstants.ESTADO_EN_RENTA);
-       map.put("tipo_pedido", ApplicationConstants.TIPO_PEDIDO);
-       map.put("id_renta", rentId);
-       
-       return salesDao.getDetailByRentIdWithDetailItems(map);
-    }
     
     // obtener la disponibilidad de articulos en un rango de fechas
     @Deprecated
@@ -222,133 +211,17 @@ public class SaleService {
     } // fin disponibilidad renta por 
     
     
-     public List<Renta> obtenerDisponibilidadRentaPorConsulta(Map<String, Object> parameters)throws BusinessException {
+     public List<AvailabilityItemResult> obtenerDisponibilidadRentaPorConsulta(Map<String, Object> parameters)throws BusinessException {
          
         try {
-            List<Renta> rentas = salesDao.obtenerDisponibilidadRentaPorConsulta(parameters);
-            for (Renta renta : rentas) {
-                renta.setDetalleRenta(getDetailByRentIdWithDetailItems(renta.getRentaId()+""));
-                if (!renta.getDetalleRenta().isEmpty()) {
-                    for (DetalleRenta detail : renta.getDetalleRenta()) {
-                        detail.getArticulo().setUtiles(itemService.utilesCalculate(detail.getArticulo()));
-                    }
-                }
+            List<AvailabilityItemResult> availabilityItemResults = salesDao.obtenerDisponibilidadRentaPorConsulta(parameters);
+            for (AvailabilityItemResult availabilityItemResult : availabilityItemResults) {        
+              availabilityItemResult.getItem().setUtiles(itemService.utilesCalculate(availabilityItemResult.getItem()));  
             }
-            return rentas;
+            return availabilityItemResults;
         } catch (DataOriginException e) {
             throw new BusinessException(e.getMessage(),e);
         }
-       
-
-//        Object[][] dtconduc = null;
-//        try {
-//            dtconduc = sql.GetTabla(obtenerColumnasRenta(), "renta",query );
-//        } catch (SQLNonTransientConnectionException e) {
-//            sql.conectate();
-//            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-//        } catch (SQLException e) {
-//            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-//        } catch (Exception e) {
-//            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-//        }       
-//        
-//         if(dtconduc == null || dtconduc.length <= 0)
-//            return null;
-//         
-//        List<Renta> rentas = new ArrayList<>();
-//        CustomerService customerService = CustomerService.getInstance();
-//        
-//         for (int i = 0; i < dtconduc.length; i++) {
-//             Renta renta = new Renta();
-//             renta.setRentaId(Integer.parseInt(dtconduc[i][0].toString()));
-//             if(dtconduc[i][1] != null)
-//                renta.setEstadoId(Integer.parseInt(dtconduc[i][1].toString()));
-//             
-//             if(dtconduc[i][2] != null)
-//                renta.setCliente(customerService.obtenerClientePorId(Long.parseLong(dtconduc[i][2].toString()))); 
-//             
-//             if(dtconduc[i][3] != null)
-//                renta.setUsuario(userService.obtenerUsuarioPorId(sql, Integer.parseInt(dtconduc[i][3].toString())));  
-//             
-//             if(dtconduc[i][4] != null)
-//                 renta.setFechaPedido(dtconduc[i][4].toString());
-//             
-//             if(dtconduc[i][5] != null)
-//                 renta.setFechaEntrega(dtconduc[i][5].toString());
-//             
-//             if(dtconduc[i][6] != null)
-//                 renta.setHoraEntrega(dtconduc[i][6].toString());
-//             
-//             if(dtconduc[i][7] != null)
-//                 renta.setFechaDevolucion(dtconduc[i][7].toString());
-//             
-//             if(dtconduc[i][8] != null)
-//                 renta.setDescripcion(dtconduc[i][8].toString());
-//             
-//             if(dtconduc[0][9] == null)
-//                 renta.setDescuento(0f);
-//             else if(dtconduc[0][9].toString().equals(""))
-//                 renta.setDescuento(0f);
-//             else
-//                 renta.setDescuento(Float.parseFloat(dtconduc[0][9].toString()));
-//             
-//             if(dtconduc[i][10] != null)
-//                 renta.setCantidadDescuento(Float.parseFloat(dtconduc[i][10].toString()));
-//             if(dtconduc[i][11] != null)
-//                 renta.setIva(Float.parseFloat(dtconduc[i][11].toString()));
-//              else
-//                 renta.setIva(0f);
-//             
-//             if(dtconduc[i][12] != null)
-//                 renta.setComentario(dtconduc[i][12].toString());
-//             
-//             if(dtconduc[i][13] != null)
-//                 renta.setUsuarioChoferId(Integer.parseInt(dtconduc[i][13].toString()));
-//             
-//             if(dtconduc[i][14] != null)
-//                 renta.setFolio(Integer.parseInt(dtconduc[i][14].toString()));
-//             
-//             if(dtconduc[i][15] != null)
-//                 renta.setStock(dtconduc[i][15].toString());
-//              
-//             if(dtconduc[i][16] != null)
-//                 renta.setTipo(this.obtenerTipoPorId(sql,Integer.parseInt(dtconduc[i][16].toString())));
-//             
-//             
-//             if(dtconduc[i][17] != null)
-//                 renta.setHoraDevolucion(dtconduc[i][17].toString());
-//             
-//             if(dtconduc[i][18] != null)
-//                 renta.setFechaEvento(dtconduc[i][18].toString());
-//              
-//             if(dtconduc[i][19] == null)
-//                 renta.setDepositoGarantia(0f);
-//             else
-//                 renta.setDepositoGarantia(Float.parseFloat(dtconduc[i][19].toString()));
-//             
-//             if(dtconduc[i][20] == null)
-//                 renta.setEnvioRecoleccion(0f);
-//             else
-//                 renta.setEnvioRecoleccion(Float.parseFloat(dtconduc[i][20].toString()));
-//             
-//             if(dtconduc[0][21] == null)
-//                 renta.setMostrarPreciosPdf("0");
-//             else
-//                 renta.setMostrarPreciosPdf(dtconduc[0][21]+"");
-//             
-//             
-//             renta.setEstado(this.obtenerEstadoEventoPorId(sql, renta.getEstadoId()));
-//             // obtenemos el detalle de la renta
-//             renta.setChofer(userService.obtenerUsuarioPorId(sql,renta.getUsuarioChoferId()));
-//             renta.setDetalleRenta(this.obtenerDetalleRenta(Integer.parseInt(dtconduc[i][0].toString())));
-//             renta.setAbonos(this.obtenerAbonosPorRentaId(sql,Integer.parseInt(dtconduc[i][0].toString())));
-//             rentas.add(renta);
-//             
-//         }
-//        
-//        return rentas;
-
-
                 
     } // fin disponibilidad renta por fechas
     

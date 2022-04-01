@@ -3,10 +3,12 @@ package dao;
 import exceptions.DataOriginException;
 import java.util.List;
 import java.util.Map;
+import mobiliario.ApplicationConstants;
 import model.Abono;
 import model.DetalleRenta;
 import model.Renta;
 import model.TipoAbono;
+import model.querys.AvailabilityItemResult;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
@@ -14,7 +16,7 @@ import org.apache.log4j.Logger;
 public class SalesDAO {
     
     private static Logger log = Logger.getLogger(SalesDAO.class.getName());
-    private SqlSessionFactory sqlSessionFactory;
+    private final SqlSessionFactory sqlSessionFactory;
  
     private SalesDAO() {
         sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();
@@ -42,19 +44,6 @@ public class SalesDAO {
         }
     }
     
-    @SuppressWarnings("unchecked")
-    public List<DetalleRenta> getDetailByRentIdWithDetailItems(Map<String,Object> map) throws DataOriginException{
-        SqlSession session = sqlSessionFactory.openSession();
-        try {
-           List<DetalleRenta> detalle = session.selectList("MapperPedidos.getDetailByRentIdWithDetailItems",map);
-           return detalle;
-        }catch(Exception ex){
-            log.error(ex);
-            throw new DataOriginException(ex.getMessage(),ex);
-        } finally {
-            session.close();
-        }
-    }
     
     @SuppressWarnings("unchecked")
     public TipoAbono obtenerTipoAbonoPorDescripcion( String descripcion) {
@@ -121,10 +110,29 @@ public class SalesDAO {
         }
     }
     
-    public List<Renta> obtenerDisponibilidadRentaPorConsulta (Map<String,Object> parameters) throws DataOriginException{
+    public List<AvailabilityItemResult> obtenerDisponibilidadRentaPorConsulta (Map<String,Object> parameters) throws DataOriginException{
         SqlSession session = sqlSessionFactory.openSession();
         try {
-           return (List<Renta>) session.selectList("MapperPedidos.obtenerRentaPorDisponibilidad",parameters);       
+            
+            List<AvailabilityItemResult> availabilityItemResults;
+            parameters.put("estado_renta", ApplicationConstants.ESTADO_EN_RENTA);
+            parameters.put("tipo_pedido", ApplicationConstants.TIPO_PEDIDO);
+            
+            parameters.put("statusOrderFinish", ApplicationConstants.STATUS_ORDER_PROVIDER_FINISH);
+            parameters.put("statusOrder", ApplicationConstants.STATUS_ORDER_PROVIDER_ORDER);
+            parameters.put("typeOrderDetail", ApplicationConstants.TYPE_DETAIL_ORDER_SHOPPING);
+            
+            if (parameters.get("showByDeliveryDate") != null && Boolean.parseBoolean(parameters.get("showByDeliveryDate").toString())) {
+                availabilityItemResults = session.selectList("MapperPedidos.obtenerRentaPorDisponibilidadPorFechaDeEntrega",parameters);
+            } else if (parameters.get("showByReturnDate") != null && Boolean.parseBoolean(parameters.get("showByReturnDate").toString())) {
+                availabilityItemResults = session.selectList("MapperPedidos.obtenerRentaPorDisponibilidadPorFechaDeDevolucion",parameters);
+            } else {
+                availabilityItemResults = session.selectList("MapperPedidos.obtenerRentaPorDisponibilidad",parameters);
+            }
+                       
+            return availabilityItemResults;
+        } catch (Exception e){
+            throw new DataOriginException(e.getMessage(),e);
         } finally {
             session.close();
         }
