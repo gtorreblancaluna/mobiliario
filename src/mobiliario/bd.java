@@ -85,7 +85,7 @@ public class bd extends javax.swing.JDialog {
         if (status == 0) {
             File selectedFile = fileChooser.getSelectedFile();
             String file = selectedFile.getParent() + "/" + selectedFile.getName() + ".sql";
-            new BackUpSample().CrearBackup("localhost", "3306", "root", "america", "mobiliario", file);
+            new BackUpSample().crearBackup("localhost", "3306", "root", "america", "mobiliario", file);
             this.dispose();
         }
     }//GEN-LAST:event_jButton1ActionPerformed

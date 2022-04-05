@@ -49,16 +49,6 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
         
     }
 
-//    public void conectar() {
-//        // conexion.setIp(IpServer);
-//        try {        
-//            conexion.conectate();
-//        } catch (SQLException e) {
-//            JOptionPane.showMessageDialog( rootPane,"No se puede establecer la comunicacion con la bd:\n"+e);
-//        }  catch (Exception e) {
-//             JOptionPane.showMessageDialog( rootPane,"Ocurrio un error inesperado, porfavor intentalo de nuevo, verifica tu conexion a internet\n"+e);
-//        }
-//    }
 
     class TimerListener implements ActionListener {
 
@@ -135,46 +125,6 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
         return false;
     }
 
-//    public void entrar() {
-//         String pswd = new String(this.txt_contraseña.getPassword());
-//        //String area = null, priv = null;
-//        int inm = 0;
-//        conectar();
-//        try {
-//            Connection con = conexion.getConnection();
-//            Statement s = con.createStatement();
-//            ResultSet rs = s.executeQuery("SELECT * FROM usuarios WHERE contraseña = '" + pswd + "'");
-//            if (rs.first()) {
-//                inm = 1;
-//                
-//                id_usuario_global = rs.getString("id_usuarios");
-//                usuarioGlobal = userService.obtenerUsuarioPorId(funcion,new Integer(id_usuario_global));
-//                nombre_usuario_global = rs.getString("nombre");
-//                apellidos_usuario_global = rs.getString("apellidos");
-//                administrador_global = rs.getString("administrador");
-//                id_puesto_global = rs.getString("id_puesto");
-//
-//            }
-//            con.close();
-//            if (inm == 1) {
-//                barrita.setVisible(true);
-//                cont = -1;
-//                barrita.setValue(0);
-//                barrita.setStringPainted(true);
-//                tiempo = new Timer(TWO_SECOND, new TimerListener());
-//                activar();
-//                this.txt_contraseña.setText("");
-//
-//            } else {
-//                JOptionPane.showMessageDialog(null, "Contraseña incorrecta ", "Error SQL", JOptionPane.ERROR_MESSAGE);
-//                this.txt_contraseña.setText("");
-//                this.txt_contraseña.requestFocus();
-//            }
-//        } catch (SQLException | HeadlessException ex) {
-//            java.awt.Toolkit.getDefaultToolkit().beep();
-//            JOptionPane.showMessageDialog(null, "Error con la conexión a la base de datos: " + ex, "Error SQL", JOptionPane.ERROR_MESSAGE);
-//        }
-//    }
 
     /**
      * This method is called from within the constructor to initialize the form.
