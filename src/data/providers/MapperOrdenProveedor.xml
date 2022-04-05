@@ -32,6 +32,8 @@
         <result property="fgActivo" column="fg_activo"/>        
         <result property="creado" column="creado"/>
         <result property="actualizado" column="actualizado"/> 
+        <result property="abonos" column="abonos"/>
+        <result property="total" column="total"/>
         <!-- datos de la renta-->
         <result property="renta.rentaId" column="renta_id"/>
         <result property="renta.folio" column="renta_folio"/>
@@ -96,7 +98,17 @@
             p.id AS proveedor_id,
             p.nombre AS proveedor_nombre,
             p.apellidos AS proveedor_apellidos,
-            p.email AS proveedor_email
+            p.email AS proveedor_email,
+            (
+                SELECT COALESCE(SUM(pagos.cantidad),0)
+                FROM pagos_proveedor pagos
+                WHERE pagos.id_orden_proveedor = o.id
+            )AS abonos,
+            (
+                SELECT COALESCE(SUM(detalle.cantidad * detalle.precio))
+                FROM detalle_orden_proveedor detalle
+                WHERE detalle.id_orden_proveedor = o.id
+            )AS total
         FROM orden_proveedor o
             INNER JOIN renta r ON (r.id_renta = o.id_renta)
             INNER JOIN usuarios u ON (u.id_usuarios = o.id_usuario)

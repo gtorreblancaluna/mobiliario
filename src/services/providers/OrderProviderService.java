@@ -9,7 +9,6 @@ import java.util.Map;
 import mobiliario.ApplicationConstants;
 import model.providers.DetalleOrdenProveedor;
 import model.providers.OrdenProveedor;
-import model.providers.PagosProveedor;
 import parametersVO.ParameterOrderProvider;
 
 
@@ -100,46 +99,13 @@ public class OrderProviderService {
     }
     
     public List<OrdenProveedor> getOrdersByParameters(ParameterOrderProvider parameter)throws BusinessException{
-        
-        List<OrdenProveedor> list;
+
         try{
-            list = orderProviderDAO.getOrdersByParameters(parameter);
-            
-            if(list != null && list.size()>0){
-                // add payments
-                for(OrdenProveedor orden : list){
-                    orden.setPagosProveedor(providersPaymentsDAO.getAllProviderPaymentsByOrderId(orden.getId()));
-                    
-                    // calculate total payments to provider
-                    if(orden.getPagosProveedor() != null && orden.getPagosProveedor().size()>0){
-                        float fPagos = 0f;
-                        for(PagosProveedor pagos : orden.getPagosProveedor()){
-                            fPagos += pagos.getCantidad();
-                        }
-                        orden.setAbonos(fPagos);
-                    }else{ // end if
-                        orden.setAbonos(0f);
-                    }
-                    // calculate total amount by order
-                     if(orden.getDetalleOrdenProveedorList() != null && 
-                            orden.getDetalleOrdenProveedorList().size()>0){
-                            float fTotal = 0f;
-                            for(DetalleOrdenProveedor detalle : orden.getDetalleOrdenProveedorList()){
-                                fTotal += (detalle.getCantidad() * detalle.getPrecio());
-                            }
-                            orden.setTotal(fTotal);
-                     }else{ // end if
-                            orden.setTotal(0f);
-                     }
-                } // end for
-                
-            }
-            
+            return orderProviderDAO.getOrdersByParameters(parameter);           
         }catch(DataOriginException e){
           throw new BusinessException(e.getMessage(),e.getCause());
         }
      
-        return list;
     }
     
     public List<DetalleOrdenProveedor> getDetailProvider(Map<String,Object> map)throws BusinessException{

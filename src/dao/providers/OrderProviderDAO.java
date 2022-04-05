@@ -76,27 +76,17 @@ public class OrderProviderDAO {
      }
      
      public List<OrdenProveedor> getOrdersByParameters(ParameterOrderProvider parameter)throws DataOriginException{
-         List<OrdenProveedor> list = new ArrayList<>();
-         SqlSession session = sqlSessionFactory.openSession();
-        try{           
-             list = (List<OrdenProveedor>) session.selectList("MapperOrdenProveedor.getOrdersByParameters",parameter); 
-             if(list !=null && list.size()>0){
-                 for(OrdenProveedor orden : list){
-                       orden.setDetalleOrdenProveedorList((List<DetalleOrdenProveedor>) 
-                       session.selectList("MapperOrdenProveedor.getDetailOrderByOrderId",orden.getId()));
-                 }
-             }
+         
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+            return session.selectList("MapperOrdenProveedor.getOrdersByParameters",parameter);
         }catch(Exception ex){
             log.error(ex);
             throw new DataOriginException(ex.getMessage(),ex.getCause());
         } finally {
             session.close();
         }
-        
-                    
-        return list;
-         
-     
+       
      }
      
      public void updateOrder(OrdenProveedor orden)throws DataOriginException{
