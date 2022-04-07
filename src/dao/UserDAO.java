@@ -30,20 +30,21 @@ public class UserDAO {
     }
     
     @SuppressWarnings("unchecked")
-    public Usuario obtenerUsuarioPorPassword(String password) {
-        SqlSession session = sqlSessionFactory.openSession();
+    public Usuario obtenerUsuarioPorPassword(String password) throws DataOriginException {
+        SqlSession session = null;
         try {
+            session = sqlSessionFactory.openSession();
             Usuario usuario = (Usuario) session.selectOne("MapperUsuarios.obtenerUsuarioPorPassword",password);
             if(usuario != null)
                 log.debug("usuario obtenido es: "+usuario.getNombre()+" "+usuario.getApellidos());
             else
                 log.debug("usuario no econtrado para la contrasenia: "+password);
             return usuario;
-        }catch(Exception e){           
-            log.error(e);
-             return null;
+        } catch(Exception e){           
+            throw new DataOriginException(e.getMessage(),e);
         } finally {
-            session.close();
+            if (session != null)
+                session.close();
         }
     }
     

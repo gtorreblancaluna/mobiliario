@@ -56,9 +56,9 @@ public class CategoryService {
         for (int i = 0; i < dtconduc.length; i++){
            try {
                AsignaCategoria asignaCategoria = new AsignaCategoria();
-               asignaCategoria.setAsignaCategoriaId(new Integer(dtconduc[i][0].toString()));
-               asignaCategoria.setUsuario(userService.obtenerUsuarioPorId(sql, new Integer(dtconduc[i][1].toString())));
-               asignaCategoria.setCategoria(this.obtenerCategoriaPorId(sql, new Integer(dtconduc[i][2].toString())));
+               asignaCategoria.setAsignaCategoriaId(Integer.parseInt(dtconduc[i][0].toString()));
+               asignaCategoria.setUsuario(userService.obtenerUsuarioPorId(sql, Integer.parseInt(dtconduc[i][1].toString())));
+               asignaCategoria.setCategoria(this.obtenerCategoriaPorId(sql, Integer.parseInt(dtconduc[i][2].toString())));
                
                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
                Date parsedDate = dateFormat.parse(dtconduc[i][3].toString());
@@ -98,7 +98,7 @@ public class CategoryService {
          if(dtconduc == null || dtconduc.equals(""))
             return null;
          
-         categoria.setCategoriaId(new Integer(dtconduc[0][0].toString()));
+         categoria.setCategoriaId(Integer.parseInt(dtconduc[0][0].toString()));
          categoria.setDescripcion(dtconduc[0][1].toString());
          
          return categoria;  
@@ -127,7 +127,7 @@ public class CategoryService {
             for (int i = 0; i < dtconduc.length; i++) {
                 CategoriaDTO categoria = new CategoriaDTO();
                 
-                categoria.setCategoriaId(new Integer(dtconduc[i][0].toString()));
+                categoria.setCategoriaId(Integer.parseInt(dtconduc[i][0].toString()));
                
                 if(dtconduc[i][1] != null)
                     categoria.setDescripcion(dtconduc[i][1].toString());

@@ -932,7 +932,7 @@ private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(u
 //              temp.setRowCount(0);
               String nombre = (tabla_usuarios.getValueAt(tabla_usuarios.getSelectedRow(), 1).toString()) + " " + (tabla_usuarios.getValueAt(tabla_usuarios.getSelectedRow(), 2).toString()) ;
               lblNombreUsuario.setText(nombre);
-              int usuarioId = new Integer (tabla_usuarios.getValueAt(tabla_usuarios.getSelectedRow(), 0).toString());
+              int usuarioId = Integer.parseInt(tabla_usuarios.getValueAt(tabla_usuarios.getSelectedRow(), 0).toString());
               List<AsignaCategoria> categorias = categoryService.obtenerCategoriasAsignadasPorUsuarioId(funcion, usuarioId);
               if(categorias == null || categorias.size()<=0){
                   this.lblEncontrados.setText("No se encontraron categorias asignadas a este usuario :( ");

@@ -1,4 +1,6 @@
 package mobiliario;
+
+import exceptions.DataOriginException;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -79,8 +81,13 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
         log.debug("iniciando sesion ");       
         String pswd = new String(this.txt_contraseña.getPassword());
         //String area = null, priv = null;
-//        usuarioGlobal = userService.obtenerUsuarioPorPassword(funcion, pswd);
-        usuarioGlobal = userService.obtenerUsuarioPorPassword(pswd);
+        try {
+            usuarioGlobal = userService.obtenerUsuarioPorPassword(pswd);
+        } catch (DataOriginException e) {
+            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
+            log.error(e);
+            return;
+        }
         if(usuarioGlobal == null || usuarioGlobal.getNombre().equals("")){
             JOptionPane.showMessageDialog(null, ApplicationConstants.DS_MESSAGE_FAIL_LOGIN, ApplicationConstants.TITLE_MESSAGE_FAIL_LOGIN, JOptionPane.ERROR_MESSAGE);
             this.txt_contraseña.setText("");
@@ -104,8 +111,13 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
     }
     
     public static boolean dataSessionUptade(String password){
-        
-        Usuario user = userService.obtenerUsuarioPorPassword(password);
+        Usuario user;
+        try {
+            user = userService.obtenerUsuarioPorPassword(password);
+        } catch (DataOriginException e) {
+            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.INFORMATION_MESSAGE);
+            return false;
+        }
         if(user != null && !user.getNombre().equals("")){
             String msgUpdateSession = "Actualización sesión: "+user.getNombre()+" "+user.getApellidos();
             log.info(msgUpdateSession);
@@ -190,9 +202,9 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jbtn_entrar, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(txt_contraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(barrita, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                .addGap(25, 25, 25))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(barrita, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();

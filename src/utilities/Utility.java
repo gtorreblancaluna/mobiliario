@@ -174,7 +174,7 @@ public abstract class Utility {
             return false;
         
          try {
-             amount = new Float(value);
+             amount = Float.parseFloat(value);
          } catch (NumberFormatException e) {
              valid = false;
          }

@@ -80,7 +80,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
             materialSaleItem.setMaterialInventory(new MaterialInventory(Long.parseLong(gMaterialId)));
             materialSaleItem.setProvider(new Proveedor(Long.parseLong(gProviderId)));
             materialSaleItem.setItem(gItem);
-            materialSaleItem.setAmount(new Float(amount));
+            materialSaleItem.setAmount(Float.parseFloat(amount));
             materialInventoryService.save(materialSaleItem);
             getItems();
             txtAmount.setText("");

@@ -369,7 +369,7 @@ public class SubCategoriaContabilidadForm extends java.awt.Dialog {
        SubCategoriaContabilidad subCategoriaContabilidad = new SubCategoriaContabilidad();
        subCategoriaContabilidad.setCategoriaContabilidad(category);
        subCategoriaContabilidad.setDescripcion(txt_categoria.getText().toString());
-       subCategoriaContabilidad.setSubCategoriaContabilidadId(new Integer(g_id_sub_categoria));
+       subCategoriaContabilidad.setSubCategoriaContabilidadId(Integer.parseInt(g_id_sub_categoria));
        
        if(this.radioIngreso.isSelected())
             subCategoriaContabilidad.setIngreso("1");
@@ -449,7 +449,7 @@ public class SubCategoriaContabilidadForm extends java.awt.Dialog {
          String subCategoria = this.tabla_categorias.getValueAt(tabla_categorias.getSelectedRow(), 1).toString();
          int seleccion = JOptionPane.showOptionDialog(this, "¿Eliminar registro: " + subCategoria + "?", "Confirme eliminacion", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "No");
          if ((seleccion + 1) == 1) {
-            contabilidadService.deleteSubCategoryById(new Integer(idSubCategoria));
+            contabilidadService.deleteSubCategoryById(Integer.parseInt(idSubCategoria));
             
             this.limpiar();
             JOptionPane.showMessageDialog(null, ApplicationConstants.MESSAGE_DELETE_SUCCESSFUL, "Sucess update", JOptionPane.INFORMATION_MESSAGE);

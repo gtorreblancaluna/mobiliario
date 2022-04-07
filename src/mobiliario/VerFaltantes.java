@@ -614,9 +614,9 @@ public class VerFaltantes extends java.awt.Dialog {
         float precioCobrar = 0f;
         
         try {
-            cantidad = new Float(this.txtCantidad.getText());
-            cantidadPedido = new Float(g_cantidadEnPedido);
-            precioCobrar = new Float(this.txtPrecioCobrar.getText());
+            cantidad = Float.parseFloat(this.txtCantidad.getText());
+            cantidadPedido = Float.parseFloat(g_cantidadEnPedido);
+            precioCobrar = Float.parseFloat(this.txtPrecioCobrar.getText());
         } catch (NumberFormatException e) {
             mensaje.append(++cont + ". Error al ingresar la cantidad\n");
         } catch (Exception e) {

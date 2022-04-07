@@ -3,7 +3,6 @@ package forms.rentas;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,12 +16,12 @@ import model.Usuario;
 
 public class FiltersConsultarRentas extends javax.swing.JDialog {
     
-    private List<Tipo> typesGlobal = new ArrayList<>();
-    private List<EstadoEvento> statusListGlobal = new ArrayList<>();
-    private List<Usuario> choferes = new ArrayList<>();
+    private List<Tipo> typesGlobal;
+    private List<EstadoEvento> statusListGlobal;
+    private List<Usuario> choferes;
 
 
-    public FiltersConsultarRentas(java.awt.Frame parent, boolean modal,List<Tipo> typesGlobal,List<EstadoEvento> statusListGlobal,List<Usuario> choferes ) {
+    public FiltersConsultarRentas(java.awt.Frame parent, boolean modal, List<Tipo> typesGlobal, List<EstadoEvento> statusListGlobal, List<Usuario> choferes ) {
         super(parent, modal);
         initComponents();
         this.typesGlobal = typesGlobal;

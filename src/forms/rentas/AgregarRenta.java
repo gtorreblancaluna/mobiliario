@@ -558,10 +558,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 fEnvioRecoleccion = Float.parseFloat(this.txt_envioRecoleccion.getText()+"".replace(",", "."));
             
             if(!this.txt_depositoGarantia.getText().equals(""))
-                fDepositoGarantia = new Float (this.txt_depositoGarantia.getText()+"".replace(",", "."));
+                fDepositoGarantia = Float.parseFloat(this.txt_depositoGarantia.getText()+"".replace(",", "."));
             
             if(!this.txt_abonos.getText().equals(""))
-                fAbonos = new Float (this.txt_abonos.getText()+"".replace(",", "."));        
+                fAbonos = Float.parseFloat(this.txt_abonos.getText()+"".replace(",", "."));        
             
             if(fPorcentaejeDescuento == 0)
                 this.txt_descuento.setValue(0);

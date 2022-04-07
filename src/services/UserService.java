@@ -244,7 +244,7 @@ public class UserService {
         return usuario;
     }
     
-     public Usuario obtenerUsuarioPorPassword(String psw){
+     public Usuario obtenerUsuarioPorPassword(String psw) throws DataOriginException{
          return usuariosDao.obtenerUsuarioPorPassword(psw);
      }
     

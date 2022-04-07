@@ -1544,7 +1544,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "Seleciona un articulo para continuar", "Error", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        this.g_articuloId = new Integer (tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString());
+        this.g_articuloId = Integer.parseInt(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString());
         Articulo articulo = itemService.obtenerArticuloPorId(g_articuloId);
         if(articulo == null ){
             JOptionPane.showMessageDialog(null, "Ocurrio un error al obtener el articulo, intenta de nuevo porfavor ", "Error", JOptionPane.INFORMATION_MESSAGE);
@@ -1561,7 +1561,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             return;
         }
          
-        Integer idArticulo = new Integer (tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString());
+        Integer idArticulo = Integer.parseInt(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString());
          
         Articulo articulo = itemService.obtenerArticuloPorId(idArticulo);
         AgregarCompraFormDialog.articulo = articulo;

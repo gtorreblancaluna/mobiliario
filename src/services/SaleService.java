@@ -528,7 +528,7 @@ public class SaleService {
                if(dtconduc[i][3] != null)
                     abono.setFecha(dtconduc[i][3].toString() );
                if(dtconduc[i][4] != null)
-                    abono.setAbono(new Float (dtconduc[i][4].toString()) );
+                    abono.setAbono(Float.parseFloat(dtconduc[i][4].toString()) );
                if(dtconduc[i][5] != null)
                     abono.setComentario(dtconduc[i][5].toString());               
                abonos.add(abono);               

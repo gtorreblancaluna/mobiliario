@@ -149,9 +149,9 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
             float egresos = 0f;
             float abonos = 0f;
             try {
-                 ingresos = new Float(tabla_resumen.getValueAt(j, 1).toString().replaceAll(",",""));
-                 egresos = new Float(tabla_resumen.getValueAt(j, 2).toString().replaceAll(",","")); 
-                 abonos = new Float(tabla_resumen.getValueAt(j, 3).toString().replaceAll(",","")); 
+                 ingresos = Float.parseFloat(tabla_resumen.getValueAt(j, 1).toString().replaceAll(",",""));
+                 egresos = Float.parseFloat(tabla_resumen.getValueAt(j, 2).toString().replaceAll(",","")); 
+                 abonos = Float.parseFloat(tabla_resumen.getValueAt(j, 3).toString().replaceAll(",","")); 
             } catch (Exception e) {
                 System.out.println(e);
             }
@@ -639,7 +639,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         
          Timestamp movementDate = new Timestamp(txt_fecha_movimiento.getDate().getTime());
         
-         Float cantidad = new Float(txtCantidad.getText().toString());
+         Float cantidad = Float.parseFloat(txtCantidad.getText().toString());
         
          SubCategoriaContabilidad subCategoriaContabilidad = 
                 contabilidadServices.getSubCategoryByName(subCategoria);
@@ -969,7 +969,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
             int row = tabla_contabilidad.getSelectedRow();
             String contabilidadId  = tabla_contabilidad.getValueAt(row, 0).toString();
             Contabilidad contabilidad = 
-                    contabilidadServices.getContabilidadById(new Integer(contabilidadId));
+                    contabilidadServices.getContabilidadById(Integer.parseInt(contabilidadId));
             
             if(contabilidad == null){
                 JOptionPane.showMessageDialog(null, ApplicationConstants.MESSAGE_NOT_PARAMETER_RECEIVED, "Error", JOptionPane.INFORMATION_MESSAGE);

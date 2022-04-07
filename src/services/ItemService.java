@@ -96,15 +96,15 @@ public class ItemService {
         if(dtconduc == null || dtconduc.equals(""))
             return null;
         Articulo articulo = new Articulo();       
-        articulo.setArticuloId(dtconduc[0][0] != null ? new Integer(dtconduc[0][0].toString()) : null);
-        articulo.setCategoriaId(dtconduc[0][1] != null ?new Integer(dtconduc[0][1].toString()) : null);
-        articulo.setUsuarioId(dtconduc[0][2] != null ?new Integer(dtconduc[0][2].toString()) : null);
+        articulo.setArticuloId(dtconduc[0][0] != null ? Integer.parseInt(dtconduc[0][0].toString()) : null);
+        articulo.setCategoriaId(dtconduc[0][1] != null ?Integer.parseInt(dtconduc[0][1].toString()) : null);
+        articulo.setUsuarioId(dtconduc[0][2] != null ?Integer.parseInt(dtconduc[0][2].toString()) : null);
         articulo.setCantidad(dtconduc[0][3] != null ? Float.parseFloat(dtconduc[0][3].toString()) : null);
         articulo.setDescripcion(dtconduc[0][4] != null ? dtconduc[0][4].toString() : null);
         
         // COLOR
         Color color = new Color();
-        color.setColorId(dtconduc[0][5] != null ? new Integer(dtconduc[0][5].toString()) : null);
+        color.setColorId(dtconduc[0][5] != null ? Integer.parseInt(dtconduc[0][5].toString()) : null);
         if(dtconduc[0][14] != null)
             color.setColor(dtconduc[0][14].toString());
          if(dtconduc[0][15] != null)
@@ -127,7 +127,7 @@ public class ItemService {
 
         CategoriaDTO categoria = new CategoriaDTO();
         if(dtconduc[0][16] != null)
-            categoria.setCategoriaId(new Integer(dtconduc[0][16]+""));
+            categoria.setCategoriaId(Integer.parseInt(dtconduc[0][16]+""));
          if(dtconduc[0][17] != null)
              categoria.setDescripcion( (dtconduc[0][17]+""));
          articulo.setCategoria(categoria);
@@ -156,15 +156,15 @@ public class ItemService {
         List<Articulo> articulos = new ArrayList<>();
         for (int i = 0; i < dtconduc.length; i++) {
         Articulo articulo = new Articulo();       
-        articulo.setArticuloId(dtconduc[i][0] != null ? new Integer(dtconduc[i][0].toString()) : null);
-        articulo.setCategoriaId(dtconduc[i][1] != null ?new Integer(dtconduc[i][1].toString()) : null);
-        articulo.setUsuarioId(dtconduc[i][2] != null ?new Integer(dtconduc[i][2].toString()) : null);
+        articulo.setArticuloId(dtconduc[i][0] != null ? Integer.parseInt(dtconduc[i][0].toString()) : null);
+        articulo.setCategoriaId(dtconduc[i][1] != null ?Integer.parseInt(dtconduc[i][1].toString()) : null);
+        articulo.setUsuarioId(dtconduc[i][2] != null ?Integer.parseInt(dtconduc[i][2].toString()) : null);
         articulo.setCantidad(dtconduc[i][3] != null ? Float.parseFloat(dtconduc[i][3].toString()) : null);
         articulo.setDescripcion(dtconduc[i][4] != null ? dtconduc[i][4].toString() : null);
         
         // COLOR
         Color color = new Color();
-        color.setColorId(dtconduc[i][5] != null ? new Integer(dtconduc[i][5].toString()) : null);
+        color.setColorId(dtconduc[i][5] != null ? Integer.parseInt(dtconduc[i][5].toString()) : null);
         if(dtconduc[i][14] != null)
             color.setColor(dtconduc[i][14].toString());
          if(dtconduc[i][15] != null)
@@ -234,7 +234,7 @@ public class ItemService {
         List<Articulo> articulos = new ArrayList<>();
         for (int i = 0; i < dtconduc.length; i++) {
         Articulo articulo = new Articulo();       
-        articulo.setArticuloId(dtconduc[i][0] != null ? new Integer(dtconduc[i][0].toString()) : null);
+        articulo.setArticuloId(dtconduc[i][0] != null ? Integer.parseInt(dtconduc[i][0].toString()) : null);
         if(dtconduc[i][1] != null)
             articulo.setCodigo(dtconduc[i][1]+"");
         if(dtconduc[i][2] != null)
@@ -436,11 +436,11 @@ public class ItemService {
             Faltante faltante = new Faltante();
             
             if(dtconduc[i][0] != null)
-                faltante.setFaltanteId(new Integer(dtconduc[i][0]+""));
+                faltante.setFaltanteId(Integer.parseInt(dtconduc[i][0]+""));
             
             Articulo articulo = new Articulo();
             if(dtconduc[i][1] != null)
-                articulo.setArticuloId(new Integer(dtconduc[i][1]+""));
+                articulo.setArticuloId(Integer.parseInt(dtconduc[i][1]+""));
             
              if(dtconduc[i][16] != null){
                  articulo.setPrecioCompra(Float.parseFloat(dtconduc[i][16]+""));
@@ -448,11 +448,11 @@ public class ItemService {
             
             Renta renta = new Renta();
             if(dtconduc[i][2] != null)
-                renta.setRentaId(new Integer(dtconduc[i][2]+""));
+                renta.setRentaId(Integer.parseInt(dtconduc[i][2]+""));
             
             Usuario usuario = new Usuario();
             if(dtconduc[i][3] != null)
-                usuario.setUsuarioId(new Integer(dtconduc[i][3]+""));
+                usuario.setUsuarioId(Integer.parseInt(dtconduc[i][3]+""));
             
             if(dtconduc[i][4] != null)
                 faltante.setFechaRegistro(dtconduc[i][4].toString());
@@ -464,11 +464,11 @@ public class ItemService {
                 faltante.setComentario(dtconduc[i][6].toString());
             
             if(dtconduc[i][7] != null)
-                faltante.setFgFaltante(new Integer(dtconduc[i][7].toString()));
+                faltante.setFgFaltante(Integer.parseInt(dtconduc[i][7].toString()));
             if(dtconduc[i][8] != null)
-                faltante.setFgDevolucion(new Integer(dtconduc[i][8].toString()));
+                faltante.setFgDevolucion(Integer.parseInt(dtconduc[i][8].toString()));
             if(dtconduc[i][9] != null)
-                faltante.setFgActivo(new Integer(dtconduc[i][9].toString()));
+                faltante.setFgActivo(Integer.parseInt(dtconduc[i][9].toString()));
             
             if(dtconduc[i][10] != null)
                 articulo.setDescripcion(dtconduc[i][10].toString());
@@ -486,7 +486,7 @@ public class ItemService {
                 usuario.setApellidos(dtconduc[i][13].toString());
             
             if(dtconduc[i][14] != null)
-                faltante.setFgAccidenteTrabajo(new Integer(dtconduc[i][14].toString()));
+                faltante.setFgAccidenteTrabajo(Integer.parseInt(dtconduc[i][14].toString()));
             
             if(dtconduc[i][15] != null){
                 faltante.setPrecioCobrar(Float.parseFloat(dtconduc[i][15].toString()));
@@ -565,15 +565,15 @@ public class ItemService {
             Color color = new Color();
             
             if(dtconduc[i][0] != null)
-                renta.setRentaId(new Integer(dtconduc[i][0]+""));
+                renta.setRentaId(Integer.parseInt(dtconduc[i][0]+""));
             if(dtconduc[i][1] != null)
-                renta.setFolio(new Integer(dtconduc[i][1]+""));
+                renta.setFolio(Integer.parseInt(dtconduc[i][1]+""));
             
             if(dtconduc[i][2] != null)
                 faltante.setCantidad(Float.parseFloat(dtconduc[i][2]+""));
             
             if(dtconduc[i][3] != null)
-                articulo.setArticuloId(new Integer(dtconduc[i][3]+""));
+                articulo.setArticuloId(Integer.parseInt(dtconduc[i][3]+""));
             
             if(dtconduc[i][4] != null)
                 articulo.setDescripcion(dtconduc[i][4]+"");
@@ -582,13 +582,13 @@ public class ItemService {
                 color.setColor(dtconduc[i][5]+"");
             
             if(dtconduc[i][6] != null)
-                faltante.setFgFaltante(new Integer(dtconduc[i][6].toString()));
+                faltante.setFgFaltante(Integer.parseInt(dtconduc[i][6].toString()));
             if(dtconduc[i][7] != null)
-                faltante.setFgDevolucion(new Integer(dtconduc[i][7].toString()));
+                faltante.setFgDevolucion(Integer.parseInt(dtconduc[i][7].toString()));
             if(dtconduc[i][8] != null)
-                faltante.setFgActivo(new Integer(dtconduc[i][8].toString()));
+                faltante.setFgActivo(Integer.parseInt(dtconduc[i][8].toString()));
             if(dtconduc[i][9] != null)
-                faltante.setFgAccidenteTrabajo(new Integer(dtconduc[i][9].toString()));
+                faltante.setFgAccidenteTrabajo(Integer.parseInt(dtconduc[i][9].toString()));
             
            if(dtconduc[i][10] != null)
                 faltante.setComentario((dtconduc[i][10].toString()));

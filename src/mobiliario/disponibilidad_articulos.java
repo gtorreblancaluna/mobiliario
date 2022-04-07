@@ -157,7 +157,7 @@ public class disponibilidad_articulos extends java.awt.Dialog {
             System.out.println("Agregando el pedido actual");
             // AGREGAMOS EL PEDIDO ACTUAL EN LA TABLA DE DETALLE
             for (int z = 0; z < AgregarRenta.tabla_detalle.getRowCount(); z ++ ){
-                Integer id = new Integer(AgregarRenta.tabla_detalle.getValueAt(z,1).toString());
+                Integer id = Integer.parseInt(AgregarRenta.tabla_detalle.getValueAt(z,1).toString());
                 Articulo availabeItem = null;
                 try {
                     availabeItem = itemService.getItemAvailable(id);
@@ -241,7 +241,7 @@ AgregarRenta.tabla_detalle.getValueAt(z, 0).toString(), // 1
                                 
                                 if(tabla_comparativa.getValueAt(j, 0).toString().equals(detalle.getArticulo().getArticuloId()+"") ){
                                     // articulo encontrado :)                       
-                                    float cantidadPedido = new Float(tabla_comparativa.getValueAt(j, 1).toString());
+                                    float cantidadPedido = Float.parseFloat(tabla_comparativa.getValueAt(j, 1).toString());
                                     
                                
                                     tabla_comparativa.setValueAt((cantidadPedido + detalle.getCantidad()), j, 1);
