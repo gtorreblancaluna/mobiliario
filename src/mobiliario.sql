@@ -317,6 +317,7 @@ CREATE TABLE `detalle_orden_proveedor` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_orden_proveedor` int(11) NOT NULL,
   `id_articulo` int(11) NOT NULL,
+  `tipo_orden_detalle_proveedor_id` INT(11) NOT NULL,
   `cantidad` float DEFAULT NULL,
   `precio` float DEFAULT NULL,
   `comentario` varchar(450) DEFAULT NULL,
@@ -328,6 +329,7 @@ CREATE TABLE `detalle_orden_proveedor` (
   PRIMARY KEY (`id`),
   KEY `fk_detalle_orden_proveedor_orden_proveedor_id` (`id_orden_proveedor`),
   KEY `fk_orden_proveedor_id_articulo` (`id_articulo`),
+  CONSTRAINT `fk_tipo_orden_detalle_proveedor_id` FOREIGN KEY (`tipo_orden_detalle_proveedor_id`) REFERENCES `tipo_detalle_orden_proveedor` (`id`),
   CONSTRAINT `fk_detalle_orden_proveedor_orden_proveedor_id` FOREIGN KEY (`id_orden_proveedor`) REFERENCES `orden_proveedor` (`id`),
   CONSTRAINT `fk_orden_proveedor_id_articulo` FOREIGN KEY (`id_articulo`) REFERENCES `articulo` (`id_articulo`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
@@ -552,4 +554,13 @@ CREATE TABLE order_status_changes (
     REFERENCES estado (id_estado)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE tipo_detalle_orden_proveedor (
+  id INT(10) NOT NULL AUTO_INCREMENT,
+  description VARCHAR(145) NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

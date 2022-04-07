@@ -9,6 +9,7 @@ import java.util.Map;
 import mobiliario.ApplicationConstants;
 import model.providers.DetalleOrdenProveedor;
 import model.providers.OrdenProveedor;
+import model.providers.DetailOrderProviderType;
 import parametersVO.ParameterOrderProvider;
 
 
@@ -114,6 +115,12 @@ public class OrderProviderService {
         }catch(DataOriginException e){
             throw new BusinessException(e.getMessage());
         }
+    }
+    
+    public List<DetailOrderProviderType> getTypesOrderDetailProvider ()throws DataOriginException{
+        
+         return orderProviderDAO.getTypesOrderDetailProvider();
+        
     }
     
     

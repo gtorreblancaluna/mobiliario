@@ -11,24 +11,22 @@ public class DetalleOrdenProveedor {
     private Articulo articulo;
     private Float cantidad;
     private Float precio;
-    private String tipoOrden;
     private String fgActivo;
     private Timestamp creado;
     private Timestamp actualizado;
     private String comentario;
     private String status;
     private String statusDescription;
-    private String tipoOrdenDescripcion;
+    
+    private DetailOrderProviderType detailOrderProviderType;
 
-    public String getTipoOrdenDescripcion() {
-        return tipoOrdenDescripcion;
+    public DetailOrderProviderType getDetailOrderProviderType() {
+        return detailOrderProviderType;
     }
 
-    public void setTipoOrdenDescripcion(String tipoOrdenDescripcion) {
-        this.tipoOrdenDescripcion = tipoOrdenDescripcion;
-    }
-    
-    
+    public void setDetailOrderProviderType(DetailOrderProviderType detailOrderProviderType) {
+        this.detailOrderProviderType = detailOrderProviderType;
+    }    
 
     public String getStatus() {
         return status;
@@ -107,24 +105,6 @@ public class DetalleOrdenProveedor {
 
     public void setCantidad(Float cantidad) {
         this.cantidad = cantidad;
-    }
-
-    public String getTipoOrden() {
-        return tipoOrden;
-    }
-
-    public void setTipoOrden(String tipoOrden) {
-        
-         switch(tipoOrden){
-            case ApplicationConstants.TYPE_DETAIL_ORDER_SHOPPING:
-                this.setTipoOrdenDescripcion(ApplicationConstants.DS_TYPE_DETAIL_ORDER_SHOPPING);
-                break;
-            case ApplicationConstants.TYPE_DETAIL_ORDER_RENTAL:
-                this.setTipoOrdenDescripcion(ApplicationConstants.DS_TYPE_DETAIL_ORDER_RENTAL);
-                break;
-        }
-        
-        this.tipoOrden = tipoOrden;
     }
 
     public String getFgActivo() {

@@ -5,6 +5,11 @@
   
 <mapper namespace="MapperOrdenProveedor">
     
+    <resultMap id="resultMapTypeDetailOrderProvider" type="model.providers.DetailOrderProviderType">
+        <result property="id" column="id"/>
+        <result property="description" column="description"/>
+    </resultMap>
+    
     <resultMap id="resultDetailOrderProvider" type="model.providers.DetalleOrdenProveedor">
         
         <result property="id" column="id"/>
@@ -12,7 +17,6 @@
         <result property="cantidad" column="cantidad"/>
         <result property="precio" column="precio"/>   
         <result property="comentario" column="comentario"/>        
-        <result property="tipoOrden" column="tipo_orden"/>
         <result property="fgActivo" column="fg_activo"/> 
         <result property="creado" column="creado"/> 
         <result property="actualizado" column="actualizado"/> 
@@ -21,7 +25,8 @@
         <result property="articulo.articuloId" column="articulo_id"/> 
         <result property="articulo.descripcion" column="articulo_descripcion"/>
         
-        <result property="articulo.color.color" column="articulo_color"/>         
+        <result property="articulo.color.color" column="articulo_color"/>  
+        <result property="detailOrderProviderType.description" column="tipo_descripcion"/>         
         
     </resultMap>
   
@@ -155,10 +160,12 @@
         SELECT detalle.*,
             a.id_articulo AS articulo_id,
             a.descripcion AS articulo_descripcion,
-            c.color AS articulo_color
+            c.color AS articulo_color,
+            t.description AS tipo_descripcion
         FROM detalle_orden_proveedor detalle
             INNER JOIN articulo a ON (a.id_articulo = detalle.id_articulo)
             INNER JOIN color c ON (a.id_color = c.id_color)
+            INNER JOIN tipo_detalle_orden_proveedor t ON (t.id = detalle.tipo_orden_detalle_proveedor_id)
         WHERE detalle.fg_activo = '1'
         AND detalle.id_orden_proveedor = #{idOrdenProveedor}
         ORDER BY detalle.id DESC
@@ -218,21 +225,21 @@
         (   
            id_orden_proveedor,
            id_articulo,
+           tipo_orden_detalle_proveedor_id,
            cantidad,
-            precio,
-            comentario,
-            tipo_orden,
-            creado,
-            actualizado
+           precio,
+           comentario,
+           creado,
+           actualizado
         )
         VALUES
         (
             #{idOrdenProveedor},
             #{articulo.articuloId},
+            #{detailOrderProviderType.id},
             #{cantidad},
             #{precio},
             #{comentario},
-            #{tipoOrden},
             #{creado},
             #{actualizado}
         )
@@ -250,11 +257,13 @@
         SELECT detalle.*,
             a.id_articulo AS articulo_id,
             a.descripcion AS articulo_descripcion,
-            c.color AS articulo_color
+            c.color AS articulo_color,
+            t.description AS tipo_descripcion
         FROM detalle_orden_proveedor detalle
             INNER JOIN articulo a ON (a.id_articulo = detalle.id_articulo)
             INNER JOIN color c ON (a.id_color = c.id_color)
             INNER JOIN orden_proveedor o ON (o.id = detalle.id_orden_proveedor)
+            INNER JOIN tipo_detalle_orden_proveedor t ON (t.id = detalle.tipo_orden_detalle_proveedor_id)
         WHERE detalle.fg_activo = '1'
         <if test="articuloId != null and articuloId != '' ">
             AND a.id_articulo = #{articuloId}
@@ -267,5 +276,8 @@
         </if>
         
     </select>  
-  
+    
+    <select id="getTypesOrderDetailProvider" resultMap="resultMapTypeDetailOrderProvider">
+        SELECT * FROM tipo_detalle_orden_proveedor WHERE fg_active = '1' ORDER BY description
+    </select> 
 </mapper>

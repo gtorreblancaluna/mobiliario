@@ -102,7 +102,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
             parametros.put("NOMBRE_EMPRESA",datosGenerales.getCompanyName());
             parametros.put("DIRECCION_EMPRESA",datosGenerales.getAddress1());
             parametros.put("TELEFONOS_EMPRESA",datosGenerales.getAddress2());
-            parametros.put("EMAIL_EMPRESA",datosGenerales.getAddress3());
+            parametros.put("EMAIL_EMPRESA",datosGenerales.getAddress3() != null ? datosGenerales.getAddress3() : "");
             //guardamos el parámetro
             parametros.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
            

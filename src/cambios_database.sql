@@ -261,3 +261,16 @@ INSERT INTO material_area (description) VALUES ('Herrería');
 INSERT INTO measurement_units (description) VALUES ('METRO');
 INSERT INTO measurement_units (description) VALUES ('KILO');
 INSERT INTO measurement_units (description) VALUES ('TRAMO');
+
+INSERT INTO tipo_detalle_orden_proveedor (description,created_at,updated_at) VALUES ('Renta','2022-04-22','2022-04-22');
+INSERT INTO tipo_detalle_orden_proveedor (description,created_at,updated_at) VALUES ('Compra','2022-04-22','2022-04-22');
+
+-- modificar id tipo de orden
+ALTER TABLE detalle_orden_proveedor CHANGE COLUMN tipo_orden tipo_orden_detalle_proveedor_id;
+
+ALTER TABLE detalle_orden_proveedor
+ADD CONSTRAINT FK_detalle_orden_proveedor_id FOREIGN KEY (tipo_orden_detalle_proveedor_id)
+    REFERENCES detalle_orden_proveedor(id);
+
+ALTER TABLE detalle_orden_proveedor DROP COLUMN tipo_orden;
+-- FIN agregar id tipo de orden

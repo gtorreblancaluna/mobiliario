@@ -22,13 +22,15 @@ o.comentario AS comentario_general,
 CONCAT(a.descripcion," ",c.color) AS descripcion_articulo,
 d.precio AS precio,
 (d.cantidad * d.precio) AS total,
-CONCAT(p.nombre," ",p.apellidos)AS nombre_proveedor
+CONCAT(p.nombre," ",p.apellidos)AS nombre_proveedor,
+t.description AS description_type
 FROM detalle_orden_proveedor d
 INNER JOIN orden_proveedor o ON (o.id = d.id_orden_proveedor)
 INNER JOIN renta r ON (r.id_renta = o.id_renta)
 INNER JOIN articulo a ON (a.id_articulo = d.id_articulo)
 INNER JOIN color c ON (c.id_color = a.id_color)
 INNER JOIN proveedores p ON(p.id = o.id_proveedores)
+INNER JOIN tipo_detalle_orden_proveedor t ON(t.id = d.tipo_orden_detalle_proveedor_id)
 WHERE d.fg_activo = '1'
 AND d.id_orden_proveedor = $P{ID_ORDEN}]]>
 	</queryString>
@@ -45,6 +47,7 @@ AND d.id_orden_proveedor = $P{ID_ORDEN}]]>
 	<field name="cantidad" class="java.lang.String"/>
 	<field name="comentario_general" class="java.lang.String"/>
 	<field name="comentario_detalle" class="java.lang.String"/>
+	<field name="description_type" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -143,11 +146,18 @@ AND d.id_orden_proveedor = $P{ID_ORDEN}]]>
 				<text><![CDATA[Articulo]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="418" y="2" width="218" height="20" uuid="c2935854-70b2-41c8-83d9-c85fac0deca1"/>
+				<reportElement x="584" y="2" width="218" height="20" uuid="c2935854-70b2-41c8-83d9-c85fac0deca1"/>
 				<textElement>
 					<font fontName="Arial" size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Comentario]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="418" y="2" width="153" height="20" uuid="3eb4ec98-01d3-4f6d-a56f-c2a8220269d5"/>
+				<textElement>
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -178,11 +188,18 @@ AND d.id_orden_proveedor = $P{ID_ORDEN}]]>
 				<reportElement x="0" y="15" width="787" height="1" forecolor="#CCCCCC" uuid="bb0eb9f4-0af6-44f4-acb6-2ae398af3ffb"/>
 			</line>
 			<textField>
-				<reportElement x="418" y="0" width="218" height="13" forecolor="#333333" uuid="85b3b06f-0e38-4f63-bb3a-6dee1a86c380"/>
+				<reportElement x="584" y="3" width="218" height="13" forecolor="#333333" uuid="85b3b06f-0e38-4f63-bb3a-6dee1a86c380"/>
 				<textElement verticalAlignment="Top">
 					<font fontName="Arial" size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{comentario_detalle}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="418" y="3" width="166" height="13" forecolor="#333333" uuid="d2a21f4b-2bcf-4fa0-81ff-0c36c2b337b4"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description_type}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

@@ -29,6 +29,7 @@ import model.providers.DetalleOrdenProveedor;
 import model.providers.OrdenProveedor;
 import model.providers.PagosProveedor;
 import model.providers.Proveedor;
+import model.providers.DetailOrderProviderType;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -39,10 +40,6 @@ import services.SystemService;
 import services.providers.OrderProviderService;
 import utilities.Utility;
 
-/**
- *
- * @author Gerardo Torreblanca
- */
 public class OrderProviderForm extends javax.swing.JInternalFrame {
     
     sqlclass funcion = new sqlclass();
@@ -55,7 +52,6 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     public static String rentaId;
     public static String g_cantidadEnPedido;
     public static Long g_provider_id;
-    private String navigation;
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
     protected OrdenProveedor ordenProveedor = null;
     private PaymentsProvidersForm paymentsProvidersForm;
@@ -68,10 +64,11 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     public final static int HD_ORDEN_PROVEEDOR_PRECIO = 4;
     public final static int HD_ORDEN_PROVEEDOR_IMPORTE = 5;
     public final static int HD_ORDEN_PROVEEDOR_COMENTARIO = 6;
-    public final static int HD_ORDEN_PROVEEDOR_TIPO_ORDEN = 7;
-    public final static int HD_ORDEN_PROVEEDOR_CREADO = 8;
-    public final static int HD_ORDEN_PROVEEDOR_ACTUALIZADO = 9;
-    public final static int HD_ORDEN_PROVEEDOR_STATUS = 10;
+    public final static int HD_ORDEN_PROVEEDOR_TIPO_ORDEN_ID = 7;
+    public final static int HD_ORDEN_PROVEEDOR_TIPO_ORDEN = 8;
+    public final static int HD_ORDEN_PROVEEDOR_CREADO = 9;
+    public final static int HD_ORDEN_PROVEEDOR_ACTUALIZADO = 10;
+    public final static int HD_ORDEN_PROVEEDOR_STATUS = 11;
    
     
     /** Encabezados de la tabla ARTICULOS */
@@ -102,6 +99,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         formato_tabla_articulos();      
         llenar_tabla_articulos();
         resetInputBoxes();
+        fillOrderTypeDetail();
         
         this.setClosable(true);
         txtSubTotal.setHorizontalAlignment(JTextField.RIGHT);
@@ -137,7 +135,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             parametros.put("NOMBRE_EMPRESA",datosGenerales.getCompanyName());
             parametros.put("DIRECCION_EMPRESA",datosGenerales.getAddress1());
             parametros.put("TELEFONOS_EMPRESA",datosGenerales.getAddress2());
-            parametros.put("EMAIL_EMPRESA",datosGenerales.getAddress3());
+            parametros.put("EMAIL_EMPRESA",datosGenerales.getAddress3() != null ? datosGenerales.getAddress3() : "");
             //guardamos el parámetro
             parametros.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
            
@@ -195,15 +193,17 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
            
             String tipo = 
                    jTableOrderProvider.getValueAt(i, HD_ORDEN_PROVEEDOR_TIPO_ORDEN).toString();
-            String[] arrayTipo = tipo.split("-");
-            String tipoFinal = arrayTipo[0].trim();
+            
            
-           articulo.setArticuloId(new Integer(articuloId));
+           articulo.setArticuloId(Integer.parseInt(articuloId));
            
            detail.setArticulo(articulo);
            detail.setCantidad(Float.parseFloat(cantidad));
            detail.setPrecio(Float.parseFloat(precio));
-           detail.setTipoOrden(tipoFinal);
+           
+           detail.setDetailOrderProviderType(
+                   new DetailOrderProviderType(Long.parseLong(jTableOrderProvider.getValueAt(i, HD_ORDEN_PROVEEDOR_TIPO_ORDEN_ID).toString()))
+           );
            detail.setComentario(comentario);
            
            list.add(detail);
@@ -273,18 +273,35 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         this.txtCantidad.setEnabled(false);
         this.txtComentario.setEnabled(false);
         this.txtArticulo.setEnabled(false);
+        comboOrderType.setEnabled(false);
         
         this.txtPrecioCobrar.setText("");
         this.txtCantidad.setText("");
         this.txtComentario.setText("");
         this.txtArticulo.setText("");
-        resetComboOrderType();
     }
     
     public void enabledInputBoxes(){
         this.txtPrecioCobrar.setEnabled(true);
         this.txtCantidad.setEnabled(true);
         this.txtComentario.setEnabled(true);
+        comboOrderType.setEnabled(true);
+    }
+    
+    private void fillOrderTypeDetail () {
+        new Thread(() -> {
+            try{
+              List<DetailOrderProviderType> types = orderProviderService.getTypesOrderDetailProvider();
+              comboOrderType.removeAllItems();
+              comboOrderType.addItem(new DetailOrderProviderType(0L , ApplicationConstants.CMB_SELECCIONE)
+              );
+              types.stream().forEach(t -> {
+                comboOrderType.addItem(t);
+              });
+            } catch(DataOriginException e){
+              JOptionPane.showMessageDialog(this, e.getMessage()+"\n"+e, "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+        }).start();
     }
     
     public void llenar_tabla_articulos(){
@@ -352,7 +369,8 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
                         detalle.getPrecio(),
                         decimalFormat.format(detalle.getCantidad()*detalle.getPrecio()),
                         detalle.getComentario(),
-                        detalle.getTipoOrdenDescripcion(),
+                        detalle.getDetailOrderProviderType().getId(),
+                        detalle.getDetailOrderProviderType().getDescription(),
                         detalle.getCreado(),
                         detalle.getActualizado(),
                         detalle.getStatusDescription()
@@ -365,18 +383,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
          
     }
     
-  
-    
-    public void resetComboOrderType() {
-       
-        comboOrderType.removeAllItems();
-        comboOrderType.addItem(ApplicationConstants.CMB_SELECCIONE);
-        comboOrderType.addItem(ApplicationConstants.DS_TYPE_DETAIL_ORDER_SHOPPING);
-        comboOrderType.addItem(ApplicationConstants.DS_TYPE_DETAIL_ORDER_RENTAL);
-        
-        
-    }
-    
+     
     public void resetCmbOrderStatus(){
         cmbStatusOrder.removeAllItems();
         cmbStatusOrder.addItem(ApplicationConstants.CMB_SELECCIONE);
@@ -479,7 +486,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     }
     
      public void formato_tabla_orden() {
-        Object[][] data = {{"","","","","","","","","","",""}};
+        Object[][] data = {{"","","","","","","","","","","",""}};
         String[] columnNames = {
                         "Id_detalle_orden",
                         "Id articulo", 
@@ -488,6 +495,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
                         "Precio u.",   
                         "Importe",
                         "Comentario",
+                        "Tipo Orden ID",
                         "Tipo Orden",
                         "Creado",
                         "Actualizado",
@@ -499,7 +507,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
         jTableOrderProvider.setRowSorter(ordenarTabla);
 
-        int[] anchos = {20,20,80,40,40, 80,100,80,80,80,80};
+        int[] anchos = {20,20,80,40,40, 80,80,100,80,80,80,80};
 
         for (int inn = 0; inn < jTableOrderProvider.getColumnCount(); inn++) {
             jTableOrderProvider.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -520,6 +528,10 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         jTableOrderProvider.getColumnModel().getColumn(HD_ORDEN_PROVEEDOR_ID_ORDEN).setMaxWidth(0);
         jTableOrderProvider.getColumnModel().getColumn(HD_ORDEN_PROVEEDOR_ID_ORDEN).setMinWidth(0);
         jTableOrderProvider.getColumnModel().getColumn(HD_ORDEN_PROVEEDOR_ID_ORDEN).setPreferredWidth(0);
+        
+        jTableOrderProvider.getColumnModel().getColumn(HD_ORDEN_PROVEEDOR_TIPO_ORDEN_ID).setMaxWidth(0);
+        jTableOrderProvider.getColumnModel().getColumn(HD_ORDEN_PROVEEDOR_TIPO_ORDEN_ID).setMinWidth(0);
+        jTableOrderProvider.getColumnModel().getColumn(HD_ORDEN_PROVEEDOR_TIPO_ORDEN_ID).setPreferredWidth(0);
         
         jTableOrderProvider.getColumnModel().getColumn(HD_ORDEN_PROVEEDOR_ID_ARTICULO).setMaxWidth(1);
         jTableOrderProvider.getColumnModel().getColumn(HD_ORDEN_PROVEEDOR_ID_ARTICULO).setMinWidth(1);
@@ -596,7 +608,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         btnAgregar = new javax.swing.JButton();
         txtCantidad = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        comboOrderType = new javax.swing.JComboBox();
+        comboOrderType = new javax.swing.JComboBox<>();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tablaArticulos = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
@@ -693,7 +705,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
 
         btnAgregar.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnAgregar.setText("(+) agregar");
-        btnAgregar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnAgregar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnAgregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAgregarActionPerformed(evt);
@@ -714,7 +726,11 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         jPanel4.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 20, 60, 20));
 
         comboOrderType.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        comboOrderType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboOrderType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboOrderTypeActionPerformed(evt);
+            }
+        });
         jPanel4.add(comboOrderType, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 40, 190, -1));
 
         getContentPane().add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 1140, 70));
@@ -734,7 +750,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tablaArticulos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tablaArticulos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tablaArticulos.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tablaArticulosMouseClicked(evt);
@@ -776,7 +792,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jTableOrderProvider.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jTableOrderProvider.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jTableOrderProvider.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jTableOrderProviderMouseClicked(evt);
@@ -792,7 +808,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         jButton1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jButton1.setText("(-) quitar elemento");
         jButton1.setToolTipText("Elimina el elemento de la bd");
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -805,7 +821,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         jButton2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jButton2.setText("Cambiar status");
         jButton2.setToolTipText("Elimina el elemento de la bd");
-        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -875,14 +891,14 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
 
         getContentPane().add(jPanel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 10, 460, 140));
 
-        jMenuBar1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenuBar1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         jMenu2.setText("Archivo");
         jMenu2.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
         jMenuItem3.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jMenuItem3.setText("Guardar");
-        jMenuItem3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenuItem3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem3ActionPerformed(evt);
@@ -892,7 +908,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
 
         jMenuItem4.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jMenuItem4.setText("Proveedores");
-        jMenuItem4.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenuItem4.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem4ActionPerformed(evt);
@@ -902,7 +918,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
 
         jMenuItem5.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jMenuItem5.setText("Ver pagos");
-        jMenuItem5.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenuItem5.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem5ActionPerformed(evt);
@@ -913,12 +929,12 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         jMenuBar1.add(jMenu2);
 
         jMenu1.setText("Exportar");
-        jMenu1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenu1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jMenu1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
         jMenuItem2.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jMenuItem2.setText("Exportar tabla pedidos");
-        jMenuItem2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenuItem2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem2ActionPerformed(evt);
@@ -928,7 +944,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
 
         jMenuItem1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jMenuItem1.setText("Exportar tabla articulos");
-        jMenuItem1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenuItem1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem1ActionPerformed(evt);
@@ -938,7 +954,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
 
         jMenuItem6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jMenuItem6.setText("Generar PDF");
-        jMenuItem6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenuItem6.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem6ActionPerformed(evt);
@@ -1004,7 +1020,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
 
              String statusChange;
              try{
-                statusChange = this.orderProviderService.changeStatusDetailOrderById(new Long(idDetailOrder));
+                statusChange = this.orderProviderService.changeStatusDetailOrderById(Long.parseLong(idDetailOrder));
                 jTableOrderProvider.setValueAt(statusChange,jTableOrderProvider.getSelectedRow(), HD_ORDEN_PROVEEDOR_STATUS);
              }catch(BusinessException e){
                 JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);            
@@ -1041,7 +1057,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
 
         float cantidad = 0f;
         float precio = 0f;
-        String tipoOrden = this.comboOrderType.getSelectedItem().toString();
+        DetailOrderProviderType type = (DetailOrderProviderType) this.comboOrderType.getSelectedItem();
         
         
         try {
@@ -1069,7 +1085,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         }
         
         
-        if(tipoOrden.equals(ApplicationConstants.CMB_SELECCIONE)){
+        if(type.getId().toString().equals("0")){
             mensaje.append(++cont + ". Seleccione tipo de orden\n");
         }
         if(!mensaje.toString().equals("")){
@@ -1103,7 +1119,8 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             precio+"",
             decimalFormat.format(cantidad*precio),
             comentario,
-            tipoOrden};       
+            type.getId().toString(),
+            type.getDescription()};       
                 
       DefaultTableModel tabla = (DefaultTableModel) jTableOrderProvider.getModel();
       tabla.addRow(datos);
@@ -1196,11 +1213,15 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
+    private void comboOrderTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboOrderTypeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_comboOrderTypeActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
     private javax.swing.JComboBox cmbStatusOrder;
-    private javax.swing.JComboBox comboOrderType;
+    private javax.swing.JComboBox<DetailOrderProviderType> comboOrderType;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;

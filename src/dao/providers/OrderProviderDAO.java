@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import model.providers.DetalleOrdenProveedor;
 import model.providers.OrdenProveedor;
+import model.providers.DetailOrderProviderType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
@@ -201,6 +202,23 @@ public class OrderProviderDAO {
         }
         
         return list;
+        
+    }
+    
+    public List<DetailOrderProviderType> getTypesOrderDetailProvider()throws DataOriginException{
+        
+       
+        SqlSession session = null;
+        try{
+            session = sqlSessionFactory.openSession();
+            return session.selectList("MapperOrdenProveedor.getTypesOrderDetailProvider");     
+         }catch(Exception ex){
+            log.error(ex);
+            throw new DataOriginException(ex.getMessage(),ex.getCause());
+        } finally {
+            if (session != null)
+                session.close();
+        }
         
     }
     
