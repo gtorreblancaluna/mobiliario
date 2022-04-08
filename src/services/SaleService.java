@@ -471,6 +471,13 @@ public class SaleService {
                 
     } // renta por id
      
+      public Renta obtenerRentaPorIdSinDetalle(int rentaId) throws Exception { 
+        
+        return salesDao.obtenerRentaPorId(rentaId);
+      
+                
+    } // renta por id
+     
      public Renta obtenerRentaPorIdSinSumas(int rentaId) throws Exception { 
         
         Renta renta = salesDao.obtenerRentaPorIdSinSumas(rentaId);

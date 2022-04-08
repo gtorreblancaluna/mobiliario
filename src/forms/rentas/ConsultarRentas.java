@@ -2244,7 +2244,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jbtn_buscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/search-icon_32.png"))); // NOI18N
         jbtn_buscar.setMnemonic('B');
         jbtn_buscar.setToolTipText("Realizar busqueda (Alt+B)");
-        jbtn_buscar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jbtn_buscar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jbtn_buscar.setFocusable(false);
         jbtn_buscar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_buscar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2257,7 +2257,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         jbtn_refrescar.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jbtn_refrescar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/arrow-refresh-3-icon_32.png"))); // NOI18N
-        jbtn_refrescar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jbtn_refrescar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jbtn_refrescar.setFocusable(false);
         jbtn_refrescar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_refrescar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2271,7 +2271,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jbtn_generar_reporte1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/blank-catalog-icon.png"))); // NOI18N
         jbtn_generar_reporte1.setMnemonic('R');
         jbtn_generar_reporte1.setToolTipText("Generar reporte (Alt+R)");
-        jbtn_generar_reporte1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jbtn_generar_reporte1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jbtn_generar_reporte1.setFocusable(false);
         jbtn_generar_reporte1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_generar_reporte1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2289,7 +2289,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         jbtnGenerarReporteEntregas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/truck.png"))); // NOI18N
         jbtnGenerarReporteEntregas.setToolTipText("reporte para entregas");
-        jbtnGenerarReporteEntregas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jbtnGenerarReporteEntregas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jbtnGenerarReporteEntregas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbtnGenerarReporteEntregasActionPerformed(evt);
@@ -2299,7 +2299,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         jtbtnGenerateExcel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/excel-icon.png"))); // NOI18N
         jtbtnGenerateExcel.setToolTipText("Exportar a Excel");
-        jtbtnGenerateExcel.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jtbtnGenerateExcel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jtbtnGenerateExcel.setFocusable(false);
         jtbtnGenerateExcel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jtbtnGenerateExcel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2312,7 +2312,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/archive-icon.png"))); // NOI18N
         jButton2.setToolTipText("Reporte articulos por categoria");
-        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton2.setFocusable(false);
         jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2325,7 +2325,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/faltantes_32x.png"))); // NOI18N
         jButton6.setToolTipText("Ver faltantes");
-        jButton6.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jButton6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton6.setFocusable(false);
         jButton6.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton6.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2337,7 +2337,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jToolBar1.add(jButton6);
 
         btnInventoryMaterialReport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Inventory-maintenance-icon-32px.png"))); // NOI18N
-        btnInventoryMaterialReport.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnInventoryMaterialReport.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnInventoryMaterialReport.setFocusable(false);
         btnInventoryMaterialReport.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnInventoryMaterialReport.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2353,6 +2353,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         jButton1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jButton1.setText("Buscar por folio");
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -4268,7 +4269,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         Renta renta = null;
         
         try {
-            renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
+            renta = saleService.obtenerRentaPorIdSinDetalle(Integer.parseInt(rentaId));
         } catch (Exception e) {
             Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
@@ -4280,45 +4281,30 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
            return;
         }
 
-        if( renta.getTipo().getTipoId() != Integer.parseInt(ApplicationConstants.TIPO_PEDIDO)){
-            JOptionPane.showMessageDialog(rootPane, "ERROR. el tipo de pedido actualmente es: "+renta.getTipo().getTipo()+"\nPara continuar debera ser de tipo PEDIDO ");
-           return;
-        }
-
+        
         // mandamos a generar el reporte PDF
         JasperPrint jasperPrint;
         
         try {               
-                String pathLocation = Utility.getPathLocation();
-                JasperReport masterReport = null;
-            try {
-                masterReport = (JasperReport) JRLoader.loadObject(pathLocation+ApplicationConstants.RUTA_REPORTE_ENTREGAS);
-            } catch (JRException e) {                
-                JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());
-            }
-            
-           
-            
+            String pathLocation = Utility.getPathLocation();
+            JasperReport masterReport = null;
+
+            masterReport = (JasperReport) JRLoader.loadObject(pathLocation+ApplicationConstants.RUTA_REPORTE_ENTREGAS);     
             // enviamos los parametros
             Map map = new HashMap<>();
-            // generamos el QR
-//            map.put("QR",systemService.generarQR());            
-            map.put("id_renta", renta.getRentaId());                
-            map.put("chofer", renta.getChofer().getNombre()+" "+renta.getChofer().getApellidos());    
+            map.put("id_renta", renta.getRentaId());
+            map.put("chofer", renta.getChofer().getNombre()+" "+renta.getChofer().getApellidos());
             map.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
 
             jasperPrint = JasperFillManager.fillReport(masterReport, map, funcion.getConnection());
             JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_ENTREGAS);
             File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_ENTREGAS);
-            try {
-                Desktop.getDesktop().open(file2);
-            } catch (IOException ex) {
-                Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            
+            Desktop.getDesktop().open(file2);
 
-        } catch (Exception j) {
-            System.out.println("Mensaje de Error:" + j.toString());
-            JOptionPane.showMessageDialog(rootPane, "Mensaje de Error :" + j.toString() + "\n Existe un PDF abierto, cierralo e intenta generar el PDF nuevamente");
+        } catch (Exception e) {
+            Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(rootPane, e);
         }
             
          
