@@ -82,6 +82,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     public static String orderId = "";
     private String folio = "";
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(OrderProviderForm.class.getName());
+    private String idDetailOrderProviderToEdit = null;
     
    public OrderProviderForm(String folio, String orderId, String rentaId) {
         initComponents();
@@ -173,6 +174,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
       
       Articulo articulo;
       DetalleOrdenProveedor detail;
+      
       for (int i = 0; i < jTableOrderProvider.getRowCount(); i++) {        
            detail = new DetalleOrdenProveedor();
            articulo = new Articulo();
@@ -279,6 +281,10 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         this.txtCantidad.setText("");
         this.txtComentario.setText("");
         this.txtArticulo.setText("");
+        if (comboOrderType.getItemCount() > 0) 
+            comboOrderType.setSelectedIndex(0);
+        idDetailOrderProviderToEdit = null;
+        btnAgregar.setText("Agregar");
     }
     
     public void enabledInputBoxes(){
@@ -356,33 +362,35 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             txtProviderName.setText(ordenProveedor.getProveedor().getNombre() + " "+ordenProveedor.getProveedor().getApellidos() );
             g_provider_id = ordenProveedor.getProveedor().getId();
             txtCommentOrder.setText(ordenProveedor.getComentario());
-            
-            // llenamos los articulos del proveedor
-             DefaultTableModel tabla = (DefaultTableModel) jTableOrderProvider.getModel();
-             
-             for(DetalleOrdenProveedor detalle : ordenProveedor.getDetalleOrdenProveedorList()){
-                Object fila[] = {                                          
-                        detalle.getId(),
-                        detalle.getArticulo().getArticuloId(),
-                        detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor(),
-                        detalle.getCantidad(),
-                        detalle.getPrecio(),
-                        decimalFormat.format(detalle.getCantidad()*detalle.getPrecio()),
-                        detalle.getComentario(),
-                        detalle.getDetailOrderProviderType().getId(),
-                        detalle.getDetailOrderProviderType().getDescription(),
-                        detalle.getCreado(),
-                        detalle.getActualizado(),
-                        detalle.getStatusDescription()
-                    };
-                tabla.addRow(fila);
-             }
+                  
+            fillTableDetailOrderProvider (ordenProveedor.getDetalleOrdenProveedorList());
             
         }
         this.total();
          
     }
     
+    private void fillTableDetailOrderProvider (List<DetalleOrdenProveedor> detail) {
+        DefaultTableModel tabla = (DefaultTableModel) jTableOrderProvider.getModel();
+
+         for(DetalleOrdenProveedor detalle : detail ){
+            Object fila[] = {                                          
+                    detalle.getId(),
+                    detalle.getArticulo().getArticuloId(),
+                    detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor(),
+                    detalle.getCantidad(),
+                    detalle.getPrecio(),
+                    decimalFormat.format(detalle.getCantidad()*detalle.getPrecio()),
+                    detalle.getComentario(),
+                    detalle.getDetailOrderProviderType().getId(),
+                    detalle.getDetailOrderProviderType().getDescription(),
+                    detalle.getCreado(),
+                    detalle.getActualizado(),
+                    detalle.getStatusDescription()
+                };
+            tabla.addRow(fila);
+         }
+    }
      
     public void resetCmbOrderStatus(){
         cmbStatusOrder.removeAllItems();
@@ -618,6 +626,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         jButton1 = new javax.swing.JButton();
         lblQuitarElemento = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
         txtTotal = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
@@ -704,7 +713,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         jPanel4.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 20, 60, 20));
 
         btnAgregar.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        btnAgregar.setText("(+) agregar");
+        btnAgregar.setText("Agregar");
         btnAgregar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnAgregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -828,6 +837,16 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             }
         });
 
+        jButton3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jButton3.setText("Editar");
+        jButton3.setToolTipText("Elimina el elemento de la bd");
+        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -836,9 +855,11 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 111, Short.MAX_VALUE)
+                        .addGap(0, 98, Short.MAX_VALUE)
                         .addComponent(lblQuitarElemento, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(127, 127, 127)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(4, 4, 4)
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -850,12 +871,13 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(lblQuitarElemento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(12, 12, 12))
         );
@@ -1006,6 +1028,11 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             this.txtArticulo.setText(descripcion);
             this.txtCantidad.requestFocus();
             this.txtPrecioCobrar.setText(precioCobrar);
+            
+            btnAgregar.setText("Agregar");
+            idDetailOrderProviderToEdit = null;
+            txtComentario.setText("");
+            comboOrderType.setSelectedIndex(0);
 
         }
     }//GEN-LAST:event_tablaArticulosMouseClicked
@@ -1104,14 +1131,29 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             }
         }
         
-        if (existe){
+        if (idDetailOrderProviderToEdit == null && existe){
             if(JOptionPane.showOptionDialog(this, "Ya existe ese articulo.  \u00BFContinuar? " ,"Confirme", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si") != 0)
                 return;                
         }
+        
+        
 
         String comentario = this.txtComentario.getText();
-
-        String datos[] = {
+        
+        if (idDetailOrderProviderToEdit != null) {
+            // update detail order
+          
+            try {
+                orderProviderService.updateDetailOrderProvider(Long.parseLong(idDetailOrderProviderToEdit), cantidad, precio, comentario, type.getId());
+                OrdenProveedor orderProvider = orderProviderService.getOrderById(Long.parseLong(orderId));
+                formato_tabla_orden();
+                fillTableDetailOrderProvider(orderProvider.getDetalleOrdenProveedorList());
+            } catch (BusinessException e) {
+                JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+        } else {
+            String datos[] = {
             "0",
             g_articuloId,
             txtArticulo.getText(),
@@ -1122,8 +1164,11 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             type.getId().toString(),
             type.getDescription()};       
                 
-      DefaultTableModel tabla = (DefaultTableModel) jTableOrderProvider.getModel();
-      tabla.addRow(datos);
+            DefaultTableModel tabla = (DefaultTableModel) jTableOrderProvider.getModel();
+            tabla.addRow(datos);
+        }
+
+        
        this.resetInputBoxes();
        this.total();
        
@@ -1217,13 +1262,48 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_comboOrderTypeActionPerformed
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        
+        if (jTableOrderProvider.getSelectedRow() == - 1) {
+            JOptionPane.showMessageDialog(this, "Selecciona una fila para continuar ", "Error", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        this.enabledInputBoxes();
+
+        String artId = jTableOrderProvider.getValueAt(jTableOrderProvider.getSelectedRow(), HD_ORDEN_PROVEEDOR_ID_ARTICULO).toString();
+        String descripcion = jTableOrderProvider.getValueAt(jTableOrderProvider.getSelectedRow(), HD_ORDEN_PROVEEDOR_DESCRIPCION_ARTICULO).toString();
+        String precioCobrar = jTableOrderProvider.getValueAt(jTableOrderProvider.getSelectedRow(), HD_ORDEN_PROVEEDOR_PRECIO).toString();
+        this.g_cantidadEnPedido = jTableOrderProvider.getValueAt(jTableOrderProvider.getSelectedRow(), HD_ORDEN_PROVEEDOR_CANTIDAD).toString();
+        if(this.g_cantidadEnPedido == null || this.g_cantidadEnPedido.equals("")){
+            this.g_cantidadEnPedido = "0";
+        }
+        this.g_articuloId = artId;
+        
+        DetailOrderProviderType type = new DetailOrderProviderType(
+                Long.parseLong(jTableOrderProvider.getValueAt(jTableOrderProvider.getSelectedRow(), HD_ORDEN_PROVEEDOR_TIPO_ORDEN_ID).toString()) ,
+                jTableOrderProvider.getValueAt(jTableOrderProvider.getSelectedRow(), HD_ORDEN_PROVEEDOR_TIPO_ORDEN).toString()
+        );
+        
+        comboOrderType.getModel().setSelectedItem(type);
+        
+        this.txtArticulo.setText(descripcion);
+        this.txtCantidad.requestFocus();
+        txtCantidad.setText(g_cantidadEnPedido);
+        txtComentario.setText(jTableOrderProvider.getValueAt(jTableOrderProvider.getSelectedRow(), HD_ORDEN_PROVEEDOR_COMENTARIO).toString());
+        this.txtPrecioCobrar.setText(precioCobrar);
+        idDetailOrderProviderToEdit = jTableOrderProvider.getValueAt(jTableOrderProvider.getSelectedRow(), HD_ORDEN_PROVEEDOR_ID_ORDEN).toString();
+        btnAgregar.setText("Actualizar");
+    }//GEN-LAST:event_jButton3ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
     private javax.swing.JComboBox cmbStatusOrder;
-    private javax.swing.JComboBox<DetailOrderProviderType> comboOrderType;
+    private javax.swing.JComboBox<model.providers.DetailOrderProviderType> comboOrderType;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;

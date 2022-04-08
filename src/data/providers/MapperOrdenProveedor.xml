@@ -26,7 +26,8 @@
         <result property="articulo.descripcion" column="articulo_descripcion"/>
         
         <result property="articulo.color.color" column="articulo_color"/>  
-        <result property="detailOrderProviderType.description" column="tipo_descripcion"/>         
+        <result property="detailOrderProviderType.description" column="tipo_descripcion"/>     
+        <result property="detailOrderProviderType.id" column="tipo_id"/>         
         
     </resultMap>
   
@@ -161,7 +162,8 @@
             a.id_articulo AS articulo_id,
             a.descripcion AS articulo_descripcion,
             c.color AS articulo_color,
-            t.description AS tipo_descripcion
+            t.description AS tipo_descripcion,
+            t.id AS tipo_id
         FROM detalle_orden_proveedor detalle
             INNER JOIN articulo a ON (a.id_articulo = detalle.id_articulo)
             INNER JOIN color c ON (a.id_color = c.id_color)
@@ -175,10 +177,13 @@
         SELECT detalle.*,
             a.id_articulo AS articulo_id,
             a.descripcion AS articulo_descripcion,
-            c.color AS articulo_color
+            c.color AS articulo_color,
+            t.description AS tipo_descripcion,
+            t.id AS tipo_id
         FROM detalle_orden_proveedor detalle
             INNER JOIN articulo a ON (a.id_articulo = detalle.id_articulo)
             INNER JOIN color c ON (a.id_color = c.id_color)
+            INNER JOIN tipo_detalle_orden_proveedor t ON (t.id = detalle.tipo_orden_detalle_proveedor_id)
         WHERE detalle.fg_activo = '1'
         AND detalle.id = #{id}
     </select>  
@@ -258,7 +263,8 @@
             a.id_articulo AS articulo_id,
             a.descripcion AS articulo_descripcion,
             c.color AS articulo_color,
-            t.description AS tipo_descripcion
+            t.description AS tipo_descripcion,
+            t.id AS tipo_id
         FROM detalle_orden_proveedor detalle
             INNER JOIN articulo a ON (a.id_articulo = detalle.id_articulo)
             INNER JOIN color c ON (a.id_color = c.id_color)

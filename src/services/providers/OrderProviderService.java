@@ -4,9 +4,11 @@ import dao.providers.OrderProviderDAO;
 import dao.providers.ProvidersPaymentsDAO;
 import exceptions.BusinessException;
 import exceptions.DataOriginException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import mobiliario.ApplicationConstants;
+import model.Articulo;
 import model.providers.DetalleOrdenProveedor;
 import model.providers.OrdenProveedor;
 import model.providers.DetailOrderProviderType;
@@ -68,6 +70,29 @@ public class OrderProviderService {
     public void updateOrder(OrdenProveedor orden)throws BusinessException{
         try{
             orderProviderDAO.updateOrder(orden);
+        }catch(DataOriginException e){
+          throw new BusinessException(e.getMessage(),e.getCause());
+        }
+        
+    }
+    
+    public void updateDetailOrderProvider(Long detalleOrdenProveedorId, Float cantidad, Float precio, String comentario, Long detailOrderProviderType)throws BusinessException{
+        
+        DetalleOrdenProveedor detail = new DetalleOrdenProveedor();
+        DetailOrderProviderType type = new DetailOrderProviderType();
+        
+        type.setId(detailOrderProviderType);
+        
+        detail.setId(detalleOrdenProveedorId);
+        detail.setCantidad(cantidad);
+        detail.setPrecio(precio);
+        detail.setComentario(comentario);
+        detail.setDetailOrderProviderType(type);
+        detail.setActualizado(new Timestamp(System.currentTimeMillis()));
+        detail.setStatus("1");
+        
+        try{
+            orderProviderDAO.updateDetailOrderProvider(detail);
         }catch(DataOriginException e){
           throw new BusinessException(e.getMessage(),e.getCause());
         }

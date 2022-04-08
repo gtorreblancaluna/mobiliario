@@ -33,5 +33,19 @@
         WHERE d.fg_activo = '1'
         AND d.id_orden_proveedor = #{ordenProviderId}
     </select>  
+    
+    <update id="updateDetailOrderProvider" parameterType="model.providers.DetalleOrdenProveedor">
+        
+        UPDATE detalle_orden_proveedor SET
+            cantidad = #{cantidad},
+            precio = #{precio},
+            comentario = #{comentario},
+            status = #{status},
+            comentario = #{comentario},
+            actualizado = #{actualizado},
+            tipo_orden_detalle_proveedor_id = #{detailOrderProviderType.id}
+        WHERE id = #{id}          
+        
+    </update>
   
 </mapper>

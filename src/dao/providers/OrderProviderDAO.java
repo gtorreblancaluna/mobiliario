@@ -112,6 +112,24 @@ public class OrderProviderDAO {
             saveOrderDetail(detail);
         }
     }
+     
+     public void updateDetailOrderProvider(DetalleOrdenProveedor detail)throws DataOriginException{
+        
+        
+        SqlSession session = null;
+        try{
+           session = sqlSessionFactory.openSession();
+           session.update("MapperDetalleOrdenProveedor.updateDetailOrderProvider",detail);     
+           session.commit();
+         }catch(Exception ex){
+            log.error(ex);
+            throw new DataOriginException(ex.getMessage(),ex.getCause());
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        
+    }
     
     public void saveOrder(OrdenProveedor orden)throws DataOriginException{
         orden.setCreado(new Timestamp(System.currentTimeMillis()));
