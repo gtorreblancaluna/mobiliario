@@ -109,11 +109,13 @@
                 SELECT COALESCE(SUM(pagos.cantidad),0)
                 FROM pagos_proveedor pagos
                 WHERE pagos.id_orden_proveedor = o.id
+                AND pagos.fg_activo = '1'
             )AS abonos,
             (
-                SELECT COALESCE(SUM(detalle.cantidad * detalle.precio))
+                SELECT COALESCE(SUM(detalle.cantidad * detalle.precio),0)
                 FROM detalle_orden_proveedor detalle
                 WHERE detalle.id_orden_proveedor = o.id
+                AND detalle.fg_activo = '1'
             )AS total
         FROM orden_proveedor o
             INNER JOIN renta r ON (r.id_renta = o.id_renta)

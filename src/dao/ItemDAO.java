@@ -1,5 +1,7 @@
 package dao;
 
+import exceptions.DataOriginException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,15 +43,17 @@ public class ItemDAO {
     }
     
     @SuppressWarnings("unchecked")
-    public List<Articulo> obtenerArticulosBusquedaInventario( Map<String,Object> map) {
-        SqlSession session = sqlSessionFactory.openSession();
+    public List<Articulo> obtenerArticulosBusquedaInventario( Map<String,Object> map) throws DataOriginException{
+        SqlSession session = null;
         try {
-            return (List<Articulo>) session.selectList("MapperArticulos.obtenerArticulosBusquedaInventario",map);
-        }catch(Exception ex){
-            log.error(ex);
-            return null;
+            session = sqlSessionFactory.openSession();
+            return session.selectList("MapperArticulos.obtenerArticulosBusquedaInventario",map);
+        }catch(Exception e){
+            log.error(e);
+            throw new DataOriginException(e.getMessage(),e);
         } finally {
-            session.close();
+            if (session != null)
+                session.close();
         }
     }
     

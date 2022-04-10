@@ -1197,7 +1197,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             temp.removeRow(jTableOrderProvider.getSelectedRow());
 
         }else{
-            if(JOptionPane.showOptionDialog(this, "Se eliminara de la bd,  \u00BFContinuar? " ,"Confirme eliminacion", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si") != 0)
+            if(JOptionPane.showOptionDialog(this, "Se eliminará de la base de datos,  \u00BFContinuar? " ,"Confirme eliminacion", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si") != 0)
             return;
 
             String datos[] = {"0",id};

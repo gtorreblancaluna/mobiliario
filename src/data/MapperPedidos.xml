@@ -477,7 +477,7 @@
                 WHERE detalle_orden_proveedor.fg_activo = '1'
                 AND detalle_orden_proveedor.id_articulo = articulo.id_articulo
                 AND orden_proveedor.status = #{statusOrder} OR orden_proveedor.status = #{statusOrderFinish}
-                AND detalle_orden_proveedor.tipo_orden = #{typeOrderDetail}
+                AND detalle_orden_proveedor.tipo_orden_detalle_proveedor_id = #{typeOrderDetail}
             ) AS total_shop_provider
         FROM detalle_renta detalle
             INNER JOIN renta renta ON (renta.id_renta = detalle.id_renta)
@@ -570,7 +570,7 @@
                 WHERE detalle_orden_proveedor.fg_activo = '1'
                 AND detalle_orden_proveedor.id_articulo = articulo.id_articulo
                 AND orden_proveedor.status = #{statusOrder} OR orden_proveedor.status = #{statusOrderFinish}
-                AND detalle_orden_proveedor.tipo_orden = #{typeOrderDetail}
+                AND detalle_orden_proveedor.tipo_orden_detalle_proveedor_id = #{typeOrderDetail}
             ) AS total_shop_provider
         FROM detalle_renta detalle
             INNER JOIN renta renta ON (renta.id_renta = detalle.id_renta)
@@ -663,7 +663,7 @@
                 WHERE detalle_orden_proveedor.fg_activo = '1'
                 AND detalle_orden_proveedor.id_articulo = articulo.id_articulo
                 AND orden_proveedor.status = #{statusOrder} OR orden_proveedor.status = #{statusOrderFinish}
-                AND detalle_orden_proveedor.tipo_orden = #{typeOrderDetail}
+                AND detalle_orden_proveedor.tipo_orden_detalle_proveedor_id = #{typeOrderDetail}
             ) AS total_shop_provider
         FROM detalle_renta detalle
             INNER JOIN renta renta ON (renta.id_renta = detalle.id_renta)
@@ -760,7 +760,7 @@
                 WHERE detalle_orden_proveedor.fg_activo = '1'
                 AND detalle_orden_proveedor.id_articulo = articulo.id_articulo
                 AND orden_proveedor.status = #{statusOrder} OR orden_proveedor.status = #{statusOrderFinish}
-                AND detalle_orden_proveedor.tipo_orden = #{typeOrderDetail}
+                AND detalle_orden_proveedor.tipo_orden_detalle_proveedor_id = #{typeOrderDetail}
             ) AS total_shop_provider
         FROM detalle_renta detalle
             INNER JOIN renta renta ON (renta.id_renta = detalle.id_renta)
@@ -856,7 +856,7 @@
                 WHERE detalle_orden_proveedor.fg_activo = '1'
                 AND detalle_orden_proveedor.id_articulo = articulo.id_articulo
                 AND orden_proveedor.status = #{statusOrder} OR orden_proveedor.status = #{statusOrderFinish}
-                AND detalle_orden_proveedor.tipo_orden = #{typeOrderDetail}
+                AND detalle_orden_proveedor.tipo_orden_detalle_proveedor_id = #{typeOrderDetail}
             ) AS total_shop_provider
         FROM detalle_renta detalle
             INNER JOIN renta renta ON (renta.id_renta = detalle.id_renta)

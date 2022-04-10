@@ -262,8 +262,8 @@ INSERT INTO measurement_units (description) VALUES ('METRO');
 INSERT INTO measurement_units (description) VALUES ('KILO');
 INSERT INTO measurement_units (description) VALUES ('TRAMO');
 
-INSERT INTO tipo_detalle_orden_proveedor (description,created_at,updated_at) VALUES ('Renta','2022-04-22','2022-04-22');
 INSERT INTO tipo_detalle_orden_proveedor (description,created_at,updated_at) VALUES ('Compra','2022-04-22','2022-04-22');
+INSERT INTO tipo_detalle_orden_proveedor (description,created_at,updated_at) VALUES ('Renta','2022-04-22','2022-04-22');
 
 -- modificar id tipo de orden
 ALTER TABLE detalle_orden_proveedor CHANGE COLUMN tipo_orden tipo_orden_detalle_proveedor_id INT(11) NOT NULL;;

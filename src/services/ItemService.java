@@ -8,6 +8,7 @@ package services;
 import clases.sqlclass;
 import dao.ItemDAO;
 import exceptions.BusinessException;
+import exceptions.DataOriginException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.ArrayList;
@@ -283,7 +284,7 @@ public class ItemService {
                                         (articulo.getTotalShopProvider() != null ? articulo.getTotalShopProvider() : 0F );
     }
     
-    public List<Articulo> obtenerArticulosBusquedaInventario(Map<String,Object> map) throws Exception{
+    public List<Articulo> obtenerArticulosBusquedaInventario(Map<String,Object> map) throws DataOriginException {
         
         
        // neccesary for get total shop from provider
