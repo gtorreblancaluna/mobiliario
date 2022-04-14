@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package forms.inventario;
 
 import services.SystemService;
@@ -16,6 +11,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +25,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.AgregarArticuloDisponibilidad;
 import mobiliario.ApplicationConstants;
 import mobiliario.AsignarFaltante;
 import mobiliario.Categoria;
@@ -45,34 +40,27 @@ import services.ItemService;
 import utilities.Utility;
 import static mobiliario.principal.jDesktopPane1;
 
-/**
- *
- * @author Carlos Alberto
- */
 public class InventarioForm extends javax.swing.JInternalFrame {
+    
     private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(InventarioForm.class.getName());
     public static int g_articuloId;
     public static int g_rentaId;
     public static String g_descripcionArticulo;
     private final String TITLE = "Inventario";
-//    static sqlclass funcion = new sqlclass();    
-//    conectate conexion = new conectate();
     static Object[][] dtconduc;
-    String id_usuario, strSql, id_articulo;
+    private String id_articulo;
     Object[] datos_combo;
-    String fecha_sistema;
+    private String fecha_sistema;
     public static boolean validar_colores, validar_categorias;
     private final SystemService systemService = SystemService.getInstance();
     private static final ItemService itemService = ItemService.getInstance();
     private static final CategoryService categoryService = new CategoryService();
+    // variable para mandar a la ventana de agregar articulo
+    private List<Articulo> articulos = new ArrayList<>();
 
-    /**
-     * Creates new form inventario
-     */
     public InventarioForm() {
-//        funcion.conectate();
+
         initComponents();
-//        tabla_articulos();
         formato_tabla_articulos();
         
         new Thread(() -> {
@@ -87,7 +75,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         if (iniciar_sesion.administrador_global.equals("0")) {
             txt_precio_compra.setEditable(false);
             txt_precio_renta.setEditable(false);
-
         }        
         formato_tabla();
         this.setTitle(TITLE);
@@ -312,7 +299,10 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     }
     
     public void mostrar_agregar_articulo() {
-        AgregarArticuloDisponibilidad ventanaAgregarArticuloDisponibilidad = new AgregarArticuloDisponibilidad(null, true);
+        if (articulos.isEmpty()) {
+            articulos = itemService.obtenerArticulosActivos();
+        }
+        AgregarArticuloDisponibilidad ventanaAgregarArticuloDisponibilidad = new AgregarArticuloDisponibilidad(null, true, articulos);
         ventanaAgregarArticuloDisponibilidad.setVisible(true);
         ventanaAgregarArticuloDisponibilidad.setLocationRelativeTo(null);
     }
@@ -482,70 +472,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         return nueva_cadena;
     }
 
-    public void tabla_articulos() {
-        // funcion.conectate();
-//        tabla_articulos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//        String[] columNames = {"Id","Codigo" ,"Stock","En renta", "Categoria", "Descripcion", "Color", "Fecha", "P Compra", "P Renta"};
-//        String[] colName = {"id_articulo","Codigo", "cantidad","en_renta", "c.descripcion", "a.descripcion", "color", "fecha_ingreso", "precio_compra", "precio_renta"};
-//        //nombre de columnas, tabla, instruccion sql
-//        try {
-//           dtconduc = funcion.GetTabla(colName, "articulo", "SELECT a.id_articulo,a.codigo, a.cantidad,a.en_renta, c.descripcion, a.descripcion, co.color, a.fecha_ingreso, a.precio_compra, a.precio_renta "
-//                + "FROM articulo a, categoria c, color co "
-//                + "WHERE a.id_categoria=c.id_categoria AND a.id_color=co.id_color AND a.activo = '1' ORDER BY a.descripcion ");
-//        } catch (SQLNonTransientConnectionException e) {
-//            funcion.conectate();
-//            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-//        } catch (SQLException e) {
-//            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-//        } catch (Exception e) {
-//            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-//        }         
-//       
-//
-//        for (int i = 0; i < dtconduc.length; i++) {
-//            String valor = dtconduc[i][8].toString();
-//            String valor2 = dtconduc[i][9].toString();
-//            dtconduc[i][8] = conviertemoneda(valor).toString();
-//            dtconduc[i][9] = conviertemoneda(valor2).toString();
-//            System.out.println(conviertemoneda(valor));
-//
-//        }
-//
-//        DefaultTableModel datos = new DefaultTableModel(dtconduc, columNames);
-//        DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
-//        centrar.setHorizontalAlignment(SwingConstants.CENTER);
-//        tabla_articulos.setModel(datos);
-//
-//        tabla_articulos.getColumnModel().getColumn(1).setCellRenderer(centrar);
-//        tabla_articulos.getColumnModel().getColumn(2).setCellRenderer(centrar);
-//        tabla_articulos.getColumnModel().getColumn(3).setCellRenderer(centrar);
-//        tabla_articulos.getColumnModel().getColumn(4).setCellRenderer(centrar);
-//        tabla_articulos.getColumnModel().getColumn(5).setCellRenderer(centrar);
-//        tabla_articulos.getColumnModel().getColumn(6).setCellRenderer(centrar);
-//        tabla_articulos.getColumnModel().getColumn(7).setCellRenderer(centrar);
-//        tabla_articulos.getColumnModel().getColumn(8).setCellRenderer(centrar);
-//        tabla_articulos.getColumnModel().getColumn(9).setCellRenderer(centrar);
-//
-//        // funcion.desconecta();
-//        int[] anchos = {10,40,40, 40, 100, 200, 120, 80, 80, 80};
-//
-//        for (int inn = 0; inn < tabla_articulos.getColumnCount(); inn++) {
-//            tabla_articulos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
-//        }
-//        tabla_articulos.getColumnModel().getColumn(0).setMaxWidth(0);
-//        tabla_articulos.getColumnModel().getColumn(0).setMinWidth(0);
-//        tabla_articulos.getColumnModel().getColumn(0).setPreferredWidth(0);
-
-    }
-
-    public void tabla_articulos_busqueda() {
-      
-        
-       
-
-        
-    }
-    public void formato_tabla_articulos(){
+    private void formato_tabla_articulos(){
         Object[][] data = {{"","","","", "","","", "", "", "", "", "","","",""}};
         String[] columNames = {"Id","Codigo", "Stock","En renta","faltantes","reparacion","accidente trabajo","devolucion","compras","utiles", "Categoria", "Descripcion", "Color", "Fecha", "P Compra", "P Renta","ult. modifiacion"};
         DefaultTableModel tableModel = new DefaultTableModel(data, columNames);

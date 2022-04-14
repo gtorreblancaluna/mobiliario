@@ -1,86 +1,52 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package mobiliario;
+package forms.inventario;
 
-import forms.inventario.InventarioForm;
-import clases.sqlclass;
 import java.awt.Toolkit;
-import java.sql.SQLException;
-import java.sql.SQLNonTransientConnectionException;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import services.ItemService;
+import model.Articulo;
 
-/**
- *
- * @author Carlos Alberto
- */
 public class AgregarArticuloDisponibilidad extends java.awt.Dialog {
 
-    sqlclass funcion = new sqlclass();   
-    ItemService itemService = ItemService.getInstance();
-//    conectate conexion = new conectate();
-    Object[][] dtconduc;
-    boolean existe, editar = false;
-    String id_color;
-    float cant = 0; 
-   
     
-    public String conviertemoneda(String valor) {
-
-        DecimalFormatSymbols simbolo = new DecimalFormatSymbols();
-        simbolo.setDecimalSeparator('.');
-        simbolo.setGroupingSeparator(',');
-
-        float entero = Float.parseFloat(valor);
-        DecimalFormat formateador = new DecimalFormat("###,###.##", simbolo);
-        String entero2 = formateador.format(entero);
-
-        if (entero2.contains(".")) {
-            entero2 = "$" + entero2;
-
-        } else {
-            entero2 = "$" + entero2 + ".00";
-        }
-
-        return entero2;
-
-    }
-    public AgregarArticuloDisponibilidad(java.awt.Frame parent, boolean modal) {
+    private List<Articulo> articulos = new ArrayList<>();
+    private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
+    
+   
+    public AgregarArticuloDisponibilidad(java.awt.Frame parent, boolean modal, List<Articulo> articulos) {
         super(parent, modal);
         initComponents();       
-        funcion.conectate();
         txt_buscar.requestFocus();
         
         this.setLocationRelativeTo(null);
         this.lblEncontrados.setText("");
         this.setTitle("Buscar articulo ");
-        formato_tabla();
-        
+        formato_tabla();     
+        this.articulos = articulos;
     }
+
     
-    public void formato_tabla() {
+    private void formato_tabla() {
+        
         Object[][] data = {{"", "", "", "", ""}};
         String[] columnNames = {"Id", "Categoria", "Descripcion", "Color", "P.Unitario", "Stock"};       
         DefaultTableModel TableModel = new DefaultTableModel(data, columnNames);
         tablaArticulos.setModel(TableModel);
 
-         int[] anchos = {10, 120, 250, 100, 90, 90};
+        int[] anchos = {10, 120, 250, 100, 90, 90};
 
         for (int inn = 0; inn < tablaArticulos.getColumnCount(); inn++) {
             tablaArticulos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
         }
 
-        DefaultTableCellRenderer TablaRenderer = new DefaultTableCellRenderer();
-        TablaRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
+        DefaultTableCellRenderer right = new DefaultTableCellRenderer();
+        right.setHorizontalAlignment(SwingConstants.RIGHT);
 
         DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
         centrar.setHorizontalAlignment(SwingConstants.CENTER);
@@ -89,94 +55,43 @@ public class AgregarArticuloDisponibilidad extends java.awt.Dialog {
             DefaultTableModel temp = (DefaultTableModel) tablaArticulos.getModel();
             temp.removeRow(temp.getRowCount() - 1);
         } catch (ArrayIndexOutOfBoundsException e) {
-            ;
         }
-//        tablaArticulos.getColumnModel().getColumn(1).setMaxWidth(0);
-//        tablaArticulos.getColumnModel().getColumn(1).setMinWidth(0);
-//        tablaArticulos.getColumnModel().getColumn(1).setPreferredWidth(0);
-
         
+        tablaArticulos.getColumnModel().getColumn(0).setMaxWidth(0);
+        tablaArticulos.getColumnModel().getColumn(0).setMinWidth(0);
+        tablaArticulos.getColumnModel().getColumn(0).setPreferredWidth(0);      
+        tablaArticulos.getColumnModel().getColumn(2).setCellRenderer(centrar);
+        tablaArticulos.getColumnModel().getColumn(3).setCellRenderer(centrar);
+        tablaArticulos.getColumnModel().getColumn(4).setCellRenderer(right);
+        tablaArticulos.getColumnModel().getColumn(5).setCellRenderer(right);
 
     }
 
      public void tabla_articulos_like() {
+         
+        formato_tabla();
         
-        tablaArticulos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        String[] columNames = {"Id", "Categoria", "Descripcion", "Color", "P.Unitario", "Stock"};
-        String[] colName = {"id_articulo", "categoria", "descripcion", "color", "precio_renta", "cantidad"};
-        //nombre de columnas, tabla, instruccion sql        
-
-//        String querySql = "SELECT a.id_articulo, ca.descripcion as categoria, a.descripcion, c.color, a.precio_renta,a.cantidad "
-//                + "FROM articulo a, color c, categoria ca "
-//                +"+INNER JOIN color color ON (color.id_color = a.id_color) "
-//                + "WHERE a.activo =1 AND a.id_categoria=ca.id_categoria "
-//                + "AND a.descripcion like '%" + txt_buscar.getText().toString() + "%' ";
-       
-       try {       
-            dtconduc = funcion.GetTabla(colName, "articulo", "SELECT a.`id_articulo`, ca.`descripcion` as categoria, a.`descripcion`, c.`color`, a.`precio_renta`,a.`cantidad` "
-                   + "FROM articulo a, color c, categoria ca\n"
-                   + "WHERE a.id_color=c.id_color and activo =1 AND a.id_categoria=ca.id_categoria "
-                   + "AND a.`descripcion` like '%" + txt_buscar.getText().toString() + "%' "
-                   +" AND a.activo=1 "
-           );
-        } catch (SQLNonTransientConnectionException e) {
-            funcion.conectate();
-            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-        }
-       
-//        List<Articulo> articulos = itemService.obtenerArticulos(funcion,querySql);
-
-        if(dtconduc!= null && dtconduc.length > 0)
-            this.lblEncontrados.setText("Articulos encontrados: "+dtconduc.length);
-        else
-            this.lblEncontrados.setText("Sin resultados :( ");
-       
+        List<Articulo> filterArticulos = articulos.stream()
+                .filter(articulo -> Objects.nonNull(articulo))
+                .filter(articulo -> Objects.nonNull(articulo.getDescripcion()))
+                .filter(articulo -> Objects.nonNull(articulo.getColor()))
+                .filter(articulo -> (articulo.getDescripcion().trim().toLowerCase() + " " + articulo.getColor().getColor().trim().toLowerCase()).contains(txt_buscar.getText().toLowerCase().trim()))
+                .collect(Collectors.toList());
         
-        for (int i = 0; i < dtconduc.length; i++) {
-            String valor = dtconduc[i][4].toString();
-            dtconduc[i][4] = conviertemoneda(valor).toString();
-            System.out.println(conviertemoneda(valor));
-
-        }
-
-        DefaultTableModel datos = new DefaultTableModel(dtconduc, columNames);
-        DefaultTableCellRenderer TablaRenderer = new DefaultTableCellRenderer();
-        TablaRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
-
-        DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
-        centrar.setHorizontalAlignment(SwingConstants.CENTER);
-
-        tablaArticulos.setModel(datos);
-
-        int[] anchos = {10, 120, 250, 100, 90, 90};
-
-        for (int inn = 0; inn < tablaArticulos.getColumnCount(); inn++) {
-            tablaArticulos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
-        }
-
-        tablaArticulos.getColumnModel().getColumn(0).setMaxWidth(0);
-        tablaArticulos.getColumnModel().getColumn(0).setMinWidth(0);
-        tablaArticulos.getColumnModel().getColumn(0).setPreferredWidth(0);
-
-        //tablaArticulos.getColumnModel().getColumn(4).setCellRenderer(TablaRenderer);
-        tablaArticulos.getColumnModel().getColumn(5).setCellRenderer(centrar);
-
-        tablaArticulos.getColumnModel().getColumn(4).setCellRenderer(centrar);
-
-
-    }
-
-
-    public void agregar() {
+        DefaultTableModel tableModel = (DefaultTableModel) tablaArticulos.getModel();
         
-    }
+        filterArticulos.forEach(articulo -> {
+            Object fila[] = {                                          
+                articulo.getArticuloId(),
+                articulo.getCategoria().getDescripcion(),
+                articulo.getDescripcion(),
+                articulo.getColor().getColor(),
+                decimalFormat.format(articulo.getPrecioRenta()),
+                decimalFormat.format(articulo.getStock())
+              };
+              tableModel.addRow(fila);
+        });
 
-    public void guardar() {
-      
     }
 
     /**
@@ -282,13 +197,11 @@ public class AgregarArticuloDisponibilidad extends java.awt.Dialog {
          }
     }//GEN-LAST:event_tablaArticulosMouseClicked
 
-    /**
-     * @param args the command line arguments
-     */
+
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                AgregarArticuloDisponibilidad dialog = new AgregarArticuloDisponibilidad(new java.awt.Frame(), true);
+                AgregarArticuloDisponibilidad dialog = new AgregarArticuloDisponibilidad(new java.awt.Frame(), true, new ArrayList<>());
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
