@@ -1,6 +1,5 @@
-package mobiliario;
+package forms.inventario;
 
-import forms.inventario.InventarioForm;
 import forms.rentas.ConsultarRentas;
 import services.SaleService;
 import clases.sqlclass;
@@ -18,8 +17,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import mobiliario.ApplicationConstants;
 import model.querys.AvailabilityItemResult;
-import services.ItemService;
 import services.SystemService;
 
 public class VerDisponibilidadArticulos extends java.awt.Dialog {
@@ -75,20 +74,22 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
     }
     
     private enum HeaderTable {
-    
+
         ITEM_ID(0),
         ORDER_AMOUNT(1),
         ITEM_UTILES(2),
         ITEM_DESCRIPTION(3),
-        ORDER_DELIVERY_DATE(4),
-        ORDER_DELIVERY_HOUR(5),
-        ORDER_RETURN_DATE(6),
-        ORDER_RETURN_HOUR(7),
-        ORDER_CUSTOMER(8),
-        ORDER_FOLIO(9),
-        ORDER_DESCRIPTION(10),
-        ORDER_TYPE(11),
-        ORDER_STATUS(12);
+        ORDER_EVENT_DATE(4),
+        ORDER_ELABORATION_DATE(5),
+        ORDER_DELIVERY_DATE(6),
+        ORDER_DELIVERY_HOUR(7),
+        ORDER_RETURN_DATE(8),
+        ORDER_RETURN_HOUR(9),
+        ORDER_CUSTOMER(10),
+        ORDER_FOLIO(11),
+        ORDER_DESCRIPTION(12),
+        ORDER_TYPE(13),
+        ORDER_STATUS(14);
         
         private final Integer column;
 
@@ -211,6 +212,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
                             availabilityItemResult.getItem().getUtiles(),
                             availabilityItemResult.getItem().getDescripcion()+" "+availabilityItemResult.getItem().getColor().getColor(),
                             availabilityItemResult.getEventDateOrder(),
+                            availabilityItemResult.getEventDateElaboration(),
                             availabilityItemResult.getDeliveryDateOrder(),
                             availabilityItemResult.getDeliveryHourOrder(),
                             availabilityItemResult.getReturnDateOrder(),
@@ -285,15 +287,15 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
     }// en funcion mostrarDisponibilidad
      
     public void formato_tabla() {
-        Object[][] data = {{"","","", "", "", "", "", "", "","","","",""}};
-        String[] columnNames = {"id_articulo", "cantidad pedido", "Utiles", "articulo", "fecha evento","fecha entrega","hora entrega", "fecha_devolucion","hora devoluci\u00F3n" ,"cliente","folio","descripci\u00F3n evento","tipo","estado"};
+        Object[][] data = {{"","","", "", "", "", "", "", "","","","","",""}};
+        String[] columnNames = {"id_articulo", "cantidad pedido", "Utiles", "articulo", "fecha evento","fecha elaboración","fecha entrega","hora entrega", "fecha_devolucion","hora devoluci\u00F3n" ,"cliente","folio","descripci\u00F3n evento","tipo","estado"};
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
         tablaArticulos.setModel(tableModel);
         
-        TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
+        TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<>(tableModel); 
         tablaArticulos.setRowSorter(ordenarTabla);
 
-        int[] anchos = {20, 80, 80, 160,100, 100, 100, 80,240,80,80,80,80,80};
+        int[] anchos = {20, 80, 80, 160,100, 100,100, 100, 80,240,80,80,80,80,80};
 
         for (int inn = 0; inn < tablaArticulos.getColumnCount(); inn++) {
             tablaArticulos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -325,7 +327,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         tablaArticulosUnicos.setModel(tableModel);
         
         // Instanciamos el TableRowSorter y lo añadimos al JTable
-        TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
+        TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<>(tableModel); 
         tablaArticulosUnicos.setRowSorter(ordenarTabla);
 
         int[] anchos = {20, 60, 60, 60,120};
@@ -443,7 +445,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
 
         jbtnExportarDetalle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/excel-icon.png"))); // NOI18N
         jbtnExportarDetalle.setToolTipText("Exportar tabla detalle a Excel");
-        jbtnExportarDetalle.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtnExportarDetalle.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtnExportarDetalle.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbtnExportarDetalleActionPerformed(evt);
@@ -453,7 +455,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
 
         jbtnExportarUnicos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/excel-icon.png"))); // NOI18N
         jbtnExportarUnicos.setToolTipText("Exportar tabla unicos a Excel");
-        jbtnExportarUnicos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtnExportarUnicos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtnExportarUnicos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbtnExportarUnicosActionPerformed(evt);

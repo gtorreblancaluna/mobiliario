@@ -29,7 +29,6 @@ import mobiliario.ApplicationConstants;
 import mobiliario.AsignarFaltante;
 import mobiliario.Categoria;
 import mobiliario.Colores;
-import mobiliario.VerDisponibilidadArticulos;
 import mobiliario.VerFoliosPorArticulo;
 import mobiliario.iniciar_sesion;
 import model.Articulo;

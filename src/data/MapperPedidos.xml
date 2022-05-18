@@ -9,6 +9,7 @@
         
         <result property="numberOfItems" column="number_of_items"/>
         <result property="eventDateOrder" column="event_date_order"/>
+        <result property="eventDateElaboration" column="event_date_elaboration"/>
         <result property="deliveryDateOrder" column="delivery_date_order"/>
         <result property="returnHourOrder" column="return_hour_order"/>
         <result property="deliveryHourOrder" column="delivery_hour_order"/>
@@ -400,7 +401,8 @@
     <select id="obtenerRentaPorDisponibilidad" resultMap="resultMapAvailabilityItemResult" parameterType="java.util.Map">
         SELECT
             detalle.cantidad AS number_of_items,
-            renta.fecha_pedido AS event_date_order,
+            renta.fecha_evento AS event_date_order,
+            renta.fecha_pedido AS event_date_elaboration,
             renta.fecha_entrega AS delivery_date_order,
             renta.hora_devolucion AS return_hour_order,
             renta.hora_entrega AS delivery_hour_order,
@@ -493,7 +495,8 @@
         UNION
         SELECT
             detalle.cantidad AS number_of_items,
-            renta.fecha_pedido AS event_date_order,
+            renta.fecha_evento AS event_date_order,
+            renta.fecha_pedido AS event_date_elaboration,
             renta.fecha_entrega AS delivery_date_order,
             renta.hora_devolucion AS return_hour_order,
             renta.hora_entrega AS delivery_hour_order,
@@ -586,7 +589,8 @@
         UNION
         SELECT
             detalle.cantidad AS number_of_items,
-            renta.fecha_pedido AS event_date_order,
+            renta.fecha_evento AS event_date_order,
+            renta.fecha_pedido AS event_date_elaboration,
             renta.fecha_entrega AS delivery_date_order,
             renta.hora_devolucion AS return_hour_order,
             renta.hora_entrega AS delivery_hour_order,
@@ -683,7 +687,8 @@
     <select id="obtenerRentaPorDisponibilidadPorFechaDeEntrega" resultMap="resultMapAvailabilityItemResult" parameterType="java.util.Map">
         SELECT
             detalle.cantidad AS number_of_items,
-            renta.fecha_pedido AS event_date_order,
+            renta.fecha_evento AS event_date_order,
+            renta.fecha_pedido AS event_date_elaboration,
             renta.fecha_entrega AS delivery_date_order,
             renta.hora_devolucion AS return_hour_order,
             renta.hora_entrega AS delivery_hour_order,
@@ -779,7 +784,8 @@
     <select id="obtenerRentaPorDisponibilidadPorFechaDeDevolucion" resultMap="resultMapAvailabilityItemResult" parameterType="java.util.Map">
         SELECT
             detalle.cantidad AS number_of_items,
-            renta.fecha_pedido AS event_date_order,
+            renta.fecha_evento AS event_date_order,
+            renta.fecha_pedido AS event_date_elaboration,
             renta.fecha_entrega AS delivery_date_order,
             renta.hora_devolucion AS return_hour_order,
             renta.hora_entrega AS delivery_hour_order,
