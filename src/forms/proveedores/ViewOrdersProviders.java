@@ -6,6 +6,7 @@ import clases.sqlclass;
 import exceptions.BusinessException;
 import java.awt.Desktop;
 import java.awt.Toolkit;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
@@ -93,7 +94,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
                 return;
             }
-            JasperReport masterReport = masterReport = (JasperReport) JRLoader.loadObject(archivo);
+            JasperReport masterReport = (JasperReport) JRLoader.loadObject(new ByteArrayInputStream(archivo.getBytes()));
            
             DatosGenerales datosGenerales = systemService.getGeneralData();
             

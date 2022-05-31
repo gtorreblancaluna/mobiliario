@@ -64,6 +64,21 @@ public class SystemDAO {
         }
     }
     
+     @SuppressWarnings("unchecked")
+    public void updateInfoPDFSummary (DatosGenerales datosGenerales)throws DataOriginException {
+        SqlSession session = sqlSessionFactory.openSession();
+        
+        try {
+            session.update("MapperDatosGenerales.updateInfoPDFSummary",datosGenerales);
+            session.commit();
+        }catch(Exception ex){
+            log.error(ex);
+            throw new DataOriginException(ex.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+    
     
     @SuppressWarnings("unchecked")
     public String getDataConfigurationByKey (String key)throws DataOriginException {

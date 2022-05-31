@@ -71,6 +71,10 @@ public class SystemService {
         systemDao.saveDatosGenerales(datosGenerales);
     }
     
+    public void updateInfoPDFSummary(DatosGenerales datosGenerales) throws DataOriginException{
+        systemDao.updateInfoPDFSummary(datosGenerales);
+    }
+    
     public Image generarQR(){
         
         //GENERACION QR

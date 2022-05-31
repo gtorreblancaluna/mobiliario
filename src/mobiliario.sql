@@ -255,6 +255,7 @@ CREATE TABLE `datos_generales` (
   `direccion3` varchar(45) DEFAULT NULL,
   `folio` int(10) unsigned NOT NULL,
   `folio_cambio` varchar(2) DEFAULT NULL,
+   info_summary_folio VARCHAR(9028) DEFAULT NULL,
   PRIMARY KEY (`id_datos_generales`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 

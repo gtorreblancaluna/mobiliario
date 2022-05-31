@@ -1,6 +1,7 @@
 package forms.material.inventory;
 
 import java.awt.Desktop;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -132,9 +133,7 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
             JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper: "+pathFile);
             return;
         }
-        JasperReport masterReport;
-
-        masterReport = (JasperReport) JRLoader.loadObject(pathFile);            
+        JasperReport masterReport = (JasperReport) JRLoader.loadObject(new ByteArrayInputStream(pathFile.getBytes()));      
         Map params = new HashMap<>();
         params.put("RENT_ID",this.gRentId);
         params.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA);

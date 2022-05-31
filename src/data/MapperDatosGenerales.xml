@@ -12,8 +12,8 @@
         <result property="address1" column="direccion1"/>    
         <result property="address2" column="direccion2"/>
         <result property="address3" column="direccion3"/> 
-        <result property="folio" column="folio"/>    
-       
+        <result property="folio" column="folio"/>
+        <result property="infoSummaryFolio" column="info_summary_folio"/>  
 
     </resultMap>   
   
@@ -31,10 +31,12 @@
         </set>
     </update>
     
+    <update id="updateInfoPDFSummary" parameterType="model.DatosGenerales">
+        UPDATE datos_generales SET info_summary_folio=#{infoSummaryFolio} WHERE id_datos_generales = 2
+    </update>
+    
     <select id="getDataConfigurationByKey" resultType="java.lang.String" parameterType="java.lang.String" >
         SELECT valor FROM configuracion WHERE llave = #{key}
     </select>
-    
-         
      
 </mapper>

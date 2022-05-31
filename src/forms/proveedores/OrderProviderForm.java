@@ -5,6 +5,7 @@ import exceptions.BusinessException;
 import exceptions.DataOriginException;
 import java.awt.Desktop;
 import java.awt.Toolkit;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -118,32 +119,32 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         JasperPrint jasperPrint;
        
            
-            String pathLocation = Utility.getPathLocation();
-            String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_ORDEN_PROVEEDOR;
-            System.out.println("Cargando desde: " + archivo);
-            if (archivo == null) {
-                JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
-                return;
-            }
-            JasperReport masterReport = null;
-            
-            masterReport = (JasperReport) JRLoader.loadObject(archivo);
-           
-            DatosGenerales datosGenerales = systemService.getGeneralData();
-            
-            Map parametros = new HashMap<>();
-            parametros.put("ID_ORDEN",orderProviderId);
-            parametros.put("NOMBRE_EMPRESA",datosGenerales.getCompanyName());
-            parametros.put("DIRECCION_EMPRESA",datosGenerales.getAddress1());
-            parametros.put("TELEFONOS_EMPRESA",datosGenerales.getAddress2());
-            parametros.put("EMAIL_EMPRESA",datosGenerales.getAddress3() != null ? datosGenerales.getAddress3() : "");
-            //guardamos el parámetro
-            parametros.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
-           
-            jasperPrint = JasperFillManager.fillReport(masterReport, parametros, funcion.getConnection());
-            JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
-            File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
-            Desktop.getDesktop().open(file2);
+        String pathLocation = Utility.getPathLocation();
+        String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_ORDEN_PROVEEDOR;
+        System.out.println("Cargando desde: " + archivo);
+        if (archivo == null) {
+            JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
+            return;
+        }
+        JasperReport masterReport = null;
+
+        masterReport = (JasperReport) JRLoader.loadObject(new ByteArrayInputStream(archivo.getBytes()));
+
+        DatosGenerales datosGenerales = systemService.getGeneralData();
+
+        Map parametros = new HashMap<>();
+        parametros.put("ID_ORDEN",orderProviderId);
+        parametros.put("NOMBRE_EMPRESA",datosGenerales.getCompanyName());
+        parametros.put("DIRECCION_EMPRESA",datosGenerales.getAddress1());
+        parametros.put("TELEFONOS_EMPRESA",datosGenerales.getAddress2());
+        parametros.put("EMAIL_EMPRESA",datosGenerales.getAddress3() != null ? datosGenerales.getAddress3() : "");
+        //guardamos el parámetro
+        parametros.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
+
+        jasperPrint = JasperFillManager.fillReport(masterReport, parametros, funcion.getConnection());
+        JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
+        File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
+        Desktop.getDesktop().open(file2);
      
      }
     

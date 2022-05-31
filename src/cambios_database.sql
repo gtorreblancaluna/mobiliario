@@ -273,3 +273,6 @@ ADD CONSTRAINT FK_detalle_orden_proveedor_id FOREIGN KEY (tipo_orden_detalle_pro
     REFERENCES detalle_orden_proveedor(id);
 
 -- FIN agregar id tipo de orden
+
+
+ALTER TABLE datos_generales ADD COLUMN info_summary_folio VARCHAR(9028) DEFAULT NULL;

@@ -10,8 +10,8 @@ import exceptions.BusinessException;
 import exceptions.DataOriginException;
 import java.awt.Desktop;
 import java.awt.Toolkit;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.text.DecimalFormat;
@@ -436,19 +436,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             System.out.println("Cargando desde: " + archivo);
             if (archivo == null) {
                 JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
-                //System.exit(2);
             }
-            JasperReport masterReport = null;
-            try {
-                masterReport = (JasperReport) JRLoader.loadObject(archivo);
-            } catch (JRException e) {
-                // System.out.println("Error cargando el reporte maestro: " + e.getMessage());
-                Logger.getLogger(AgregarRenta.class.getName()).log(Level.SEVERE, null, e);
-                JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());
-                
-                //System.exit(3);
-            }
-            
+            JasperReport masterReport = (JasperReport) JRLoader.loadObject(new ByteArrayInputStream(archivo.getBytes()));  
+
             DatosGenerales datosGenerales = systemService.getGeneralData();
             
             Map parametro = new HashMap<>();
@@ -460,27 +450,25 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             parametro.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
             System.out.println("id_renta: " + id_ultima_renta);
             parametro.put("id_renta", id_ultima_renta);
-            parametro.put("abonos", cant_abono);
-            parametro.put("subTotal", subTotal);
+            parametro.put("abonos", cant_abono+"");
+            parametro.put("subTotal", subTotal+"");
             parametro.put("chofer", chofer);
             parametro.put("descuento", descuento);
             parametro.put("iva", iva);
+            parametro.put("INFO_SUMMARY_FOLIO",datosGenerales.getInfoSummaryFolio());
 
             // funcion.conectate();
             jasperPrint = JasperFillManager.fillReport(masterReport, parametro, funcion.getConnection());
             JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_NUEVO_PEDIDO);
             File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_NUEVO_PEDIDO);
-            try {
-                Desktop.getDesktop().open(file2);
-            } catch (IOException ex) {
-                Logger.getLogger(AgregarRenta.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            // funcion.desconecta();
-            // funcion.desconecta();
+            Desktop.getDesktop().open(file2);
+        } catch (NoClassDefFoundError j) {
+            Logger.getLogger(AgregarRenta.class.getName()).log(Level.SEVERE, null, j);
+            JOptionPane.showMessageDialog(rootPane, "No se pudo generar el PDF, muestra este mensaje de error al administrador del sistema: " + j.toString());
         } catch (Exception j) {
             Logger.getLogger(AgregarRenta.class.getName()).log(Level.SEVERE, null, j);
             System.out.println("Mensaje de Error:" + j.toString());
-            JOptionPane.showMessageDialog(rootPane, "Mensaje de Error:" + j.toString() + "\nExiste un PDF abierto, cierralo e intenta generar el PDF nuevamente");
+            JOptionPane.showMessageDialog(rootPane, "No se pudo generar el PDF, muestra este mensaje de error al administrador del sistema:" + j.toString() + "\nO bien, revisa que no exista un PDF abierto, cierralo e intenta generar el PDF nuevamente");
         }
     }
 

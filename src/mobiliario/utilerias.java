@@ -10,6 +10,7 @@ import clases.JCMail_enviar_prueba;
 import clases.conectate;
 import clases.sqlclass;
 import exceptions.BusinessException;
+import exceptions.DataOriginException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -150,12 +151,15 @@ public class utilerias extends java.awt.Dialog {
         this.txtCompanyName.setText(datosGenerales.getCompanyName());
         this.txtAdress.setText(datosGenerales.getAddress1());
         this.txtTels.setText(datosGenerales.getAddress2());
+        txtInfoPDFSummary.setText(datosGenerales.getInfoSummaryFolio());
         
         this.txtCompanyName.setEnabled(false);
         this.txtAdress.setEnabled(false);
         this.txtTels.setEnabled(false);
         this.btnSave.setEnabled(false);
         this.btnEdit.setEnabled(true);
+        txtInfoPDFSummary.setEnabled(false);
+        
     }
     
     public void editDatosGenerales(){
@@ -360,6 +364,10 @@ public class utilerias extends java.awt.Dialog {
         txtEmailCompras = new javax.swing.JTextField();
         btnSaveConfiguration = new javax.swing.JButton();
         btnEditConfiguration = new javax.swing.JButton();
+        jPanel8 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtInfoPDFSummary = new javax.swing.JTextArea();
+        btnEditPdfSummary = new javax.swing.JButton();
 
         setLocationRelativeTo(jLabel1);
         setTitle("Utilerias");
@@ -371,7 +379,10 @@ public class utilerias extends java.awt.Dialog {
 
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jTabbedPane1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+
         jPanel1.setToolTipText("Folio");
+        jPanel1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         txt_folio.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
@@ -398,7 +409,7 @@ public class utilerias extends java.awt.Dialog {
 
         jbtn_editar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Actions-edit-icon.png"))); // NOI18N
         jbtn_editar.setToolTipText("Editar");
-        jbtn_editar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_editar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_editar.setFocusable(false);
         jbtn_editar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_editar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -411,7 +422,7 @@ public class utilerias extends java.awt.Dialog {
 
         jbtn_guardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/floppy-disk-icon.png"))); // NOI18N
         jbtn_guardar.setToolTipText("Guardar");
-        jbtn_guardar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_guardar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_guardar.setFocusable(false);
         jbtn_guardar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_guardar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -425,6 +436,8 @@ public class utilerias extends java.awt.Dialog {
         jPanel1.add(jToolBar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, 330));
 
         jTabbedPane1.addTab("Folio", jPanel1);
+
+        jPanel3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
 
         subPanel_configuracion_email.setBorder(javax.swing.BorderFactory.createTitledBorder("Configurar email"));
         subPanel_configuracion_email.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -558,7 +571,7 @@ public class utilerias extends java.awt.Dialog {
 
         Jbtn_editar_email.setText("Editar");
         Jbtn_editar_email.setToolTipText("Editar");
-        Jbtn_editar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        Jbtn_editar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         Jbtn_editar_email.setName(""); // NOI18N
         Jbtn_editar_email.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -569,7 +582,7 @@ public class utilerias extends java.awt.Dialog {
 
         Jbtn_cancelar_email.setText("Cancelar");
         Jbtn_cancelar_email.setToolTipText("cancelar");
-        Jbtn_cancelar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        Jbtn_cancelar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         Jbtn_cancelar_email.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Jbtn_cancelar_emailActionPerformed(evt);
@@ -579,7 +592,7 @@ public class utilerias extends java.awt.Dialog {
 
         Jbtn_guardar_email.setText("Guardar");
         Jbtn_guardar_email.setToolTipText("Guardar");
-        Jbtn_guardar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        Jbtn_guardar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         Jbtn_guardar_email.setFocusable(false);
         Jbtn_guardar_email.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         Jbtn_guardar_email.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -617,6 +630,8 @@ public class utilerias extends java.awt.Dialog {
 
         jTabbedPane1.addTab("Email", jPanel3);
 
+        jPanel4.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+
         info.setColumns(20);
         info.setRows(5);
         jScrollPane1.setViewportView(info);
@@ -627,7 +642,7 @@ public class utilerias extends java.awt.Dialog {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 722, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 751, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -635,11 +650,12 @@ public class utilerias extends java.awt.Dialog {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 439, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(71, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("version release", jPanel4);
 
+        jPanel5.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos de la empresa"));
@@ -683,7 +699,7 @@ public class utilerias extends java.awt.Dialog {
 
         btnSave.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnSave.setText("Guardar");
-        btnSave.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSave.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveActionPerformed(evt);
@@ -693,7 +709,7 @@ public class utilerias extends java.awt.Dialog {
 
         btnEdit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnEdit.setText("Editar");
-        btnEdit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEdit.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEditActionPerformed(evt);
@@ -705,6 +721,8 @@ public class utilerias extends java.awt.Dialog {
 
         jTabbedPane1.addTab("Datos generales", jPanel5);
 
+        jPanel7.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+
         jLabel2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel2.setText("Email compras:");
 
@@ -712,11 +730,11 @@ public class utilerias extends java.awt.Dialog {
 
         btnSaveConfiguration.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnSaveConfiguration.setText("Guardar");
-        btnSaveConfiguration.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSaveConfiguration.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         btnEditConfiguration.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnEditConfiguration.setText("Editar");
-        btnEditConfiguration.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEditConfiguration.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnEditConfiguration.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEditConfigurationActionPerformed(evt);
@@ -738,7 +756,7 @@ public class utilerias extends java.awt.Dialog {
                         .addComponent(btnSaveConfiguration, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(btnEditConfiguration, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(237, Short.MAX_VALUE))
+                .addContainerGap(279, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -747,7 +765,7 @@ public class utilerias extends java.awt.Dialog {
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtEmailCompras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 228, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 301, Short.MAX_VALUE)
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSaveConfiguration)
                     .addComponent(btnEditConfiguration))
@@ -756,7 +774,46 @@ public class utilerias extends java.awt.Dialog {
 
         jTabbedPane1.addTab("Configuración", jPanel7);
 
-        jPanel2.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 750, 500));
+        jPanel8.setToolTipText("");
+        jPanel8.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+
+        txtInfoPDFSummary.setColumns(20);
+        txtInfoPDFSummary.setFont(new java.awt.Font("Arial", 0, 9)); // NOI18N
+        txtInfoPDFSummary.setRows(5);
+        jScrollPane2.setViewportView(txtInfoPDFSummary);
+
+        btnEditPdfSummary.setText("Editar");
+        btnEditPdfSummary.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditPdfSummaryActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 751, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnEditPdfSummary)))
+                .addContainerGap())
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 478, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnEditPdfSummary))
+        );
+
+        jTabbedPane1.addTab("Info PDF resumen", jPanel8);
+
+        jPanel2.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 780, 550));
         jTabbedPane1.getAccessibleContext().setAccessibleName("Folio");
         jTabbedPane1.getAccessibleContext().setAccessibleDescription("Folio");
 
@@ -1047,6 +1104,24 @@ public class utilerias extends java.awt.Dialog {
         this.txtEmailCompras.setEnabled(true);
     }//GEN-LAST:event_btnEditConfigurationActionPerformed
 
+    private void btnEditPdfSummaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditPdfSummaryActionPerformed
+        String textButton = btnEditPdfSummary.getText();
+        if (textButton.equals("Editar")) {
+            txtInfoPDFSummary.setEnabled(true);
+            btnEditPdfSummary.setText("Actualizar");
+        } else {
+            DatosGenerales data = new DatosGenerales();
+            data.setInfoSummaryFolio(txtInfoPDFSummary.getText().trim());
+            try {
+                systemService.updateInfoPDFSummary(data);
+            } catch (DataOriginException e) {
+                JOptionPane.showMessageDialog(null, e,"Error", JOptionPane.ERROR_MESSAGE);
+            }
+            btnEditPdfSummary.setText("Editar");
+            txtInfoPDFSummary.setEnabled(false);
+        }
+    }//GEN-LAST:event_btnEditPdfSummaryActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1072,6 +1147,7 @@ public class utilerias extends java.awt.Dialog {
     private javax.swing.JButton Jbtn_guardar_email;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnEditConfiguration;
+    private javax.swing.JButton btnEditPdfSummary;
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnSaveConfiguration;
     private javax.swing.ButtonGroup buttonGroup1;
@@ -1098,7 +1174,9 @@ public class utilerias extends java.awt.Dialog {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane21;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
@@ -1113,6 +1191,7 @@ public class utilerias extends java.awt.Dialog {
     private javax.swing.JTextField txtAdress;
     private javax.swing.JTextField txtCompanyName;
     private javax.swing.JTextField txtEmailCompras;
+    private javax.swing.JTextArea txtInfoPDFSummary;
     private javax.swing.JTextField txtTels;
     public static javax.swing.JTextField txt_asunto;
     public static javax.swing.JPasswordField txt_contraseña_email;

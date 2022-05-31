@@ -17,6 +17,17 @@ public class DatosGenerales {
     private String address2;
     private String address3;
     private Integer folio;
+    private String infoSummaryFolio;
+
+    public String getInfoSummaryFolio() {
+        return infoSummaryFolio;
+    }
+
+    public void setInfoSummaryFolio(String infoSummaryFolio) {
+        this.infoSummaryFolio = infoSummaryFolio;
+    }
+    
+    
 
     public Integer getId() {
         return id;

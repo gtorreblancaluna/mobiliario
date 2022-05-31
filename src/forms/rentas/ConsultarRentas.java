@@ -17,6 +17,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -499,9 +500,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
                 return;
             }
-            JasperReport masterReport = null;
-            
-            masterReport = (JasperReport) JRLoader.loadObject(archivo);
+            JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(archivo);  
            
             DatosGenerales datosGenerales = systemService.getGeneralData();
             
@@ -521,6 +520,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             parametro.put("total_faltantes", g_totalFaltantes+"");
             parametro.put("mensaje_faltantes", g_mensajeFaltantes);  
             parametro.put("URL_SUB_REPORT_CONSULTA", pathLocation+ApplicationConstants.URL_SUB_REPORT_CONSULTA);
+            parametro.put("INFO_SUMMARY_FOLIO",datosGenerales.getInfoSummaryFolio());
          
             jasperPrint = JasperFillManager.fillReport(masterReport, parametro, funcion.getConnection());
             JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_CONSULTA);
@@ -4079,95 +4079,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
     private void jbtn_generar_reporte1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_generar_reporte1ActionPerformed
         // TODO add your handling code here:
-//        String xiva;
-//        float yiva, itotal;
-//        if (tabla_prox_rentas.getSelectedRow() != - 1) {
-//            id_renta = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
-//            // funcion.conectate();
-//            
-//            Renta renta = saleService.obtenerRentaPorId(new Integer(id_renta), funcion);
-//            if(renta ==null){
-//                JOptionPane.showMessageDialog(null, "No se obtuvieron resultados, porfavor cierra y abre la aplicacion ", "ERROR", JOptionPane.INFORMATION_MESSAGE);
-//                return;
-//            }
-//            
-//            float fAbonos = 0f;
-//            float fSubTotal = 0f;
-//            
-//            for(DetalleRenta detalle : renta.getDetalleRenta()){
-//                float fDescuento = 0f;
-//                if(detalle.getPorcentajeDescuento() > 0)
-//                    fDescuento += ( detalle.getCantidad() * detalle.getPrecioUnitario() ) * (detalle.getPorcentajeDescuento()/100);                
-//                    
-//                fSubTotal += ( detalle.getCantidad() * detalle.getPrecioUnitario() ) - fDescuento;
-//            }
-//             subTotal = fSubTotal+"";
-//             
-//             if(renta.getAbonos() != null && renta.getAbonos().size()>0){
-//                for(Abono abono : renta.getAbonos()){
-//                    fAbonos += abono.getAbono();
-//                }
-//             }
-//             
-//             float fSubtTotalFaltantes = 0f;
-//             float fTotalFaltantes = 0f;
-//             
-//             String totalFaltantes = funcion.GetData("total",
-//                      "SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * a.precio_compra),0) )AS total "
-//                    + "FROM faltantes f "
-//                    + "INNER JOIN articulo a ON (f.id_articulo = a.id_articulo) "
-//                    + "WHERE f.id_renta=" + id_renta + " "
-//                    + "AND f.fg_activo = '1' "
-//                    );
-//            if(totalFaltantes == null || totalFaltantes.equals(""))
-//                totalFaltantes = "0";
-//            
-//            try {
-//                fSubtTotalFaltantes = new Float(totalFaltantes);
-//            } catch (Exception e) {
-//            }
-//            g_mensajeFaltantes = "";
-//            if(fSubtTotalFaltantes > 0){
-//                // el pedido tiene pago pendiente por faltante
-//                if(renta.getDepositoGarantia()>0){
-//                    // a dejado deposito en garantia
-//                    fTotalFaltantes = fSubtTotalFaltantes - renta.getDepositoGarantia();
-//                    if(fTotalFaltantes < 0)
-//                        this.g_mensajeFaltantes = "deposito en garantia es: $ "+renta.getDepositoGarantia()+", concepto faltantes es: $ "+fSubtTotalFaltantes+", cantidad a devolver al cliente: $ "+ (fTotalFaltantes * -1);
-//                    else if(fTotalFaltantes > 0)
-//                        this.g_mensajeFaltantes = "deposito en garantia es: $ "+renta.getDepositoGarantia()+", concepto faltantes es: $ "+fSubtTotalFaltantes+", resta: $ "+ (fTotalFaltantes);
-//                }else{
-//                    // se asgina el total                   
-//                    this.g_mensajeFaltantes = "total a pagar por concepto de faltantes es: $ "+fSubtTotalFaltantes;
-//                }                
-//                
-//            }
-//            if(fTotalFaltantes>0)
-//                g_totalFaltantes = fTotalFaltantes;
-//             else
-//                g_totalFaltantes = 0f;
-//             cant_abono = fAbonos+"";
-//             desc_rep  = renta.getCantidadDescuento()+"";
-//             xiva = renta.getIva()+"";
-//            
-//            if (cant_abono == null) {
-//                cant_abono = "0";
-//            }
-//            if (desc_rep == null) {
-//                desc_rep = "0";
-//            }
-//            if (xiva == null) {
-//                iva_rep = "0";
-//            } else {
-//                yiva = Float.parseFloat(xiva.toString());
-//                itotal = (Float.parseFloat(subTotal) * (yiva / 100));
-//                iva_rep = String.valueOf(itotal);
-//
-//                //((Float.parseFloat(auxSubtotal) * (xiva / 100)));
-//            }
-//            System.out.println("SUBTOTAL: " + subTotal);
-//            System.out.println("ABONO: " + cant_abono);
-//            chofer = renta.getChofer().getNombre() + " " + renta.getChofer().getApellidos();
+
             fgConsultaTabla= true;
             try{
                 reporte();
@@ -4175,10 +4087,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 log.error(e);
             }
             
-//        } else {
-//            JOptionPane.showMessageDialog(null, "Selecciona una fila para generar el reporte...", "Reporte", JOptionPane.INFORMATION_MESSAGE);
-//            
-//        }
+
     }//GEN-LAST:event_jbtn_generar_reporte1ActionPerformed
 
     private void jbtn_generar_reporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_generar_reporteActionPerformed
@@ -4287,9 +4196,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         try {               
             String pathLocation = Utility.getPathLocation();
-            JasperReport masterReport = null;
-
-            masterReport = (JasperReport) JRLoader.loadObject(pathLocation+ApplicationConstants.RUTA_REPORTE_ENTREGAS);     
+           
+            JasperReport masterReport = (JasperReport) JRLoader.loadObject(new ByteArrayInputStream((pathLocation+ApplicationConstants.RUTA_REPORTE_ENTREGAS).getBytes()));  
             // enviamos los parametros
             Map map = new HashMap<>();
             map.put("id_renta", renta.getRentaId());
@@ -4377,12 +4285,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
               
             }
-            JasperReport masterReport = null;
-            try {
-                masterReport = (JasperReport) JRLoader.loadObject(pathLocation+archivo);
-            } catch (JRException e) {               
-                JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());              
-            }
+            
+            JasperReport masterReport = (JasperReport) JRLoader.loadObject(new ByteArrayInputStream((pathLocation+archivo).getBytes()));
             Map parametro = new HashMap<>();
             //guardamos el parametro
 
