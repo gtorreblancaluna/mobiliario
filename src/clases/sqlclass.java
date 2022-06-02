@@ -168,22 +168,6 @@ public class sqlclass {
        return id;
     }
     
-
- //Funcion para deshabilitar un panel
- public static void setEnableContainer(Container c, boolean band) {
-        
-    Component[] components = c.getComponents();
-    c.setEnabled(band);
-    for(int i = 0; i < components.length; i++){           
-     components[i].setEnabled(band);
-
-     if(components[i] instanceof Container){
-      setEnableContainer((Container)components[i], band);
-     }
-   
- }       
-} 
-    
     /* INSERTA UN NUEVO REGISTRO EN LA BASE DE DATOS
      * PARAMETROS(Un array de String con los datos a insertar,la instruccion sql)
      */

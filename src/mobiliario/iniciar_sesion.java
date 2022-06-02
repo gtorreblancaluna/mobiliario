@@ -8,8 +8,8 @@ import java.awt.event.ActionListener;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
-import static mobiliario.principal.lbl_logueo;
-import static mobiliario.principal.lblPuesto;
+import static mobiliario.IndexForm.lbl_logueo;
+import static mobiliario.IndexForm.lblPuesto;
 import model.Usuario;
 import org.apache.log4j.Logger;
 import org.jvnet.substance.SubstanceLookAndFeel;
@@ -20,7 +20,7 @@ public class iniciar_sesion extends javax.swing.JFrame {
 //initializing the logger
 private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
 
-    private principal ventana_principal;
+    private IndexForm ventana_principal;
     private static final UserService userService = UserService.getInstance();
     private Timer tiempo;
     int cont;
@@ -60,7 +60,7 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
             if (cont == 100) {
                 tiempo.stop();
                 esconder();
-                ventana_principal = new principal();
+                ventana_principal = new IndexForm();
                 ventana_principal.setVisible(true);
                 setVisible(false);
 

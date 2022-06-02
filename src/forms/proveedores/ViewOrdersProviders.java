@@ -20,7 +20,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import mobiliario.ApplicationConstants;
-import mobiliario.principal;
+import mobiliario.IndexForm;
 import model.DatosGenerales;
 import model.providers.OrdenProveedor;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -68,7 +68,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
          
         if (Utility.verifyIfInternalFormIsOpen(orderProviderForm)) {
             orderProviderForm = new OrderProviderForm(folio, orderId, rentaId);
-            principal.jDesktopPane1.add(orderProviderForm);
+            IndexForm.jDesktopPane1.add(orderProviderForm);
             orderProviderForm.show();
         } else {
             JOptionPane.showMessageDialog(this, "Ahi ta la ventana =)");
@@ -94,7 +94,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
                 return;
             }
-            JasperReport masterReport = (JasperReport) JRLoader.loadObject(new ByteArrayInputStream(archivo.getBytes()));
+            JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(archivo);  
            
             DatosGenerales datosGenerales = systemService.getGeneralData();
             
@@ -197,7 +197,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
        
         if (Utility.verifyIfInternalFormIsOpen(paymentsProvidersForm)) {
             paymentsProvidersForm = new PaymentsProvidersForm();
-            principal.jDesktopPane1.add(paymentsProvidersForm);
+            IndexForm.jDesktopPane1.add(paymentsProvidersForm);
             paymentsProvidersForm.show();
         } else {
             JOptionPane.showMessageDialog(this, "Ahi ta la ventana =)");

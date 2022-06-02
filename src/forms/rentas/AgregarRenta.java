@@ -43,7 +43,6 @@ import model.DatosGenerales;
 import model.Renta;
 import model.TipoAbono;
 import model.Usuario;
-import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -437,7 +436,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             if (archivo == null) {
                 JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
             }
-            JasperReport masterReport = (JasperReport) JRLoader.loadObject(new ByteArrayInputStream(archivo.getBytes()));  
+            JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(archivo);  
 
             DatosGenerales datosGenerales = systemService.getGeneralData();
             

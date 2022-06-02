@@ -1,1 +1,1 @@
-
+Para poder modificar los reportes jasper, se utiliza el programa iReport 5.6.0, es importante que tambien tengan en las librerias del proyecto el JAR jasperreports-5.6.0.jar para que se generen de manera correcta los PDFs

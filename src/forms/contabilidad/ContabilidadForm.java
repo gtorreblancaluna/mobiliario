@@ -5,6 +5,7 @@
  */
 package forms.contabilidad;
 
+import exceptions.DataOriginException;
 import forms.tipo.abonos.cuentas.CuentasBancariasForm;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -32,14 +33,10 @@ import services.ContabilidadServices;
 import services.SystemService;
 import utilities.Utility;
 
-/**
- *
- * @author idscomercial
- */
 public final class ContabilidadForm extends javax.swing.JInternalFrame {
     ContabilidadServices contabilidadServices = new ContabilidadServices();
     private final SystemService systemService = SystemService.getInstance();
-    private final AbonosService abonosService = new AbonosService();
+    private final AbonosService abonosService = AbonosService.getInstance();
     public static AccountService accountService = new AccountService();
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
      public static boolean isContabilidadForm = false;
@@ -95,9 +92,14 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
        List<Cuenta> accountsList = accountService.getAccounts();
        
        List<Contabilidad> contabilidadList = new ArrayList<>();
-        contabilidadList =  contabilidadServices.getAllContabilidadByDatesGroupByBankAccounts(tsInitDate,tsEndDate);
-       
-       List<Abono> abonosList = abonosService.getAbonosByDatesGroupByBankAccounts(initDate, endDate);
+       contabilidadList =  contabilidadServices.getAllContabilidadByDatesGroupByBankAccounts(tsInitDate,tsEndDate);
+       List<Abono> abonosList;
+       try {
+        abonosList = abonosService.getAbonosByDatesGroupByBankAccounts(initDate, endDate);
+       } catch (DataOriginException e) {
+            JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
          
         DefaultTableModel temp = (DefaultTableModel) tabla_resumen.getModel();
         for(Cuenta cuenta : accountsList){
@@ -809,7 +811,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
     }
     
      public void formato_tabla_resumen(){
-    Object[][] data = {{"", "", "", "",""}};
+        Object[][] data = {{"", "", "", "",""}};
         String[] columnNames = {"Cuenta", "Ingresos", "Egresos", "Pagos","Total"};       
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
         tabla_resumen.setModel(tableModel);
@@ -819,6 +821,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
        
         TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
         tabla_resumen.setRowSorter(ordenarTabla);
+        
         int[] anchos = {400, 100, 100, 100, 100,100};
 
             tabla_resumen.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 10));
@@ -920,8 +923,13 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         String endDate = new SimpleDateFormat("dd/MM/yyyy").format(txt_fecha_final.getDate());
        
         
-        List<Abono> list = new ArrayList<>();
-        list =  abonosService.getAbonosByDates(initDate,endDate);
+        List<Abono> list;
+        try {
+            list =  abonosService.getAbonosByDates(initDate,endDate);
+        } catch (DataOriginException e) {
+            JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         
         if(list == null || list.isEmpty() || list.size()<=0)
             return;

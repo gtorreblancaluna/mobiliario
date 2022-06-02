@@ -21,6 +21,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import mobiliario.IndexForm;
 import model.DatosGenerales;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -31,6 +32,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import utilities.Utility;
 
 
 public class SystemService {
@@ -64,7 +66,12 @@ public class SystemService {
     }
     
     public DatosGenerales getGeneralData(){
-        return systemDao.getGeneralData();
+        if (IndexForm.generalDataGlobal == null ) {
+                DatosGenerales generalData = systemDao.getGeneralData();
+                IndexForm.generalDataGlobal = generalData;
+                Utility.pushNotification("Datos generales del sistema obtenidos de la base de datos.");
+        }
+        return IndexForm.generalDataGlobal;
     }
     
     public void saveDatosGenerales(DatosGenerales datosGenerales){

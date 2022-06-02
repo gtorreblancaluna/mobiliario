@@ -17,7 +17,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -47,7 +46,7 @@ import mobiliario.ApplicationConstants;
 import mobiliario.VerFaltantes;
 import mobiliario.disponibilidad_articulos;
 import mobiliario.iniciar_sesion;
-import mobiliario.principal;
+import mobiliario.IndexForm;
 import model.Abono;
 import model.Articulo;
 import model.AsignaCategoria;
@@ -57,7 +56,6 @@ import model.Faltante;
 import model.Renta;
 import model.TipoAbono;
 import model.Usuario;
-import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -327,7 +325,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         GenerateReportMaterialSaleItemsView win = new GenerateReportMaterialSaleItemsView(eventId);
         win.setLocation(this.getWidth() / 2 - win.getWidth() / 2, this.getHeight() / 2 - win.getHeight() / 2 - 20);
-        principal.jDesktopPane1.add(win);
+        IndexForm.jDesktopPane1.add(win);
         win.show();
     }
     
@@ -341,7 +339,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
        if (Utility.verifyIfInternalFormIsOpen(orderProviderForm)) {
             orderProviderForm = new OrderProviderForm(folio, orderId, rentaId);
             orderProviderForm.setLocation(this.getWidth() / 2 - orderProviderForm.getWidth() / 2, this.getHeight() / 2 - orderProviderForm.getHeight() / 2 - 20);
-            principal.jDesktopPane1.add(orderProviderForm);
+            IndexForm.jDesktopPane1.add(orderProviderForm);
             orderProviderForm.show();
         } else {
             JOptionPane.showMessageDialog(this, "Ahi ta la ventana =)");
@@ -1312,7 +1310,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         Utility.pushNotification(messageLogInfo);
         log.info(messageLogInfo);
         jbtn_guardar.setEnabled(false);
-        funcion.setEnableContainer(panel_datos_generales, false);
+        
         tabla_articulos();
         checkNewItemsAndUpdateRenta();
         descuento = txt_descuento.getText().toString();
@@ -1323,6 +1321,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         // actualizamos la renta
         globalRenta = saleService.obtenerRentaPorId(globalRenta.getRentaId());
+        
+        disableEvent();
     }
     
     private void checkNewItemsAndUpdateRenta () {
@@ -3710,16 +3710,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private void tabla_prox_rentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_prox_rentasMouseClicked
         // TODO add your handling code here:
         if (evt.getClickCount() == 2) {
-            this.txt_editar_cantidad.setEnabled(false);
-            this.txt_editar_precio_unitario.setEnabled(false);
-            this.txt_editar_porcentaje_descuento.setEnabled(false);
-            
-            funcion.setEnableContainer(panel_datos_cliente, false);
-          
-            funcion.setEnableContainer(panel_datos_generales, false);
-            funcion.setEnableContainer(jTabbedPane2, false);
-            funcion.setEnableContainer(panel_abonos, false);
-            
+                        
             llenar_combo_tipo();
             llenar_combo_estado2();
             llenar_combo_chofer();
@@ -3818,12 +3809,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             txt_total.setText(decimalFormat.format(globalRenta.getTotal()));
             // FIN TOTALES
 
-              subTotal();
-//            total();
+            subTotal();
             
             datos_cliente(Integer.parseInt(globalRenta.getCliente().getId().toString()));
-            jbtn_agregar_cliente.setEnabled(false);
-            jbtn_guardar_cliente.setEnabled(false);
+            disableEvent();
             
         }
     }//GEN-LAST:event_tabla_prox_rentasMouseClicked
@@ -3936,25 +3925,147 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private void jbtn_guardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_guardarActionPerformed
         // TODO add your handling code here:
         actualizar_renta();
-//        buscar();
-        jbtn_disponible.setEnabled(true);
     }//GEN-LAST:event_jbtn_guardarActionPerformed
 
+    private void enabledEvent () {
+        cmb_fecha_entrega.setEnabled(true);
+        cmb_chofer.setEnabled(true);
+        cmb_fecha_devolucion.setEnabled(true);
+        cmb_fecha_evento.setEnabled(true);
+        cmb_hora.setEnabled(true);
+        cmb_hora_devolucion.setEnabled(true);
+        cmb_hora_dos.setEnabled(true);
+        cmb_hora_devolucion_dos.setEnabled(true);
+        txt_descripcion.setEnabled(true);
+        cmb_estado1.setEnabled(true);
+        cmb_tipo.setEnabled(true);
+        check_mostrar_precios.setEnabled(true);
+        check_enviar_email.setEnabled(true);
+        txtEmailToSend.setEnabled(true);
+        txtPorcentajeDescuento.setEnabled(true);
+        txt_envioRecoleccion.setEnabled(true);
+        txt_depositoGarantia.setEnabled(true);
+        txt_iva.setEnabled(true);
+        jbtn_guardar.setEnabled(true);
+        jbtn_agregar_articulos.setEnabled(true);
+        txt_buscar.setEnabled(true);
+        btnGetItemsFromFolio.setEnabled(true);
+        txt_cantidad.setEnabled(true);
+        txt_precio_unitario.setEnabled(true);
+        txt_porcentaje_descuento.setEnabled(true);
+        tabla_articulos.setEnabled(true);
+        txt_abono.setEnabled(true);
+        txt_comentario.setEnabled(true);
+        cmbTipoPago.setEnabled(true);
+        cmb_fecha_pago.setEnabled(true);
+        tabla_abonos.setEnabled(true);
+        txt_comentarios.setEnabled(true);
+        tableOrdersProvider.setEnabled(true);
+        jbtn_agregar_articulo.setEnabled(true);
+        jbtn_editar_dinero.setEnabled(true);
+        jButton4.setEnabled(true);
+        jButton3.setEnabled(true);
+        jbtn_disponible.setEnabled(true);
+        jbtn_mostrar_articulos.setEnabled(true);
+        jButton5.setEnabled(true);
+        jBtnAddOrderProvider.setEnabled(true);
+        txt_nombre.setEnabled(true);
+        txt_apellidos.setEnabled(true);
+        txt_apodo.setEnabled(true);
+        txt_tel_movil.setEnabled(true);
+        txt_tel_casa.setEnabled(true);
+        txt_email.setEnabled(true);
+        txt_direccion.setEnabled(true);
+        txt_localidad.setEnabled(true);
+        txt_rfc.setEnabled(true);
+        jbtn_nuevo_cliente.setEnabled(true);
+        jbtn_agregar_cliente.setEnabled(true);
+        jbtn_guardar_cliente.setEnabled(true);        
+        jbtn_editar_cliente.setEnabled(true);        
+        tabla_clientes.setEnabled(true);       
+        txt_buscar1.setEnabled(true);       
+        check_nombre.setEnabled(true);        
+        check_apellidos.setEnabled(true);       
+        check_apodo.setEnabled(true);
+        jbtn_agregar_abono.setEnabled(true);
+        jbtn_quitar_abono.setEnabled(true);
+        jbtn_editar_abonos.setEnabled(true);        
+        jbtn_guardar_abonos.setEnabled(true); 
+        tabla_detalle.setEnabled(true);
+    }
+    
+    private void disableEvent () {
+        cmb_fecha_entrega.setEnabled(false);
+        cmb_chofer.setEnabled(false);
+        cmb_fecha_devolucion.setEnabled(false);
+        cmb_fecha_evento.setEnabled(false);
+        cmb_hora.setEnabled(false);
+        cmb_hora_devolucion.setEnabled(false);
+        cmb_hora_dos.setEnabled(false);
+        cmb_hora_devolucion_dos.setEnabled(false);
+        txt_descripcion.setEnabled(false);
+        cmb_estado1.setEnabled(false);
+        cmb_tipo.setEnabled(false);
+        check_mostrar_precios.setEnabled(false);
+        check_enviar_email.setEnabled(false);
+        txtEmailToSend.setEnabled(false);
+        txtPorcentajeDescuento.setEnabled(false);
+        txt_envioRecoleccion.setEnabled(false);
+        txt_depositoGarantia.setEnabled(false);
+        txt_iva.setEnabled(false);
+        jbtn_guardar.setEnabled(false);
+        jbtn_agregar_articulos.setEnabled(false);
+        txt_buscar.setEnabled(false);
+        btnGetItemsFromFolio.setEnabled(false);
+        txt_cantidad.setEnabled(false);
+        txt_precio_unitario.setEnabled(false);
+        txt_porcentaje_descuento.setEnabled(false);
+        tabla_articulos.setEnabled(false);
+        txt_abono.setEnabled(false);
+        txt_comentario.setEnabled(false);
+        cmbTipoPago.setEnabled(false);
+        cmb_fecha_pago.setEnabled(false);
+        tabla_abonos.setEnabled(false);
+        txt_comentarios.setEnabled(false);
+        tableOrdersProvider.setEnabled(false);
+        jbtn_agregar_articulo.setEnabled(false);
+        jbtn_editar_dinero.setEnabled(false);
+        jButton4.setEnabled(false);
+        jButton3.setEnabled(false);
+        jbtn_disponible.setEnabled(false);
+        jbtn_mostrar_articulos.setEnabled(false);
+        jButton5.setEnabled(false);
+        jBtnAddOrderProvider.setEnabled(false);
+        txt_nombre.setEnabled(false);
+        txt_apellidos.setEnabled(false);
+        txt_apodo.setEnabled(false);
+        txt_tel_movil.setEnabled(false);
+        txt_tel_casa.setEnabled(false);
+        txt_email.setEnabled(false);
+        txt_direccion.setEnabled(false);
+        txt_localidad.setEnabled(false);
+        txt_rfc.setEnabled(false);
+        jbtn_nuevo_cliente.setEnabled(false);
+        jbtn_agregar_cliente.setEnabled(false);
+        jbtn_guardar_cliente.setEnabled(false);        
+        jbtn_editar_cliente.setEnabled(false);        
+        tabla_clientes.setEnabled(false);       
+        txt_buscar1.setEnabled(false);       
+        check_nombre.setEnabled(false);        
+        check_apellidos.setEnabled(false);       
+        check_apodo.setEnabled(false);
+        jbtn_agregar_abono.setEnabled(false);
+        jbtn_quitar_abono.setEnabled(false);
+        jbtn_editar_abonos.setEnabled(false);        
+        jbtn_guardar_abonos.setEnabled(false);   
+        tabla_detalle.setEnabled(false);
+                
+    }
     private void jbtn_editarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_editarActionPerformed
         // TODO add your handling code here:
 
         if (iniciar_sesion.administrador_global.equals("1")) {
-            funcion.setEnableContainer(panel_datos_generales, true);
-            funcion.setEnableContainer(jTabbedPane2, true);
-            
-//            JOptionPane.showMessageDialog(null, "Puedes modificar...=)", "Modificar pedido", JOptionPane.INFORMATION_MESSAGE);
-            Toolkit.getDefaultToolkit().beep();
-            jbtn_guardar.setEnabled(true);
-            
-            this.txt_editar_cantidad.setEnabled(false);
-            this.txt_editar_precio_unitario.setEnabled(false);
-            this.txt_editar_porcentaje_descuento.setEnabled(false);
-            
+            enabledEvent();            
         } else {
             JOptionPane.showMessageDialog(null, "No cuenta con permisos suficientos :(", "Error", JOptionPane.INFORMATION_MESSAGE);
             
@@ -3978,10 +4089,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         guardar_cliente();
         jTabbedPane1.setSelectedIndex(1);
         JOptionPane.showMessageDialog(null, "Se actualizo los datos del cliente...", "Datos del cliente", JOptionPane.INFORMATION_MESSAGE);
-        
-        jbtn_guardar_cliente.setEnabled(false);
-        funcion.setEnableContainer(panel_datos_cliente, false);
-        //limpiar();
         tabla_clientes();
         tabla_detalle();
         
@@ -4036,7 +4143,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private void jbtn_nuevo_clienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_nuevo_clienteActionPerformed
         // TODO add your handling code here:
         limpiar();
-        funcion.setEnableContainer(panel_datos_cliente, true);
         jbtn_agregar_cliente.setEnabled(true);
         jbtn_guardar_cliente.setEnabled(false);
         jbtn_editar_cliente.setEnabled(false);
@@ -4052,8 +4158,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(null, "Se agrego el cliente a la db y se actualizo...", "Cliente bd", JOptionPane.INFORMATION_MESSAGE);
                 
                 this.lbl_cliente.setText("Socio: " + this.txt_nombre.getText() + " " + this.txt_apellidos.getText());
-                //limpiar();
-                funcion.setEnableContainer(panel_datos_cliente, false);
+                
                 jbtn_agregar_cliente.setEnabled(false);
                 jbtn_editar_cliente.setEnabled(true);
                 
@@ -4064,7 +4169,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private void jbtn_editar_clienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_editar_clienteActionPerformed
         // TODO add your handling code here:
         jbtn_guardar_cliente.setEnabled(true);
-        funcion.setEnableContainer(panel_datos_cliente, true);
     }//GEN-LAST:event_jbtn_editar_clienteActionPerformed
 
     private void jTabbedPane2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTabbedPane2MouseClicked
@@ -4197,7 +4301,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         try {               
             String pathLocation = Utility.getPathLocation();
            
-            JasperReport masterReport = (JasperReport) JRLoader.loadObject(new ByteArrayInputStream((pathLocation+ApplicationConstants.RUTA_REPORTE_ENTREGAS).getBytes()));  
+            JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(pathLocation+ApplicationConstants.RUTA_REPORTE_ENTREGAS);  
             // enviamos los parametros
             Map map = new HashMap<>();
             map.put("id_renta", renta.getRentaId());
@@ -4211,7 +4315,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             Desktop.getDesktop().open(file2);
 
         } catch (Exception e) {
-            Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(IndexForm.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(rootPane, e);
         }
             
@@ -4285,8 +4389,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
               
             }
+            JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(pathLocation+archivo);
             
-            JasperReport masterReport = (JasperReport) JRLoader.loadObject(new ByteArrayInputStream((pathLocation+archivo).getBytes()));
             Map parametro = new HashMap<>();
             //guardamos el parametro
 
@@ -4302,8 +4406,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             try {
                 Desktop.getDesktop().open(file2);
             } catch (IOException ex) {
-                Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(IndexForm.class.getName()).log(Level.SEVERE, null, ex);
             }
+            // funcion.desconecta();
+            // funcion.desconecta();
+            // funcion.desconecta();
             // funcion.desconecta();
         } catch (Exception j) {
             System.out.println("Mensaje de Error:" + j.toString());
@@ -4609,7 +4716,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 //            mail.setArchive(rutaPDF_email);
 //        }
 
-        // mail.setArchive(principal.rutaXML_email.toString());
+        // mail.setArchive(IndexForm.rutaXML_email.toString());
         mail.SEND();
     }
     

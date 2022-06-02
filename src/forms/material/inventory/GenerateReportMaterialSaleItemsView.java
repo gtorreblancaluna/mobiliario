@@ -133,7 +133,7 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
             JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper: "+pathFile);
             return;
         }
-        JasperReport masterReport = (JasperReport) JRLoader.loadObject(new ByteArrayInputStream(pathFile.getBytes()));      
+        JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(pathFile);
         Map params = new HashMap<>();
         params.put("RENT_ID",this.gRentId);
         params.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA);

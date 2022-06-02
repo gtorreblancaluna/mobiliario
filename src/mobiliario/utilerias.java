@@ -1114,8 +1114,9 @@ public class utilerias extends java.awt.Dialog {
             data.setInfoSummaryFolio(txtInfoPDFSummary.getText().trim());
             try {
                 systemService.updateInfoPDFSummary(data);
+                JOptionPane.showMessageDialog(this, "Se actualizó con éxito, cierra y abre de nuevo el sistema para ver los cambios.", "ATENCIÓN", JOptionPane.INFORMATION_MESSAGE);
             } catch (DataOriginException e) {
-                JOptionPane.showMessageDialog(null, e,"Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, e,"Error", JOptionPane.ERROR_MESSAGE);
             }
             btnEditPdfSummary.setText("Editar");
             txtInfoPDFSummary.setEnabled(false);

@@ -21,7 +21,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import mobiliario.ApplicationConstants;
 import mobiliario.iniciar_sesion;
-import mobiliario.principal;
+import mobiliario.IndexForm;
 import model.Articulo;
 import model.DatosGenerales;
 import model.DetalleRenta;
@@ -126,9 +126,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
             return;
         }
-        JasperReport masterReport = null;
-
-        masterReport = (JasperReport) JRLoader.loadObject(new ByteArrayInputStream(archivo.getBytes()));
+        JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(archivo);  
 
         DatosGenerales datosGenerales = systemService.getGeneralData();
 
@@ -263,7 +261,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         if (Utility.verifyIfInternalFormIsOpen(paymentsProvidersForm)) {
             paymentsProvidersForm = new PaymentsProvidersForm();
 //            orderProviderForm.setLocation(this.getWidth() / 2 - orderProviderForm.getWidth() / 2, this.getHeight() / 2 - orderProviderForm.getHeight() / 2 - 20);
-            principal.jDesktopPane1.add(paymentsProvidersForm);
+            IndexForm.jDesktopPane1.add(paymentsProvidersForm);
             paymentsProvidersForm.show();
         } else {
             JOptionPane.showMessageDialog(this, "Ahi ta la ventana =)");

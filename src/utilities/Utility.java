@@ -21,8 +21,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import mobiliario.ApplicationConstants;
 import mobiliario.iniciar_sesion;
-import mobiliario.principal;
-import static mobiliario.principal.jDesktopPane1;
+import mobiliario.IndexForm;
+import static mobiliario.IndexForm.jDesktopPane1;
 
 
 public abstract class Utility {
@@ -67,15 +67,15 @@ public abstract class Utility {
         StringBuilder messages = new StringBuilder();
         
         String date = simpleDateFormat.format(new Timestamp(System.currentTimeMillis()));
-        principal.listNotifications.add(date+" >> "+notification);
-        principal.listNotifications.stream().forEach(t -> {
+        IndexForm.listNotifications.add(date+" >> "+notification);
+        IndexForm.listNotifications.stream().forEach(t -> {
             messages.append(t);
             messages.append("\n");
         });
         
        
-        principal.txtAreaNotifications.setText(null);
-        principal.txtAreaNotifications.setText(messages+"");
+        IndexForm.txtAreaNotifications.setText(null);
+        IndexForm.txtAreaNotifications.setText(messages+"");
     }
     
      public static String formatMoney(String valor) {

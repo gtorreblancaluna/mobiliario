@@ -1,16 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
+import forms.abonos.PaymentsForm;
 import forms.inventario.InventarioForm;
 import forms.rentas.AgregarRenta;
 import forms.rentas.ConsultarRentas;
 import forms.contabilidad.ContabilidadForm;
 import forms.material.inventory.MaterialInventoryView;
-import forms.proveedores.OrderProviderForm;
 import forms.proveedores.ViewOrdersProviders;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
@@ -24,87 +19,38 @@ import model.DatosGenerales;
 import services.SystemService;
 import utilities.Utility;
 
-/**
- *
- * @author Carlos Alberto
- */
-public class principal extends javax.swing.JFrame {
+public class IndexForm extends javax.swing.JFrame {
 
-    OrderProviderForm orderProviderForm;
-    ViewOrdersProviders viewOrdersProviders;
-    MaterialInventoryView materialInventoryView;
-    clientes ventana_clientes;
-    iniciar_sesion v_iniciar_sesion;
-    utilerias ventana_utilerias;
-    usuarios ventana_usuarios;
-    ContabilidadForm ventana_contabilidad;
-    InventarioForm ventana_inventario;
-    consultar_abonos ventana_abonos;
-    AgregarRenta ventana_agregar_renta;
-    ConsultarRentas v_consultar_renta;
-    Object[][] dtconduc, datos_cliente;
-    Object[] datos_combo;
-    String sql = "", fecha_sistema = "";
+    private ViewOrdersProviders viewOrdersProviders;
+    private MaterialInventoryView materialInventoryView;
+    private clientes ventana_clientes;
+    private iniciar_sesion v_iniciar_sesion;
+    private usuarios ventana_usuarios;
+    private ContabilidadForm ventana_contabilidad;
+    private InventarioForm ventana_inventario;
+    private PaymentsForm ventana_abonos;
+    private AgregarRenta ventana_agregar_renta;
+    private ConsultarRentas v_consultar_renta;
     private final SystemService systemService = SystemService.getInstance();
-     private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(principal.class.getName());
-     public static List<String> listNotifications = new ArrayList<>();
+    private final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(IndexForm.class.getName());
+    public static List<String> listNotifications = new ArrayList<>();
+    public static DatosGenerales generalDataGlobal;
 
-    /**
-     * Creates new form principal
-     */
-    
-    public principal() {       
-        
-//        funcion.conectate(); 
-            initComponents();
-            Utility.getSystemDate("/");
-//            Image icon = Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png"));
-//            setIconImage(icon);
-            this.setExtendedState(this.MAXIMIZED_BOTH);
-//            lbl_logueo.setText(iniciar_sesion.nombre_usuario_global + " " + iniciar_sesion.apellidos_usuario_global);
-//            lblPuesto.setText(funcion.GetData("descripcion", "SELECT p.`descripcion` FROM usuarios u, puesto p\n"
-//                    + "WHERE u.id_puesto=p.id_puesto AND p.`id_puesto`='" + iniciar_sesion.id_puesto_global.toString() + "'"));
-//            funcion.desconecta();
-            lbl_logueo.setText(iniciar_sesion.usuarioGlobal.getNombre()+" "+iniciar_sesion.usuarioGlobal.getApellidos());
-            lblPuesto.setText(iniciar_sesion.usuarioGlobal.getPuesto().getDescripcion());
+    public IndexForm() {
 
-            sql = "SELECT r.`id_renta`,r.`folio`,CONCAT(c.`nombre`,\" \", c.`apellidos`)AS cliente,e.`descripcion` as estado, r.`fecha_entrega`, r.`hora_entrega`, r.`descripcion`,CONCAT(u.`nombre`,\" \",u.`apellidos`)AS Chofer FROM renta r, estado e, clientes c,usuarios u\n"
-                    + "WHERE r.id_estado=e.id_estado AND r.id_clientes=c.id_clientes AND STR_TO_DATE(r.`fecha_entrega`, '%d/%m/%Y') >= STR_TO_DATE('" + fecha_sistema + "', '%d/%m/%Y') AND r.id_usuario_chofer=u.id_usuarios AND r.`id_tipo`='1' ORDER BY r.`folio`";
-            
-//            validarVersion();
-            DatosGenerales d = systemService.getGeneralData();
-            log.info(">>> datos generales obtenidos: "+d);
-            this.setTitle(d.getCompanyName().toUpperCase());
-          Utility.pushNotification("NOTIFICACIONES");
-          Utility.pushNotification("Inicio sesión: " + usuarioGlobal.getNombre() + " " + usuarioGlobal.getApellidos() );
-            
+        initComponents();
+        Utility.getSystemDate("/");
+        this.setExtendedState(this.MAXIMIZED_BOTH);
+        lbl_logueo.setText(iniciar_sesion.usuarioGlobal.getNombre()+" "+iniciar_sesion.usuarioGlobal.getApellidos());
+        lblPuesto.setText(iniciar_sesion.usuarioGlobal.getPuesto().getDescripcion());
         
-    }
-    
-    public void validarVersion(){
-        // funcion para instalar version de prueba
+        Utility.pushNotification("NOTIFICACIONES");
+        Utility.pushNotification("Inicio sesión: " + usuarioGlobal.getNombre() + " " + usuarioGlobal.getApellidos() );
         
-//        String no = funcion.GetData("numero", "SELECT COUNT(*) AS numero FROM renta ");
-//        int numero = Integer.parseInt(no);
-//        if(numero >= 350000){
-            // 2018.04.27 GTL limite de registros para versiones de prueba
-//            JOptionPane.showMessageDialog(this, "Usted alcanzo el limite de registros para esta version de prueba :(");
-//            System.exit(0);
-//        }else{        
-            //20180427 GTL obtener el path de una ruta y si es diferente a donde queremos instalarlo
-            // no dejara seguir con el sistema, con esto evitamos que se instale en otra maquina sin nuestra autorizacion
-//            Path path = Paths.get("C:\\Users\\jerry");
-//            Path path = Paths.get("C:\\Users\\hp");
-//            Path path = Paths.get("C:\\Users\\Ricardo");
+        generalDataGlobal = systemService.getGeneralData();
+        LOGGER.info(">>> datos generales obtenidos: "+generalDataGlobal);
+        this.setTitle(generalDataGlobal.getCompanyName().toUpperCase());
 
-            
-//            Path path = Paths.get("C:\\Users\\OEM");
-//            System.out.println(Files.exists(path));
-//            if(!Files.exists(path)){
-//                JOptionPane.showMessageDialog(this, "Se a detectado ruta original de instalacion diferente, porfavor contacte al administrador del sistema ");
-//                System.exit(0);
-//            }
-//        }
     }
 
     public void abrir_ventana(JInternalFrame internalFrame) {
@@ -177,7 +123,7 @@ public class principal extends javax.swing.JFrame {
 
     public void abrir_abonos() {
         if (Utility.verifyIfInternalFormIsOpen(ventana_abonos)) {
-            ventana_abonos = new consultar_abonos();
+            ventana_abonos = new PaymentsForm();
             ventana_abonos.setLocation(this.getWidth() / 2 - ventana_abonos.getWidth() / 2, this.getHeight() / 2 - ventana_abonos.getHeight() / 2 - 20);
             jDesktopPane1.add(ventana_abonos);
             ventana_abonos.show();
@@ -402,7 +348,7 @@ public class principal extends javax.swing.JFrame {
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/rentas_48.png"))); // NOI18N
         jButton3.setMnemonic('A');
         jButton3.setToolTipText("Agregar evento (Alt+A)");
-        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton3.setFocusable(false);
         jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -417,7 +363,7 @@ public class principal extends javax.swing.JFrame {
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/consultar_renta_48.png"))); // NOI18N
         jButton4.setMnemonic('C');
         jButton4.setToolTipText("Consultar eventos (Alt+C)");
-        jButton4.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton4.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton4.setFocusable(false);
         jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton4.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -432,7 +378,7 @@ public class principal extends javax.swing.JFrame {
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/inventario_48.png"))); // NOI18N
         jButton2.setMnemonic('I');
         jButton2.setToolTipText("Inventario (Alt+I)");
-        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton2.setFocusable(false);
         jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -446,7 +392,7 @@ public class principal extends javax.swing.JFrame {
         jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/coins-icon_48.png"))); // NOI18N
         jButton5.setMnemonic('Z');
         jButton5.setToolTipText("Consultar abonos (Alt+Z)");
-        jButton5.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton5.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton5.setFocusable(false);
         jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -459,7 +405,7 @@ public class principal extends javax.swing.JFrame {
         jToolBar1.add(jSeparator4);
 
         btnContabilidad.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/cash-register-icon_48.png"))); // NOI18N
-        btnContabilidad.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnContabilidad.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnContabilidad.setFocusable(false);
         btnContabilidad.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnContabilidad.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -472,7 +418,7 @@ public class principal extends javax.swing.JFrame {
 
         jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Utilities-icon_48.png"))); // NOI18N
         jButton6.setToolTipText("Utilerias");
-        jButton6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton6.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton6.setFocusable(false);
         jButton6.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton6.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -485,7 +431,7 @@ public class principal extends javax.swing.JFrame {
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Apps-system-users-icon_48.png"))); // NOI18N
         jButton1.setToolTipText("Clientes");
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton1.setFocusable(false);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -498,7 +444,7 @@ public class principal extends javax.swing.JFrame {
 
         jbtn_usuarios.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/User-Files-icon_48.png"))); // NOI18N
         jbtn_usuarios.setToolTipText("Usuarios");
-        jbtn_usuarios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_usuarios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_usuarios.setFocusable(false);
         jbtn_usuarios.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_usuarios.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -512,7 +458,7 @@ public class principal extends javax.swing.JFrame {
 
         jButton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/database-arrow-down-icon_48.png"))); // NOI18N
         jButton7.setToolTipText("Respaldar base de datos");
-        jButton7.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton7.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton7.setFocusable(false);
         jButton7.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton7.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -527,7 +473,7 @@ public class principal extends javax.swing.JFrame {
         jbtn_cerrar_sesion.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/cerrar_ventana_48.png"))); // NOI18N
         jbtn_cerrar_sesion.setMnemonic('C');
         jbtn_cerrar_sesion.setToolTipText("Cerrar sesion (Alt+C)");
-        jbtn_cerrar_sesion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_cerrar_sesion.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbtn_cerrar_sesion.setFocusable(false);
         jbtn_cerrar_sesion.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_cerrar_sesion.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -539,7 +485,7 @@ public class principal extends javax.swing.JFrame {
         jToolBar1.add(jbtn_cerrar_sesion);
 
         jBtnViewOrderProviders.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/customer-service-icon-48.png"))); // NOI18N
-        jBtnViewOrderProviders.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jBtnViewOrderProviders.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jBtnViewOrderProviders.setFocusable(false);
         jBtnViewOrderProviders.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jBtnViewOrderProviders.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -552,7 +498,7 @@ public class principal extends javax.swing.JFrame {
 
         jButton8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/inventory-maintenance-icon.png"))); // NOI18N
         jButton8.setToolTipText("Inventario de material");
-        jButton8.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton8.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton8.setFocusable(false);
         jButton8.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton8.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -607,7 +553,7 @@ public class principal extends javax.swing.JFrame {
             abrir_nueva_renta();
         } catch (PropertyVetoException ex) {
             JOptionPane.showMessageDialog(null, ex, "Error", JOptionPane.ERROR);
-            Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IndexForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton3ActionPerformed
 
@@ -617,7 +563,7 @@ public class principal extends javax.swing.JFrame {
             abrir_consultar_renta();
         } catch (PropertyVetoException ex) {
             JOptionPane.showMessageDialog(null, ex, "Error", JOptionPane.ERROR);
-            Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IndexForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -627,14 +573,20 @@ public class principal extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Solo el administrador puede visualizar abonos ", "Error", JOptionPane.INFORMATION_MESSAGE);
                 return;
         }
+        if(!Utility.showWindowDataUpdateSession()){
+            return;
+        }
         abrir_abonos();
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         if(iniciar_sesion.usuarioGlobal.getAdministrador().equals("0")){
-                JOptionPane.showMessageDialog(null, "Solo el administrador puede abrir las preferencias del sistema :( ", "Error", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
+            JOptionPane.showMessageDialog(null, "Solo el administrador puede abrir las preferencias del sistema :( ", "Error", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        if(!Utility.showWindowDataUpdateSession()){
+            return;
+        }
         mostrar_utilerias();
     }//GEN-LAST:event_jButton6ActionPerformed
 
@@ -705,20 +657,23 @@ public class principal extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(principal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(IndexForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(principal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(IndexForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(principal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(IndexForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(principal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(IndexForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new principal().setVisible(true);
+                new IndexForm().setVisible(true);
             }
         });
     }
