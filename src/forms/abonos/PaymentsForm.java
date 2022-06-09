@@ -48,7 +48,7 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
         String paymentInitDate = getFormatDate(txtPaymentInitDate.getDate());
         String paymentEndDate = getFormatDate(txtPaymentEndDate.getDate());
               
-        if (createdAtInitDate == null || createdAtEndDate == null && paymentInitDate == null || paymentEndDate == null) {
+        if ( (createdAtInitDate == null || createdAtEndDate == null) && (paymentInitDate == null || paymentEndDate == null)) {
             JOptionPane.showMessageDialog(this, "Ingresa un rango de fechas", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -69,9 +69,12 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-       
-        
+        if (abonos.isEmpty()) {
+            lblInfo.setText("No se obtubieron resultados");
+        } else {
+            lblInfo.setText("Total de pagos: "+abonos.size());
+        }
+
         for(Abono abono : abonos){
               DefaultTableModel temp = (DefaultTableModel) tabla_abonos.getModel();
 
@@ -123,9 +126,6 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
             ;
         }
 
-       
-
-        
         tabla_abonos.getColumnModel().getColumn(0).setMaxWidth(0);
         tabla_abonos.getColumnModel().getColumn(0).setMinWidth(0);
         tabla_abonos.getColumnModel().getColumn(0).setPreferredWidth(0);
@@ -142,7 +142,7 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
         for (int i = 0; i < tabla_abonos.getRowCount(); i++) {
             total = total + Float.parseFloat(Utility.deleteCharacters(tabla_abonos.getValueAt(i, 6).toString(), "$,"));
         }
-        txt_totales.setValue(total);
+        lblTotal.setText("Pagos: $"+decimalFormat.format(total));
     }
 
     /**
@@ -163,9 +163,10 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
         txtPaymentEndDate = new com.toedter.calendar.JDateChooser();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        txt_totales = new javax.swing.JFormattedTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabla_abonos = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
+        lblTotal = new javax.swing.JLabel();
+        lblInfo = new javax.swing.JLabel();
 
         cmb_fecha_final.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
 
@@ -268,12 +269,6 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        txt_totales.setEditable(false);
-        txt_totales.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getCurrencyInstance())));
-        txt_totales.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txt_totales.setToolTipText("Muestra el total de abonos");
-        txt_totales.setFont(new java.awt.Font("Microsoft Sans Serif", 1, 14)); // NOI18N
-
         tabla_abonos.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
         tabla_abonos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -295,6 +290,10 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
         });
         jScrollPane2.setViewportView(tabla_abonos);
 
+        lblTotal.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        lblInfo.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -303,10 +302,11 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(txt_totales, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane2))
+                    .addComponent(jScrollPane2)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -315,9 +315,11 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(9, 9, 9)
-                .addComponent(txt_totales, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 419, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblTotal, javax.swing.GroupLayout.DEFAULT_SIZE, 18, Short.MAX_VALUE)
+                    .addComponent(lblInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -362,9 +364,10 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblInfo;
+    private javax.swing.JLabel lblTotal;
     public static javax.swing.JTable tabla_abonos;
     public static com.toedter.calendar.JDateChooser txtPaymentEndDate;
     public static com.toedter.calendar.JDateChooser txtPaymentInitDate;
-    private javax.swing.JFormattedTextField txt_totales;
     // End of variables declaration//GEN-END:variables
 }

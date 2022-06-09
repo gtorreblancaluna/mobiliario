@@ -157,14 +157,24 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jTabbedPane1.setEnabledAt(2, false);
         jbtn_guardar.setEnabled(false);
         jbtn_guardar_abonos.setEnabled(false);
-        txt_subtotal.setEditable(false);
-        txt_faltantes.setEditable(false);
-        txt_abonos.setEditable(false);
-        txt_descuento.setEditable(false);
-        txt_total_iva.setEditable(false);
-        txt_total.setEditable(false);
-        txt_calculo.setEditable(false);
+        txt_subtotal.setEnabled(false);
+        txt_subtotal.setHorizontalAlignment(SwingConstants.RIGHT);
+        txt_faltantes.setEnabled(false);
+        txt_abonos.setEnabled(false);
+        txt_descuento.setEnabled(false);
+        txt_descuento.setHorizontalAlignment(SwingConstants.RIGHT);
+        txt_total_iva.setEnabled(false);
+        txt_total_iva.setHorizontalAlignment(SwingConstants.RIGHT);
+        txt_total.setEnabled(false);
+        txt_calculo.setEnabled(false);
         jbtn_guardar_cliente.setEnabled(false);
+        
+        txt_envioRecoleccion.setHorizontalAlignment(SwingConstants.RIGHT);
+        txt_depositoGarantia.setHorizontalAlignment(SwingConstants.RIGHT);
+        txt_calculo.setHorizontalAlignment(SwingConstants.RIGHT);
+        txt_abonos.setHorizontalAlignment(SwingConstants.RIGHT);
+        txt_faltantes.setHorizontalAlignment(SwingConstants.RIGHT);
+        txt_total.setHorizontalAlignment(SwingConstants.RIGHT);
       
         panel_articulos.setVisible(false);
         jbtn_disponible.setEnabled(false);
@@ -1301,10 +1311,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
         
         String mostrarPrecios = check_mostrar_precios.isSelected() == true ? "1" : "0";
-        String envioRecoleccion = this.txt_envioRecoleccion.getText().equals("") ? "0" : this.txt_envioRecoleccion.getText().toString().replaceAll(",", "");
-        String depositoGarantia = this.txt_depositoGarantia.getText().equals("") ? "0" : this.txt_depositoGarantia.getText().toString().replaceAll(",", "");; 
+        String envioRecoleccion = this.txt_envioRecoleccion.getText().equals("") ? "0" : this.txt_envioRecoleccion.getText().replaceAll(",", "");
+        String depositoGarantia = this.txt_depositoGarantia.getText().equals("") ? "0" : this.txt_depositoGarantia.getText().replaceAll(",", "");; 
         String hora_devolucion = this.cmb_hora_devolucion.getSelectedItem()+" a "+this.cmb_hora_devolucion_dos.getSelectedItem();
-        String datos[] = {estadoEventoSelected.getEstadoId()+"", fecha_entrega, hora_entrega, fecha_devolucion, txt_descripcion.getText().toString(),porcentajeDescuentoRenta,cantidadDescuento, txt_comentarios.getText().toString(), id_chofer, tipoSelected.getTipoId()+"", hora_devolucion,fecha_evento,depositoGarantia,envioRecoleccion,iva,mostrarPrecios,id_renta};
+        String datos[] = {estadoEventoSelected.getEstadoId()+"", fecha_entrega, hora_entrega, fecha_devolucion, txt_descripcion.getText(),porcentajeDescuentoRenta,cantidadDescuento, txt_comentarios.getText().toString(), id_chofer, tipoSelected.getTipoId()+"", hora_devolucion,fecha_evento,depositoGarantia,envioRecoleccion,iva,mostrarPrecios,id_renta};
         funcion.UpdateRegistro(datos, "update renta set id_estado=?,fecha_entrega=?,hora_entrega=?,fecha_devolucion=?,descripcion=?,descuento=?,cantidad_descuento=?,comentario=?,id_usuario_chofer=?,id_tipo=?,hora_devolucion=?,fecha_evento=?,deposito_garantia=?,envio_recoleccion=?,iva=?,mostrar_precios_pdf=? where id_renta=?");
         String messageLogInfo = iniciar_sesion.usuarioGlobal.getNombre() + " actualizó con éxito el folio "+this.lbl_folio.getText();
         Utility.pushNotification(messageLogInfo);
@@ -1313,7 +1323,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         tabla_articulos();
         checkNewItemsAndUpdateRenta();
-        descuento = txt_descuento.getText().toString();
+        descuento = txt_descuento.getText();
         
         if (check_enviar_email.isSelected() == true){
            enviar_email();                
@@ -1377,20 +1387,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         DefaultTableModel tablaDetalle = (DefaultTableModel) tabla_detalle.getModel();
         
         for(DetalleRenta detalle : renta.getDetalleRenta()){
-            boolean exist = false;
-            // checar duplicados
-            for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
-                String itemId = tabla_detalle.getValueAt(i, ColumnTableDetail.ITEM_ID.getNumber()).toString();
-                if (itemId.equals(detalle.getArticulo().getArticuloId().toString())) {
-                    exist = true;
-                    break;
-                }
-            }
-            
-            if (exist) {
-                return;
-            }
-            
+                        
             float descuento = 0f;
             float importe = detalle.getCantidad()*detalle.getPrecioUnitario();
             if(detalle.getPorcentajeDescuento() > 0)
@@ -1554,7 +1551,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 fAbonos = Float.parseFloat(this.txt_abonos.getText().toString().replaceAll(",", ""));      
             
             if(fPorcentaejeDescuento == 0)
-                this.txt_descuento.setValue(0);
+                this.txt_descuento.setText(decimalFormat.format(0));
             if(!this.txt_faltantes.equals(""))
                 fFaltantes = Float.parseFloat(this.txt_faltantes.getText().toString().replaceAll(",", ""));
             
@@ -1571,16 +1568,16 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento; 
             if(!this.txt_iva.getText().equals(""))
             {              
-                fIVA = Float.parseFloat(this.txt_iva.getText().toString().replaceAll(",", ""));
+                fIVA = Float.parseFloat(this.txt_iva.getText().replaceAll(",", ""));
                 fTotalIVA = (fCalculo * (fIVA / 100));              
                 this.txt_total_iva.setText(decimalFormat.format(fTotalIVA));
             }
             
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento; 
-            this.txt_calculo.setValue(fCalculo);            
+            this.txt_calculo.setText(decimalFormat.format(fCalculo));            
             
              if(!this.txt_total_iva.getText().equals(""))
-                fTotalIVA = Float.parseFloat(this.txt_total_iva.getText().toString().replaceAll(",", ""));
+                fTotalIVA = Float.parseFloat(this.txt_total_iva.getText().replaceAll(",", ""));
             
             
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento;
@@ -2026,6 +2023,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         lbl_aviso_resultados = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         panel_datos_generales = new javax.swing.JPanel();
+        lbl_folio = new javax.swing.JLabel();
         lbl_cliente = new javax.swing.JLabel();
         lbl_atiende = new javax.swing.JLabel();
         cmb_fecha_entrega = new com.toedter.calendar.JDateChooser();
@@ -2039,7 +2037,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         txt_descripcion = new javax.swing.JTextPane();
         cmb_chofer = new javax.swing.JComboBox<>();
         jLabel31 = new javax.swing.JLabel();
-        lbl_folio = new javax.swing.JLabel();
         cmb_tipo = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -2062,21 +2059,21 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jLabel43 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
-        txt_total = new javax.swing.JFormattedTextField();
-        txt_abonos = new javax.swing.JFormattedTextField();
-        txt_calculo = new javax.swing.JFormattedTextField();
-        txt_total_iva = new javax.swing.JFormattedTextField();
         txt_iva = new javax.swing.JFormattedTextField();
-        txt_depositoGarantia = new javax.swing.JFormattedTextField();
-        txt_envioRecoleccion = new javax.swing.JFormattedTextField();
-        txt_descuento = new javax.swing.JFormattedTextField();
-        txt_subtotal = new javax.swing.JFormattedTextField();
         txtPorcentajeDescuento = new javax.swing.JFormattedTextField();
         check_mostrar_precios = new javax.swing.JCheckBox();
         jLabel48 = new javax.swing.JLabel();
-        txt_faltantes = new javax.swing.JFormattedTextField();
         check_enviar_email = new javax.swing.JCheckBox();
         txtEmailToSend = new javax.swing.JTextField();
+        txt_subtotal = new javax.swing.JTextField();
+        txt_descuento = new javax.swing.JTextField();
+        txt_envioRecoleccion = new javax.swing.JTextField();
+        txt_depositoGarantia = new javax.swing.JTextField();
+        txt_total_iva = new javax.swing.JTextField();
+        txt_calculo = new javax.swing.JTextField();
+        txt_abonos = new javax.swing.JTextField();
+        txt_faltantes = new javax.swing.JTextField();
+        txt_total = new javax.swing.JTextField();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel6 = new javax.swing.JPanel();
         panel_articulos = new javax.swing.JPanel();
@@ -2397,11 +2394,14 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         panel_datos_generales.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos generales", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
         panel_datos_generales.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        lbl_cliente.setFont(new java.awt.Font("Microsoft Sans Serif", 1, 14)); // NOI18N
-        panel_datos_generales.add(lbl_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 10, 210, 20));
+        lbl_folio.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        panel_datos_generales.add(lbl_folio, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 40, 170, 20));
 
-        lbl_atiende.setFont(new java.awt.Font("Microsoft Sans Serif", 1, 12)); // NOI18N
-        panel_datos_generales.add(lbl_atiende, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 20, 180, 20));
+        lbl_cliente.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        panel_datos_generales.add(lbl_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 60, 220, 20));
+
+        lbl_atiende.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        panel_datos_generales.add(lbl_atiende, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 80, 210, 20));
 
         cmb_fecha_entrega.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_fecha_entrega.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -2429,20 +2429,20 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         jLabel13.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel13.setText("Dirección del evento:");
-        panel_datos_generales.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 40, 340, 10));
+        panel_datos_generales.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 20, 160, 10));
 
         jLabel14.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel14.setText("Estado:");
-        panel_datos_generales.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 140, 50, 20));
+        panel_datos_generales.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 140, 50, 20));
 
         cmb_estado1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_estado1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_estado1, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 140, 160, -1));
+        panel_datos_generales.add(cmb_estado1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 140, 130, -1));
 
         txt_descripcion.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jScrollPane3.setViewportView(txt_descripcion);
 
-        panel_datos_generales.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 60, 250, 70));
+        panel_datos_generales.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 40, 270, 90));
 
         cmb_chofer.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_chofer.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -2452,16 +2452,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jLabel31.setText("Chofer:");
         panel_datos_generales.add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 110, 20));
 
-        lbl_folio.setFont(new java.awt.Font("Microsoft Sans Serif", 1, 18)); // NOI18N
-        panel_datos_generales.add(lbl_folio, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 10, 80, 20));
-
         cmb_tipo.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_tipo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_tipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 170, 160, -1));
+        panel_datos_generales.add(cmb_tipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 170, 130, -1));
 
         jLabel1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel1.setText("Tipo:");
-        panel_datos_generales.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 170, 50, 20));
+        panel_datos_generales.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 170, 50, 20));
 
         jLabel11.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel11.setText("Hora entrega:");
@@ -2482,10 +2479,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         panel_datos_generales.add(cmb_hora, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 140, 60, -1));
 
         jLabel35.setText("a");
-        panel_datos_generales.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 140, 20, 30));
+        panel_datos_generales.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 140, 20, 20));
 
         jLabel36.setText("a");
-        panel_datos_generales.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 170, 20, 30));
+        panel_datos_generales.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 170, 20, 20));
 
         cmb_hora_devolucion_dos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmb_hora_devolucion_dos.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
@@ -2542,36 +2539,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jLabel19.setText("Total:");
         panel_datos_generales.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 180, 69, 20));
 
-        txt_total.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_total.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_total.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_total.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_totalActionPerformed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_total, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 180, 120, -1));
-
-        txt_abonos.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_abonos.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_abonos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        panel_datos_generales.add(txt_abonos, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 140, 120, -1));
-
-        txt_calculo.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_calculo.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_calculo.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_calculo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_calculoActionPerformed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_calculo, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 120, 120, -1));
-
-        txt_total_iva.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_total_iva.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_total_iva.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        panel_datos_generales.add(txt_total_iva, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 100, 70, -1));
-
         txt_iva.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
         txt_iva.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txt_iva.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -2586,56 +2553,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
         });
         panel_datos_generales.add(txt_iva, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 100, 40, -1));
-
-        txt_depositoGarantia.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_depositoGarantia.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_depositoGarantia.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_depositoGarantia.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_depositoGarantiaActionPerformed(evt);
-            }
-        });
-        txt_depositoGarantia.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_depositoGarantiaKeyPressed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_depositoGarantia, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 80, 120, -1));
-
-        txt_envioRecoleccion.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_envioRecoleccion.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_envioRecoleccion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_envioRecoleccion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_envioRecoleccionActionPerformed(evt);
-            }
-        });
-        txt_envioRecoleccion.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_envioRecoleccionKeyPressed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_envioRecoleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 60, 120, -1));
-
-        txt_descuento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_descuento.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_descuento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_descuento.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txt_descuentoFocusLost(evt);
-            }
-        });
-        txt_descuento.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_descuentoKeyPressed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_descuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 40, 70, -1));
-
-        txt_subtotal.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_subtotal.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_subtotal.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        panel_datos_generales.add(txt_subtotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 20, 120, -1));
 
         txtPorcentajeDescuento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
         txtPorcentajeDescuento.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -2652,26 +2569,16 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         });
         panel_datos_generales.add(txtPorcentajeDescuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 40, 40, -1));
 
-        check_mostrar_precios.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        check_mostrar_precios.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
         check_mostrar_precios.setText("Mostrar precios en PDF");
         check_mostrar_precios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(check_mostrar_precios, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 50, 170, 30));
+        panel_datos_generales.add(check_mostrar_precios, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 120, 140, -1));
 
         jLabel48.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel48.setText("Faltantes:");
         panel_datos_generales.add(jLabel48, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 160, 69, 20));
 
-        txt_faltantes.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_faltantes.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_faltantes.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_faltantes.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_faltantesActionPerformed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_faltantes, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 160, 120, -1));
-
-        check_enviar_email.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        check_enviar_email.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
         check_enviar_email.setText("Enviar email confirmación");
         check_enviar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         check_enviar_email.addActionListener(new java.awt.event.ActionListener() {
@@ -2679,7 +2586,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 check_enviar_emailActionPerformed(evt);
             }
         });
-        panel_datos_generales.add(check_enviar_email, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 80, 180, -1));
+        panel_datos_generales.add(check_enviar_email, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 140, 160, -1));
 
         txtEmailToSend.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
         txtEmailToSend.setToolTipText("Para enviar multiples correos deberas separarlos por punto y coma [;]");
@@ -2688,7 +2595,34 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 txtEmailToSendActionPerformed(evt);
             }
         });
-        panel_datos_generales.add(txtEmailToSend, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 140, 240, -1));
+        panel_datos_generales.add(txtEmailToSend, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 170, 210, -1));
+
+        txt_subtotal.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(txt_subtotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 20, 120, 20));
+
+        txt_descuento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(txt_descuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 40, 80, -1));
+
+        txt_envioRecoleccion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(txt_envioRecoleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 60, 120, 20));
+
+        txt_depositoGarantia.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(txt_depositoGarantia, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 80, 120, 20));
+
+        txt_total_iva.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(txt_total_iva, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 100, 80, -1));
+
+        txt_calculo.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(txt_calculo, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 120, 120, 20));
+
+        txt_abonos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(txt_abonos, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 140, 120, 20));
+
+        txt_faltantes.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(txt_faltantes, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 160, 120, 20));
+
+        txt_total.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(txt_total, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 180, 120, 20));
 
         jPanel4.add(panel_datos_generales, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 1120, 210));
 
@@ -2840,7 +2774,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        jPanel6.add(panel_articulos, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 11, 1080, 350));
+        jPanel6.add(panel_articulos, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 0, 1080, 350));
 
         panel_conceptos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Conceptos del evento", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
         panel_conceptos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -2865,10 +2799,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         });
         jScrollPane5.setViewportView(tabla_detalle);
 
-        panel_conceptos.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 1040, 220));
+        panel_conceptos.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 1050, 270));
 
         lbl_infoItems.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
-        panel_conceptos.add(lbl_infoItems, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 280, 250, 20));
+        panel_conceptos.add(lbl_infoItems, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 320, 250, 20));
 
         jLabel40.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel40.setText("Cantidad:");
@@ -2914,7 +2848,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         lbl_sel.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         panel_conceptos.add(lbl_sel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 250, 20));
 
-        jPanel6.add(panel_conceptos, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 10, 1080, 310));
+        jPanel6.add(panel_conceptos, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 10, 1080, 350));
 
         jToolBar3.setFloatable(false);
         jToolBar3.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -3654,9 +3588,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1215, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1189, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -3759,8 +3693,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jTabbedPane1.setSelectedIndex(1);
             jTabbedPane1.setEnabledAt(2, true);
             
-            lbl_cliente.setText(globalRenta.getCliente().getNombre()+" "+globalRenta.getCliente().getApellidos());
-            lbl_folio.setText(globalRenta.getFolio()+"");            
+            lbl_cliente.setText("Cliente: "+globalRenta.getCliente().getNombre()+" "+globalRenta.getCliente().getApellidos());
+            lbl_folio.setText("Folio: "+globalRenta.getFolio()+"");            
           
             try {
                 cmb_fecha_entrega.setDate((Date) formatoDelTexto.parse((String) globalRenta.getFechaEntrega()));
@@ -4425,14 +4359,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         agregar_abonos();
     }//GEN-LAST:event_txt_abonoKeyPressed
 
-    private void txt_totalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_totalActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_totalActionPerformed
-
-    private void txt_calculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_calculoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_calculoActionPerformed
-
     private void txt_ivaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_ivaFocusLost
         // TODO add your handling code here:
         if (txt_iva.getText().equals("")) {
@@ -4449,63 +4375,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             Toolkit.getDefaultToolkit().beep();
         }
     }//GEN-LAST:event_txt_ivaKeyPressed
-
-    private void txt_depositoGarantiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_depositoGarantiaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_depositoGarantiaActionPerformed
-
-    private void txt_depositoGarantiaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_depositoGarantiaKeyPressed
-        if (evt.getKeyCode() == 10) {
-            if (txt_subtotal.getText().toString().equals("")) {
-                JOptionPane.showMessageDialog(null, "No hay cantidad en subtotal para agregar el descuento", "Deposito en garantia", JOptionPane.INFORMATION_MESSAGE);
-                Toolkit.getDefaultToolkit().beep();
-
-            } else {
-                total();
-                Toolkit.getDefaultToolkit().beep();
-            }
-        }
-    }//GEN-LAST:event_txt_depositoGarantiaKeyPressed
-
-    private void txt_envioRecoleccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_envioRecoleccionActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_envioRecoleccionActionPerformed
-
-    private void txt_envioRecoleccionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_envioRecoleccionKeyPressed
-        if (evt.getKeyCode() == 10) {
-            if (txt_subtotal.getText().toString().equals("")) {
-                JOptionPane.showMessageDialog(null, "No hay cantidad en subtotal para agregar el descuento", "Envio y recoleccion", JOptionPane.INFORMATION_MESSAGE);
-                Toolkit.getDefaultToolkit().beep();
-
-            } else {
-                total();
-                Toolkit.getDefaultToolkit().beep();
-            }
-        }
-    }//GEN-LAST:event_txt_envioRecoleccionKeyPressed
-
-    private void txt_descuentoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_descuentoFocusLost
-        // TODO add your handling code here:
-        if (txt_descuento.getText().equals("")) {
-            txt_descuento.setText("0");
-        }
-    }//GEN-LAST:event_txt_descuentoFocusLost
-
-    private void txt_descuentoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_descuentoKeyPressed
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == 10) {
-            if (txt_subtotal.getText().toString().equals("")) {
-                JOptionPane.showMessageDialog(null, "No hay cantidad en subtotal para agregar el descuento", "Descuento", JOptionPane.INFORMATION_MESSAGE);
-                Toolkit.getDefaultToolkit().beep();
-
-            } else {
-
-                total();
-                //lbl_aviso.setText("Se aplico con exito el descuento...");
-                Toolkit.getDefaultToolkit().beep();
-            }
-        }
-    }//GEN-LAST:event_txt_descuentoKeyPressed
 
     private void txt_porcentaje_descuentoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_porcentaje_descuentoKeyPressed
         if (evt.getKeyCode() == 10) {
@@ -4760,10 +4629,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         this.g_idRenta = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
         mostrar_faltantes();
     }//GEN-LAST:event_jButton6ActionPerformed
-
-    private void txt_faltantesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_faltantesActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_faltantesActionPerformed
 
     private void txtEmailToSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEmailToSendActionPerformed
         // TODO add your handling code here:
@@ -5023,36 +4888,36 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtEmailToSend;
     private javax.swing.JFormattedTextField txtPorcentajeDescuento;
     private javax.swing.JTextField txt_abono;
-    private javax.swing.JFormattedTextField txt_abonos;
+    private javax.swing.JTextField txt_abonos;
     private javax.swing.JTextField txt_apellidos;
     private javax.swing.JTextField txt_apodo;
     private javax.swing.JTextField txt_buscar;
     private javax.swing.JTextField txt_buscar1;
-    private javax.swing.JFormattedTextField txt_calculo;
+    private javax.swing.JTextField txt_calculo;
     private javax.swing.JTextField txt_cantidad;
     private javax.swing.JTextField txt_comentario;
     private javax.swing.JTextPane txt_comentarios;
-    private javax.swing.JFormattedTextField txt_depositoGarantia;
+    private javax.swing.JTextField txt_depositoGarantia;
     private javax.swing.JTextPane txt_descripcion;
-    private javax.swing.JFormattedTextField txt_descuento;
+    private javax.swing.JTextField txt_descuento;
     private javax.swing.JTextField txt_direccion;
     private javax.swing.JTextField txt_editar_cantidad;
     private javax.swing.JTextField txt_editar_porcentaje_descuento;
     private javax.swing.JTextField txt_editar_precio_unitario;
     private javax.swing.JTextField txt_email;
-    private javax.swing.JFormattedTextField txt_envioRecoleccion;
-    private javax.swing.JFormattedTextField txt_faltantes;
+    private javax.swing.JTextField txt_envioRecoleccion;
+    private javax.swing.JTextField txt_faltantes;
     private javax.swing.JFormattedTextField txt_iva;
     private javax.swing.JTextField txt_localidad;
     private javax.swing.JTextField txt_nombre;
     private javax.swing.JTextField txt_porcentaje_descuento;
     private javax.swing.JTextField txt_precio_unitario;
     private javax.swing.JTextField txt_rfc;
-    private javax.swing.JFormattedTextField txt_subtotal;
+    private javax.swing.JTextField txt_subtotal;
     private javax.swing.JTextField txt_tel_casa;
     private javax.swing.JTextField txt_tel_movil;
-    private javax.swing.JFormattedTextField txt_total;
-    private javax.swing.JFormattedTextField txt_total_iva;
+    private javax.swing.JTextField txt_total;
+    private javax.swing.JTextField txt_total_iva;
     // End of variables declaration//GEN-END:variables
 
     private void setExtendedState(int MAXIMIZED_BOTH) {

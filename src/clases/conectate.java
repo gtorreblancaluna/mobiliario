@@ -1,7 +1,6 @@
 package clases;
 
 import java.sql.*;
-import java.util.Properties;
 import services.PropertiesService;
 
 public class conectate {
@@ -24,9 +23,8 @@ public class conectate {
     private final String url;
     private final String driver;
     private Connection connection;
-    /**
-     * Constructor de DbConnection
-     */
+
+    
     public void conectate() throws Exception{  
         
         try {
@@ -54,10 +52,7 @@ public class conectate {
         }
     }
     
-    
-    /**
-     * Permite retornar la conexión
-     */
+
     public Connection getConnection() {
         return connection;
     }

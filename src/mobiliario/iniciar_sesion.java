@@ -31,11 +31,6 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
     
     public static Usuario usuarioGlobal;
     
-    
-
-    /**
-     * Creates new form iniciar_sesion
-     */
     public iniciar_sesion() {
         
         

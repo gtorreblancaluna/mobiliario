@@ -10,7 +10,6 @@ import exceptions.BusinessException;
 import exceptions.DataOriginException;
 import java.awt.Desktop;
 import java.awt.Toolkit;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
@@ -1356,6 +1355,56 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         tabla_clientes = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
         jPanel2 = new javax.swing.JPanel();
+        panel_datos_generales = new javax.swing.JPanel();
+        lbl_cliente = new javax.swing.JLabel();
+        lbl_atiende = new javax.swing.JLabel();
+        cmb_fecha_entrega = new com.toedter.calendar.JDateChooser();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        cmb_fecha_devolucion = new com.toedter.calendar.JDateChooser();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        cmb_estado = new javax.swing.JComboBox();
+        txt_subtotal = new javax.swing.JFormattedTextField();
+        jLabel15 = new javax.swing.JLabel();
+        txt_descuento = new javax.swing.JFormattedTextField();
+        jLabel16 = new javax.swing.JLabel();
+        txtPorcentajeDescuento = new javax.swing.JFormattedTextField();
+        jLabel17 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        txt_abonos = new javax.swing.JFormattedTextField();
+        jLabel19 = new javax.swing.JLabel();
+        txt_total = new javax.swing.JFormattedTextField();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        txt_descripcion = new javax.swing.JTextPane();
+        txt_total_iva = new javax.swing.JFormattedTextField();
+        cmb_chofer = new javax.swing.JComboBox();
+        jLabel26 = new javax.swing.JLabel();
+        cmb_tipo = new javax.swing.JComboBox();
+        jLabel27 = new javax.swing.JLabel();
+        jLabel28 = new javax.swing.JLabel();
+        cmb_hora_devolucion = new javax.swing.JComboBox();
+        cmb_hora_dos = new javax.swing.JComboBox();
+        cmb_hora = new javax.swing.JComboBox();
+        jLabel29 = new javax.swing.JLabel();
+        cmb_hora_devolucion_dos = new javax.swing.JComboBox();
+        jLabel30 = new javax.swing.JLabel();
+        jLabel31 = new javax.swing.JLabel();
+        cmb_fecha_evento = new com.toedter.calendar.JDateChooser();
+        jLabel32 = new javax.swing.JLabel();
+        jLabel33 = new javax.swing.JLabel();
+        jLabel34 = new javax.swing.JLabel();
+        txt_envioRecoleccion = new javax.swing.JFormattedTextField();
+        jLabel35 = new javax.swing.JLabel();
+        txt_depositoGarantia = new javax.swing.JFormattedTextField();
+        jLabel36 = new javax.swing.JLabel();
+        txt_calculo = new javax.swing.JFormattedTextField();
+        txt_iva = new javax.swing.JFormattedTextField();
+        check_generar_reporte = new javax.swing.JCheckBox();
+        check_enviar_email = new javax.swing.JCheckBox();
+        check_mostrar_precios = new javax.swing.JCheckBox();
+        txtEmailToSend = new javax.swing.JTextField();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel6 = new javax.swing.JPanel();
         panel_articulos = new javax.swing.JPanel();
@@ -1407,57 +1456,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jPanel11 = new javax.swing.JPanel();
         jScrollPane6 = new javax.swing.JScrollPane();
         txt_comentarios = new javax.swing.JTextPane();
-        panel_datos_generales = new javax.swing.JPanel();
-        lbl_cliente = new javax.swing.JLabel();
-        lbl_atiende = new javax.swing.JLabel();
-        cmb_fecha_entrega = new com.toedter.calendar.JDateChooser();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        cmb_fecha_devolucion = new com.toedter.calendar.JDateChooser();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        cmb_estado = new javax.swing.JComboBox();
-        txt_subtotal = new javax.swing.JFormattedTextField();
-        jLabel15 = new javax.swing.JLabel();
-        txt_descuento = new javax.swing.JFormattedTextField();
-        jLabel16 = new javax.swing.JLabel();
-        txtPorcentajeDescuento = new javax.swing.JFormattedTextField();
-        jLabel17 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
-        txt_abonos = new javax.swing.JFormattedTextField();
-        jLabel19 = new javax.swing.JLabel();
-        txt_total = new javax.swing.JFormattedTextField();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        txt_descripcion = new javax.swing.JTextPane();
-        txt_total_iva = new javax.swing.JFormattedTextField();
-        cmb_chofer = new javax.swing.JComboBox();
-        jLabel26 = new javax.swing.JLabel();
-        lbl_folio = new javax.swing.JLabel();
-        check_mostrar_precios = new javax.swing.JCheckBox();
-        cmb_tipo = new javax.swing.JComboBox();
-        jLabel27 = new javax.swing.JLabel();
-        jLabel28 = new javax.swing.JLabel();
-        cmb_hora_devolucion = new javax.swing.JComboBox();
-        cmb_hora_dos = new javax.swing.JComboBox();
-        cmb_hora = new javax.swing.JComboBox();
-        jLabel29 = new javax.swing.JLabel();
-        cmb_hora_devolucion_dos = new javax.swing.JComboBox();
-        jLabel30 = new javax.swing.JLabel();
-        jLabel31 = new javax.swing.JLabel();
-        cmb_fecha_evento = new com.toedter.calendar.JDateChooser();
-        jLabel32 = new javax.swing.JLabel();
-        jLabel33 = new javax.swing.JLabel();
-        jLabel34 = new javax.swing.JLabel();
-        txt_envioRecoleccion = new javax.swing.JFormattedTextField();
-        jLabel35 = new javax.swing.JLabel();
-        txt_depositoGarantia = new javax.swing.JFormattedTextField();
-        jLabel36 = new javax.swing.JLabel();
-        txt_calculo = new javax.swing.JFormattedTextField();
-        txt_iva = new javax.swing.JFormattedTextField();
-        check_generar_reporte = new javax.swing.JCheckBox();
-        check_enviar_email = new javax.swing.JCheckBox();
-        txtEmailToSend = new javax.swing.JTextField();
         jToolBar2 = new javax.swing.JToolBar();
         jbtn_agregar_evento = new javax.swing.JButton();
         jbtn_reporte = new javax.swing.JButton();
@@ -1662,7 +1660,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1692,6 +1690,293 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         );
 
         jTabbedPane1.addTab("Elige el cliente", jPanel1);
+
+        panel_datos_generales.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos generales", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        panel_datos_generales.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lbl_cliente.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        panel_datos_generales.add(lbl_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 20, 220, 20));
+
+        lbl_atiende.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        lbl_atiende.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        panel_datos_generales.add(lbl_atiende, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 40, 220, 20));
+
+        cmb_fecha_entrega.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(cmb_fecha_entrega, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 50, 210, 21));
+
+        jLabel10.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel10.setText("Fecha de entrega:");
+        panel_datos_generales.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 100, 21));
+
+        jLabel11.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel11.setText("Hora entrega:");
+        panel_datos_generales.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 80, 20));
+
+        cmb_fecha_devolucion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(cmb_fecha_devolucion, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 80, 210, 21));
+
+        jLabel12.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel12.setText("Fecha del evento:");
+        panel_datos_generales.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 100, 20));
+
+        jLabel13.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel13.setText("Direccion del evento:");
+        panel_datos_generales.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 20, 230, -1));
+
+        jLabel14.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel14.setText("Estado:");
+        panel_datos_generales.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 140, -1, 23));
+
+        cmb_estado.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmb_estado.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmb_estado.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        panel_datos_generales.add(cmb_estado, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 140, 190, -1));
+
+        txt_subtotal.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        txt_subtotal.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txt_subtotal.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(txt_subtotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 20, 120, -1));
+
+        jLabel15.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel15.setText("Subtotal:");
+        panel_datos_generales.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 20, 69, 20));
+
+        txt_descuento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        txt_descuento.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txt_descuento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_descuento.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txt_descuentoFocusLost(evt);
+            }
+        });
+        txt_descuento.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_descuentoKeyPressed(evt);
+            }
+        });
+        panel_datos_generales.add(txt_descuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 40, 70, -1));
+
+        jLabel16.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel16.setText("Descuento % :");
+        panel_datos_generales.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 40, 110, 20));
+
+        txtPorcentajeDescuento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        txtPorcentajeDescuento.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtPorcentajeDescuento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtPorcentajeDescuento.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtPorcentajeDescuentoFocusLost(evt);
+            }
+        });
+        txtPorcentajeDescuento.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtPorcentajeDescuentoKeyPressed(evt);
+            }
+        });
+        panel_datos_generales.add(txtPorcentajeDescuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 40, 40, -1));
+
+        jLabel17.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel17.setText("IVA % :");
+        panel_datos_generales.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 100, 69, 20));
+
+        jLabel18.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel18.setText("Pagos:");
+        panel_datos_generales.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 140, 69, 20));
+
+        txt_abonos.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        txt_abonos.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txt_abonos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(txt_abonos, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 140, 120, -1));
+
+        jLabel19.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel19.setText("Total:");
+        panel_datos_generales.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 160, 69, 20));
+
+        txt_total.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        txt_total.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txt_total.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_total.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_totalActionPerformed(evt);
+            }
+        });
+        panel_datos_generales.add(txt_total, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 160, 120, -1));
+
+        txt_descripcion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jScrollPane3.setViewportView(txt_descripcion);
+
+        panel_datos_generales.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 40, 230, 90));
+
+        txt_total_iva.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        txt_total_iva.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txt_total_iva.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(txt_total_iva, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 100, 70, -1));
+
+        cmb_chofer.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmb_chofer.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmb_chofer.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        panel_datos_generales.add(cmb_chofer, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 20, 210, -1));
+
+        jLabel26.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel26.setText("Chofer:");
+        panel_datos_generales.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 110, 20));
+
+        cmb_tipo.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmb_tipo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmb_tipo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        panel_datos_generales.add(cmb_tipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 170, 190, -1));
+
+        jLabel27.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel27.setText("Tipo:");
+        panel_datos_generales.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 170, 40, 20));
+
+        jLabel28.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel28.setText("Hora devolución:");
+        panel_datos_generales.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 100, 20));
+
+        cmb_hora_devolucion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmb_hora_devolucion.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
+        cmb_hora_devolucion.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        panel_datos_generales.add(cmb_hora_devolucion, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 60, -1));
+
+        cmb_hora_dos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmb_hora_dos.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
+        cmb_hora_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        panel_datos_generales.add(cmb_hora_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 140, -1, -1));
+
+        cmb_hora.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmb_hora.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
+        cmb_hora.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        panel_datos_generales.add(cmb_hora, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 140, 60, -1));
+
+        jLabel29.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel29.setText("a");
+        panel_datos_generales.add(jLabel29, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 170, 20, 30));
+
+        cmb_hora_devolucion_dos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmb_hora_devolucion_dos.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
+        cmb_hora_devolucion_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        panel_datos_generales.add(cmb_hora_devolucion_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 170, -1, -1));
+
+        jLabel30.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel30.setText("a");
+        panel_datos_generales.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 140, 20, 30));
+
+        jLabel31.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel31.setText("Fecha de devolución:");
+        panel_datos_generales.add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 120, 20));
+
+        cmb_fecha_evento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        panel_datos_generales.add(cmb_fecha_evento, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 110, 210, 21));
+
+        jLabel32.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel32.setText("Hrs.");
+        panel_datos_generales.add(jLabel32, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 170, -1, -1));
+
+        jLabel33.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel33.setText("Hrs.");
+        panel_datos_generales.add(jLabel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 140, -1, -1));
+
+        jLabel34.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel34.setText("Envío y recolección");
+        panel_datos_generales.add(jLabel34, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 60, 110, 20));
+
+        txt_envioRecoleccion.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        txt_envioRecoleccion.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txt_envioRecoleccion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_envioRecoleccion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_envioRecoleccionActionPerformed(evt);
+            }
+        });
+        txt_envioRecoleccion.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_envioRecoleccionKeyPressed(evt);
+            }
+        });
+        panel_datos_generales.add(txt_envioRecoleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 60, 120, -1));
+
+        jLabel35.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel35.setText("Depósito en garantía");
+        panel_datos_generales.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(829, 80, 110, 20));
+
+        txt_depositoGarantia.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        txt_depositoGarantia.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txt_depositoGarantia.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_depositoGarantia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_depositoGarantiaActionPerformed(evt);
+            }
+        });
+        txt_depositoGarantia.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_depositoGarantiaKeyPressed(evt);
+            }
+        });
+        panel_datos_generales.add(txt_depositoGarantia, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 80, 120, -1));
+
+        jLabel36.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel36.setText("Calculo:");
+        panel_datos_generales.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 120, 69, 20));
+
+        txt_calculo.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        txt_calculo.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txt_calculo.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_calculo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_calculoActionPerformed(evt);
+            }
+        });
+        panel_datos_generales.add(txt_calculo, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 120, 120, -1));
+
+        txt_iva.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        txt_iva.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txt_iva.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_iva.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txt_ivaFocusLost(evt);
+            }
+        });
+        txt_iva.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_ivaKeyPressed(evt);
+            }
+        });
+        panel_datos_generales.add(txt_iva, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 100, 40, -1));
+
+        check_generar_reporte.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        check_generar_reporte.setText("Generar reporte al guardar");
+        check_generar_reporte.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        check_generar_reporte.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                check_generar_reporteActionPerformed(evt);
+            }
+        });
+        panel_datos_generales.add(check_generar_reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 150, 220, 20));
+
+        check_enviar_email.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        check_enviar_email.setText("Enviar email confirmación");
+        check_enviar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        check_enviar_email.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                check_enviar_emailActionPerformed(evt);
+            }
+        });
+        panel_datos_generales.add(check_enviar_email, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 110, 220, -1));
+
+        check_mostrar_precios.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        check_mostrar_precios.setText("Mostrar precios en PDF");
+        check_mostrar_precios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        panel_datos_generales.add(check_mostrar_precios, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 130, 220, 20));
+
+        txtEmailToSend.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        txtEmailToSend.setToolTipText("Para enviar multiples correos deberas separarlos por punto y coma [;]");
+        txtEmailToSend.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtEmailToSendActionPerformed(evt);
+            }
+        });
+        panel_datos_generales.add(txtEmailToSend, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 170, 220, -1));
 
         jTabbedPane2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jTabbedPane2.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
@@ -2221,300 +2506,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(195, Short.MAX_VALUE))
+                .addContainerGap(193, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("Comentarios", jPanel11);
-
-        panel_datos_generales.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos generales", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
-        panel_datos_generales.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        lbl_cliente.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 14)); // NOI18N
-        panel_datos_generales.add(lbl_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 190, 300, 20));
-
-        lbl_atiende.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 14)); // NOI18N
-        lbl_atiende.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        panel_datos_generales.add(lbl_atiende, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 190, 250, 20));
-
-        cmb_fecha_entrega.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        panel_datos_generales.add(cmb_fecha_entrega, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 50, 210, 21));
-
-        jLabel10.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel10.setText("Fecha de entrega:");
-        panel_datos_generales.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 100, 21));
-
-        jLabel11.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel11.setText("Hora entrega:");
-        panel_datos_generales.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 80, 20));
-
-        cmb_fecha_devolucion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        panel_datos_generales.add(cmb_fecha_devolucion, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 80, 210, 21));
-
-        jLabel12.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel12.setText("Fecha del evento:");
-        panel_datos_generales.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 100, 20));
-
-        jLabel13.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel13.setText("Direccion del evento:");
-        panel_datos_generales.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 20, 250, -1));
-
-        jLabel14.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel14.setText("Estado:");
-        panel_datos_generales.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 140, -1, 23));
-
-        cmb_estado.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_estado.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_estado.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_estado, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 140, 170, -1));
-
-        txt_subtotal.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_subtotal.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_subtotal.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        panel_datos_generales.add(txt_subtotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 20, 120, -1));
-
-        jLabel15.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel15.setText("Subtotal:");
-        panel_datos_generales.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 20, 69, 20));
-
-        txt_descuento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_descuento.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_descuento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_descuento.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txt_descuentoFocusLost(evt);
-            }
-        });
-        txt_descuento.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_descuentoKeyPressed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_descuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 40, 70, -1));
-
-        jLabel16.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel16.setText("Descuento % :");
-        panel_datos_generales.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 40, 110, 20));
-
-        txtPorcentajeDescuento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txtPorcentajeDescuento.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtPorcentajeDescuento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txtPorcentajeDescuento.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtPorcentajeDescuentoFocusLost(evt);
-            }
-        });
-        txtPorcentajeDescuento.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtPorcentajeDescuentoKeyPressed(evt);
-            }
-        });
-        panel_datos_generales.add(txtPorcentajeDescuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 40, 40, -1));
-
-        jLabel17.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel17.setText("IVA % :");
-        panel_datos_generales.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 100, 69, 20));
-
-        jLabel18.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel18.setText("Pagos:");
-        panel_datos_generales.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 140, 69, 20));
-
-        txt_abonos.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_abonos.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_abonos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        panel_datos_generales.add(txt_abonos, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 140, 120, -1));
-
-        jLabel19.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel19.setText("Total:");
-        panel_datos_generales.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 160, 69, 20));
-
-        txt_total.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_total.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_total.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_total.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_totalActionPerformed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_total, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 160, 120, -1));
-
-        txt_descripcion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jScrollPane3.setViewportView(txt_descripcion);
-
-        panel_datos_generales.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 40, 260, 90));
-
-        txt_total_iva.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_total_iva.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_total_iva.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        panel_datos_generales.add(txt_total_iva, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 100, 70, -1));
-
-        cmb_chofer.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_chofer.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_chofer.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_chofer, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 20, 210, -1));
-
-        jLabel26.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel26.setText("Chofer:");
-        panel_datos_generales.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 110, 20));
-
-        lbl_folio.setFont(new java.awt.Font("Microsoft Sans Serif", 1, 18)); // NOI18N
-        panel_datos_generales.add(lbl_folio, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 20, 180, 30));
-
-        check_mostrar_precios.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
-        check_mostrar_precios.setText("Mostrar precios en PDF");
-        check_mostrar_precios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(check_mostrar_precios, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 100, 180, 20));
-
-        cmb_tipo.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_tipo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmb_tipo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_tipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 170, 170, -1));
-
-        jLabel27.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel27.setText("Tipo:");
-        panel_datos_generales.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 170, 40, 20));
-
-        jLabel28.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel28.setText("Hora devolución:");
-        panel_datos_generales.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 100, 20));
-
-        cmb_hora_devolucion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_hora_devolucion.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_devolucion.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_hora_devolucion, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 60, -1));
-
-        cmb_hora_dos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_hora_dos.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_hora_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 140, -1, -1));
-
-        cmb_hora.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_hora.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_hora, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 140, 60, -1));
-
-        jLabel29.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel29.setText("a");
-        panel_datos_generales.add(jLabel29, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 170, 20, 30));
-
-        cmb_hora_devolucion_dos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_hora_devolucion_dos.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_devolucion_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_hora_devolucion_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 170, -1, -1));
-
-        jLabel30.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel30.setText("a");
-        panel_datos_generales.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 140, 20, 30));
-
-        jLabel31.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel31.setText("Fecha de devolución:");
-        panel_datos_generales.add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 120, 20));
-
-        cmb_fecha_evento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        panel_datos_generales.add(cmb_fecha_evento, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 110, 210, 21));
-
-        jLabel32.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel32.setText("Hrs.");
-        panel_datos_generales.add(jLabel32, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 170, -1, -1));
-
-        jLabel33.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel33.setText("Hrs.");
-        panel_datos_generales.add(jLabel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 140, -1, -1));
-
-        jLabel34.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel34.setText("Envío y recolección");
-        panel_datos_generales.add(jLabel34, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 60, 110, 20));
-
-        txt_envioRecoleccion.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_envioRecoleccion.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_envioRecoleccion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_envioRecoleccion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_envioRecoleccionActionPerformed(evt);
-            }
-        });
-        txt_envioRecoleccion.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_envioRecoleccionKeyPressed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_envioRecoleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 60, 120, -1));
-
-        jLabel35.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel35.setText("Depósito en garantía");
-        panel_datos_generales.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(829, 80, 110, 20));
-
-        txt_depositoGarantia.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_depositoGarantia.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_depositoGarantia.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_depositoGarantia.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_depositoGarantiaActionPerformed(evt);
-            }
-        });
-        txt_depositoGarantia.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_depositoGarantiaKeyPressed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_depositoGarantia, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 80, 120, -1));
-
-        jLabel36.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel36.setText("Calculo:");
-        panel_datos_generales.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 120, 69, 20));
-
-        txt_calculo.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_calculo.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_calculo.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_calculo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_calculoActionPerformed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_calculo, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 120, 120, -1));
-
-        txt_iva.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_iva.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_iva.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_iva.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txt_ivaFocusLost(evt);
-            }
-        });
-        txt_iva.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_ivaKeyPressed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_iva, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 100, 40, -1));
-
-        check_generar_reporte.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
-        check_generar_reporte.setText("Generar reporte al guardar");
-        check_generar_reporte.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        check_generar_reporte.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                check_generar_reporteActionPerformed(evt);
-            }
-        });
-        panel_datos_generales.add(check_generar_reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 120, 180, 20));
-
-        check_enviar_email.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
-        check_enviar_email.setText("Enviar email confirmación");
-        check_enviar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        check_enviar_email.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                check_enviar_emailActionPerformed(evt);
-            }
-        });
-        panel_datos_generales.add(check_enviar_email, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 80, 180, -1));
-
-        txtEmailToSend.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
-        txtEmailToSend.setToolTipText("Para enviar multiples correos deberas separarlos por punto y coma [;]");
-        txtEmailToSend.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtEmailToSendActionPerformed(evt);
-            }
-        });
-        panel_datos_generales.add(txtEmailToSend, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 140, 240, -1));
 
         jToolBar2.setFloatable(false);
         jToolBar2.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -2585,10 +2580,13 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE))
-                    .addComponent(panel_datos_generales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(panel_datos_generales, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(151, 151, 151))
         );
 
         jTabbedPane1.addTab("Conceptos", jPanel2);
@@ -2603,9 +2601,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jTabbedPane1)
-                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 677, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 13, Short.MAX_VALUE))
         );
 
         pack();
@@ -2618,7 +2616,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         if (agregar_cliente() == true) {
             jTabbedPane1.setSelectedIndex(1);
             jTabbedPane1.setEnabledAt(1, true);
-            this.lbl_cliente.setText(this.txt_nombre.getText() + " " + this.txt_apellidos.getText());
+            this.lbl_cliente.setText("Cliente: "+this.txt_nombre.getText() + " " + this.txt_apellidos.getText());
             limpiar();
             tabla_articulos();
             jbtn_disponible.setEnabled(false);
@@ -2658,7 +2656,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
             id_cliente = tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 0).toString();
             //lbl_aviso.setText("Has elegido al cliente con exito.. Continua con los datos del evento...");
-            this.lbl_cliente.setText((String) tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 1) + " " + (String) tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 2));
+            this.lbl_cliente.setText("Cliente: "+ tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 1) + " " + (String) tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 2));
 
             tabla_articulos();
         }
@@ -3276,7 +3274,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lbl_atiende;
     private javax.swing.JLabel lbl_cliente;
     private javax.swing.JLabel lbl_eleccion;
-    private javax.swing.JLabel lbl_folio;
     private javax.swing.JLabel lbl_sel;
     private javax.swing.JPanel panel_articulos;
     private javax.swing.JPanel panel_conceptos;

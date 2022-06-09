@@ -131,6 +131,7 @@
         INNER JOIN articulo articulo ON (articulo.id_articulo = d.id_articulo)
         INNER JOIN color c ON (c.id_color = articulo.id_color)
         WHERE d.id_renta = #{id}
+        ORDER BY articulo.descripcion
     </select>    
    
     
