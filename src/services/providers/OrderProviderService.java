@@ -1,5 +1,6 @@
 package services.providers;
 
+import common.constants.ApplicationConstants;
 import dao.providers.OrderProviderDAO;
 import dao.providers.ProvidersPaymentsDAO;
 import exceptions.BusinessException;
@@ -7,8 +8,6 @@ import exceptions.DataOriginException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-import mobiliario.ApplicationConstants;
-import model.Articulo;
 import model.providers.DetalleOrdenProveedor;
 import model.providers.OrdenProveedor;
 import model.providers.DetailOrderProviderType;

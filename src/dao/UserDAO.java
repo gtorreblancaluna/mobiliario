@@ -1,8 +1,8 @@
 package dao;
 
+import common.constants.ApplicationConstants;
 import exceptions.DataOriginException;
 import java.util.List;
-import mobiliario.ApplicationConstants;
 import model.Usuario;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;

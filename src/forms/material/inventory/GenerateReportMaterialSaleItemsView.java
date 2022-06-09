@@ -1,7 +1,8 @@
 package forms.material.inventory;
 
+import common.constants.ApplicationConstants;
+import common.utilities.UtilityCommon;
 import java.awt.Desktop;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +14,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.ApplicationConstants;
 import model.material.inventory.MaterialSaleItemReport;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -126,7 +126,7 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
     private void reportPDF(List<MaterialSaleItemReport> list) throws Exception{
      
         JasperPrint jasperPrint;
-        String pathLocation = Utility.getPathLocation();
+        String pathLocation = UtilityCommon.getPathLocation();
         String pathFile = pathLocation+ApplicationConstants.JASPER_REPORT_COLLECTION_MATERIAL;
         System.out.println("Cargando desde: " + pathFile);
         if (pathFile == null || pathFile.isEmpty()) {

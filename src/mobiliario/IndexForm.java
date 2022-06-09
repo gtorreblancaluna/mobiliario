@@ -1,5 +1,6 @@
 package mobiliario;
 
+import common.utilities.UtilityCommon;
 import forms.abonos.PaymentsForm;
 import forms.inventario.InventarioForm;
 import forms.rentas.AgregarRenta;
@@ -39,7 +40,7 @@ public class IndexForm extends javax.swing.JFrame {
     public IndexForm() {
 
         initComponents();
-        Utility.getSystemDate("/");
+        UtilityCommon.getSystemDate("/");
         this.setExtendedState(this.MAXIMIZED_BOTH);
         lbl_logueo.setText(iniciar_sesion.usuarioGlobal.getNombre()+" "+iniciar_sesion.usuarioGlobal.getApellidos());
         lblPuesto.setText(iniciar_sesion.usuarioGlobal.getPuesto().getDescripcion());
@@ -67,7 +68,7 @@ public class IndexForm extends javax.swing.JFrame {
     }
 
     public void abrir_clientes() {
-        if (Utility.verifyIfInternalFormIsOpen(ventana_clientes)) {
+        if (UtilityCommon.verifyIfInternalFormIsOpen(ventana_clientes,IndexForm.jDesktopPane1)) {
             ventana_clientes = new clientes();
             ventana_clientes.setLocation(this.getWidth() / 2 - ventana_clientes.getWidth() / 2, this.getHeight() / 2 - ventana_clientes.getHeight() / 2 - 20);
             jDesktopPane1.add(ventana_clientes);
@@ -79,7 +80,7 @@ public class IndexForm extends javax.swing.JFrame {
     }
     
     public void openMaterialInventoryView() {
-        if (Utility.verifyIfInternalFormIsOpen(materialInventoryView)) {
+        if (UtilityCommon.verifyIfInternalFormIsOpen(materialInventoryView,IndexForm.jDesktopPane1)) {
              if(!Utility.showWindowDataUpdateSession()){
                 return;
             }
@@ -95,7 +96,7 @@ public class IndexForm extends javax.swing.JFrame {
     
        
     public void abrir_orden_proveedor() {
-        if (Utility.verifyIfInternalFormIsOpen(viewOrdersProviders)) {
+        if (UtilityCommon.verifyIfInternalFormIsOpen(viewOrdersProviders,IndexForm.jDesktopPane1)) {
              if(!Utility.showWindowDataUpdateSession()){
                 return;
             }
@@ -110,7 +111,7 @@ public class IndexForm extends javax.swing.JFrame {
     }
 
     public void abrir_inventario() {
-        if (Utility.verifyIfInternalFormIsOpen(ventana_inventario)) {
+        if (UtilityCommon.verifyIfInternalFormIsOpen(ventana_inventario,IndexForm.jDesktopPane1)) {
             ventana_inventario = new InventarioForm();
             ventana_inventario.setLocation(this.getWidth() / 2 - ventana_inventario.getWidth() / 2, this.getHeight() / 2 - ventana_inventario.getHeight() / 2 - 20);
             jDesktopPane1.add(ventana_inventario);
@@ -122,7 +123,7 @@ public class IndexForm extends javax.swing.JFrame {
     }
 
     public void abrir_abonos() {
-        if (Utility.verifyIfInternalFormIsOpen(ventana_abonos)) {
+        if (UtilityCommon.verifyIfInternalFormIsOpen(ventana_abonos,IndexForm.jDesktopPane1)) {
             ventana_abonos = new PaymentsForm();
             ventana_abonos.setLocation(this.getWidth() / 2 - ventana_abonos.getWidth() / 2, this.getHeight() / 2 - ventana_abonos.getHeight() / 2 - 20);
             jDesktopPane1.add(ventana_abonos);
@@ -134,7 +135,7 @@ public class IndexForm extends javax.swing.JFrame {
     }
 
     public void abrir_iniciar_sesion() {
-        if (Utility.verifyIfInternalFormIsOpen(v_iniciar_sesion)) {
+        if (UtilityCommon.verifyIfInternalFormIsOpen(v_iniciar_sesion,IndexForm.jDesktopPane1)) {
             v_iniciar_sesion = new iniciar_sesion();
             v_iniciar_sesion.setLocation(this.getWidth() / 2 - v_iniciar_sesion.getWidth() / 2, this.getHeight() / 2 - v_iniciar_sesion.getHeight() / 2 - 20);
             //jDesktopPane1.add(v_iniciar_sesion);
@@ -155,7 +156,7 @@ public class IndexForm extends javax.swing.JFrame {
    
 
     public void abrir_usuarios() {
-        if (Utility.verifyIfInternalFormIsOpen(ventana_usuarios)) {
+        if (UtilityCommon.verifyIfInternalFormIsOpen(ventana_usuarios,IndexForm.jDesktopPane1)) {
             ventana_usuarios = new usuarios();
             ventana_usuarios.setLocation(this.getWidth() / 2 - ventana_usuarios.getWidth() / 2, this.getHeight() / 2 - ventana_usuarios.getHeight() / 2 - 20);
             jDesktopPane1.add(ventana_usuarios);
@@ -167,7 +168,7 @@ public class IndexForm extends javax.swing.JFrame {
     }
     
     public void abrir_contabilidad() {
-        if (Utility.verifyIfInternalFormIsOpen(ventana_contabilidad)) {
+        if (UtilityCommon.verifyIfInternalFormIsOpen(ventana_contabilidad,IndexForm.jDesktopPane1)) {
             ventana_contabilidad = new ContabilidadForm();
             ventana_contabilidad.setLocation(this.getWidth() / 2 - ventana_contabilidad.getWidth() / 2, this.getHeight() / 2 - ventana_contabilidad.getHeight() / 2 - 20);
             jDesktopPane1.add(ventana_contabilidad);
@@ -179,7 +180,7 @@ public class IndexForm extends javax.swing.JFrame {
     }
 
     public void abrir_nueva_renta() throws PropertyVetoException{
-        if (Utility.verifyIfInternalFormIsOpen(ventana_agregar_renta)) {
+        if (UtilityCommon.verifyIfInternalFormIsOpen(ventana_agregar_renta,IndexForm.jDesktopPane1)) {
             if(!Utility.showWindowDataUpdateSession()){
                 return;
             }
@@ -196,7 +197,7 @@ public class IndexForm extends javax.swing.JFrame {
     }
 
     public void abrir_consultar_renta() throws PropertyVetoException {
-        if (Utility.verifyIfInternalFormIsOpen(v_consultar_renta)) {
+        if (UtilityCommon.verifyIfInternalFormIsOpen(v_consultar_renta,IndexForm.jDesktopPane1)) {
             if(!Utility.showWindowDataUpdateSession()){
                 return;
             }

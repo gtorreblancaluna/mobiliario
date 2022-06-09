@@ -1,11 +1,12 @@
 package forms.proveedores;
 
 import clases.sqlclass;
+import common.constants.ApplicationConstants;
+import common.utilities.UtilityCommon;
 import exceptions.BusinessException;
 import exceptions.DataOriginException;
 import java.awt.Desktop;
 import java.awt.Toolkit;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -19,7 +20,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.ApplicationConstants;
 import mobiliario.iniciar_sesion;
 import mobiliario.IndexForm;
 import model.Articulo;
@@ -119,7 +119,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         JasperPrint jasperPrint;
        
            
-        String pathLocation = Utility.getPathLocation();
+        String pathLocation = UtilityCommon.getPathLocation();
         String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_ORDEN_PROVEEDOR;
         System.out.println("Cargando desde: " + archivo);
         if (archivo == null) {
@@ -258,7 +258,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     
      public void showPaymentsProvidersForm() {
          
-        if (Utility.verifyIfInternalFormIsOpen(paymentsProvidersForm)) {
+        if (UtilityCommon.verifyIfInternalFormIsOpen(paymentsProvidersForm,IndexForm.jDesktopPane1)) {
             paymentsProvidersForm = new PaymentsProvidersForm();
 //            orderProviderForm.setLocation(this.getWidth() / 2 - orderProviderForm.getWidth() / 2, this.getHeight() / 2 - orderProviderForm.getHeight() / 2 - 20);
             IndexForm.jDesktopPane1.add(paymentsProvidersForm);

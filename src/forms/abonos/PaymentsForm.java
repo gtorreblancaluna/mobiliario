@@ -1,5 +1,6 @@
 package forms.abonos;
 
+import common.utilities.UtilityCommon;
 import exceptions.DataOriginException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -140,7 +141,7 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
     private void total() {
         float total = 0;
         for (int i = 0; i < tabla_abonos.getRowCount(); i++) {
-            total = total + Float.parseFloat(Utility.deleteCharacters(tabla_abonos.getValueAt(i, 6).toString(), "$,"));
+            total = total + Float.parseFloat(UtilityCommon.deleteCharacters(tabla_abonos.getValueAt(i, 6).toString(), "$,"));
         }
         lblTotal.setText("Pagos: $"+decimalFormat.format(total));
     }

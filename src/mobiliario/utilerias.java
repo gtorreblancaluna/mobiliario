@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
 import forms.inventario.InventarioForm;
 import clases.JCMail_enviar_prueba;
 import clases.conectate;
 import clases.sqlclass;
+import common.constants.ApplicationConstants;
 import exceptions.BusinessException;
 import exceptions.DataOriginException;
 import java.sql.Connection;
@@ -23,10 +19,6 @@ import javax.swing.JOptionPane;
 import model.DatosGenerales;
 import services.SystemService;
 
-/**
- *
- * @author Carlos Alberto
- */
 public class utilerias extends java.awt.Dialog {
 
     sqlclass funcion = new sqlclass();

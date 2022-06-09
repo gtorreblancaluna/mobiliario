@@ -1,19 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package utilities;
 
-import mobiliario.ApplicationConstants;
+import common.constants.ApplicationConstants;
 import org.apache.log4j.Logger;
 import parametersVO.DataEmailTemplate;
 import parametersVO.ModelTableItem;
 
-/**
- *
- * @author idscomercial
- */
 public class BuildEmailTemplate {
      
     // TEXT

@@ -1,6 +1,7 @@
 package services;
 
 import clases.sqlclass;
+import common.constants.ApplicationConstants;
 import dao.SalesDAO;
 import exceptions.BusinessException;
 import exceptions.DataOriginException;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import javax.swing.JOptionPane;
-import mobiliario.ApplicationConstants;
 import model.Abono;
 import model.Articulo;
 import model.Cliente;

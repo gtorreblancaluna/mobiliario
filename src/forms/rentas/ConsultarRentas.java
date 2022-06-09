@@ -8,6 +8,8 @@ import clases.FormatoTabla;
 import clases.Mail;
 import clases.sqlclass;
 import com.mysql.jdbc.MysqlDataTruncation;
+import common.constants.ApplicationConstants;
+import common.utilities.UtilityCommon;
 import exceptions.BusinessException;
 import exceptions.DataOriginException;
 import forms.material.inventory.GenerateReportMaterialSaleItemsView;
@@ -42,7 +44,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.ApplicationConstants;
 import mobiliario.VerFaltantes;
 import mobiliario.disponibilidad_articulos;
 import mobiliario.iniciar_sesion;
@@ -346,7 +347,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }
     
      public void mostrar_agregar_orden_proveedor(String folio, String orderId, String rentaId) {
-       if (Utility.verifyIfInternalFormIsOpen(orderProviderForm)) {
+       if (UtilityCommon.verifyIfInternalFormIsOpen(orderProviderForm,IndexForm.jDesktopPane1)) {
             orderProviderForm = new OrderProviderForm(folio, orderId, rentaId);
             orderProviderForm.setLocation(this.getWidth() / 2 - orderProviderForm.getWidth() / 2, this.getHeight() / 2 - orderProviderForm.getHeight() / 2 - 20);
             IndexForm.jDesktopPane1.add(orderProviderForm);
@@ -501,7 +502,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         JasperPrint jasperPrint;
         try {
             fgConsultaTabla= false;
-            String pathLocation = Utility.getPathLocation();
+            String pathLocation = UtilityCommon.getPathLocation();
             String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_CONSULTA;
             System.out.println("Cargando desde: " + archivo);
             if (archivo == null) {
@@ -1235,7 +1236,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         if (check_enviar_email.isSelected() == true){
            try{
-                Utility.isEmail(this.txtEmailToSend.getText());
+                UtilityCommon.isEmail(this.txtEmailToSend.getText());
            }catch(MessagingException e){
                JOptionPane.showMessageDialog(null,e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                return;
@@ -4233,7 +4234,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         JasperPrint jasperPrint;
         
         try {               
-            String pathLocation = Utility.getPathLocation();
+            String pathLocation = UtilityCommon.getPathLocation();
            
             JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(pathLocation+ApplicationConstants.RUTA_REPORTE_ENTREGAS);  
             // enviamos los parametros
@@ -4317,7 +4318,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             JasperPrint jasperPrint;
         try {
             String archivo = ApplicationConstants.RUTA_REPORTE_CATEGORIAS;
-            String pathLocation = Utility.getPathLocation();
+            String pathLocation = UtilityCommon.getPathLocation();
             System.out.println("Cargando desde: " + archivo);
             if (archivo == null) {
                 JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
@@ -4519,7 +4520,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         
         try{
-            Utility.isEmail(email);
+            UtilityCommon.isEmail(email);
         }catch(MessagingException e){
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR);
             return;            

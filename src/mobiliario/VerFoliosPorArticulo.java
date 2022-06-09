@@ -1,13 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
 import forms.inventario.InventarioForm;
 import services.SaleService;
 import clases.sqlclass;
+import common.constants.ApplicationConstants;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
@@ -38,7 +34,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
     float cant = 0; 
     private final SaleService saleService;
     private final SystemService systemService = SystemService.getInstance();
-    ItemService itemService = ItemService.getInstance();
+    private final ItemService itemService = ItemService.getInstance();
     public static String g_rentaId;
     public static int g_articuloId;
    

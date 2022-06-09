@@ -1,10 +1,10 @@
 package forms.tipo.abonos.cuentas;
 
 import clases.conectate;
+import common.constants.ApplicationConstants;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import mobiliario.ApplicationConstants;
 import forms.rentas.AgregarRenta;
 import model.Cuenta;
 import model.TipoAbono;
@@ -21,9 +21,7 @@ public class TiposAbonosForm extends java.awt.Dialog {
     static AccountService accountService = new AccountService();
     String id_tipo_abono;
 
-    /**
-     * Creates new form Colores
-     */
+
     public TiposAbonosForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();

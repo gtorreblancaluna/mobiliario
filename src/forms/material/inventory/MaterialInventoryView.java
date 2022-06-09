@@ -1,9 +1,9 @@
 
 package forms.material.inventory;
 
+import common.constants.ApplicationConstants;
 import exceptions.BusinessException;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import mobiliario.ApplicationConstants;
 import model.material.inventory.MaterialArea;
 import model.material.inventory.MaterialInventory;
 import model.material.inventory.MeasurementUnit;

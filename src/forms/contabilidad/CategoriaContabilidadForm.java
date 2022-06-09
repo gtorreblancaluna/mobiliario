@@ -1,17 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package forms.contabilidad;
 
+import common.constants.ApplicationConstants;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import mobiliario.ApplicationConstants;
 import forms.inventario.InventarioForm;
 import model.CategoriaContabilidad;
 import services.ContabilidadServices;
@@ -25,9 +20,6 @@ public class CategoriaContabilidadForm extends java.awt.Dialog {
     private ContabilidadServices contabilidadService = new ContabilidadServices();
     private String g_id_categoria=null;
 
-    /**
-     * Creates new form Colores
-     */
     public CategoriaContabilidadForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();

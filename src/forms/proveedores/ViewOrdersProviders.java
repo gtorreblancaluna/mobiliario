@@ -3,10 +3,11 @@ package forms.proveedores;
 
 
 import clases.sqlclass;
+import common.constants.ApplicationConstants;
+import common.utilities.UtilityCommon;
 import exceptions.BusinessException;
 import java.awt.Desktop;
 import java.awt.Toolkit;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
@@ -19,7 +20,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.ApplicationConstants;
 import mobiliario.IndexForm;
 import model.DatosGenerales;
 import model.providers.OrdenProveedor;
@@ -66,7 +66,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         String orderId = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 0).toString();
         String folio = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 1).toString();
          
-        if (Utility.verifyIfInternalFormIsOpen(orderProviderForm)) {
+        if (UtilityCommon.verifyIfInternalFormIsOpen(orderProviderForm,IndexForm.jDesktopPane1)) {
             orderProviderForm = new OrderProviderForm(folio, orderId, rentaId);
             IndexForm.jDesktopPane1.add(orderProviderForm);
             orderProviderForm.show();
@@ -87,7 +87,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
          JasperPrint jasperPrint;
         try {
            
-            String pathLocation = Utility.getPathLocation();
+            String pathLocation = UtilityCommon.getPathLocation();
             String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_ORDEN_PROVEEDOR;
             System.out.println("Cargando desde: " + archivo);
             if (archivo == null) {
@@ -195,7 +195,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         
        g_idOrder = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 0).toString();
        
-        if (Utility.verifyIfInternalFormIsOpen(paymentsProvidersForm)) {
+        if (UtilityCommon.verifyIfInternalFormIsOpen(paymentsProvidersForm,IndexForm.jDesktopPane1)) {
             paymentsProvidersForm = new PaymentsProvidersForm();
             IndexForm.jDesktopPane1.add(paymentsProvidersForm);
             paymentsProvidersForm.show();

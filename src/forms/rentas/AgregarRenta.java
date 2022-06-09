@@ -6,6 +6,8 @@ import clases.Mail;
 import clases.conectate;
 import clases.sqlclass;
 import com.mysql.jdbc.MysqlDataTruncation;
+import common.constants.ApplicationConstants;
+import common.utilities.UtilityCommon;
 import exceptions.BusinessException;
 import exceptions.DataOriginException;
 import java.awt.Desktop;
@@ -33,7 +35,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.ApplicationConstants;
 import mobiliario.disponibilidad_articulos;
 import mobiliario.iniciar_sesion;
 import model.Articulo;
@@ -174,7 +175,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     public void enviar_email() {
         String email = this.txtEmailToSend.getText();
         try{
-            Utility.isEmail(email);
+            UtilityCommon.isEmail(email);
         }catch(MessagingException e){
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR);
             return;            
@@ -428,7 +429,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         JasperPrint jasperPrint;
         try {
-            String pathLocation = Utility.getPathLocation();
+            String pathLocation = UtilityCommon.getPathLocation();
             String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_NUEVO_PEDIDO;
 
             System.out.println("Cargando desde: " + archivo);
@@ -753,7 +754,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
        
         if (check_enviar_email.isSelected() == true){
            try{
-                Utility.isEmail(this.txtEmailToSend.getText());
+                UtilityCommon.isEmail(this.txtEmailToSend.getText());
            }catch(MessagingException e){
                JOptionPane.showMessageDialog(null,e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                return;

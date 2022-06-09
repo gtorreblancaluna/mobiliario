@@ -1,9 +1,9 @@
 package dao;
 
+import common.constants.ApplicationConstants;
 import exceptions.DataOriginException;
 import java.util.List;
 import java.util.Map;
-import mobiliario.ApplicationConstants;
 import model.Abono;
 import model.DetalleRenta;
 import model.Renta;

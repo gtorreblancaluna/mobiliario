@@ -1,5 +1,6 @@
 package forms.rentas;
 
+import common.constants.ApplicationConstants;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.text.SimpleDateFormat;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import mobiliario.ApplicationConstants;
 import model.EstadoEvento;
 import model.Tipo;
 import model.Usuario;

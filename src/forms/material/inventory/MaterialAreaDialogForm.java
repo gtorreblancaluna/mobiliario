@@ -1,9 +1,9 @@
 package forms.material.inventory;
 
+import common.constants.ApplicationConstants;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import mobiliario.ApplicationConstants;
 import model.material.inventory.MaterialArea;
 import org.apache.log4j.Priority;
 import services.SystemService;

@@ -3,6 +3,7 @@ package forms.inventario;
 import forms.rentas.ConsultarRentas;
 import services.SaleService;
 import clases.sqlclass;
+import common.constants.ApplicationConstants;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -17,7 +18,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.ApplicationConstants;
 import model.querys.AvailabilityItemResult;
 import services.SystemService;
 

@@ -6,6 +6,8 @@
 package forms.proveedores;
 
 
+import common.constants.ApplicationConstants;
+import common.utilities.UtilityCommon;
 import exceptions.BusinessException;
 import exceptions.InvalidDataException;
 import java.awt.Toolkit;
@@ -17,7 +19,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.ApplicationConstants;
 import model.providers.Proveedor;
 import services.providers.ProvidersService;
 import utilities.Utility;
@@ -593,7 +594,7 @@ public class ViewProviderForm extends javax.swing.JDialog {
         }
         if(!this.txtEmail.getText().equals("")){
             try{
-                Utility.isEmail(this.txtEmail.getText());
+                UtilityCommon.isEmail(this.txtEmail.getText());
             }catch(MessagingException e){
                 message.append("Email no válido\n");
             }

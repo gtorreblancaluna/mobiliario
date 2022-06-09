@@ -1,5 +1,7 @@
 package forms.inventario;
 
+import common.constants.ApplicationConstants;
+import common.utilities.UtilityCommon;
 import services.SystemService;
 import forms.compras.AgregarCompraFormDialog;
 import forms.material.inventory.MaterialSaleItemsView;
@@ -25,7 +27,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.ApplicationConstants;
 import mobiliario.AsignarFaltante;
 import mobiliario.Categoria;
 import mobiliario.Colores;
@@ -191,7 +192,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
 
     public void buscar() {
               
-       JDialog dialog = Utility.showDialog("Espere porfavor...","Espere porfavor...", this);
+       JDialog dialog = UtilityCommon.showDialog("Espere porfavor...","Espere porfavor...", this);
          
         this.formato_tabla_articulos();
         Map<String,Object> map = new HashMap<>();

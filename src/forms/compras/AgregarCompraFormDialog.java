@@ -5,6 +5,7 @@
  */
 package forms.compras;
 
+import common.constants.ApplicationConstants;
 import java.text.DecimalFormat;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -13,7 +14,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.ApplicationConstants;
 import model.Articulo;
 import model.Compra;
 import services.ComprasService;

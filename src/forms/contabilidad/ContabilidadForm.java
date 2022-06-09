@@ -5,6 +5,8 @@
  */
 package forms.contabilidad;
 
+import common.constants.ApplicationConstants;
+import common.utilities.UtilityCommon;
 import exceptions.DataOriginException;
 import forms.tipo.abonos.cuentas.CuentasBancariasForm;
 import java.awt.Font;
@@ -20,7 +22,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.ApplicationConstants;
 import mobiliario.iniciar_sesion;
 import model.Abono;
 import model.CategoriaContabilidad;
@@ -621,10 +622,10 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         String subCategoria = this.cmbSubCategoria.getSelectedItem().toString().replace(" (+)", "").replace(" (-)", "");
         StringBuilder message = new StringBuilder();
         
-        if(!Utility.validateComboBoxDataValue(subCategoria))
+        if(!UtilityCommon.validateComboBoxDataValue(subCategoria))
             message.append("Falta dato de sub categoria\n");
              
-        if(!Utility.validateAmount(this.txtCantidad.getText().toString()))
+        if(!UtilityCommon.validateAmount(this.txtCantidad.getText().toString()))
            message.append("Error en cantidad, porfavor verifica el dato\n");
         
         Cuenta account = accountService.getAccountByDescription(cuenta);

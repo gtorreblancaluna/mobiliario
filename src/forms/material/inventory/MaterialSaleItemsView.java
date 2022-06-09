@@ -1,10 +1,10 @@
 package forms.material.inventory;
 
+import common.constants.ApplicationConstants;
 import forms.proveedores.SelectProviderToOrder;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import mobiliario.ApplicationConstants;
 import model.Articulo;
 import model.material.inventory.MaterialInventory;
 import model.material.inventory.MaterialSaleItem;

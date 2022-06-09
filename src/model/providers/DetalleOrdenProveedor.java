@@ -1,7 +1,7 @@
 package model.providers;
 
+import common.constants.ApplicationConstants;
 import java.sql.Timestamp;
-import mobiliario.ApplicationConstants;
 import model.Articulo;
 
 public class DetalleOrdenProveedor {

@@ -1,6 +1,7 @@
 package forms.proveedores;
 
 import clases.sqlclass;
+import common.constants.ApplicationConstants;
 import exceptions.BusinessException;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -10,7 +11,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.ApplicationConstants;
 import mobiliario.iniciar_sesion;
 import model.TipoAbono;
 import model.providers.OrdenProveedor;

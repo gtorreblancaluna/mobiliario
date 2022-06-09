@@ -1,31 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package forms.contabilidad;
 
-import forms.tipo.abonos.cuentas.CuentasBancariasForm;
-import static forms.tipo.abonos.cuentas.TiposAbonosForm.cmbCuenta;
+import common.constants.ApplicationConstants;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import mobiliario.ApplicationConstants;
 import forms.inventario.InventarioForm;
 import model.CategoriaContabilidad;
-import model.Cuenta;
 import model.SubCategoriaContabilidad;
 import services.AccountService;
 import services.ContabilidadServices;
 
 
-/**
- *
- * @author Carlos Alberto
- */
 public class SubCategoriaContabilidadForm extends java.awt.Dialog {
     private ContabilidadServices contabilidadService = new ContabilidadServices();
     private String g_id_sub_categoria=null;
@@ -33,9 +21,7 @@ public class SubCategoriaContabilidadForm extends java.awt.Dialog {
     private static AccountService accountService = new AccountService();
     public static boolean isSubCategoriaContabilidadForm = false;
 
-    /**
-     * Creates new form Colores
-     */
+
     public SubCategoriaContabilidadForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         

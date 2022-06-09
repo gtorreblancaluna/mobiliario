@@ -1,11 +1,10 @@
 package dao;
 
+import common.constants.ApplicationConstants;
 import exceptions.DataOriginException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import mobiliario.ApplicationConstants;
 import model.Articulo;
 import model.CategoriaDTO;
 import model.Color;

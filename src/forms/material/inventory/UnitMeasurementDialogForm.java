@@ -1,9 +1,9 @@
 package forms.material.inventory;
 
+import common.constants.ApplicationConstants;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import mobiliario.ApplicationConstants;
 import model.material.inventory.MeasurementUnit;
 import org.apache.log4j.Priority;
 import services.SystemService;
@@ -11,7 +11,7 @@ import services.material.inventory.MaterialInventoryService;
 
 public class UnitMeasurementDialogForm extends javax.swing.JDialog {
 
-    private MaterialInventoryService materialInventoryService;
+    private final MaterialInventoryService materialInventoryService;
     private String idToUpdate;
     private static org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(UnitMeasurementDialogForm.class.getName());
     private final SystemService systemService = SystemService.getInstance();

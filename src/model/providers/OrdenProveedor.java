@@ -1,9 +1,9 @@
 package model.providers;
 
+import common.constants.ApplicationConstants;
 import exceptions.BusinessException;
 import java.sql.Timestamp;
 import java.util.List;
-import mobiliario.ApplicationConstants;
 import model.Renta;
 import model.Usuario;
 
