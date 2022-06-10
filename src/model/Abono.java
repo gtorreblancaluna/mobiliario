@@ -3,6 +3,7 @@ package model;
 
 import common.model.Usuario;
 
+
 public class Abono {
     
     private int abonoId;
