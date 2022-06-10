@@ -20,7 +20,7 @@ import model.EstadoEvento;
 import model.Renta;
 import model.Tipo;
 import model.TipoAbono;
-import model.Usuario;
+import common.model.Usuario;
 import model.querys.AvailabilityItemResult;
 
 public class SaleService {

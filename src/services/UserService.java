@@ -9,8 +9,8 @@ import java.sql.SQLNonTransientConnectionException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
-import model.Puesto;
-import model.Usuario;
+import common.model.Puesto;
+import common.model.Usuario;
 import org.apache.log4j.Logger;
 
 public class UserService {

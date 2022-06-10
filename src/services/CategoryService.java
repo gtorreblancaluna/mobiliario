@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package services;
 
 import clases.sqlclass;
+import common.model.Usuario;
 import dao.CategoryDAO;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
@@ -21,10 +17,6 @@ import javax.swing.JOptionPane;
 import model.AsignaCategoria;
 import model.CategoriaDTO;
 
-/**
- *
- * @author jerry
- */
 public class CategoryService {
     
     private final UserService userService = UserService.getInstance();
@@ -57,7 +49,7 @@ public class CategoryService {
            try {
                AsignaCategoria asignaCategoria = new AsignaCategoria();
                asignaCategoria.setAsignaCategoriaId(Integer.parseInt(dtconduc[i][0].toString()));
-               asignaCategoria.setUsuario(userService.obtenerUsuarioPorId(sql, Integer.parseInt(dtconduc[i][1].toString())));
+               asignaCategoria.setUsuario((Usuario) userService.obtenerUsuarioPorId(sql, Integer.parseInt(dtconduc[i][1].toString())));
                asignaCategoria.setCategoria(this.obtenerCategoriaPorId(sql, Integer.parseInt(dtconduc[i][2].toString())));
                
                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");

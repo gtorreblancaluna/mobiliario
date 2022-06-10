@@ -8,7 +8,7 @@ import java.util.Date;
 import model.OrderTypeChange;
 import model.Renta;
 import model.Tipo;
-import model.Usuario;
+import common.model.Usuario;
 import org.apache.log4j.Logger;
 
 

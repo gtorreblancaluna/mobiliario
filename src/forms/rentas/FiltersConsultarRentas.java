@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import model.EstadoEvento;
 import model.Tipo;
-import model.Usuario;
+import common.model.Usuario;
 
 
 public class FiltersConsultarRentas extends javax.swing.JDialog {

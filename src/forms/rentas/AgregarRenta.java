@@ -42,7 +42,7 @@ import model.Cliente;
 import model.DatosGenerales;
 import model.Renta;
 import model.TipoAbono;
-import model.Usuario;
+import common.model.Usuario;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;

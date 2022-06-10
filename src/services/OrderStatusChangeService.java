@@ -8,7 +8,7 @@ import exceptions.DataOriginException;
 import java.util.Date;
 import model.EstadoEvento;
 import model.Renta;
-import model.Usuario;
+import common.model.Usuario;
 import org.apache.log4j.Logger;
 
 

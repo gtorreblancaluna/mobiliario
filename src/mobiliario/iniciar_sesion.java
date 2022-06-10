@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import static mobiliario.IndexForm.lbl_logueo;
 import static mobiliario.IndexForm.lblPuesto;
-import model.Usuario;
+import common.model.Usuario;
 import org.apache.log4j.Logger;
 import org.jvnet.substance.SubstanceLookAndFeel;
 import services.UserService;

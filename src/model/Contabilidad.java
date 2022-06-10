@@ -5,6 +5,7 @@
  */
 package model;
 
+import common.model.Usuario;
 import java.sql.Timestamp;
 
 /**

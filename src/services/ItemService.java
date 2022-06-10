@@ -18,7 +18,7 @@ import model.Color;
 import model.Compra;
 import model.Faltante;
 import model.Renta;
-import model.Usuario;
+import common.model.Usuario;
 import model.providers.DetalleOrdenProveedor;
 import org.apache.log4j.Logger;
 import services.providers.OrderProviderService;

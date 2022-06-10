@@ -5,7 +5,7 @@
   
 <mapper namespace="MapperUsuarios">
   
-    <resultMap id="resultUsuario" type="model.Usuario">        
+    <resultMap id="resultUsuario" type="common.model.Usuario">        
         <result property="usuarioId" column="id_usuarios"/>
         <result property="nombre" column="nombre"/>
         <result property="apellidos" column="apellidos"/>
