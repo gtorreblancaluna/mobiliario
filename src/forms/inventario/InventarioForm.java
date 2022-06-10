@@ -334,6 +334,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         txt_precio_renta.setText("");
         this.txtCodigo.setText("");
         txt_cantidad.requestFocus();
+        cmb_categoria.setSelectedIndex(0);
+        cmb_color.setSelectedIndex(0);
 
     }
 
@@ -1240,55 +1242,14 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             
             this.txt_cantidad.setText(articulo.getCantidad()+"");
             
-             for (int i = 0; i < cmb_categoria.getItemCount(); i++) {
-                if (cmb_categoria.getItemAt(i).equals(articulo.getCategoria().getDescripcion())) {
-                    System.out.println("categoria:" + cmb_categoria.getItemAt(i));
-                    cmb_categoria.setSelectedIndex(i);
-                    break;
-                }
-            }             
-            for (int i = 0; i < cmb_color.getItemCount(); i++) {
-                if (cmb_color.getItemAt(i).equals(articulo.getColor().getColor())) {
-                    cmb_color.setSelectedIndex(i);
-                    break;
-                }
-            }
+            
             this.txtCodigo.setText(articulo.getCodigo());
             this.txt_descripcion.setText(articulo.getDescripcion());
             txt_precio_compra.setText(articulo.getPrecioCompra()+"");
             this.txt_precio_renta.setText(articulo.getPrecioRenta()+"");
             
-//             String valor;
-            //jbtn_agregar.setEnabled(false);
-//            jbtn_guardar.setEnabled(true);
-//            jbtn_agregar.setEnabled(false);
-
-//            id_articulo = tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString();
-//            this.txt_cantidad.setText(String.valueOf(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 2)));
-
-//            for (int i = 0; i < cmb_categoria.getItemCount(); i++) {
-//                if (cmb_categoria.getItemAt(i).equals(String.valueOf(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 4)))) {
-//                    System.out.println("categoria:" + cmb_categoria.getItemAt(i));
-//                    cmb_categoria.setSelectedIndex(i);
-//                    break;
-//                }
-//            }
-
-//            for (int i = 0; i < cmb_color.getItemCount(); i++) {
-//                if (cmb_color.getItemAt(i).equals(String.valueOf(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 6)))) {
-//                    cmb_color.setSelectedIndex(i);
-//                    break;
-//                }
-//
-//            }
-//            this.txtCodigo.setText(String.valueOf(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 1)));
-//            this.txt_descripcion.setText(String.valueOf(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 5)));
-            //EliminaCaracteres(txt_total_pagar.getText(), "$,");
-//            valor = (String.valueOf(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 8)));
-//            txt_precio_compra.setText(EliminaCaracteres(valor, "$,"));
-
-//            valor = (String.valueOf(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 9)));
-//            this.txt_precio_renta.setText(EliminaCaracteres(valor, "$,"));
+            cmb_categoria.getModel().setSelectedItem(articulo.getCategoria());
+            cmb_color.getModel().setSelectedItem(articulo.getColor());
 
         } else {
             JOptionPane.showMessageDialog(null, "Selecciona una fila para editar", "Error", JOptionPane.INFORMATION_MESSAGE);
