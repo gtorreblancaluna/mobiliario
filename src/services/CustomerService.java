@@ -2,8 +2,8 @@ package services;
 
 
 import dao.CustomerDao;
-import exceptions.BusinessException;
-import exceptions.DataOriginException;
+import common.exceptions.BusinessException;
+import common.exceptions.DataOriginException;
 import java.util.List;
 import model.Cliente;
 

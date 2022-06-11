@@ -1,6 +1,7 @@
 package forms.material.inventory;
 
 import common.constants.ApplicationConstants;
+import common.services.UtilityService;
 import forms.proveedores.SelectProviderToOrder;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -11,14 +12,13 @@ import model.material.inventory.MaterialSaleItem;
 import model.providers.Proveedor;
 import org.apache.log4j.Priority;
 import services.ItemService;
-import services.SystemService;
 import services.material.inventory.MaterialInventoryService;
 
 public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
 
     private final MaterialInventoryService materialInventoryService;
     private final ItemService itemService;
-    private final SystemService systemService;
+    private final UtilityService utilityService = UtilityService.getInstance();
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(MaterialSaleItemsView.class.getName());
     private Articulo gItem = null;
     public static String gMaterialId = "";
@@ -33,7 +33,6 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
         this.setClosable(true);
         itemService = ItemService.getInstance();
         materialInventoryService = MaterialInventoryService.getInstance();
-        systemService = SystemService.getInstance();
         init(itemId);
     }
     
@@ -420,7 +419,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnExportExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportExcelActionPerformed
-        systemService.exportarExcel(table);
+        utilityService.exportarExcel(table);
     }//GEN-LAST:event_btnExportExcelActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed

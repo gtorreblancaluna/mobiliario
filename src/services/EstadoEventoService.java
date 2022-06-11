@@ -2,7 +2,7 @@ package services;
 
 import dao.EstadoEventoDao;
 import java.util.List;
-import model.EstadoEvento;
+import common.model.EstadoEvento;
 
 public class EstadoEventoService {
         

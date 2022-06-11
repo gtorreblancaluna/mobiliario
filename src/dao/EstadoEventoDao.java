@@ -1,6 +1,6 @@
 package dao;
 
-import model.EstadoEvento;
+import common.model.EstadoEvento;
 import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;

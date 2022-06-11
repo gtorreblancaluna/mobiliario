@@ -1,8 +1,8 @@
 package forms.inventario;
 
 import common.constants.ApplicationConstants;
+import common.services.UtilityService;
 import common.utilities.UtilityCommon;
-import services.SystemService;
 import forms.compras.AgregarCompraFormDialog;
 import forms.material.inventory.MaterialSaleItemsView;
 import java.awt.Dimension;
@@ -37,7 +37,6 @@ import model.CategoriaDTO;
 import model.Color;
 import services.CategoryService;
 import services.ItemService;
-import utilities.Utility;
 import static mobiliario.IndexForm.jDesktopPane1;
 
 public class InventarioForm extends javax.swing.JInternalFrame {
@@ -52,11 +51,11 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     Object[] datos_combo;
     private String fecha_sistema;
     public static boolean validar_colores, validar_categorias;
-    private final SystemService systemService = SystemService.getInstance();
     private static final ItemService itemService = ItemService.getInstance();
     private static final CategoryService categoryService = new CategoryService();
     // variable para mandar a la ventana de agregar articulo
     private List<Articulo> articulos = new ArrayList<>();
+    private final UtilityService utilityService = UtilityService.getInstance();
 
     public InventarioForm() {
 
@@ -1394,7 +1393,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jbtnBuscarDisponibilidadMouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-       systemService.exportarExcel(tabla_articulos);
+       utilityService.exportarExcel(tabla_articulos);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed

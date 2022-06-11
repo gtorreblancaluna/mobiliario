@@ -2,8 +2,8 @@
 package services;
 
 import clases.sqlclass;
+import common.exceptions.DataOriginException;
 import dao.UserDAO;
-import exceptions.DataOriginException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.ArrayList;

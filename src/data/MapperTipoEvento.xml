@@ -5,7 +5,7 @@
   
 <mapper namespace="MapperTipoEvento">
   
-    <resultMap id="resultMapTipoEvento" type="model.Tipo">        
+    <resultMap id="resultMapTipoEvento" type="common.model.Tipo">        
         <result property="tipoId" column="id_tipo"/>
         <result property="tipo" column="tipo"/>    
         

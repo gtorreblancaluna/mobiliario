@@ -5,7 +5,7 @@
   
 <mapper namespace="MapperEstadoEvento">
   
-    <resultMap id="resultMapEstadoEvento" type="model.EstadoEvento">        
+    <resultMap id="resultMapEstadoEvento" type="common.model.EstadoEvento">        
         <result property="estadoId" column="id_estado"/>
         <result property="descripcion" column="descripcion"/>    
         

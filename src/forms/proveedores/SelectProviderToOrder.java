@@ -1,5 +1,5 @@
 package forms.proveedores;
-import exceptions.BusinessException;
+import common.exceptions.BusinessException;
 import forms.material.inventory.MaterialSaleItemsView;
 import java.util.List;
 import javax.swing.JOptionPane;

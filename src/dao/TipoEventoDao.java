@@ -1,6 +1,6 @@
 package dao;
 
-import model.Tipo;
+import common.model.Tipo;
 import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;

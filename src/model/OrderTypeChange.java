@@ -1,5 +1,6 @@
 package model;
 
+import common.model.Tipo;
 import common.model.Usuario;
 import java.util.Date;
 

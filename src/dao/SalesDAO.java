@@ -1,7 +1,7 @@
 package dao;
 
 import common.constants.ApplicationConstants;
-import exceptions.DataOriginException;
+import common.exceptions.DataOriginException;
 import java.util.List;
 import java.util.Map;
 import model.Abono;

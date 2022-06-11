@@ -1,6 +1,6 @@
 package dao;
 
-import exceptions.DataOriginException;
+import common.exceptions.DataOriginException;
 import java.util.List;
 import model.Cliente;
 import org.apache.ibatis.session.SqlSession;

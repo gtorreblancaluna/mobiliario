@@ -7,9 +7,7 @@ package mobiliario;
 
 import clases.conectate;
 import clases.sqlclass;
-import java.awt.Component;
-import java.awt.Dialog;
-import java.awt.Frame;
+import common.services.UtilityService;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.logging.Level;
@@ -17,23 +15,15 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import services.SystemService;
 
-/**
- *
- * @author Carlos Alberto
- */
 public class clientes extends javax.swing.JInternalFrame {
 
     sqlclass funcion = new sqlclass();
     conectate conexion = new conectate();
-    private final SystemService systemService = SystemService.getInstance();
+    private final UtilityService utilityService = UtilityService.getInstance();
     Object[][] dtconduc;
     String id_cliente;
 
-    /**
-     * Creates new form clientes
-     */
     public clientes() {
         funcion.conectate();
         initComponents();
@@ -634,7 +624,7 @@ public class clientes extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txt_buscarKeyReleased
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        systemService.exportarExcel(tabla_clientes);
+        utilityService.exportarExcel(tabla_clientes);
     }//GEN-LAST:event_jButton1ActionPerformed
 
 

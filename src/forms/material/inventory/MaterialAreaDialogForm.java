@@ -1,12 +1,12 @@
 package forms.material.inventory;
 
 import common.constants.ApplicationConstants;
+import common.services.UtilityService;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.material.inventory.MaterialArea;
 import org.apache.log4j.Priority;
-import services.SystemService;
 import services.material.inventory.MaterialInventoryService;
 
 public class MaterialAreaDialogForm extends javax.swing.JDialog {
@@ -14,7 +14,7 @@ public class MaterialAreaDialogForm extends javax.swing.JDialog {
     private final MaterialInventoryService materialInventoryService;
     private String idToUpdate;
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(MaterialAreaDialogForm.class.getName());
-    private final SystemService systemService = SystemService.getInstance();
+    private final UtilityService utilityService = UtilityService.getInstance();
     
     public MaterialAreaDialogForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -325,7 +325,7 @@ public class MaterialAreaDialogForm extends javax.swing.JDialog {
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       systemService.exportarExcel(table);
+       utilityService.exportarExcel(table);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

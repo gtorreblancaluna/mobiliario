@@ -1,7 +1,7 @@
 package model.providers;
 
 import common.constants.ApplicationConstants;
-import exceptions.BusinessException;
+import common.exceptions.BusinessException;
 import java.sql.Timestamp;
 import java.util.List;
 import model.Renta;

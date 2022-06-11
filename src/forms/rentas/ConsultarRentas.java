@@ -10,8 +10,8 @@ import clases.sqlclass;
 import com.mysql.jdbc.MysqlDataTruncation;
 import common.constants.ApplicationConstants;
 import common.utilities.UtilityCommon;
-import exceptions.BusinessException;
-import exceptions.DataOriginException;
+import common.exceptions.BusinessException;
+import common.exceptions.DataOriginException;
 import forms.material.inventory.GenerateReportMaterialSaleItemsView;
 import forms.proveedores.OrderProviderForm;
 import java.awt.Desktop;
@@ -68,8 +68,9 @@ import services.CategoryService;
 import services.EstadoEventoService;
 import utilities.BuildEmailTemplate;
 import utilities.Utility;
-import model.EstadoEvento;
-import model.Tipo;
+import common.model.EstadoEvento;
+import common.model.Tipo;
+import common.services.UtilityService;
 import model.providers.OrdenProveedor;
 import parametersVO.ParameterOrderProvider;
 import services.OrderStatusChangeService;
@@ -121,6 +122,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private List<Tipo> typesGlobal = new ArrayList<>();
     private List<EstadoEvento> statusListGlobal = new ArrayList<>();
     private List<Usuario> choferes = new ArrayList<>();
+    private UtilityService utilityService = UtilityService.getInstance();
 
     
     private enum ColumnTableDetail {
@@ -4258,7 +4260,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jbtnGenerarReporteEntregasActionPerformed
 
     private void jtbtnGenerateExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtbtnGenerateExcelActionPerformed
-        systemService.exportarExcel(tabla_prox_rentas);
+        utilityService.exportarExcel(tabla_prox_rentas);
     }//GEN-LAST:event_jtbtnGenerateExcelActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed

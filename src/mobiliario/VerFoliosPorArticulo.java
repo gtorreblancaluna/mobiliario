@@ -4,6 +4,7 @@ import forms.inventario.InventarioForm;
 import services.SaleService;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
+import common.services.UtilityService;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
@@ -17,7 +18,6 @@ import model.DetalleRenta;
 import model.Faltante;
 import model.Renta;
 import services.ItemService;
-import services.SystemService;
 
 /**
  *
@@ -33,7 +33,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
     String id_color;
     float cant = 0; 
     private final SaleService saleService;
-    private final SystemService systemService = SystemService.getInstance();
+    private final UtilityService utilityService = UtilityService.getInstance();
     private final ItemService itemService = ItemService.getInstance();
     public static String g_rentaId;
     public static int g_articuloId;
@@ -531,7 +531,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
 
     private void btnExportarExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportarExcelActionPerformed
         // TODO add your handling code here:
-        systemService.exportarExcel(tablaArticulos);
+        utilityService.exportarExcel(tablaArticulos);
     }//GEN-LAST:event_btnExportarExcelActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed

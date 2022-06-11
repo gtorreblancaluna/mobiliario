@@ -3,8 +3,9 @@ package forms.proveedores;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
 import common.utilities.UtilityCommon;
-import exceptions.BusinessException;
-import exceptions.DataOriginException;
+import common.exceptions.BusinessException;
+import common.exceptions.DataOriginException;
+import common.services.UtilityService;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.io.File;
@@ -47,7 +48,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     
     Object[][] dtconduc;      
     private final SaleService saleService;
-    private final SystemService systemService;
+    private final UtilityService utilityService = UtilityService.getInstance();
     private final OrderProviderService orderProviderService = OrderProviderService.getInstance();
     public static String g_articuloId;
     public static String rentaId;
@@ -56,6 +57,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
     protected OrdenProveedor ordenProveedor = null;
     private PaymentsProvidersForm paymentsProvidersForm;
+    private SystemService systemService = SystemService.getInstance();
     
     /** Encabezados de la tabla ARTICULOS ORDEN PROVEEDOR */
     public final static int HD_ORDEN_PROVEEDOR_ID_ORDEN = 0;
@@ -1214,12 +1216,12 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // TODO add your handling code here:
-        systemService.exportarExcel(tablaArticulos);
+        utilityService.exportarExcel(tablaArticulos);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here:
-        systemService.exportarExcel(jTableOrderProvider);
+        utilityService.exportarExcel(jTableOrderProvider);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed

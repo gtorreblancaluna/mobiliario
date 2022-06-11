@@ -5,7 +5,7 @@
  */
 package dao;
 
-import exceptions.DataOriginException;
+import common.exceptions.DataOriginException;
 import java.sql.Timestamp;
 import java.util.List;
 import model.Cuenta;

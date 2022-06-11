@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import model.EstadoEvento;
-import model.Tipo;
+import common.model.EstadoEvento;
+import common.model.Tipo;
 import common.model.Usuario;
 
 

@@ -4,6 +4,7 @@ import forms.rentas.ConsultarRentas;
 import services.SaleService;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
+import common.services.UtilityService;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -19,7 +20,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import model.querys.AvailabilityItemResult;
-import services.SystemService;
+
 
 public class VerDisponibilidadArticulos extends java.awt.Dialog {
 
@@ -30,7 +31,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
     String id_color;
     float cant = 0; 
     private final SaleService saleService;
-    private final SystemService systemService = SystemService.getInstance();
+    private final UtilityService utilityService = UtilityService.getInstance();
     
     public String conviertemoneda(String valor) {
 
@@ -489,12 +490,12 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
 
     private void jbtnExportarDetalleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnExportarDetalleActionPerformed
         // TODO add your handling code here:
-        systemService.exportarExcel(tablaArticulos);
+        utilityService.exportarExcel(tablaArticulos);
     }//GEN-LAST:event_jbtnExportarDetalleActionPerformed
 
     private void jbtnExportarUnicosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnExportarUnicosActionPerformed
         // TODO add your handling code here:
-        systemService.exportarExcel(tablaArticulosUnicos);
+        utilityService.exportarExcel(tablaArticulosUnicos);
     }//GEN-LAST:event_jbtnExportarUnicosActionPerformed
 
     /**

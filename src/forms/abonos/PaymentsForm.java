@@ -1,7 +1,8 @@
 package forms.abonos;
 
 import common.utilities.UtilityCommon;
-import exceptions.DataOriginException;
+import common.exceptions.DataOriginException;
+import common.services.UtilityService;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,15 +17,13 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import model.Abono;
 import services.AbonosService;
-import services.SystemService;
-import utilities.Utility;
-
 
 public class PaymentsForm extends javax.swing.JInternalFrame {
 
-    private final SystemService systemService = SystemService.getInstance();
+    
     private final AbonosService abonosService = AbonosService.getInstance();
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
+    private final UtilityService utilityService = UtilityService.getInstance();
     
     public PaymentsForm() {
         this.setClosable(true);
@@ -348,7 +347,7 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-         systemService.exportarExcel(tabla_abonos);
+         utilityService.exportarExcel(tabla_abonos);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void tabla_abonosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_abonosMouseClicked

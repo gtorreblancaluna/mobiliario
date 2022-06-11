@@ -7,6 +7,7 @@ package mobiliario;
 
 import clases.conectate;
 import clases.sqlclass;
+import common.services.UtilityService;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.List;
@@ -18,7 +19,6 @@ import javax.swing.table.DefaultTableModel;
 import model.AsignaCategoria;
 import model.CategoriaDTO;
 import services.CategoryService;
-import services.SystemService;
 import services.UserService;
 
 /**
@@ -31,7 +31,7 @@ private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(u
     conectate conexion = new conectate();
     private final UserService userService = UserService.getInstance();
     CategoryService categoryService = new CategoryService();
-    private final SystemService systemService = SystemService.getInstance();
+    private final UtilityService utilityService = UtilityService.getInstance();
     Object[][] dtconduc;
     Object[] datos_combo;
     String id_usuario;
@@ -916,7 +916,7 @@ private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(u
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        systemService.exportarExcel(tabla_usuarios);
+        utilityService.exportarExcel(tabla_usuarios);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void tabla_usuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_usuariosMouseClicked

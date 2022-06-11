@@ -1,6 +1,8 @@
 package model;
 
 
+import common.model.Tipo;
+import common.model.EstadoEvento;
 import common.model.Usuario;
 import java.util.List;
 

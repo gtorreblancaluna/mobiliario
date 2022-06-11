@@ -1,15 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package forms.proveedores;
-
 
 import common.constants.ApplicationConstants;
 import common.utilities.UtilityCommon;
-import exceptions.BusinessException;
-import exceptions.InvalidDataException;
+import common.exceptions.BusinessException;
+import common.exceptions.InvalidDataException;
 import java.awt.Toolkit;
 import java.util.List;
 import javax.mail.MessagingException;
@@ -21,7 +15,6 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import model.providers.Proveedor;
 import services.providers.ProvidersService;
-import utilities.Utility;
 
 /**
  *
@@ -47,9 +40,6 @@ public class ViewProviderForm extends javax.swing.JDialog {
         this.txtPhones.setText("");
         this.txtAdress.setText("");
         this.txtEmail.setText("");
-        
-//        this.btnEdit.setEnabled(false);
-//        this.btnDelete.setEnabled(false);
         this.btnUpdate.setEnabled(false);
         
     }

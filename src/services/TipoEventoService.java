@@ -2,7 +2,7 @@ package services;
 
 import dao.TipoEventoDao;
 import java.util.List;
-import model.Tipo;
+import common.model.Tipo;
 
 public class TipoEventoService {
         

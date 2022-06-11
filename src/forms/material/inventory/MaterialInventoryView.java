@@ -2,7 +2,8 @@
 package forms.material.inventory;
 
 import common.constants.ApplicationConstants;
-import exceptions.BusinessException;
+import common.exceptions.BusinessException;
+import common.services.UtilityService;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -15,14 +16,13 @@ import model.material.inventory.MaterialArea;
 import model.material.inventory.MaterialInventory;
 import model.material.inventory.MeasurementUnit;
 import org.apache.log4j.Priority;
-import services.SystemService;
 import services.material.inventory.MaterialInventoryService;
 
 
 public class MaterialInventoryView extends javax.swing.JInternalFrame {
 
     private static MaterialInventoryService materialInventoryService;
-    private final SystemService systemService;
+    private final UtilityService utilityService = UtilityService.getInstance();
     private static org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(MaterialInventoryView.class.getName());
     private String idToUpdate = "";
     
@@ -43,7 +43,6 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         
         super.setTitle("Inventario de material");
         materialInventoryService = MaterialInventoryService.getInstance();
-        systemService = SystemService.getInstance();
         this.setClosable(true);
         this.btnUpdate.setEnabled(false);
         loadComboBoxs();
@@ -685,7 +684,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPDFActionPerformed
-        systemService.exportarExcel(table);
+        utilityService.exportarExcel(table);
     }//GEN-LAST:event_btnPDFActionPerformed
 
 

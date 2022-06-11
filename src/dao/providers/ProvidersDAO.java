@@ -1,24 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dao.providers;
 
+import common.exceptions.DataOriginException;
 import dao.MyBatisConnectionFactory;
-import exceptions.DataOriginException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import model.providers.Proveedor;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
-/**
- *
- * @author idscomercial
- */
 public class ProvidersDAO {
     
     private static Logger log = Logger.getLogger(ProvidersDAO.class.getName());

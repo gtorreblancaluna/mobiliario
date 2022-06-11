@@ -1,7 +1,7 @@
 package dao.providers;
 
+import common.exceptions.DataOriginException;
 import dao.MyBatisConnectionFactory;
-import exceptions.DataOriginException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;

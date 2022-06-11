@@ -1,6 +1,7 @@
 package forms.material.inventory;
 
 import common.constants.ApplicationConstants;
+import common.services.UtilityService;
 import common.utilities.UtilityCommon;
 import java.awt.Desktop;
 import java.io.File;
@@ -22,19 +23,17 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
-import services.SystemService;
 import services.material.inventory.MaterialInventoryService;
-import utilities.Utility;
+
 
 public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFrame {
     
-    private final SystemService systemService;
+    private final UtilityService utilityService = UtilityService.getInstance();
     private final MaterialInventoryService materialInventoryService;
     private final String gRentId;
     
     public GenerateReportMaterialSaleItemsView(String rentId) {
         initComponents();
-        systemService = SystemService.getInstance();
         materialInventoryService = MaterialInventoryService.getInstance();
         this.setClosable(true);
         this.setTitle("Generar reporte RECOLECCIÓN DE MATERIAL");
@@ -350,7 +349,7 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcelActionPerformed
-        systemService.exportarExcel(table);
+        utilityService.exportarExcel(table);
     }//GEN-LAST:event_btnExcelActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed

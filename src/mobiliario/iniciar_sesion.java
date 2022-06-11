@@ -1,7 +1,7 @@
 package mobiliario;
 
 import common.constants.ApplicationConstants;
-import exceptions.DataOriginException;
+import common.exceptions.DataOriginException;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;

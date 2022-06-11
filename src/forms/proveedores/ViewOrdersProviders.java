@@ -5,7 +5,8 @@ package forms.proveedores;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
 import common.utilities.UtilityCommon;
-import exceptions.BusinessException;
+import common.exceptions.BusinessException;
+import common.services.UtilityService;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.io.File;
@@ -31,12 +32,11 @@ import net.sf.jasperreports.engine.util.JRLoader;
 import parametersVO.ParameterOrderProvider;
 import services.SystemService;
 import services.providers.OrderProviderService;
-import utilities.Utility;
 
 public class ViewOrdersProviders extends javax.swing.JInternalFrame {
 
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(ViewOrdersProviders.class.getName());
-    private final SystemService systemService = SystemService.getInstance();
+    private final UtilityService utilityService = UtilityService.getInstance();
     private final OrderProviderService orderService = OrderProviderService.getInstance();
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
     private PaymentsProvidersForm paymentsProvidersForm = null;
@@ -44,6 +44,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
     public static String g_idOrder=null;    
     private OrderProviderForm orderProviderForm = null;  
     private sqlclass funcion = new sqlclass();  
+    private SystemService systemService = SystemService.getInstance();
 
     public ViewOrdersProviders() {
         initComponents();
@@ -632,7 +633,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        systemService.exportarExcel(tableViewOrdersProviders);
+        utilityService.exportarExcel(tableViewOrdersProviders);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed

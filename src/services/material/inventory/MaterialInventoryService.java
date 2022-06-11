@@ -2,8 +2,8 @@ package services.material.inventory;
 
 import clases.sqlclass;
 import dao.material.inventory.MaterialInventoryDAO;
-import exceptions.BusinessException;
-import exceptions.DataOriginException;
+import common.exceptions.BusinessException;
+import common.exceptions.DataOriginException;
 import java.util.List;
 import java.util.Map;
 import model.material.inventory.MaterialArea;

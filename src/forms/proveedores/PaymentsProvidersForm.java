@@ -2,7 +2,8 @@ package forms.proveedores;
 
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
-import exceptions.BusinessException;
+import common.exceptions.BusinessException;
+import common.services.UtilityService;
 import java.text.DecimalFormat;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -16,13 +17,12 @@ import model.TipoAbono;
 import model.providers.OrdenProveedor;
 import model.providers.PagosProveedor;
 import services.SaleService;
-import services.SystemService;
 import services.providers.OrderProviderService;
 import services.providers.ProvidersPaymentsService;
 
 public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
     
-    private final SystemService systemService = SystemService.getInstance();
+    private final UtilityService utilityService = UtilityService.getInstance();
     private final OrderProviderService orderService = OrderProviderService.getInstance();
     private final ProvidersPaymentsService providersPaymentsService = ProvidersPaymentsService.getInstance();
     private final SaleService saleService;
@@ -431,7 +431,7 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         // TODO add your handling code here:
-        systemService.exportarExcel(tablePayments);
+        utilityService.exportarExcel(tablePayments);
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed

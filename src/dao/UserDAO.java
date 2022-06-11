@@ -1,7 +1,7 @@
 package dao;
 
 import common.constants.ApplicationConstants;
-import exceptions.DataOriginException;
+import common.exceptions.DataOriginException;
 import java.util.List;
 import common.model.Usuario;
 import org.apache.ibatis.session.SqlSession;
@@ -24,7 +24,7 @@ public class UserDAO {
         }
     }
     
-     public static UserDAO getInstance() {
+    public static UserDAO getInstance() {
         if (INSTANCE == null) createInstance();
             return INSTANCE;
     }

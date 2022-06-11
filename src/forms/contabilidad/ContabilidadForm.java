@@ -1,13 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package forms.contabilidad;
 
 import common.constants.ApplicationConstants;
 import common.utilities.UtilityCommon;
-import exceptions.DataOriginException;
+import common.exceptions.DataOriginException;
+import common.services.UtilityService;
 import forms.tipo.abonos.cuentas.CuentasBancariasForm;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -31,16 +27,16 @@ import model.SubCategoriaContabilidad;
 import services.AbonosService;
 import services.AccountService;
 import services.ContabilidadServices;
-import services.SystemService;
-import utilities.Utility;
+
+
 
 public final class ContabilidadForm extends javax.swing.JInternalFrame {
-    ContabilidadServices contabilidadServices = new ContabilidadServices();
-    private final SystemService systemService = SystemService.getInstance();
+    private ContabilidadServices contabilidadServices = new ContabilidadServices();
     private final AbonosService abonosService = AbonosService.getInstance();
     public static AccountService accountService = new AccountService();
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
      public static boolean isContabilidadForm = false;
+     private final UtilityService utilityService = UtilityService.getInstance();
     /**
      * Creates new form ContabilidadForm
      */
@@ -957,7 +953,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
     }
     private void btnExportExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportExcelActionPerformed
         // TODO add your handling code here:
-        systemService.exportarExcel(this.tabla_contabilidad);
+        utilityService.exportarExcel(this.tabla_contabilidad);
     }//GEN-LAST:event_btnExportExcelActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
