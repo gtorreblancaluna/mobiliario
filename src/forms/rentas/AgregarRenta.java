@@ -429,7 +429,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         JasperPrint jasperPrint;
         try {
-            String pathLocation = UtilityCommon.getPathLocation();
+            String pathLocation = Utility.getPathLocation();
             String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_NUEVO_PEDIDO;
 
             System.out.println("Cargando desde: " + archivo);

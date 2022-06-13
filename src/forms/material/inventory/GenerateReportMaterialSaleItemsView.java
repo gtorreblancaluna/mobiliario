@@ -24,6 +24,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 import services.material.inventory.MaterialInventoryService;
+import utilities.Utility;
 
 
 public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFrame {
@@ -125,7 +126,7 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
     private void reportPDF(List<MaterialSaleItemReport> list) throws Exception{
      
         JasperPrint jasperPrint;
-        String pathLocation = UtilityCommon.getPathLocation();
+        String pathLocation = Utility.getPathLocation();
         String pathFile = pathLocation+ApplicationConstants.JASPER_REPORT_COLLECTION_MATERIAL;
         System.out.println("Cargando desde: " + pathFile);
         if (pathFile == null || pathFile.isEmpty()) {

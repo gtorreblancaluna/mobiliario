@@ -20,7 +20,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 import java.io.File;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.text.DecimalFormat;
@@ -504,7 +503,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         JasperPrint jasperPrint;
         try {
             fgConsultaTabla= false;
-            String pathLocation = UtilityCommon.getPathLocation();
+            String pathLocation = Utility.getPathLocation();
             String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_CONSULTA;
             System.out.println("Cargando desde: " + archivo);
             if (archivo == null) {
@@ -4233,10 +4232,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         
         // mandamos a generar el reporte PDF
-        JasperPrint jasperPrint;
         
-        try {               
-            String pathLocation = UtilityCommon.getPathLocation();
+        
+        try {      
+            JasperPrint jasperPrint;
+            String pathLocation = Utility.getPathLocation();
            
             JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(pathLocation+ApplicationConstants.RUTA_REPORTE_ENTREGAS);  
             // enviamos los parametros
@@ -4284,17 +4284,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "Agrega por lo menos una categoria al usuario seleccionado ", "Reporte", JOptionPane.INFORMATION_MESSAGE);
             return;
          }
-         
-//         String query = "SELECT * " +
-//                    "FROM renta renta\n" +
-//                    "INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta)\n" +
-//                    "INNER JOIN articulo articulo ON (articulo.id_articulo = detalle.id_articulo)\n" +
-//                    "INNER JOIN categoria categoria ON (categoria.id_categoria = articulo.id_categoria)\n" +
-//                    "INNER JOIN color color ON (color.id_color = articulo.id_color)\n" +
-//                    "INNER JOIN usuarios usuarios ON (usuarios.id_usuarios = renta.id_usuarios)\n" +
-//                    "INNER JOIN asigna_categoria asigna ON (asigna.id_usuarios = usuarios.id_usuarios)\n" +
-//                    "WHERE renta.id_renta = "+rentaId+" AND articulo.id_categoria IN (SELECT asigna.id_categoria FROM asigna_categoria asigna WHERE asigna.id_usuarios = "+usuarioId+")";
-         
+                 
         String query = "SELECT * FROM renta renta\n" +
         "INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta)\n" +
         "INNER JOIN articulo articulo ON (articulo.id_articulo = detalle.id_articulo)\n" +
@@ -4317,10 +4307,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "No se obtuvieron registros :( ", "Reporte", JOptionPane.INFORMATION_MESSAGE);
             return;
          }
-            JasperPrint jasperPrint;
+            
         try {
+            JasperPrint jasperPrint;
             String archivo = ApplicationConstants.RUTA_REPORTE_CATEGORIAS;
-            String pathLocation = UtilityCommon.getPathLocation();
+            String pathLocation = Utility.getPathLocation();
             System.out.println("Cargando desde: " + archivo);
             if (archivo == null) {
                 JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
@@ -4336,19 +4327,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             parametro.put("ID_USUARIO",usuarioId);
             parametro.put("NOMBRE_ENCARGADO_AREA",this.cmbUsuarios.getSelectedItem()+"");
             
-            // funcion.conectate();
             jasperPrint = JasperFillManager.fillReport(masterReport, parametro, funcion.getConnection());
             JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_CATEGORIAS);
             File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_CATEGORIAS);
-            try {
-                Desktop.getDesktop().open(file2);
-            } catch (IOException ex) {
-                Logger.getLogger(IndexForm.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            // funcion.desconecta();
-            // funcion.desconecta();
-            // funcion.desconecta();
-            // funcion.desconecta();
+            
+            Desktop.getDesktop().open(file2);
+          
+
         } catch (Exception j) {
             System.out.println("Mensaje de Error:" + j.toString());
             JOptionPane.showMessageDialog(rootPane, "Mensaje de Error :" + j.toString() + "\n Existe un PDF abierto, cierralo e intenta generar el PDF nuevamente");

@@ -2,6 +2,9 @@ package utilities;
 
 import common.utilities.RequestFocusListener;
 import common.constants.ApplicationConstants;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
@@ -14,6 +17,15 @@ public abstract class Utility {
     
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     
+    
+    public static String getPathLocation()throws IOException,URISyntaxException{
+   
+        File file = new File(Utility.class.getProtectionDomain().getCodeSource().getLocation()
+                .toURI()).getParentFile();
+        
+        return file+"";
+    
+    }
     
     public static void pushNotification(final String notification){
         StringBuilder messages = new StringBuilder();

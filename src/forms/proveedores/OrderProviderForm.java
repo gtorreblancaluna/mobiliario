@@ -121,7 +121,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         JasperPrint jasperPrint;
        
            
-        String pathLocation = UtilityCommon.getPathLocation();
+        String pathLocation = Utility.getPathLocation();
         String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_ORDEN_PROVEEDOR;
         System.out.println("Cargando desde: " + archivo);
         if (archivo == null) {

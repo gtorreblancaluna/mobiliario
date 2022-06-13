@@ -32,6 +32,7 @@ import net.sf.jasperreports.engine.util.JRLoader;
 import parametersVO.ParameterOrderProvider;
 import services.SystemService;
 import services.providers.OrderProviderService;
+import utilities.Utility;
 
 public class ViewOrdersProviders extends javax.swing.JInternalFrame {
 
@@ -88,7 +89,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
          JasperPrint jasperPrint;
         try {
            
-            String pathLocation = UtilityCommon.getPathLocation();
+            String pathLocation = Utility.getPathLocation();
             String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_ORDEN_PROVEEDOR;
             System.out.println("Cargando desde: " + archivo);
             if (archivo == null) {
