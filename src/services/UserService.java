@@ -248,5 +248,8 @@ public class UserService {
          return usuariosDao.obtenerUsuarioPorPassword(psw);
      }
     
+    public List<Usuario> getUsersInCategoriesAlmacenAndEvent (Integer eventId) throws DataOriginException {
+        return usuariosDao.getUsersInCategoriesAlmacenAndEvent(eventId);
+    }
     
 }

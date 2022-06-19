@@ -61,6 +61,21 @@ public class UserDAO {
             session.close();
         }
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<Usuario> getUsersInCategoriesAlmacenAndEvent(Integer eventId) throws DataOriginException{
+        SqlSession session = null;
+        try {
+            session = sqlSessionFactory.openSession();
+            return (List<Usuario>) session.selectList("MapperUsuarios.getUsersInCategoriesAlmacenAndEvent",eventId);
+        }catch(Exception e){           
+            log.error(e);
+            throw new DataOriginException(e.getMessage(),e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
  
     
 }

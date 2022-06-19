@@ -49,7 +49,6 @@ import mobiliario.iniciar_sesion;
 import mobiliario.IndexForm;
 import model.Abono;
 import model.Articulo;
-import model.AsignaCategoria;
 import model.DatosGenerales;
 import model.DetalleRenta;
 import model.Faltante;
@@ -94,7 +93,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private static boolean fgConsultaTabla=false;
     String fecha_sistema, sql, id_articulo, id_abonos, id_cliente, cant_abono = "0", subTotal = "0", chofer, id_tipo = "1", descuento, desc_rep, iva_rep, id_estado;
     public static String fecha_inicial, fecha_final, validar_consultar = "0", id_renta;
-    sqlclass funcion = new sqlclass();    
+    private static sqlclass funcion = new sqlclass();    
     private final ItemService itemService;
     private static SaleService saleService;
     private final UserService userService = UserService.getInstance();
@@ -186,8 +185,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         this.txt_editar_cantidad.setEnabled(false);
         this.txt_editar_precio_unitario.setEnabled(false);
         this.txt_editar_porcentaje_descuento.setEnabled(false);
-        
-        new Thread(this::fillCmbUsers).start();
         initalData ();
          
     }
@@ -266,19 +263,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         tabla_consultar_renta(map);
         
     }
-    
-    private void fillCmbUsers () {
-        List<Usuario> users = userService.obtenerUsuarios(funcion);
-        cmbUsuarios.removeAllItems();
         
-        cmbUsuarios.addItem(
-                new Usuario(0, ApplicationConstants.CMB_SELECCIONE)
-        );
-        users.stream().forEach(t -> {
-            cmbUsuarios.addItem(t);
-        });
-    }
-    
     public static void disableButtonsActions () {
         
         jbtn_buscar.setEnabled(false);
@@ -2020,7 +2005,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jButton2 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         btnInventoryMaterialReport = new javax.swing.JButton();
-        cmbUsuarios = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
         lbl_aviso_resultados = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
@@ -2347,9 +2331,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         });
         jToolBar1.add(btnInventoryMaterialReport);
 
-        cmbUsuarios.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmbUsuarios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-
         jButton1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jButton1.setText("Buscar por folio");
         jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -2366,9 +2347,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(189, 189, 189)
                 .addComponent(jButton1)
                 .addContainerGap(523, Short.MAX_VALUE))
         );
@@ -2377,9 +2356,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(2, 2, 2)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(cmbUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton1))
+                    .addComponent(jButton1)
                     .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(52, 52, 52))
         );
@@ -4263,80 +4240,70 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         utilityService.exportarExcel(tabla_prox_rentas);
     }//GEN-LAST:event_jtbtnGenerateExcelActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-       
-       
+    
+    public static void generateReportByCategories (Usuario user) {
+    
         if (tabla_prox_rentas.getSelectedRow() == - 1){
             JOptionPane.showMessageDialog(null, "Selecciona una fila para generar el reporte...", "Reporte", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         
-        if (this.cmbUsuarios.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Selecciona un usuario para generar el reporte ", "Reporte", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+        String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
         
-         String usuarioId = funcion.GetData("id_usuarios", "SELECT id_usuarios FROM usuarios WHERE CONCAT(nombre,\" \",apellidos)='" + this.cmbUsuarios.getSelectedItem().toString() + "'");
-         String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
-         List<AsignaCategoria> categoriasPorUsuario = categoryService.obtenerCategoriasAsignadasPorUsuarioId(funcion, Integer.parseInt(usuarioId));
-           
-         if(categoriasPorUsuario == null || categoriasPorUsuario.size()<=0){
-            JOptionPane.showMessageDialog(null, "Agrega por lo menos una categoria al usuario seleccionado ", "Reporte", JOptionPane.INFORMATION_MESSAGE);
-            return;
-         }
-                 
-        String query = "SELECT * FROM renta renta\n" +
-        "INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta)\n" +
-        "INNER JOIN articulo articulo ON (articulo.id_articulo = detalle.id_articulo)\n" +
-        "WHERE renta.id_renta = "+rentaId+" AND articulo.id_categoria IN (SELECT asigna.id_categoria FROM asigna_categoria asigna WHERE asigna.id_usuarios = "+usuarioId+" )";
-         
-         
-         List<Renta> rentas = null;
-         
-         
         try {
-            rentas = saleService.obtenerPedidosPorConsultaSql(query, funcion);
-        } catch (Exception e) {
-            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
-            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-            return;
-        }
-         
-         
-         if(rentas == null || rentas.size()<=0){
-            JOptionPane.showMessageDialog(null, "No se obtuvieron registros :( ", "Reporte", JOptionPane.INFORMATION_MESSAGE);
-            return;
-         }
             
-        try {
             JasperPrint jasperPrint;
             String archivo = ApplicationConstants.RUTA_REPORTE_CATEGORIAS;
             String pathLocation = Utility.getPathLocation();
             System.out.println("Cargando desde: " + archivo);
             if (archivo == null) {
-                JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
-              
+                JOptionPane.showMessageDialog(null, "No se encuentra el Archivo jasper");
             }
             JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(pathLocation+archivo);
             
-            Map parametro = new HashMap<>();
+            Map<String,Object> parametro = new HashMap<>();
             //guardamos el parametro
 
             parametro.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
             parametro.put("ID_RENTA",rentaId);
-            parametro.put("ID_USUARIO",usuarioId);
-            parametro.put("NOMBRE_ENCARGADO_AREA",this.cmbUsuarios.getSelectedItem()+"");
+            parametro.put("ID_USUARIO",user.getUsuarioId());
+            parametro.put("NOMBRE_ENCARGADO_AREA",user.getNombre() + " " + user.getApellidos());
             
             jasperPrint = JasperFillManager.fillReport(masterReport, parametro, funcion.getConnection());
             JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_CATEGORIAS);
             File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_CATEGORIAS);
             
             Desktop.getDesktop().open(file2);
-          
+            
+            
 
-        } catch (Exception j) {
-            System.out.println("Mensaje de Error:" + j.toString());
-            JOptionPane.showMessageDialog(rootPane, "Mensaje de Error :" + j.toString() + "\n Existe un PDF abierto, cierralo e intenta generar el PDF nuevamente");
+        } catch (Exception e) {
+            System.out.println("Mensaje de Error:" + e.toString());
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+    
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+       
+       
+        String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
+        String folio = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 1).toString();
+            
+        try {
+          final List<Usuario> usersInCategoriesAlmacen = userService.getUsersInCategoriesAlmacenAndEvent(Integer.parseInt(rentaId));
+          if (usersInCategoriesAlmacen.isEmpty()) {
+              JOptionPane.showMessageDialog(this, "Ops!, no se puede generar el reporte, por que no existen usuarios que tengan categorias asignadas al folio: "+folio, "Error", JOptionPane.ERROR_MESSAGE);
+          } else if (usersInCategoriesAlmacen.size() == 1) {
+              generateReportByCategories(usersInCategoriesAlmacen.get(0));
+          } else {
+              final SelectUserGenerateReportByCategoriesDialog win = new SelectUserGenerateReportByCategoriesDialog(null, true, usersInCategoriesAlmacen);
+              win.setLocationRelativeTo(null);
+              win.setVisible(true);
+          }
+
+        } catch (DataOriginException e) {
+            JOptionPane.showMessageDialog(this,e,"Error",JOptionPane.ERROR_MESSAGE);
+            log.error(e);
         }
             
         
@@ -4744,7 +4711,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JCheckBox check_mostrar_precios;
     private javax.swing.JCheckBox check_nombre;
     private javax.swing.JComboBox<TipoAbono> cmbTipoPago;
-    private javax.swing.JComboBox<Usuario> cmbUsuarios;
     private javax.swing.JComboBox<Usuario> cmb_chofer;
     private javax.swing.JComboBox<EstadoEvento> cmb_estado1;
     private com.toedter.calendar.JDateChooser cmb_fecha_devolucion;
