@@ -1,7 +1,7 @@
 package forms.rentas;
 
 import forms.tipo.abonos.cuentas.TiposAbonosForm;
-import services.UserService;
+import common.services.UserService;
 import clases.Mail;
 import clases.conectate;
 import clases.sqlclass;
@@ -923,16 +923,21 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         cmb_fecha_devolucion.setDate(null);
         txt_descripcion.setText("");
         txt_descuento.setText("0.0");
-        txtPorcentajeDescuento.setText("0.0");
-        txt_abono.setText("0.0");
+        txtPorcentajeDescuento.setText("");
+        txt_abono.setText("");
         txt_comentarios.setText("");
         txt_comentario.setText("");
         txt_cantidad.setText("");
         txt_precio_unitario.setText("");
         check_mostrar_precios.setSelected(true);
         check_generar_reporte.setSelected(true);
+        txt_envioRecoleccion.setText("");
+        txt_depositoGarantia.setText("");
+        txt_iva.setText("");
+        txt_calculo.setText("");
         formato_tabla_detalles();
         formato_tabla_abonos();
+        txt_abonos.setText("");
         abonos();
         subTotal();
         total();

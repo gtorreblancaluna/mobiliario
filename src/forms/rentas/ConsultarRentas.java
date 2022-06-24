@@ -3,7 +3,7 @@ package forms.rentas;
 import services.ItemService;
 import services.SaleService;
 import services.SystemService;
-import services.UserService;
+import common.services.UserService;
 import clases.FormatoTabla;
 import clases.Mail;
 import clases.sqlclass;
@@ -63,7 +63,7 @@ import net.sf.jasperreports.engine.util.JRLoader;
 import parametersVO.ModelTableItem;
 import parametersVO.DataEmailTemplate;
 import services.CategoryService;
-import services.EstadoEventoService;
+import common.services.EstadoEventoService;
 import utilities.BuildEmailTemplate;
 import utilities.Utility;
 import common.model.EstadoEvento;
@@ -73,7 +73,7 @@ import model.providers.OrdenProveedor;
 import parametersVO.ParameterOrderProvider;
 import services.OrderStatusChangeService;
 import services.OrderTypeChangeService;
-import services.TipoEventoService;
+import common.services.TipoEventoService;
 import services.providers.OrderProviderService;
 
 public class ConsultarRentas extends javax.swing.JInternalFrame {
@@ -1591,8 +1591,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     
     private void llenar_combo_tipo() {
         
-        if (typesGlobal.isEmpty()) {
-            typesGlobal = tipoEventoService.get();
+        try {
+            if (typesGlobal.isEmpty()) {
+                typesGlobal = tipoEventoService.get();
+            }
+        } catch (DataOriginException e) {
+            JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);
         }
 
         
@@ -1644,9 +1648,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }
     
     public void llenar_combo_estado2() {
-               
-        if (statusListGlobal.isEmpty()) {
-            statusListGlobal = estadoEventoService.get();
+        try {
+            if (statusListGlobal.isEmpty()) {
+                statusListGlobal = estadoEventoService.get();
+            }
+        } catch (DataOriginException e) {
+            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);  
         }
         
         cmb_estado1.removeAllItems();
@@ -4619,19 +4626,18 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     
     
     private void jbtn_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_buscarActionPerformed
-        
-        if (typesGlobal.isEmpty()) {
-            typesGlobal = tipoEventoService.get();
-        }
-        if (statusListGlobal.isEmpty()) {
-            statusListGlobal = estadoEventoService.get();
-        }
-        if (choferes.isEmpty()) {
-            try {
-                choferes = userService.getChoferes();
-            } catch (DataOriginException e) {
-                JOptionPane.showMessageDialog(null, "Ocurrió un error inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE);  
+        try {
+            if (typesGlobal.isEmpty()) {
+                typesGlobal = tipoEventoService.get();
             }
+            if (statusListGlobal.isEmpty()) {
+                statusListGlobal = estadoEventoService.get();
+            }
+            if (choferes.isEmpty()) {
+                choferes = userService.getChoferes();
+            }
+        } catch (DataOriginException e) {
+            JOptionPane.showMessageDialog(null, "Ocurrió un error inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE);  
         }
         
         FiltersConsultarRentas win = new FiltersConsultarRentas(null,true,typesGlobal,statusListGlobal,choferes);

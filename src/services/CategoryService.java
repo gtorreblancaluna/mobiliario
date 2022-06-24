@@ -1,6 +1,8 @@
 package services;
 
+import common.services.UserService;
 import clases.sqlclass;
+import common.exceptions.DataOriginException;
 import common.model.Usuario;
 import dao.CategoryDAO;
 import java.sql.SQLException;
@@ -49,7 +51,7 @@ public class CategoryService {
            try {
                AsignaCategoria asignaCategoria = new AsignaCategoria();
                asignaCategoria.setAsignaCategoriaId(Integer.parseInt(dtconduc[i][0].toString()));
-               asignaCategoria.setUsuario((Usuario) userService.obtenerUsuarioPorId(sql, Integer.parseInt(dtconduc[i][1].toString())));
+               asignaCategoria.setUsuario((Usuario) userService.getById(Integer.parseInt(dtconduc[i][1].toString())));
                asignaCategoria.setCategoria(this.obtenerCategoriaPorId(sql, Integer.parseInt(dtconduc[i][2].toString())));
                
                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
@@ -61,6 +63,8 @@ public class CategoryService {
            }
            catch (ParseException ex) {
                Logger.getLogger(CategoryService.class.getName()).log(Level.SEVERE, null, ex);
+           } catch (DataOriginException e) {
+               JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE); 
            }
         }                             
             

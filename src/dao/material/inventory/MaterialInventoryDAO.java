@@ -1,7 +1,7 @@
 package dao.material.inventory;
 
 import common.exceptions.DataOriginException;
-import dao.MyBatisConnectionFactory;
+import common.utilities.MyBatisConnectionFactory;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;

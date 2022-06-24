@@ -1,7 +1,7 @@
 package clases;
 
+import common.services.PropertiesService;
 import java.sql.*;
-import services.PropertiesService;
 
 public class conectate {
     

@@ -1,5 +1,6 @@
 package dao;
 
+import common.utilities.MyBatisConnectionFactory;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;

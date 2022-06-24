@@ -7,6 +7,7 @@ package mobiliario;
 
 import clases.conectate;
 import clases.sqlclass;
+import common.exceptions.DataOriginException;
 import common.services.UtilityService;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
@@ -19,7 +20,7 @@ import javax.swing.table.DefaultTableModel;
 import model.AsignaCategoria;
 import model.CategoriaDTO;
 import services.CategoryService;
-import services.UserService;
+import common.services.UserService;
 
 /**
  *
@@ -672,9 +673,14 @@ private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(u
             if (check_nivel_1.isSelected() == true)
                 nivel_1 = "1";
             
-            if(userService.verificarContraseniaExistente(funcion, txt_contraseña.getText().toString())){
-                JOptionPane.showMessageDialog(null, "Esta contraseña ya esta asignada a un usuario, porfavor introduce una diferente", "Error", JOptionPane.INFORMATION_MESSAGE);
-                return;
+            try {
+                if(userService.checkAlReadyPassword(String.valueOf(txt_contraseña.getPassword()))){
+                    JOptionPane.showMessageDialog(null, "Esta contraseña ya esta asignada a un usuario, porfavor introduce una diferente", "Error", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+            } catch (DataOriginException e) {
+                log.error(e);
+                JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR);
             }
             String id_puesto = funcion.GetData("id_puesto", "select id_puesto from puesto where descripcion = '" + cmb_puesto.getSelectedItem().toString() + "' ");
             
@@ -852,10 +858,15 @@ private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(u
             return;
         }
         
-        if(userService.verificarContraseniaExistente(funcion, contraseña)){
-           JOptionPane.showMessageDialog(null, "Esta contraseña ya esta asignada a un usuario, porfavor introduce una diferente", "Error", JOptionPane.INFORMATION_MESSAGE);
-           return;
-        }
+        try {
+                if(userService.checkAlReadyPassword(String.valueOf(txt_contraseña.getPassword()))){
+                    JOptionPane.showMessageDialog(null, "Esta contraseña ya esta asignada a un usuario, porfavor introduce una diferente", "Error", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+            } catch (DataOriginException e) {
+                log.error(e);
+                JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR);
+            }
             
         String datos[] = {txt_contraseña.getText().toString(), id_usuario};
          try {        

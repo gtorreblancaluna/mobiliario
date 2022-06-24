@@ -1,5 +1,6 @@
 package services;
 
+import common.services.UserService;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
 import dao.SalesDAO;
@@ -128,7 +129,7 @@ public class SaleService {
                 renta.setCliente(customerService.obtenerClientePorId(Long.parseLong(dtconduc[i][2].toString()))); 
              
              if(dtconduc[i][3] != null)
-                renta.setUsuario(userService.obtenerUsuarioPorId(sql, Integer.parseInt(dtconduc[i][3].toString())));  
+                renta.setUsuario(userService.getById(Integer.parseInt(dtconduc[i][3].toString())));  
              
              if(dtconduc[i][4] != null)
                  renta.setFechaPedido(dtconduc[i][4].toString());
@@ -199,7 +200,7 @@ public class SaleService {
              
              renta.setEstado(this.obtenerEstadoEventoPorId(sql, renta.getEstadoId()));
              // obtenemos el detalle de la renta
-             renta.setChofer(userService.obtenerUsuarioPorId(sql,renta.getUsuarioChoferId()));
+             renta.setChofer(userService.getById(renta.getUsuarioChoferId()));
              renta.setDetalleRenta(this.obtenerDetalleRenta(Integer.parseInt(dtconduc[i][0].toString())));
              renta.setAbonos(this.obtenerAbonosPorRentaId(sql,Integer.parseInt(dtconduc[i][0].toString())));
              rentas.add(renta);
@@ -259,7 +260,7 @@ public class SaleService {
                 renta.setCliente(customerService.obtenerClientePorId(Long.parseLong(dtconduc[i][2].toString()))); 
              
              if(dtconduc[i][3] != null)
-                renta.setUsuario(userService.obtenerUsuarioPorId(sql, Integer.parseInt(dtconduc[i][3].toString())));  
+                renta.setUsuario(userService.getById( Integer.parseInt(dtconduc[i][3].toString())));  
              
              if(dtconduc[i][4] != null)
                  renta.setFechaPedido(dtconduc[i][4].toString());
@@ -328,7 +329,7 @@ public class SaleService {
              
              
              renta.setEstado(this.obtenerEstadoEventoPorId(sql, renta.getEstadoId()));
-             renta.setChofer(userService.obtenerUsuarioPorId(sql,renta.getUsuarioChoferId()));
+             renta.setChofer(userService.getById(renta.getUsuarioChoferId()));
              // obtenemos el detalle de la renta
              renta.setDetalleRenta(this.obtenerDetalleRenta(Integer.parseInt(dtconduc[i][0].toString())));
              renta.setAbonos(this.obtenerAbonosPorRentaId(sql,Integer.parseInt(dtconduc[i][0].toString())));

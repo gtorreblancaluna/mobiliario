@@ -14,7 +14,7 @@ import static mobiliario.IndexForm.lblPuesto;
 import common.model.Usuario;
 import org.apache.log4j.Logger;
 import org.jvnet.substance.SubstanceLookAndFeel;
-import services.UserService;
+import common.services.UserService;
 import utilities.Utility;
 
 public class iniciar_sesion extends javax.swing.JFrame {
@@ -78,7 +78,7 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
         String pswd = new String(this.txt_contraseña.getPassword());
         //String area = null, priv = null;
         try {
-            usuarioGlobal = userService.obtenerUsuarioPorPassword(pswd);
+            usuarioGlobal = userService.getByPassword(pswd);
         } catch (DataOriginException e) {
             JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
             log.error(e);
@@ -109,7 +109,7 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
     public static boolean dataSessionUptade(String password){
         Usuario user;
         try {
-            user = userService.obtenerUsuarioPorPassword(password);
+            user = userService.getByPassword(password);
         } catch (DataOriginException e) {
             JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.INFORMATION_MESSAGE);
             return false;

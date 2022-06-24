@@ -1,11 +1,10 @@
-
 package dao;
 
+import common.utilities.MyBatisConnectionFactory;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import model.CategoriaDTO;
 import model.Compra;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;

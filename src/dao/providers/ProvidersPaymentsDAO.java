@@ -1,7 +1,7 @@
 package dao.providers;
 
 import common.exceptions.DataOriginException;
-import dao.MyBatisConnectionFactory;
+import common.utilities.MyBatisConnectionFactory;
 import java.sql.Timestamp;
 import java.util.List;
 import model.providers.PagosProveedor;
@@ -11,8 +11,8 @@ import org.apache.log4j.Logger;
 
 public class ProvidersPaymentsDAO {
     
-    private static Logger LOGGER = Logger.getLogger(ProvidersDAO.class.getName());
-    private SqlSessionFactory sqlSessionFactory;
+    private static final Logger LOGGER = Logger.getLogger(ProvidersDAO.class.getName());
+    private final SqlSessionFactory sqlSessionFactory;
     
     private ProvidersPaymentsDAO(){
         sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();

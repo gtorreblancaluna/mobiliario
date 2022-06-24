@@ -1,7 +1,7 @@
 package dao.providers;
 
 import common.exceptions.DataOriginException;
-import dao.MyBatisConnectionFactory;
+import common.utilities.MyBatisConnectionFactory;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,8 +17,8 @@ import parametersVO.ParameterOrderProvider;
 
 public class OrderProviderDAO {
     
-    private static Logger log = Logger.getLogger(OrderProviderDAO.class.getName());
-    private SqlSessionFactory sqlSessionFactory;
+    private static final Logger log = Logger.getLogger(OrderProviderDAO.class.getName());
+    private final SqlSessionFactory sqlSessionFactory;
     
     private OrderProviderDAO() {
         sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();

@@ -2,6 +2,7 @@ package dao;
 
 import common.constants.ApplicationConstants;
 import common.exceptions.DataOriginException;
+import common.utilities.MyBatisConnectionFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ import org.apache.log4j.Logger;
 
 public class ItemDAO {
     private static Logger log = Logger.getLogger(ItemDAO.class.getName());
-    private SqlSessionFactory sqlSessionFactory;
+    private final SqlSessionFactory sqlSessionFactory;
     private static final ItemDAO SINGLE_INSTANCE = null;
  
     private ItemDAO() {

@@ -1,6 +1,7 @@
 package dao;
 
 import common.exceptions.DataOriginException;
+import common.utilities.MyBatisConnectionFactory;
 import java.util.Date;
 import model.OrderTypeChange;
 import org.apache.ibatis.session.SqlSession;
