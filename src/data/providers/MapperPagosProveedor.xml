@@ -66,5 +66,9 @@
         )
     
     </insert>
+    
+    <update id="deletePayment" parameterType="model.providers.PagosProveedor">
+        UPDATE pagos_proveedor p SET p.fg_activo = '0', p.actualizado = #{actualizado} WHERE p.id = #{id}
+    </update>
   
 </mapper>

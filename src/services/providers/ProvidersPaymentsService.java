@@ -38,4 +38,8 @@ public class ProvidersPaymentsService {
         }
     }
     
+    public void delete(Long id)throws DataOriginException{
+       providersPaymentsDAO.delete(id);
+    }
+    
 }

@@ -3,6 +3,7 @@ package forms.proveedores;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
 import common.exceptions.BusinessException;
+import common.exceptions.DataOriginException;
 import common.services.UtilityService;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -139,7 +140,34 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
         cmbTipoPago.setSelectedIndex(0);
     }
     
-    public void addPayment(){
+    private void deletePayment () {
+        
+        if (tablePayments.getSelectedRow() == - 1) {
+            JOptionPane.showMessageDialog(this, "Selecciona una fila para continuar ", "Error", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        String id = tablePayments.getValueAt(tablePayments.getSelectedRow(), HEADER_ID).toString();
+
+        if(id == null || id.equals("")){
+            JOptionPane.showMessageDialog(this, "Ocurrio un error, intenta de nuevo o reinicia la aplicacion ", "Error", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        if(JOptionPane.showOptionDialog(this, "Se eliminará de la base de datos,  \u00BFContinuar? " ,"Confirme eliminacion", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si") != 0)
+            return;
+        
+        try {
+            providersPaymentsService.delete(Long.parseLong(id));
+            tableFormat();
+            getPayments();
+        } catch (DataOriginException e) {
+            JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        
+    }
+    
+    private void addPayment(){
         
         StringBuilder message = new StringBuilder();
         Float cantidad = 0f;
@@ -174,7 +202,7 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
             tableFormat();
             getPayments();
          }catch(BusinessException e){
-            JOptionPane.showMessageDialog(null, e.getMessage()+"\n"+e.getCause(), "ERROR", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, e.getMessage()+"\n"+e, "ERROR", JOptionPane.ERROR_MESSAGE);
             return;
          }
          
@@ -260,6 +288,7 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
         jLabel47 = new javax.swing.JLabel();
         lblInfoGeneral = new javax.swing.JLabel();
         lblTotal = new javax.swing.JLabel();
+        btnDelete = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -283,7 +312,7 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tablePayments.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tablePayments.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tablePayments.setRowHeight(14);
         tablePayments.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -299,7 +328,7 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 573, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -322,8 +351,8 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
         txtComentario.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
 
         btnAgregar.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        btnAgregar.setText("(+) agregar");
-        btnAgregar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnAgregar.setText("(+) Agregar");
+        btnAgregar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnAgregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAgregarActionPerformed(evt);
@@ -332,7 +361,7 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
 
         cmbTipoPago.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         cmbTipoPago.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmbTipoPago.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmbTipoPago.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         jLabel47.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel47.setText("Tipo de pago:");
@@ -340,6 +369,15 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
         lblInfoGeneral.setFont(new java.awt.Font("Arial", 1, 11)); // NOI18N
 
         lblTotal.setFont(new java.awt.Font("Arial", 1, 11)); // NOI18N
+
+        btnDelete.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnDelete.setText("(-) Eliminar");
+        btnDelete.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -361,11 +399,13 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(cmbTipoPago, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(lblInfoGeneral, javax.swing.GroupLayout.PREFERRED_SIZE, 441, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 9, Short.MAX_VALUE))))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -392,14 +432,15 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(cmbTipoPago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 580, 180));
 
-        jMenuBar1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenuBar1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jMenuBar1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
         jMenu2.setText("Exportar");
@@ -407,7 +448,7 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
 
         jMenuItem4.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jMenuItem4.setText("Exportar a Excel");
-        jMenuItem4.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenuItem4.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem4ActionPerformed(evt);
@@ -440,9 +481,14 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
        addPayment();
     }//GEN-LAST:event_btnAgregarActionPerformed
 
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        deletePayment();
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
+    private javax.swing.JButton btnDelete;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox cmbTipoPago;
     private javax.swing.JLabel jLabel47;
