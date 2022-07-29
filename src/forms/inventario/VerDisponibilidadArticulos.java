@@ -1,16 +1,13 @@
 package forms.inventario;
 
-import forms.rentas.ConsultarRentas;
 import services.SaleService;
-import clases.sqlclass;
 import common.constants.ApplicationConstants;
 import common.services.UtilityService;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -22,37 +19,10 @@ import javax.swing.table.TableRowSorter;
 import model.querys.AvailabilityItemResult;
 
 
-public class VerDisponibilidadArticulos extends java.awt.Dialog {
+public final class VerDisponibilidadArticulos extends java.awt.Dialog {
 
-    sqlclass funcion = new sqlclass();
-    
-    Object[][] dtconduc;
-    boolean existe, editar = false;
-    String id_color;
-    float cant = 0; 
     private final SaleService saleService;
-    private final UtilityService utilityService = UtilityService.getInstance();
-    
-    public String conviertemoneda(String valor) {
-
-        DecimalFormatSymbols simbolo = new DecimalFormatSymbols();
-        simbolo.setDecimalSeparator('.');
-        simbolo.setGroupingSeparator(',');
-
-        float entero = Float.parseFloat(valor);
-        DecimalFormat formateador = new DecimalFormat("###,###.##", simbolo);
-        String entero2 = formateador.format(entero);
-
-        if (entero2.contains(".")) {
-            entero2 = "$" + entero2;
-
-        } else {
-            entero2 = "$" + entero2 + ".00";
-        }
-
-        return entero2;
-
-    }
+    private UtilityService utilityService;
     
     private enum HeaderTableUnicos {
     
@@ -104,31 +74,47 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         
     }
     
-    public VerDisponibilidadArticulos(java.awt.Frame parent, boolean modal) {
+   
+    public VerDisponibilidadArticulos(java.awt.Frame parent, 
+            boolean modal,
+            String initialDate,
+            String endDate,
+            Boolean showOnlyNegatives,
+            Boolean showByDeliveryDate,
+            Boolean showByReturnDate,
+            Boolean includeAll,
+            List<Long> filterByItems,
+            List<AvailabilityItemResult> itemsFromNewFolio
+    ) {
         super(parent, modal);
-        
         initComponents();    
         saleService = SaleService.getInstance();
-        funcion.conectate();
         this.setLocationRelativeTo(null);
         this.lblEncontrados.setText("");
         this.setTitle("Ver disponibilidad de articulos ");
         formato_tabla();
         formato_tabla_unicos();
-      
-        try {
-           mostrarDisponibilidad();
-        } catch (Exception e) {
-            System.out.println(e);
+        
+        if (itemsFromNewFolio != null && !itemsFromNewFolio.isEmpty()) {
+            for (AvailabilityItemResult availabilityItemResult : itemsFromNewFolio) {
+                addAvailabilityItemResultToDetailTable(availabilityItemResult);
+                addAvailabilityItemResultToTableUniques(availabilityItemResult);
+            }
         }
         
-        System.out.println("MOSTRAR DISPONIBILIDAD SUCCESS");
+        executeMainProccess(
+                initialDate,
+                endDate,
+                showOnlyNegatives,
+                showByDeliveryDate,
+                showByReturnDate,
+                includeAll,
+                filterByItems
+        );
         
     }
    
-    
-    
-    public void mostrarSoloNegativosTablaUnicos(){
+    private void mostrarSoloNegativosTablaUnicos(){
         
          for(int j=tablaArticulosUnicos.getRowCount() - 1 ; j >=0 ; j--){
              float disponible = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ITEM_DISPONIBLE.getColumn()).toString());
@@ -140,152 +126,147 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
     
     }
 
-    public void mostrarDisponibilidad(){       
+    private void addAvailabilityItemResultToTableUniques (AvailabilityItemResult availabilityItemResult) {
+        DefaultTableModel tablaUnicosModel = (DefaultTableModel) tablaArticulosUnicos.getModel();
+        Object unico[] = {
+            availabilityItemResult.getItem().getArticuloId()+"", // 0
+            availabilityItemResult.getNumberOfItems(), // 1
+            availabilityItemResult.getItem().getUtiles(), // 2
+            "", // 3
+            availabilityItemResult.getItem().getDescripcion()+" "+availabilityItemResult.getItem().getColor().getColor() //4
+        };
+        tablaUnicosModel.addRow(unico);
+    }
+    
+    private void addAvailabilityItemResultToDetailTable (AvailabilityItemResult availabilityItemResult) {
+    
+        DefaultTableModel temp = (DefaultTableModel) tablaArticulos.getModel();
+        Object nuevo[] = {
+
+               availabilityItemResult.getItem().getArticuloId()+"",
+               availabilityItemResult.getNumberOfItems(),
+               // mostrar utiles
+               availabilityItemResult.getItem().getUtiles(),
+               availabilityItemResult.getItem().getDescripcion()+" "+availabilityItemResult.getItem().getColor().getColor(),
+               availabilityItemResult.getEventDateOrder(),
+               availabilityItemResult.getEventDateElaboration(),
+               availabilityItemResult.getDeliveryDateOrder(),
+               availabilityItemResult.getDeliveryHourOrder(),
+               availabilityItemResult.getReturnDateOrder(),
+               availabilityItemResult.getReturnHourOrder(),
+               availabilityItemResult.getCustomerName(),
+               availabilityItemResult.getFolioOrder(),
+               availabilityItemResult.getDescriptionOrder(),
+               availabilityItemResult.getTypeOrder(),
+               availabilityItemResult.getStatusOrder()
+           };
+           temp.addRow(nuevo);
+    }
+    
+    private void executeMainProccess(String initialDate, String endDate, Boolean showOnlyNegatives, Boolean showByDeliveryDate, Boolean showByReturnDate, Boolean includeAll, List<Long> filterByItems){       
         
-        String fechaInicial = new SimpleDateFormat("dd/MM/yyyy").format(InventarioForm.txtDisponibilidadFechaInicial.getDate());
-        String fechaFinal = new SimpleDateFormat("dd/MM/yyyy").format(InventarioForm.txtDisponibilidadFechaFinal.getDate());
         StringBuilder mensaje = new StringBuilder();
         Map<String,Object> parameters = new HashMap<>();
+        // MOSTRAR POR FECHA DE ENTREGA
+        parameters.put("showByDeliveryDate", showByDeliveryDate);
         
-        if(InventarioForm.radioBtnFechaEntrega.isSelected()){
-            // MOSTRAR POR FECHA DE ENTREGA
-            parameters.put("showByDeliveryDate", true);
-             mensaje.append("Se incluyen por fecha de entrega - ");
-        }
-        
-        if(InventarioForm.radioBtnFechaDevolucion.isSelected()){
-            // MOSTRAR POR FECHA DE DEVOLUCION
-            parameters.put("showByReturnDate", true);
-            mensaje.append("Se incluyen por fecha devolucion - ");
-        }
+        // MOSTRAR POR FECHA DE DEVOLUCION
+        parameters.put("showByReturnDate", showByReturnDate);
+       
+        mensaje.append(showByDeliveryDate ? "Se incluyen por fecha de entrega - " : "Se incluyen por fecha devolucion - ");
         
         List<AvailabilityItemResult> availabilityItemResults;
         
         parameters.put("typePedido", ApplicationConstants.TIPO_PEDIDO);
         parameters.put("statusApartado", ApplicationConstants.ESTADO_APARTADO);
         parameters.put("statusEnRenta", ApplicationConstants.ESTADO_EN_RENTA);
-        parameters.put("initDate", fechaInicial);
-        parameters.put("endDate", fechaFinal);
+        parameters.put("initDate", initialDate);
+        parameters.put("endDate", endDate);
         
         try {
             availabilityItemResults = saleService.obtenerDisponibilidadRentaPorConsulta(parameters);
         } catch (Exception e) {
-            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(VerDisponibilidadArticulos.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
             return;
         }
         
         
-        if(availabilityItemResults == null || availabilityItemResults.size()<=0){
-            lblEncontrados.setText("No se obtuvieron resultados :(");
+        if(availabilityItemResults == null || availabilityItemResults.isEmpty()){
+            lblEncontrados.setText("No se obtuvieron ordenes en las fechas indicadas, fecha de entrega: "+initialDate+", fecha devolución: "+endDate);
             return;
         }
         
-        
-        
-         mensaje.append("Total de folios "+availabilityItemResults.size()+" - ");
-          for(AvailabilityItemResult availabilityItemResult : availabilityItemResults){
+          
+         for(AvailabilityItemResult availabilityItemResult : availabilityItemResults){
             
               String id = availabilityItemResult.getItem().getArticuloId()+"";
                 
               boolean itemFound = false;
-                if (!InventarioForm.jcheckIncluirTodos.isSelected() ) {
-                    for (int i = 0; i < InventarioForm.tablaDisponibilidadArticulos.getRowCount(); i++) {
-                        if (id.equals(InventarioForm.tablaDisponibilidadArticulos.getValueAt(i, 0).toString())) {
+                if (!includeAll) {
+                    for (Long itemId : filterByItems) {
+                        if (id.equals(String.valueOf(itemId))) {
                             itemFound = true;
                             break;
                         }
                     }
                 }
                 
-                if (!InventarioForm.jcheckIncluirTodos.isSelected() && !itemFound) {
-                    continue;
-                }
-                                    
-                  
-                    // vamos agregar el articulo encontrado en la tabla detalle
-                    DefaultTableModel temp = (DefaultTableModel) tablaArticulos.getModel();
-                     Object nuevo[] = {
-                         
-                            availabilityItemResult.getItem().getArticuloId()+"",
-                            availabilityItemResult.getNumberOfItems(),
-                            // mostrar utiles
-                            availabilityItemResult.getItem().getUtiles(),
-                            availabilityItemResult.getItem().getDescripcion()+" "+availabilityItemResult.getItem().getColor().getColor(),
-                            availabilityItemResult.getEventDateOrder(),
-                            availabilityItemResult.getEventDateElaboration(),
-                            availabilityItemResult.getDeliveryDateOrder(),
-                            availabilityItemResult.getDeliveryHourOrder(),
-                            availabilityItemResult.getReturnDateOrder(),
-                            availabilityItemResult.getReturnHourOrder(),
-                            availabilityItemResult.getCustomerName(),
-                            availabilityItemResult.getFolioOrder(),
-                            availabilityItemResult.getDescriptionOrder(),
-                            availabilityItemResult.getTypeOrder(),
-                            availabilityItemResult.getStatusOrder()
-                        };
-                        temp.addRow(nuevo);
-
-                        if(this.tablaArticulosUnicos.getRowCount() == 0){
-                            // es la primer agregado, procedemos a agregar
-                            
-                            DefaultTableModel tablaUnicosModel = (DefaultTableModel) tablaArticulosUnicos.getModel();
-                            Object unico[] = {
-                                availabilityItemResult.getItem().getArticuloId()+"", // 0
-                                availabilityItemResult.getNumberOfItems(), // 1
-                                availabilityItemResult.getItem().getUtiles(), // 2
-                                "", // 3
-                                availabilityItemResult.getItem().getDescripcion()+" "+availabilityItemResult.getItem().getColor().getColor() //4
-                            };
-                            tablaUnicosModel.addRow(unico);
-                        }else{
-                            // recorremos la tabla para encontrar algun articulo y sumar y calcular la disponibilidad
-                            boolean encontrado = false;
-                            for(int j=0 ; j < tablaArticulosUnicos.getRowCount() ; j++){
-                                
-                                if(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ITEM_ID.getColumn()).toString().equals(availabilityItemResult.getItem().getArticuloId()+"") ){
-                                    // articulo encontrado :)
-                                    float cantidadPedido = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ORDER_AMOUNT.getColumn()).toString());
-                                    tablaArticulosUnicos.setValueAt((cantidadPedido + availabilityItemResult.getNumberOfItems()), j, HeaderTableUnicos.ORDER_AMOUNT.getColumn());
-                                    encontrado = true;
-                                }
-                            } // end for tablaArticulosUnicos, para realizar la busqueda
-                            
-                            if(!encontrado){
-                                // si no se encontro en la tabla, procedemos a agregar el articulo
-                                DefaultTableModel tablaUnicosModel = (DefaultTableModel) tablaArticulosUnicos.getModel();
-                                Object unico1[] = {
-                                    availabilityItemResult.getItem().getArticuloId()+"",
-                                    availabilityItemResult.getNumberOfItems(),
-                                    availabilityItemResult.getItem().getUtiles(),
-                                    "",                           
-                                    availabilityItemResult.getItem().getDescripcion()+" "+availabilityItemResult.getItem().getColor().getColor()
-                                };
-                                tablaUnicosModel.addRow(unico1);
-                             } // fin if, encontrado!
-                        
-                  
-              }               
-          
-        }    // en for renta  
-          
-           
-          // calculando la disponibilidad para la tabla unicos
-          for(int j=0 ; j < tablaArticulosUnicos.getRowCount() ; j++){
-                float pedidos = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ORDER_AMOUNT.getColumn()).toString());
-                float utiles = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ITEM_UTILES.getColumn()).toString());
-                tablaArticulosUnicos.setValueAt( ( utiles - pedidos ), j, HeaderTableUnicos.ITEM_DISPONIBLE.getColumn());
                 
-           }
+                if (!includeAll && !itemFound) {
+                    continue;
+                }    
+                // vamos agregar el articulo encontrado en la tabla detalle
+                addAvailabilityItemResultToDetailTable(availabilityItemResult);
+
+                if(this.tablaArticulosUnicos.getRowCount() == 0){
+                    // es la primer agregado, procedemos a agregar
+                    addAvailabilityItemResultToTableUniques(availabilityItemResult);
+                } else {
+                    // recorremos la tabla para encontrar algun articulo y sumar y calcular la disponibilidad
+                    boolean encontrado = false;
+                    for(int j=0 ; j < tablaArticulosUnicos.getRowCount() ; j++){
+
+                        if(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ITEM_ID.getColumn()).toString().equals(availabilityItemResult.getItem().getArticuloId()+"") ){
+                            // articulo encontrado :)
+                            float cantidadPedido = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ORDER_AMOUNT.getColumn()).toString());
+                            tablaArticulosUnicos.setValueAt((cantidadPedido + availabilityItemResult.getNumberOfItems()), j, HeaderTableUnicos.ORDER_AMOUNT.getColumn());
+                            encontrado = true;
+                        }
+                    } // end for tablaArticulosUnicos, para realizar la busqueda
+
+                    if(!encontrado){
+                        // si no se encontro en la tabla, procedemos a agregar el articulo
+                        addAvailabilityItemResultToTableUniques(availabilityItemResult);
+                     } 
+                }            
           
-          if(InventarioForm.check_solo_negativos.isSelected()) {
-                mensaje.append("Mostrando solo los negativos - ");
-                mostrarSoloNegativosTablaUnicos();
-           }
-          
-            this.lblEncontrados.setText(mensaje.toString());
+        }// en for renta  
+
+        // calculando la disponibilidad para la tabla unicos
+        for(int j=0 ; j < tablaArticulosUnicos.getRowCount() ; j++){
+          float pedidos = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ORDER_AMOUNT.getColumn()).toString());
+          float utiles = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ITEM_UTILES.getColumn()).toString());
+          tablaArticulosUnicos.setValueAt( ( utiles - pedidos ), j, HeaderTableUnicos.ITEM_DISPONIBLE.getColumn());
+        }
+
+        if(showOnlyNegatives) {
+          mensaje.append("Mostrando solo los negativos - ");
+          mostrarSoloNegativosTablaUnicos();
+        }
+        mensaje.append("Total de articulos: ").append(tablaArticulos.getRowCount()).append(" - ");
+        mensaje.append("Folios únicos: ").append(getDistictByFolioFromTable()).append(" - ");
+        this.lblEncontrados.setText(mensaje.toString());
           
     }// en funcion mostrarDisponibilidad
+    
+    private int getDistictByFolioFromTable () {
+        Set<String> distinctFolios = new HashSet<>();
+        for (int i = 0 ; i < tablaArticulos.getRowCount() ; i++) {
+            distinctFolios.add(tablaArticulos.getValueAt(i, HeaderTable.ORDER_FOLIO.getColumn()).toString());
+        }
+        return distinctFolios.size();
+    }
      
     public void formato_tabla() {
         Object[][] data = {{"","","", "", "", "", "", "", "","","","","",""}};
@@ -356,14 +337,6 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
         tablaArticulosUnicos.getColumnModel().getColumn(4).setCellRenderer(centrar);
 
     }
-    
-    public void agregar() {
-        
-    }
-
-    public void guardar() {
-      
-    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -394,8 +367,10 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
 
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        lblEncontrados.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        lblEncontrados.setForeground(new java.awt.Color(204, 0, 51));
         lblEncontrados.setText("jLabel1");
-        jPanel2.add(lblEncontrados, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 590, 530, -1));
+        jPanel2.add(lblEncontrados, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 590, 1050, 20));
 
         tablaArticulos.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         tablaArticulos.setModel(new javax.swing.table.DefaultTableModel(
@@ -490,11 +465,13 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
 
     private void jbtnExportarDetalleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnExportarDetalleActionPerformed
         // TODO add your handling code here:
+        utilityService = UtilityService.getInstance();
         utilityService.exportarExcel(tablaArticulos);
     }//GEN-LAST:event_jbtnExportarDetalleActionPerformed
 
     private void jbtnExportarUnicosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnExportarUnicosActionPerformed
-        // TODO add your handling code here:
+        
+        utilityService = UtilityService.getInstance();
         utilityService.exportarExcel(tablaArticulosUnicos);
     }//GEN-LAST:event_jbtnExportarUnicosActionPerformed
 
@@ -504,7 +481,7 @@ public class VerDisponibilidadArticulos extends java.awt.Dialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                VerDisponibilidadArticulos dialog = new VerDisponibilidadArticulos(new java.awt.Frame(), true);
+                VerDisponibilidadArticulos dialog = new VerDisponibilidadArticulos(new java.awt.Frame(), true, "", "",false, false, false, false, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

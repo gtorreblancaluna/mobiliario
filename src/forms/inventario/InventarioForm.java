@@ -308,7 +308,15 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     
      public void mostrar_ver_disponibilidad_articulos() {
          // mostrara la ventana de disponibilidad de articulos
-        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true);
+        String initDate = new SimpleDateFormat("dd/MM/yyyy").format(txtDisponibilidadFechaInicial.getDate());
+        String endDate = new SimpleDateFormat("dd/MM/yyyy").format(txtDisponibilidadFechaFinal.getDate());
+        List<Long> itemsId = new ArrayList<>();
+        if (!jcheckIncluirTodos.isSelected()) {
+            for (int i = 0; i < InventarioForm.tablaDisponibilidadArticulos.getRowCount(); i++) {
+                itemsId.add(Long.parseLong(tablaDisponibilidadArticulos.getValueAt(i, 0).toString()));
+            }
+        }
+        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,initDate,endDate,check_solo_negativos.isSelected(),radioBtnFechaEntrega.isSelected(),radioBtnFechaDevolucion.isSelected(), jcheckIncluirTodos.isSelected(),itemsId, null);
         ventanaVerDisponibilidad.setVisible(true);
         ventanaVerDisponibilidad.setLocationRelativeTo(null);
     }

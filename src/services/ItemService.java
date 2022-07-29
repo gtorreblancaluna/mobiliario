@@ -41,7 +41,11 @@ public class ItemService {
     private final static Logger LOGGER = Logger.getLogger(ItemService.class.getName());
     
     public List<Articulo> obtenerArticulosActivos() {
-        return itemDao.obtenerArticulosActivos();
+        List<Articulo> articulos = itemDao.obtenerArticulosActivos();
+        for(Articulo articulo : articulos){    
+                articulo.setUtiles(utilesCalculate(articulo));
+            } // end for articulos
+        return articulos;
     }
     
     public Articulo obtenerArticuloPorId(sqlclass sql, int articuloId){

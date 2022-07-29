@@ -35,7 +35,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.disponibilidad_articulos;
 import mobiliario.iniciar_sesion;
 import model.Articulo;
 import model.Cliente;
@@ -43,6 +42,9 @@ import model.DatosGenerales;
 import model.Renta;
 import model.TipoAbono;
 import common.model.Usuario;
+import forms.inventario.VerDisponibilidadArticulos;
+import model.Color;
+import model.querys.AvailabilityItemResult;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -60,7 +62,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     conectate conexion = new conectate();
     Object[][] dtconduc;
     Object[] datos_combo, datos_chofer;
-    String id_cliente, id_articulo, descuento, iva, email_cliente = "";
+    String id_cliente, id_articulo, descuento, iva, email_cliente = "", itemUtilesGlobal = "0";
     Integer globalFolio = 0;
     public static String fecha_inicial, fecha_final, validar_agregar = "0", id_ultima_renta = "";
     boolean existe, panel = false; 
@@ -167,9 +169,54 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     }
 
     public void mostrar_disponibilidad() {
-        disponibilidad_articulos ventana_disp = new disponibilidad_articulos(null, true);
-        ventana_disp.setVisible(true);
-        ventana_disp.setLocationRelativeTo(null);
+        
+        if (cmb_fecha_entrega.getDate() == null || cmb_fecha_devolucion.getDate() == null) {
+            JOptionPane.showMessageDialog(this, "Debes indicar fecha de entrega y fecha de devolucion para poder consultar disponibilidad por articulos");
+            return;
+        }
+        
+        if (tabla_detalle.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Debes agregar articulos para poder consultar disponibilidad por articulos");
+            return;
+        }
+        
+        String deliveryDateOrder = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
+        String returnDateOrder = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
+
+        List<Long> itemsId = new ArrayList<>();
+        List<AvailabilityItemResult> availabilityItemResults = new ArrayList<>();
+        String commonDescriptionCurrentOrder = "PEDIDO ACTUAL";
+        for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
+            String itemId = tabla_detalle.getValueAt(i, 1).toString();
+            itemsId.add(Long.parseLong(itemId));
+            AvailabilityItemResult availabilityItemResult = new AvailabilityItemResult();
+            Articulo item = new Articulo();
+            Color color = new Color();
+            color.setColor("");
+            item.setColor(color);
+            item.setArticuloId(Integer.parseInt(itemId));
+            item.setUtiles(Float.parseFloat(tabla_detalle.getValueAt(i, 7).toString()));
+            item.setDescripcion(tabla_detalle.getValueAt(i, 2).toString());
+            
+            availabilityItemResult.setItem(item);
+            availabilityItemResult.setNumberOfItems(Float.parseFloat(tabla_detalle.getValueAt(i, 0).toString()));
+            availabilityItemResult.setEventDateOrder(commonDescriptionCurrentOrder);
+            availabilityItemResult.setEventDateElaboration(commonDescriptionCurrentOrder);
+            availabilityItemResult.setDeliveryDateOrder(deliveryDateOrder);
+            availabilityItemResult.setDeliveryHourOrder(commonDescriptionCurrentOrder);
+            availabilityItemResult.setReturnDateOrder(returnDateOrder);
+            availabilityItemResult.setReturnHourOrder(commonDescriptionCurrentOrder);
+            availabilityItemResult.setCustomerName(commonDescriptionCurrentOrder);
+            availabilityItemResult.setFolioOrder(commonDescriptionCurrentOrder);
+            availabilityItemResult.setDescriptionOrder(txt_descripcion.getText());
+            availabilityItemResult.setTypeOrder(cmb_tipo.getSelectedItem().toString());
+            availabilityItemResult.setStatusOrder(cmb_estado.getSelectedItem().toString());
+            availabilityItemResults.add(availabilityItemResult);
+        }
+        
+        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,deliveryDateOrder,returnDateOrder,false,true,false, false,itemsId,availabilityItemResults);
+        ventanaVerDisponibilidad.setVisible(true);
+        ventanaVerDisponibilidad.setLocationRelativeTo(null);
     }
 
     public void enviar_email() {
@@ -1071,12 +1118,12 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     
 
     public void formato_tabla_detalles() {
-        Object[][] data = {{"", "", "", "", ""}};
-        String[] columnNames = {"cantidad", "id_articulo", "Articulo", "P.Unitario","Descuento %","Descuento", "Importe"};
+        Object[][] data = {{"", "", "", "", "","","",""}};
+        String[] columnNames = {"cantidad", "id_articulo", "Articulo", "P.Unitario","Descuento %","Descuento", "Importe","Utiles"};
         DefaultTableModel TableModel = new DefaultTableModel(data, columnNames);
         tabla_detalle.setModel(TableModel);
 
-        int[] anchos = {40, 20, 220, 60,60,60, 60};
+        int[] anchos = {40, 20, 220, 60,60,60, 60,20};
 
         for (int inn = 0; inn < tabla_detalle.getColumnCount(); inn++) {
             tabla_detalle.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -1103,6 +1150,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         tabla_detalle.getColumnModel().getColumn(5).setCellRenderer(centrar);
         tabla_detalle.getColumnModel().getColumn(6).setCellRenderer(centrar);
         tabla_detalle.getColumnModel().getColumn(2).setCellRenderer(centrar);
+        tabla_detalle.getColumnModel().getColumn(7).setMaxWidth(0);
+        tabla_detalle.getColumnModel().getColumn(7).setMinWidth(0);
+        tabla_detalle.getColumnModel().getColumn(7).setPreferredWidth(0);
 
     }
 
@@ -1184,7 +1234,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                     String xprecio = conviertemoneda(Float.toString(precio));
                     String ximporte = conviertemoneda(Float.toString(importe));
 
-                    Object nuevo1[] = {txt_cantidad.getText().toString(), id_articulo, lbl_eleccion.getText(), xprecio,porcentajeDescuento+"", conviertemoneda(totalDescuento+"") , ximporte};
+                    Object nuevo1[] = {txt_cantidad.getText().toString(), id_articulo, lbl_eleccion.getText(), xprecio,porcentajeDescuento+"", conviertemoneda(totalDescuento+"") , ximporte, itemUtilesGlobal};
                     temp.addRow(nuevo1);
                     subTotal();
                     total();
@@ -1248,8 +1298,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private void formatItemsTable () {
         
         tabla_articulos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        String[] columNames = {"Id","Código", "Categoría", "Descripción", "Color", "P. Unitario"};
-        Object[][] data = {{"","","","","","","", "", ""}};
+        String[] columNames = {"Id","Código", "Categoría", "Descripción", "Color", "P. Unitario","Utiles"};
+        Object[][] data = {{"","","","","","",""}};
         
 
         DefaultTableModel tableModel = new DefaultTableModel(data, columNames);
@@ -1261,7 +1311,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         tabla_articulos.setModel(tableModel);
 
-        int[] anchos = {10,40, 120, 250, 100, 90};
+        int[] anchos = {10,40, 120, 250, 100,90,20};
 
         for (int inn = 0; inn < tabla_articulos.getColumnCount(); inn++) {
             tabla_articulos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -1271,6 +1321,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         tabla_articulos.getColumnModel().getColumn(0).setMinWidth(0);
         tabla_articulos.getColumnModel().getColumn(0).setPreferredWidth(0);
         tabla_articulos.getColumnModel().getColumn(5).setCellRenderer(centrar);
+        tabla_articulos.getColumnModel().getColumn(6).setMaxWidth(0);
+        tabla_articulos.getColumnModel().getColumn(6).setMinWidth(0);
+        tabla_articulos.getColumnModel().getColumn(6).setPreferredWidth(0);
         
         try {
             tableModel.removeRow(tableModel.getRowCount() - 1);
@@ -1289,7 +1342,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                     articulo.getCategoria().getDescripcion(),
                     articulo.getDescripcion(),
                     articulo.getColor().getColor(),
-                    articulo.getPrecioRenta()
+                    articulo.getPrecioRenta(),
+                    articulo.getUtiles()
                 };
                 tableModel.addRow(row);
             });
@@ -2818,23 +2872,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     private void jbtn_disponibleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_disponibleActionPerformed
         // TODO add your handling code here:
-        if (tabla_detalle.getRowCount() <= 0)
-            JOptionPane.showMessageDialog(rootPane, "Debe de haber por lo menos un articulo en la tabla \npara revisar la disponibilidad en la base de datos.");
-        else {
-
-            if (cmb_fecha_entrega.getDate() == null) {
-                JOptionPane.showMessageDialog(rootPane, "Fecha de entrega esta vacia\nFavor de indicar una fecha ");
-
-            } else if (cmb_fecha_devolucion.getDate() == null) {
-                JOptionPane.showMessageDialog(rootPane, "Fecha de devolucion esta vacia\nFavor de indicar una fecha ");
-            } else {
-
-                fecha_inicial = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
-                fecha_final = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
-                validar_agregar = "1";
-                mostrar_disponibilidad();
-            }
-        }
+        mostrar_disponibilidad();
     }//GEN-LAST:event_jbtn_disponibleActionPerformed
 
     private void jbtn_nuevo_eventoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_nuevo_eventoActionPerformed
@@ -2989,6 +3027,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             txt_cantidad.requestFocus();
             this.txt_porcentaje_descuento.setText("");
             id_articulo = (String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString();
+            itemUtilesGlobal = tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 6).toString();
             txt_precio_unitario.setEditable(false);
 
         }

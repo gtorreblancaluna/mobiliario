@@ -44,7 +44,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import mobiliario.VerFaltantes;
-import mobiliario.disponibilidad_articulos;
 import mobiliario.iniciar_sesion;
 import mobiliario.IndexForm;
 import model.Abono;
@@ -74,6 +73,7 @@ import parametersVO.ParameterOrderProvider;
 import services.OrderStatusChangeService;
 import services.OrderTypeChangeService;
 import common.services.TipoEventoService;
+import forms.inventario.VerDisponibilidadArticulos;
 import services.providers.OrderProviderService;
 
 public class ConsultarRentas extends javax.swing.JInternalFrame {
@@ -313,9 +313,30 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }
     
     public void mostrar_disponibilidad() {
-        disponibilidad_articulos ventana_disp = new disponibilidad_articulos(null, true);
-        ventana_disp.setVisible(true);
-        ventana_disp.setLocationRelativeTo(null);
+        
+        if (cmb_fecha_entrega.getDate() == null || cmb_fecha_devolucion.getDate() == null) {
+            JOptionPane.showMessageDialog(this, "Debes indicar fecha de entrega y fecha de devolucion para poder consultar disponibilidad por articulos");
+            return;
+        }
+        
+        if (tabla_detalle.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Debes agregar articulos para poder consultar disponibilidad por articulos");
+            return;
+        }
+        
+        String initDate = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
+        String endDate = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
+
+        List<Long> itemsId = new ArrayList<>();
+        
+        for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
+            itemsId.add(Long.parseLong(tabla_detalle.getValueAt(i, 2).toString()));
+        }
+        
+        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,initDate,endDate,false,true,false, false,itemsId, null);
+        ventanaVerDisponibilidad.setVisible(true);
+        ventanaVerDisponibilidad.setLocationRelativeTo(null);
+        
     }
     
     private void showMaterialSaleItemsWindow (String eventId) {
@@ -4141,14 +4162,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
     private void jbtn_disponibleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_disponibleActionPerformed
         // TODO add your handling code here:
-        if (tabla_detalle.getRowCount() < 0 && cmb_fecha_entrega.getDate() == null && cmb_fecha_devolucion.getDate() == null) {
-            JOptionPane.showMessageDialog(rootPane, "Debe de haber por lo menos un articulo en la tabla \npara revisar la disponibilidad en la base de datos \nFecha de entrega o fecha de devolucion estan vacias.");
-        } else {
-            fecha_inicial = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
-            fecha_final = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
-            validar_consultar = "1";
-            mostrar_disponibilidad();
-        }
+
+        mostrar_disponibilidad();
+        
     }//GEN-LAST:event_jbtn_disponibleActionPerformed
 
     private void jbtn_mostrar_articulosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_mostrar_articulosActionPerformed
