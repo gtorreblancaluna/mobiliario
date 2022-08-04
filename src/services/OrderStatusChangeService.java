@@ -7,7 +7,7 @@ import common.exceptions.BusinessException;
 import common.exceptions.DataOriginException;
 import java.util.Date;
 import common.model.EstadoEvento;
-import model.Renta;
+import common.model.Renta;
 import common.model.Usuario;
 import org.apache.log4j.Logger;
 

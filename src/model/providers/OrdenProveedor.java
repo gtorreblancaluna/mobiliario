@@ -4,7 +4,7 @@ import common.constants.ApplicationConstants;
 import common.exceptions.BusinessException;
 import java.sql.Timestamp;
 import java.util.List;
-import model.Renta;
+import common.model.Renta;
 import common.model.Usuario;
 
 public class OrdenProveedor {

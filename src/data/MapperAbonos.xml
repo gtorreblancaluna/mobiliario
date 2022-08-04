@@ -5,7 +5,7 @@
   
 <mapper namespace="MapperAbonos">
   
-    <resultMap id="resultMapAbonos" type="model.Abono">        
+    <resultMap id="resultMapAbonos" type="common.model.Abono">        
         <result property="abonoId" column="id_abonos"/>
         <result property="fecha" column="fecha"/>
         <result property="abono" column="abono"/>

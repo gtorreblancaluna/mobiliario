@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
 import forms.inventario.InventarioForm;
@@ -14,8 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
-import model.DetalleRenta;
-import model.Renta;
+import common.model.DetalleRenta;
+import common.model.Renta;
 import services.ItemService;
 import services.SystemService;
 
@@ -29,7 +24,6 @@ public class AsignarFaltante extends java.awt.Dialog {
     
     Object[][] dtconduc;      
     SaleService saleService;
-    private final SystemService systemService = SystemService.getInstance();
     ItemService itemService = ItemService.getInstance();
     public static int g_articuloId;
     public static int g_rentaId;

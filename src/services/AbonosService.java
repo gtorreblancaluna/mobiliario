@@ -4,7 +4,7 @@ import dao.AbonosDAO;
 import common.exceptions.DataOriginException;
 import java.util.List;
 import java.util.Map;
-import model.Abono;
+import common.model.Abono;
 
 
 public class AbonosService {

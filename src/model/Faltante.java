@@ -1,5 +1,7 @@
 package model;
 
+import common.model.Articulo;
+import common.model.Renta;
 import common.model.Usuario;
 
 public class Faltante {

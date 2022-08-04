@@ -6,7 +6,7 @@ import forms.proveedores.SelectProviderToOrder;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import model.Articulo;
+import common.model.Articulo;
 import model.material.inventory.MaterialInventory;
 import model.material.inventory.MaterialSaleItem;
 import model.providers.Proveedor;

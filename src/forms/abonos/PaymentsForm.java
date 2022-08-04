@@ -15,7 +15,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import model.Abono;
+import common.model.Abono;
 import services.AbonosService;
 
 public class PaymentsForm extends javax.swing.JInternalFrame {

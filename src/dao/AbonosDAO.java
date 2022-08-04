@@ -5,7 +5,7 @@ import common.utilities.MyBatisConnectionFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import model.Abono;
+import common.model.Abono;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;

@@ -1,5 +1,6 @@
 package model;
 
+import common.model.CategoriaDTO;
 import common.model.Usuario;
 import java.sql.Timestamp;
 

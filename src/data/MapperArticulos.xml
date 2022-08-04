@@ -5,7 +5,7 @@
   
 <mapper namespace="MapperArticulos">
   
-    <resultMap id="resultMapArticulo" type="model.Articulo">        
+    <resultMap id="resultMapArticulo" type="common.model.Articulo">        
         <result property="articuloId" column="id_articulo"/>
         <result property="categoriaId" column="categoriaId"/>
         <result property="usuarioId" column="id_usuario"/>
@@ -40,12 +40,12 @@
 
     </resultMap>
     
-     <resultMap id="resultMapCategoria" type="model.CategoriaDTO">        
+     <resultMap id="resultMapCategoria" type="common.model.CategoriaDTO">        
         <result property="categoriaId" column="id_categoria"/>
         <result property="descripcion" column="descripcion"/> 
     </resultMap>
     
-     <resultMap id="resultMapColor" type="model.Color">        
+     <resultMap id="resultMapColor" type="common.model.Color">        
         <result property="colorId" column="id_color"/>
         <result property="color" column="color"/> 
          <result property="tono" column="tono"/>
@@ -217,7 +217,7 @@
         FROM color 
         WHERE color = #{descripcion}        
     </select>
-    <insert id="insertarArticulo" parameterType="model.Articulo">
+    <insert id="insertarArticulo" parameterType="common.model.Articulo">
         INSERT INTO articulo
         (
             id_categoria,
@@ -246,7 +246,7 @@
         )
     </insert>
     
-    <update id="actualizarArticulo" parameterType="model.Articulo">
+    <update id="actualizarArticulo" parameterType="common.model.Articulo">
         UPDATE articulo
         <set>
             <if test="categoria != null and categoria.categoriaId != null">id_categoria = #{categoria.categoriaId},</if>

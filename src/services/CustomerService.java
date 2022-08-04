@@ -5,7 +5,7 @@ import dao.CustomerDao;
 import common.exceptions.BusinessException;
 import common.exceptions.DataOriginException;
 import java.util.List;
-import model.Cliente;
+import common.model.Cliente;
 
 
 public class CustomerService {

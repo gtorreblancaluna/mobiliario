@@ -14,7 +14,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import model.Articulo;
+import common.model.Articulo;
 import model.Compra;
 import services.ComprasService;
 import services.ContabilidadServices;

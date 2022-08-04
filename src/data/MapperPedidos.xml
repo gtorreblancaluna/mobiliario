@@ -37,7 +37,7 @@
         <result property="item.totalShopProvider" column="total_shop_provider" />
     </resultMap>
     
-    <resultMap id="resultMapRenta" type="model.Renta">
+    <resultMap id="resultMapRenta" type="common.model.Renta">
         <result property="rentaId" column="id_renta"/>
         <result property="detalleRenta" column="detalle_renta"/>
         <!-- customer info-->
@@ -82,7 +82,7 @@
           
     </resultMap>
   
-    <resultMap id="resultMapTipoAbono" type="model.TipoAbono">        
+    <resultMap id="resultMapTipoAbono" type="common.model.TipoAbono">        
         <result property="tipoAbonoId" column="id_tipo_abono"/>
         <result property="descripcion" column="descripcion"/>
         <result property="fgActivo" column="fg_activo"/>
@@ -90,7 +90,7 @@
       
     </resultMap> 
     
-    <resultMap id="resultMapDetalleRenta" type="model.DetalleRenta">        
+    <resultMap id="resultMapDetalleRenta" type="common.model.DetalleRenta">        
         
         <result property="detalleRentaId" column="id_detalle_renta"/>
         <result property="rentaId" column="id_renta"/>
@@ -141,7 +141,7 @@
         WHERE descripcion = #{descripcion}   
     </select> 
     
-    <update id="actualizarAbonoPorId" parameterType="model.Abono">
+    <update id="actualizarAbonoPorId" parameterType="common.model.Abono">
         UPDATE abonos
         <set>
             <if test="abono != null">abono = #{abono},</if>

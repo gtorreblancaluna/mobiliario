@@ -36,14 +36,14 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import mobiliario.iniciar_sesion;
-import model.Articulo;
-import model.Cliente;
+import common.model.Articulo;
+import common.model.Cliente;
 import model.DatosGenerales;
-import model.Renta;
-import model.TipoAbono;
+import common.model.Renta;
+import common.model.TipoAbono;
 import common.model.Usuario;
 import forms.inventario.VerDisponibilidadArticulos;
-import model.Color;
+import common.model.Color;
 import model.querys.AvailabilityItemResult;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -850,8 +850,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         }
         
         String mostrarPrecios = check_mostrar_precios.isSelected() == true ? "1" : "0";
-        String envioRecoleccion = this.txt_envioRecoleccion.getText().toString().equals("") ? "0" : this.txt_envioRecoleccion.getText()+"";
-        String depositoGarantia = this.txt_depositoGarantia.getText().toString().equals("") ? "0" : this.txt_depositoGarantia.getText()+""; 
+        String envioRecoleccion = this.txt_envioRecoleccion.getText().equals("") ? "0" : this.txt_envioRecoleccion.getText()+"";
+        String depositoGarantia = this.txt_depositoGarantia.getText().equals("") ? "0" : this.txt_depositoGarantia.getText()+""; 
         
         if (folio_cambio.equals("1")) { //cambio el folio
 
@@ -940,7 +940,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             panel_articulos.setVisible(true);
             panel_conceptos.setVisible(false);
         } else { //presiono que no
-
             this.dispose();
         }
 

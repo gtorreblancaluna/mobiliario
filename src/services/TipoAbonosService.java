@@ -7,7 +7,7 @@ package services;
 
 import dao.TipoAbonosDAO;
 import java.util.List;
-import model.TipoAbono;
+import common.model.TipoAbono;
 
 /**
  *

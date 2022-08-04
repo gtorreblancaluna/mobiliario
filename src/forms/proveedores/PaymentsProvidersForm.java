@@ -14,7 +14,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import mobiliario.iniciar_sesion;
-import model.TipoAbono;
+import common.model.TipoAbono;
 import model.providers.OrdenProveedor;
 import model.providers.PagosProveedor;
 import services.SaleService;

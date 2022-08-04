@@ -1,6 +1,7 @@
 
 package model;
 
+import common.model.Articulo;
 import java.sql.Timestamp;
 
 public class Compra {

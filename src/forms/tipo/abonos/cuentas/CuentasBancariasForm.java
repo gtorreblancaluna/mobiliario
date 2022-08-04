@@ -6,7 +6,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import forms.rentas.AgregarRenta;
-import model.Cuenta;
+import common.model.Cuenta;
 import services.AccountService;
 
 public class CuentasBancariasForm extends java.awt.Dialog {

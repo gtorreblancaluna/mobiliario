@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import model.Articulo;
+import common.model.Articulo;
 
 public class AgregarArticuloDisponibilidad extends java.awt.Dialog {
 

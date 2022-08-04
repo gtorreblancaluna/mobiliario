@@ -1,5 +1,6 @@
 package model;
 
+import common.model.Renta;
 import common.model.EstadoEvento;
 import common.model.Usuario;
 import java.util.Date;

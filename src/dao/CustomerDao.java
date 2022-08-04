@@ -3,7 +3,7 @@ package dao;
 import common.exceptions.DataOriginException;
 import common.utilities.MyBatisConnectionFactory;
 import java.util.List;
-import model.Cliente;
+import common.model.Cliente;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;

@@ -1,7 +1,7 @@
 
 package model.querys;
 
-import model.Articulo;
+import common.model.Articulo;
 
 public class AvailabilityItemResult {
     

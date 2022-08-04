@@ -6,7 +6,7 @@ import common.exceptions.BusinessException;
 import common.exceptions.DataOriginException;
 import java.util.Date;
 import model.OrderTypeChange;
-import model.Renta;
+import common.model.Renta;
 import common.model.Tipo;
 import common.model.Usuario;
 import org.apache.log4j.Logger;

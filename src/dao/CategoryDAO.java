@@ -2,7 +2,7 @@ package dao;
 
 import common.utilities.MyBatisConnectionFactory;
 import java.util.List;
-import model.CategoriaDTO;
+import common.model.CategoriaDTO;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;

@@ -1,7 +1,7 @@
 package model.providers;
 
 import java.sql.Timestamp;
-import model.TipoAbono;
+import common.model.TipoAbono;
 import common.model.Usuario;
 
 public class PagosProveedor {

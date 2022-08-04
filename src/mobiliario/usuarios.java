@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
 import clases.conectate;
@@ -18,7 +13,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import model.AsignaCategoria;
-import model.CategoriaDTO;
+import common.model.CategoriaDTO;
 import services.CategoryService;
 import common.services.UserService;
 

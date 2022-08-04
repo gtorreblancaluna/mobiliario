@@ -3,7 +3,7 @@ package services;
 
 import dao.AccountDAO;
 import java.util.List;
-import model.Cuenta;
+import common.model.Cuenta;
 
 public class AccountService {
     

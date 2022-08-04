@@ -17,7 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import model.AsignaCategoria;
-import model.CategoriaDTO;
+import common.model.CategoriaDTO;
 
 public class CategoryService {
     

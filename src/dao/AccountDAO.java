@@ -3,7 +3,7 @@ package dao;
 import common.utilities.MyBatisConnectionFactory;
 import java.sql.Timestamp;
 import java.util.List;
-import model.Cuenta;
+import common.model.Cuenta;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
