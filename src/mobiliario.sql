@@ -565,3 +565,54 @@ CREATE TABLE tipo_detalle_orden_proveedor (
   fg_active ENUM('1','0') NOT NULL DEFAULT '1',
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE status_almacen_tasks_catalog (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  description VARCHAR(145) NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE attend_almacen_tasks_type_catalog (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  description VARCHAR(145) NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE tasks_almacen (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  renta_id INT(11) NOT NULL,
+  status_almacen_tasks_catalog_id INT(11) NOT NULL,
+  attend_almacen_tasks_type_catalog_id INT(11) NOT NULL,
+  user_id INT(11) NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id),
+  CONSTRAINT fk_tasks_almacen_renta
+    FOREIGN KEY (renta_id)
+    REFERENCES renta (id_renta)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_status_almacen_tasks_catalog
+    FOREIGN KEY (status_almacen_tasks_catalog_id)
+    REFERENCES status_almacen_tasks_catalog (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_attend_almacen_tasks_type_catalog
+    FOREIGN KEY (attend_almacen_tasks_type_catalog_id)
+    REFERENCES attend_almacen_tasks_type_catalog (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_tasks_almacen_user_id
+    FOREIGN KEY (user_id)
+    REFERENCES usuarios (id_usuarios)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
