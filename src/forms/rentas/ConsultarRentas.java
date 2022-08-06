@@ -12,6 +12,7 @@ import common.constants.ApplicationConstants;
 import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
 import common.exceptions.DataOriginException;
+import common.exceptions.NoDataFoundException;
 import forms.material.inventory.GenerateReportMaterialSaleItemsView;
 import forms.proveedores.OrderProviderForm;
 import java.awt.Desktop;
@@ -75,9 +76,12 @@ import services.OrderTypeChangeService;
 import common.services.TipoEventoService;
 import forms.inventario.VerDisponibilidadArticulos;
 import services.providers.OrderProviderService;
+import services.tasks.almacen.TaskAlmacenUpdateService;
 
 public class ConsultarRentas extends javax.swing.JInternalFrame {
     
+    private Boolean updateItemsInFolio = false;
+    private TaskAlmacenUpdateService taskAlmacenUpdateService;
     private OrderProviderForm orderProviderForm;
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ConsultarRentas.class.getName());
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
@@ -903,6 +907,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     String datos[] = {id_renta, txt_cantidad.getText().toString(), id_articulo, txt_precio_unitario.getText().toString(),porcentajeDescuento+""};
 
                    int lastId = saleService.insertarDetalleRenta(datos, funcion);
+                   updateItemsInFolio = true;
 
                     DefaultTableModel temp = (DefaultTableModel) tabla_detalle.getModel();              
                      float cantidad = Float.parseFloat(txt_cantidad.getText().toString());
@@ -1100,7 +1105,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         if (seleccion != -1) {
             if ((seleccion + 1) == 1) {
-//                 String estadoId = funcion.GetData("id_estado", "Select id_estado from estado where descripcion='" + cmb_estado1.getSelectedItem().toString() + "'");
                  String estadoActualPedido = funcion.GetData("id_estado", "SELECT id_estado FROM renta WHERE id_renta=" + id_renta + "");
                                  
                  // si el estado actual del evento es igual a EN RENTA, procedemos a descontar los articulos del contador en inventario "en_renta"              
@@ -1120,8 +1124,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                      }
                     
                 }
-                 try {
+                    try {
                         funcion.DeleteRegistro("detalle_renta", "id_detalle_renta", tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 0).toString());
+                        updateItemsInFolio = true;
                      } catch (Exception e) {
                          JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
                      }
@@ -1289,8 +1294,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             new Thread(() -> {
                 try {
                     orderTypeChangeService.insert(globalRenta.getRentaId(), globalRenta.getTipo().getTipoId() , tipoSelected.getTipoId(),iniciar_sesion.usuarioGlobal.getUsuarioId());
-                     log.info(msg);
-                     Utility.pushNotification(msg);
+                    log.info(msg);
+                    Utility.pushNotification(msg);
                 } catch (BusinessException e) {
                     log.error(e.getMessage(),e);
                     Utility.pushNotification(e.getMessage());
@@ -1302,8 +1307,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         String porcentajeDescuentoRenta;
         String cantidadDescuento;
-        if (!txt_descuento.getText().toString().equals("") && !txtPorcentajeDescuento.getText().toString().equals("")) {
-            cantidadDescuento = EliminaCaracteres(txt_descuento.getText().toString(), "$");
+        if (!txt_descuento.getText().equals("") && !txtPorcentajeDescuento.getText().equals("")) {
+            cantidadDescuento = EliminaCaracteres(txt_descuento.getText(), "$");
             cantidadDescuento = cantidadDescuento.replaceAll(",", "");
             porcentajeDescuentoRenta = this.txtPorcentajeDescuento.getText()+"";
         } else {
@@ -1322,16 +1327,34 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         String envioRecoleccion = this.txt_envioRecoleccion.getText().equals("") ? "0" : this.txt_envioRecoleccion.getText().replaceAll(",", "");
         String depositoGarantia = this.txt_depositoGarantia.getText().equals("") ? "0" : this.txt_depositoGarantia.getText().replaceAll(",", "");; 
         String hora_devolucion = this.cmb_hora_devolucion.getSelectedItem()+" a "+this.cmb_hora_devolucion_dos.getSelectedItem();
-        String datos[] = {estadoEventoSelected.getEstadoId()+"", fecha_entrega, hora_entrega, fecha_devolucion, txt_descripcion.getText(),porcentajeDescuentoRenta,cantidadDescuento, txt_comentarios.getText().toString(), id_chofer, tipoSelected.getTipoId()+"", hora_devolucion,fecha_evento,depositoGarantia,envioRecoleccion,iva,mostrarPrecios,id_renta};
+        String datos[] = {estadoEventoSelected.getEstadoId()+"", fecha_entrega, hora_entrega, fecha_devolucion, txt_descripcion.getText(),porcentajeDescuentoRenta,cantidadDescuento, txt_comentarios.getText(), id_chofer, tipoSelected.getTipoId()+"", hora_devolucion,fecha_evento,depositoGarantia,envioRecoleccion,iva,mostrarPrecios,id_renta};
         funcion.UpdateRegistro(datos, "update renta set id_estado=?,fecha_entrega=?,hora_entrega=?,fecha_devolucion=?,descripcion=?,descuento=?,cantidad_descuento=?,comentario=?,id_usuario_chofer=?,id_tipo=?,hora_devolucion=?,fecha_evento=?,deposito_garantia=?,envio_recoleccion=?,iva=?,mostrar_precios_pdf=? where id_renta=?");
         String messageLogInfo = iniciar_sesion.usuarioGlobal.getNombre() + " actualizó con éxito el folio "+this.lbl_folio.getText();
         Utility.pushNotification(messageLogInfo);
         log.info(messageLogInfo);
         jbtn_guardar.setEnabled(false);
+        taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
+       
         
         tabla_articulos();
         checkNewItemsAndUpdateRenta();
         descuento = txt_descuento.getText();
+        
+         new Thread(() -> {
+            String messageSaveWhenEventIsUpdated;
+            try {
+                messageSaveWhenEventIsUpdated = taskAlmacenUpdateService
+                    .saveWhenEventIsUpdated(estadoEventoSelected, tipoSelected, globalRenta, updateItemsInFolio);
+            } catch (NoDataFoundException e) {
+                messageSaveWhenEventIsUpdated = e.getMessage();
+                log.error(messageSaveWhenEventIsUpdated);
+            } catch (DataOriginException e) {
+                log.error(e.getMessage(),e);
+                messageSaveWhenEventIsUpdated = "Ocurrió un error al generar la tarea a almacén, DETALLE: "+e.getMessage();
+            }
+            Utility.pushNotification(messageSaveWhenEventIsUpdated);
+            updateItemsInFolio = false;
+        }).start();
         
         if (check_enviar_email.isSelected() == true){
            enviar_email();                
@@ -1339,7 +1362,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         // actualizamos la renta
         globalRenta = saleService.obtenerRentaPorId(globalRenta.getRentaId());
-        
         disableEvent();
     }
     
@@ -1353,6 +1375,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 String percentaje = EliminaCaracteres(tabla_detalle.getValueAt(i, ColumnTableDetail.ITEM_PERCENT_DISCOUNT.getNumber()).toString(),"$,");
                 String datos[] = {id_renta, amount, itemId, unitPrice,percentaje};
                 saleService.insertarDetalleRenta(datos, funcion);
+                updateItemsInFolio = true;
             }
         }
     }

@@ -279,8 +279,10 @@ ALTER TABLE datos_generales ADD COLUMN info_summary_folio VARCHAR(9028) DEFAULT 
 
 
 INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Nuevo folio','1');
-INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Modificación folio','1');
-INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cancelación folio','1');
+INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio estado folio','1');
+INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio tipo folio','1');
+INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio tipo y estado folio','1');
+INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio en articulos del folio','1');
 
 INSERT INTO attend_almacen_tasks_type_catalog (description,fg_active) VALUES ('Sin atender','1');
 INSERT INTO attend_almacen_tasks_type_catalog (description,fg_active) VALUES ('Atendido','1');

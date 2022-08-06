@@ -10,6 +10,7 @@ import common.constants.ApplicationConstants;
 import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
 import common.exceptions.DataOriginException;
+import common.exceptions.NoDataFoundException;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.io.File;
@@ -44,6 +45,7 @@ import common.model.TipoAbono;
 import common.model.Usuario;
 import forms.inventario.VerDisponibilidadArticulos;
 import common.model.Color;
+import common.model.StatusAlmacenTaskCatalogVO;
 import model.querys.AvailabilityItemResult;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -54,6 +56,7 @@ import services.CustomerService;
 import services.ItemService;
 import services.SaleService;
 import services.SystemService;
+import services.tasks.almacen.TaskAlmacenUpdateService;
 import utilities.Utility;
 
 public class AgregarRenta extends javax.swing.JInternalFrame {
@@ -84,6 +87,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private static final DecimalFormat decimalFormat = new DecimalFormat( "$#,###,###,##0.00" );
     // valor de la fila a editar
     private Integer rowSelectedToEdit = null;
+    private TaskAlmacenUpdateService taskAlmacenUpdateService;
 
     public AgregarRenta() {
         
@@ -859,7 +863,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 stock = "1";
             }
 
-            String datos[] = {id_estado, id_cliente, iniciar_sesion.id_usuario_global, fecha_sistema, fecha_entrega, hora_entrega, fecha_devolucion, txt_descripcion.getText().toString(),porcentajeDescuentoRenta, descuento, iva, txt_comentarios.getText().toString(), id_chofer, folio, stock, id_tipo,hora_devolucion,fecha_evento,envioRecoleccion,depositoGarantia,mostrarPrecios};
+            String datos[] = {id_estado, id_cliente, iniciar_sesion.id_usuario_global, fecha_sistema, fecha_entrega, hora_entrega, fecha_devolucion, txt_descripcion.getText(),porcentajeDescuentoRenta, descuento, iva, txt_comentarios.getText(), id_chofer, folio, stock, id_tipo,hora_devolucion,fecha_evento,envioRecoleccion,depositoGarantia,mostrarPrecios};
             funcion.InsertarRegistro(datos, "insert into renta (id_estado,id_clientes,id_usuarios,fecha_pedido,fecha_entrega,hora_entrega,fecha_devolucion,descripcion,descuento,cantidad_descuento,iva,comentario,id_usuario_chofer,folio,stock,id_tipo,hora_devolucion,fecha_evento,envio_recoleccion,deposito_garantia,mostrar_precios_pdf) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
             id_ultima_renta = funcion.ultimoid_renta();
             
@@ -877,7 +881,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             if (id_estado.equals("2")) {
                 stock = "1";
             }
-            String datos_4[] = {id_estado, id_cliente, iniciar_sesion.id_usuario_global, fecha_sistema, fecha_entrega, hora_entrega, fecha_devolucion, txt_descripcion.getText().toString(), porcentajeDescuentoRenta,descuento, iva, txt_comentarios.getText().toString(), id_chofer, folio, stock, id_tipo,hora_devolucion,fecha_evento,envioRecoleccion,depositoGarantia,mostrarPrecios};
+            String datos_4[] = {id_estado, id_cliente, iniciar_sesion.id_usuario_global, fecha_sistema, fecha_entrega, hora_entrega, fecha_devolucion, txt_descripcion.getText(), porcentajeDescuentoRenta,descuento, iva, txt_comentarios.getText(), id_chofer, folio, stock, id_tipo,hora_devolucion,fecha_evento,envioRecoleccion,depositoGarantia,mostrarPrecios};
             funcion.InsertarRegistro(datos_4, "insert into renta (id_estado,id_clientes,id_usuarios,fecha_pedido,fecha_entrega,hora_entrega,fecha_devolucion,descripcion,descuento,cantidad_descuento,iva,comentario,id_usuario_chofer,folio,stock,id_tipo,hora_devolucion,fecha_evento,envio_recoleccion,deposito_garantia,mostrar_precios_pdf) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
             id_ultima_renta = funcion.ultimoid_renta();
             
@@ -918,18 +922,39 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
             }
         }
+        
+        
+        if (id_tipo.equals(ApplicationConstants.TIPO_PEDIDO)) {     
+            new Thread(() -> {
+                String message;
+                try {
+                    taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
+                    message = taskAlmacenUpdateService.saveWhenIsNewEvent(Long.parseLong(id_ultima_renta));
+                } catch (NoDataFoundException e) {
+                    message = "No se genero la tarea a almacen, por que no se encontraron usuarios asignados a una categoria, para el folio: "+folio;
+                    log.error(message);
+                } catch (DataOriginException e) {
+                    log.error(e.getMessage(),e);
+                    message = "Ocurrió un error al generar la tarea a almacén, DETALLE: "+e.getMessage();
+                }
+                Utility.pushNotification(message);
+            }).start();
+        }
+        
         if (check_generar_reporte.isSelected() == true)
             reporte();
 
         if (check_enviar_email.isSelected() == true){
             enviar_email();               
         }
-        JOptionPane.showMessageDialog(null, "Pedido registrado con exito... =)");
+        JOptionPane.showMessageDialog(null, "Pedido registrado con éxito... =)");
         Utility.pushNotification(iniciar_sesion.usuarioGlobal.getNombre()+ " registró un evento de tipo "+cmb_tipo.getSelectedItem().toString()
                 +" con status "+cmb_estado.getSelectedItem().toString()
         );
 
         seleccion = JOptionPane.showOptionDialog(this, "¿Deseas agregar otro evento?", "Evento nuevo ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "No");
+        
+        
         if (seleccion == 0) {//presiono que si
             nuevo_evento();
             limpiar();

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperTaskAlmacenUpdate">
+  
+    <resultMap id="resultMapTaskAlmacenVO" type="common.model.TaskAlmacenVO">        
+        
+        <result property="id" column="id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updatedAt"/>
+        <result property="systemMessage" column="system_message"/>
+              
+        <!-- renta -->
+        <result property="renta.rentaId" column="renta_id"/>
+        
+       <!-- statusAlmacenTaskCatalogVO -->
+       <result property="statusAlmacenTaskCatalogVO.id" column="status_almacen_task_catalog_id"/>
+       <result property="statusAlmacenTaskCatalogVO.description" column="status_almacen_task_catalog_description"/>
+       
+       <!-- attendAlmacenTaskTypeCatalogVO -->
+       <result property="attendAlmacenTaskTypeCatalogVO.id" column="attend_almacen_tasks_type_catalog_id"/>
+       <result property="attendAlmacenTaskTypeCatalogVO.description" column="attend_almacen_tasks_type_catalog_description"/>
+       
+       <!-- user -->
+       <result property="user.usuarioId" column="user_id"/>
+       <result property="user.nombre" column="user_nombre"/>
+       <result property="nombre.apellidos" column="nombre_apellidos"/>
+               
+        
+    </resultMap>
+    
+    <insert id="saveTaskAlmacen" parameterType="common.model.TaskAlmacenVO">
+        INSERT INTO tasks_almacen
+        (
+            renta_id,
+            status_almacen_tasks_catalog_id,
+            attend_almacen_tasks_type_catalog_id,
+            user_id,
+            system_message,
+            created_at,
+            updated_at,
+            fg_active
+        )
+        VALUES
+        (
+          #{renta.rentaId},
+          #{statusAlmacenTaskCatalogVO.id},
+          #{attendAlmacenTaskTypeCatalogVO.id},
+          #{user.usuarioId},
+          #{systemMessage},
+          #{createdAt},
+          #{updatedAt},
+          #{fgActive}
+        )
+    </insert>
+  
+</mapper>

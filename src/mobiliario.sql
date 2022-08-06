@@ -589,6 +589,7 @@ CREATE TABLE tasks_almacen (
   renta_id INT(11) NOT NULL,
   status_almacen_tasks_catalog_id INT(11) NOT NULL,
   attend_almacen_tasks_type_catalog_id INT(11) NOT NULL,
+  system_message VARCHAR(455) NOT NULL,
   user_id INT(11) NOT NULL,
   created_at TIMESTAMP NULL DEFAULT NULL,
   updated_at TIMESTAMP NULL DEFAULT NULL,
