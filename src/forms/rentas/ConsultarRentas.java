@@ -97,7 +97,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private static boolean fgConsultaTabla=false;
     String fecha_sistema, sql, id_articulo, id_abonos, id_cliente, cant_abono = "0", subTotal = "0", chofer, id_tipo = "1", descuento, desc_rep, iva_rep, id_estado;
     public static String fecha_inicial, fecha_final, validar_consultar = "0", id_renta;
-    private static sqlclass funcion = new sqlclass();    
+    private final static sqlclass funcion = new sqlclass();    
     private final ItemService itemService;
     private static SaleService saleService;
     private final UserService userService = UserService.getInstance();
@@ -124,7 +124,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private List<Tipo> typesGlobal = new ArrayList<>();
     private List<EstadoEvento> statusListGlobal = new ArrayList<>();
     private List<Usuario> choferes = new ArrayList<>();
-    private UtilityService utilityService = UtilityService.getInstance();
+    private final UtilityService utilityService = UtilityService.getInstance();
 
     
     private enum ColumnTableDetail {
@@ -1361,7 +1361,14 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
         
         // actualizamos la renta
-        globalRenta = saleService.obtenerRentaPorId(globalRenta.getRentaId());
+        new Thread(() -> {
+            try {
+                globalRenta = saleService.obtenerRentaPorId(globalRenta.getRentaId());
+            } catch (Exception ex) {
+                log.error(ex);
+                Utility.pushNotification("Ocurrio un error en el proceso de actualizar el evento, por favor contacta a soporte tecnico, detalle: "+ex);
+            }
+        }).start();
         disableEvent();
     }
     

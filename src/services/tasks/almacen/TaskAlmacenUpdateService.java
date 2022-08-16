@@ -53,7 +53,7 @@ public class TaskAlmacenUpdateService {
                     message = save(Long.parseLong(currentRenta.getRentaId()+""), 
                                 StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_STATUS_FOLIO,
                                 StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_STATUS_FOLIO.getDescription() + " [" +
-                                   currentRenta.getEstado().getDescripcion() + " a " + eventStatusChange.getDescripcion()
+                                   currentRenta.getEstado().getDescripcion() + " a " + eventStatusChange.getDescripcion() + "]"
                     );
                     
         } else if (!eventTypeChange.getTipoId().toString().equals(currentRenta.getTipo().getTipoId().toString())
@@ -63,7 +63,7 @@ public class TaskAlmacenUpdateService {
                     message = save(Long.parseLong(currentRenta.getRentaId()+""), 
                                 StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_TYPE_FOLIO,
                                 StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_TYPE_FOLIO.getDescription() + " [" +
-                                   currentRenta.getTipo().getTipo() + " a " + eventTypeChange.getTipo());
+                                   currentRenta.getTipo().getTipo() + " a " + eventTypeChange.getTipo()+ "]");
         } else if (!eventTypeChange.getTipoId().toString().equals(currentRenta.getTipo().getTipoId().toString())
                     && !eventStatusChange.getEstadoId().toString().equals(currentRenta.getEstado().getEstadoId().toString())
                     && (

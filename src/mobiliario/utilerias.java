@@ -723,6 +723,11 @@ public class utilerias extends java.awt.Dialog {
         btnSaveConfiguration.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnSaveConfiguration.setText("Guardar");
         btnSaveConfiguration.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnSaveConfiguration.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveConfigurationActionPerformed(evt);
+            }
+        });
 
         btnEditConfiguration.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnEditConfiguration.setText("Editar");
@@ -1114,6 +1119,10 @@ public class utilerias extends java.awt.Dialog {
             txtInfoPDFSummary.setEnabled(false);
         }
     }//GEN-LAST:event_btnEditPdfSummaryActionPerformed
+
+    private void btnSaveConfigurationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveConfigurationActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnSaveConfigurationActionPerformed
 
     /**
      * @param args the command line arguments

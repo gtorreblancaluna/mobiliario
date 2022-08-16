@@ -36,7 +36,7 @@
     </update>
     
     <select id="getDataConfigurationByKey" resultType="java.lang.String" parameterType="java.lang.String" >
-        SELECT valor FROM configuracion WHERE llave = #{key}
+        SELECT valor FROM configuracion WHERE llave = #{key} AND fg_activo = 1
     </select>
      
 </mapper>
