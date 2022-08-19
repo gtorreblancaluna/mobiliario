@@ -687,6 +687,22 @@ public class SaleService {
     }else if (renta.getTotal() > 0 && renta.getTotalAbonos() > 0){
         renta.setDescripcionCobranza(ApplicationConstants.COBRANZA_PARCIAL_PAGADO);
     }
+    
+    if(renta.getTotalFaltantes() > 0){
+            // el pedido tiene pago pendiente por faltante
+            if(renta.getDepositoGarantia()>0){
+                // a dejado deposito en garantia
+                float calculoDepositoMenosTotalFaltantes = renta.getDepositoGarantia() - renta.getTotalFaltantes();
+                if(calculoDepositoMenosTotalFaltantes > 0)
+                    renta.setMensajeFaltantes("Dep\u00F3sito en garant\u00EDa es: $ "+renta.getDepositoGarantia()+", concepto faltantes es: $ "+renta.getTotalFaltantes()+", cantidad a devolver al cliente: $ "+ (calculoDepositoMenosTotalFaltantes));
+                else
+                    renta.setMensajeFaltantes("Dep\u00F3sito en garant\u00EDa es: $ "+renta.getDepositoGarantia()+", concepto faltantes es: $ "+renta.getTotalFaltantes()+", resta: $ "+ (calculoDepositoMenosTotalFaltantes));
+            }else{
+                // se asgina el total                   
+                renta.setMensajeFaltantes("Total a pagar por concepto de faltantes es: $ "+renta.getTotalFaltantes());
+            }                
+
+        }   
 
      
  }

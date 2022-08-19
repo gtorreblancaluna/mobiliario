@@ -51,7 +51,6 @@ import common.model.Abono;
 import common.model.Articulo;
 import model.DatosGenerales;
 import common.model.DetalleRenta;
-import model.Faltante;
 import common.model.Renta;
 import common.model.TipoAbono;
 import common.model.Usuario;
@@ -90,8 +89,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     // variable global para almacenar el tipo de estado de la renta
     public static String g_idTipoEvento;
     public static String g_idRenta = null;
-    public static String g_mensajeFaltantes = "";
-    public static float g_totalFaltantes = 0f;
     public static String messageSucessfullyResults = "";
     // bandera para seleccionar si quiere generar el reporte pdf desde la tabla consulta
     private static boolean fgConsultaTabla=false;
@@ -401,10 +398,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     
     public void reporte() throws RuntimeException {
         
-        String xiva;
         String rentaId="";
-        g_totalFaltantes = 0f;
-        float yiva, itotal;
         if (fgConsultaTabla && tabla_prox_rentas.getSelectedRow() != - 1 ) {
             // a dado clic desde la tabla de consultar renta
             rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
@@ -415,100 +409,20 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             rentaId = id_renta;
         }
             
-            Renta renta = null;
-            
-            try {
-                renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
-            } catch (Exception e) {
-                Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
-                JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-                return;
-            }
-            
-            if(renta == null){
-                JOptionPane.showMessageDialog(null, "No se obtuvieron resultados, porfavor cierra y abre la aplicacion ", "ERROR", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-            
-            Float fAbonos = renta.getTotalAbonos();
-            float fSubTotal = 0f;
-            float fCalculo = 0f;
-            
-            for(DetalleRenta detalle : renta.getDetalleRenta()){
-                float fDescuento = 0f;
-                if(detalle.getPorcentajeDescuento() > 0)
-                    fDescuento += ( detalle.getCantidad() * detalle.getPrecioUnitario() ) * (detalle.getPorcentajeDescuento()/100);                
-                    
-                fSubTotal += ( detalle.getCantidad() * detalle.getPrecioUnitario() ) - fDescuento;
-            }
-            fCalculo = (fSubTotal+renta.getEnvioRecoleccion()+renta.getDepositoGarantia()) - renta.getCantidadDescuento(); 
-            
-             subTotal = fSubTotal+"";             
-  
-             
-             
-             float fSubtTotalFaltantes = 0f;
-             float fTotalFaltantes = 0f;
-             float totalFaltantes = 0f;
-             
-             List<Faltante> faltantes = itemService.obtenerFaltantesPorRentaId(funcion,renta.getRentaId());
-             
-             if(faltantes != null && faltantes.size() > 0){
-                 for(Faltante faltante : faltantes){
-                     if(faltante.getPrecioCobrar() == null){
-                         totalFaltantes += (faltante.getCantidad() * faltante.getArticulo().getPrecioCompra());
-                     } else {
-                        totalFaltantes += (faltante.getCantidad() * faltante.getPrecioCobrar());
-                     }
-                 }
-             }
-             
-            
-            try {
-                fSubtTotalFaltantes = totalFaltantes;
-            } catch (Exception e) {
-            }
-            g_mensajeFaltantes = "";
-            if(fSubtTotalFaltantes > 0){
-                // el pedido tiene pago pendiente por faltante
-                if(renta.getDepositoGarantia()>0){
-                    // a dejado deposito en garantia
-                    fTotalFaltantes = fSubtTotalFaltantes - renta.getDepositoGarantia();
-                    if(fTotalFaltantes < 0)
-                        this.g_mensajeFaltantes = "Dep\u00F3sito en garant\u00EDa es: $ "+renta.getDepositoGarantia()+", concepto faltantes es: $ "+fSubtTotalFaltantes+", cantidad a devolver al cliente: $ "+ (fTotalFaltantes * -1);
-                    else if(fTotalFaltantes > 0)
-                        this.g_mensajeFaltantes = "Dep\u00F3sito en garant\u00EDa es: $ "+renta.getDepositoGarantia()+", concepto faltantes es: $ "+fSubtTotalFaltantes+", resta: $ "+ (fTotalFaltantes);
-                }else{
-                    // se asgina el total                   
-                    this.g_mensajeFaltantes = "Total a pagar por concepto de faltantes es: $ "+fSubtTotalFaltantes;
-                    g_totalFaltantes = fSubtTotalFaltantes;
-                }                
-                
-            }
-            if(fTotalFaltantes>0)
-                g_totalFaltantes = fTotalFaltantes;
-            
-             cant_abono = fAbonos+"";
-             desc_rep  = renta.getCantidadDescuento()+"";
-             xiva = renta.getIva()+"";
-            
-            if (cant_abono == null)
-                cant_abono = "0";
-            
-            if (desc_rep == null)
-                desc_rep = "0";
-            
-            if (xiva == null) {
-                iva_rep = "0";
-            } else {
-                yiva = Float.parseFloat(xiva.toString());
-                itotal = (fCalculo * (yiva / 100));
-                iva_rep = String.valueOf(itotal);                
-            }
-            System.out.println("SUBTOTAL: " + subTotal);
-            System.out.println("ABONO: " + cant_abono);
-            chofer = renta.getChofer().getNombre() + " " + renta.getChofer().getApellidos();
-        
+        Renta renta;
+
+        try {
+            renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
+        } catch (Exception e) {
+            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+            return;
+        }
+
+        if(renta == null){
+            JOptionPane.showMessageDialog(null, "No se obtuvieron resultados, porfavor cierra y abre la aplicacion ", "ERROR", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         
         JasperPrint jasperPrint;
         try {
@@ -532,13 +446,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             //guardamos el parámetro
             parametro.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
             parametro.put("id_renta", rentaId);
-            parametro.put("abonos", cant_abono);
-            parametro.put("subTotal", subTotal);
-            parametro.put("chofer", chofer);
-            parametro.put("descuento", desc_rep);
-            parametro.put("iva", iva_rep);
-            parametro.put("total_faltantes", g_totalFaltantes+"");
-            parametro.put("mensaje_faltantes", g_mensajeFaltantes);  
+            parametro.put("abonos", renta.getTotalAbonos()+"");
+            parametro.put("subTotal", renta.getSubTotal()+"");
+            parametro.put("chofer", renta.getChofer().getNombre()+" "+renta.getChofer().getApellidos());
+            parametro.put("descuento", renta.getCalculoDescuento()+"");
+            parametro.put("iva", renta.getCalculoIVA()+"");
+            parametro.put("total_faltantes", renta.getTotalFaltantes()+"");
+            parametro.put("mensaje_faltantes", renta.getMensajeFaltantes());  
             parametro.put("URL_SUB_REPORT_CONSULTA", pathLocation+ApplicationConstants.URL_SUB_REPORT_CONSULTA);
             parametro.put("INFO_SUMMARY_FOLIO",datosGenerales.getInfoSummaryFolio());
          
