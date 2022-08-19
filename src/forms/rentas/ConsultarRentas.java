@@ -263,7 +263,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         map.put("limit", 200);
         map.put("applyDiff", ApplicationConstants.ESTADO_CANCELADO);
         map.put("systemDate", fecha_sistema );
-        map.put("type", ApplicationConstants.ESTADO_APARTADO );
+        map.put("type", ApplicationConstants.TIPO_PEDIDO );
         tabla_consultar_renta(map);
         
     }
@@ -526,9 +526,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             
             Map parametro = new HashMap<>();
             parametro.put("NOMBRE_EMPRESA",datosGenerales.getCompanyName());
-            parametro.put("DIRECCION_1",datosGenerales.getAddress1());
-            parametro.put("DIRECCION_2",datosGenerales.getAddress2());
-            parametro.put("DIRECCION_3",datosGenerales.getAddress3());
+            parametro.put("DIRECCION_1",datosGenerales.getAddress1() != null ? datosGenerales.getAddress1() : "");
+            parametro.put("DIRECCION_2",datosGenerales.getAddress2() != null ? datosGenerales.getAddress2() : "");
+            parametro.put("DIRECCION_3",datosGenerales.getAddress3() != null ? datosGenerales.getAddress3() : "");
             //guardamos el parámetro
             parametro.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
             parametro.put("id_renta", rentaId);

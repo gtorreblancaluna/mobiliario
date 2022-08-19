@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version last-->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="renta" pageWidth="695" pageHeight="900" columnWidth="655" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="af0ab36d-faf5-45a3-a784-d9f82f7a9acc">
 	<property name="ireport.zoom" value="1.7715610000000126"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="838"/>
-	<property name="ireport.callouts" value="callouts.1.fg=0,0,0\n
-callouts.1.bg=255,255,0\n
-"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.callouts" value="callouts.1.fg=0,0,0\n callouts.1.bg=255,255,0\n "/>
 	<parameter name="id_renta" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["C:\\Users\\Carlos Alberto\\Documents\\NetBeansProjects\\mobiliario\\reportes\\"]]></defaultValueExpression>
@@ -18,6 +15,10 @@ callouts.1.bg=255,255,0\n
 	<parameter name="iva" class="java.lang.String"/>
 	<parameter name="URL_IMAGEN" class="java.lang.String"/>
 	<parameter name="INFO_SUMMARY_FOLIO" class="java.lang.String"/>
+	<parameter name="NOMBRE_EMPRESA" class="java.lang.String"/>
+	<parameter name="DIRECCION_1" class="java.lang.String"/>
+	<parameter name="DIRECCION_2" class="java.lang.String"/>
+	<parameter name="DIRECCION_3" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT IF(d.porcentaje_descuento > 0 , (d.cantidad * d.p_unitario) * (d.porcentaje_descuento / 100) , 0 ) AS totalDescuento,
      CONCAT(u.`nombre`," ",u.`apellidos`) AS Usuario,
@@ -118,14 +119,14 @@ WHERE
 				<textFieldExpression><![CDATA["Fecha registro: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_pedido}))]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="493" y="29" width="149" height="24" uuid="d85f5de2-799f-45cb-a9b7-acaa123e12f1"/>
+				<reportElement x="517" y="89" width="135" height="24" uuid="d85f5de2-799f-45cb-a9b7-acaa123e12f1"/>
 				<textElement>
 					<font fontName="Arial" size="14" isBold="true" isUnderline="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Folio: "+$F{folio}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="493" y="62" width="149" height="20" uuid="a982fdfa-53b0-4123-992d-7be097147e24"/>
+				<reportElement x="517" y="113" width="135" height="20" uuid="a982fdfa-53b0-4123-992d-7be097147e24"/>
 				<textElement>
 					<font fontName="Arial" size="14" isBold="true" isUnderline="true"/>
 				</textElement>
@@ -135,27 +136,6 @@ WHERE
 				<reportElement x="0" y="0" width="133" height="133" uuid="6302a48b-2236-4f02-8a2c-917794354ba6"/>
 				<imageExpression><![CDATA[$P{URL_IMAGEN}]]></imageExpression>
 			</image>
-			<staticText>
-				<reportElement x="159" y="9" width="322" height="20" uuid="bdcaa47c-8062-48a3-8a70-068cc6f2cd2f"/>
-				<textElement textAlignment="Center">
-					<font fontName="Arial" size="12"/>
-				</textElement>
-				<text><![CDATA[Servicio Para Eventos Gabriela S. de R.L. de C.V.]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="159" y="29" width="322" height="20" uuid="7ab46503-9322-4336-9f0e-40d3e9f597b9"/>
-				<textElement textAlignment="Center">
-					<font fontName="Arial" size="12"/>
-				</textElement>
-				<text><![CDATA[3636-8046]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="159" y="49" width="322" height="33" uuid="5d97dc91-059e-4aef-b531-26152db0dbc8"/>
-				<textElement textAlignment="Center">
-					<font fontName="Arial" size="12"/>
-				</textElement>
-				<text><![CDATA[Ramon Corona #493, Colonia Santa Anita, San Pedro Tlaquepaque, Jalisco C.P. 45645, contacto@casagaby.com, www.casagaby.com]]></text>
-			</staticText>
 			<line>
 				<reportElement x="9" y="250" width="633" height="1" forecolor="#999999" uuid="51ca89ab-746c-499f-be85-30db44a3be47"/>
 			</line>
@@ -175,6 +155,34 @@ WHERE
 					<font fontName="Arial" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Telefono(s) cliente: "+$F{tel_movil}+", "+$F{tel_fijo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="145" y="60" width="508" height="20" uuid="502a02ab-14c1-44e8-a7c9-f1c6dc219558"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DIRECCION_3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="145" y="20" width="508" height="20" uuid="28545841-dd17-42a2-aac0-cd2be0c894f1"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DIRECCION_1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="145" y="0" width="507" height="20" uuid="144af4a1-ab24-403b-a9b2-bfc9f7ca6f44"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOMBRE_EMPRESA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="145" y="40" width="509" height="20" uuid="9a846c9d-de2c-48d4-8a1f-1d57e3fe8607"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DIRECCION_2}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>

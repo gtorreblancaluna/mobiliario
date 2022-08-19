@@ -15,6 +15,7 @@ import common.services.UserService;
 import dao.task.almacen.TaskAlmacenUpdateDAO;
 import java.util.Date;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 public class TaskAlmacenUpdateService {
     
@@ -23,6 +24,7 @@ public class TaskAlmacenUpdateService {
     private static final TaskAlmacenUpdateService SINGLE_INSTANCE = null;
     private final UserService userService = UserService.getInstance();
     private final TaskAlmacenUpdateDAO taskAlmacenUpdateDAO = TaskAlmacenUpdateDAO.getInstance();
+    private static final Logger LOGGER = Logger.getLogger(TaskAlmacenUpdateService.class.getName());
     
     public static TaskAlmacenUpdateService getInstance(){
         
@@ -91,7 +93,9 @@ public class TaskAlmacenUpdateService {
                 userService.getUsersInCategoriesAlmacenAndEvent(Integer.parseInt(rentaId.toString()));
         
         if (usersInCategories == null || usersInCategories.isEmpty()) {
-            throw new NoDataFoundException("No se generó tarea de almacén, por que no se obtuvieron usuarios por categoria");
+            String message = "No se generó tarea de almacén, por que no se obtuvieron usuarios por categoria";
+            LOGGER.info(message);
+            throw new NoDataFoundException(message);
         }
         
         StringBuilder stringBuilder = new StringBuilder();
@@ -137,6 +141,7 @@ public class TaskAlmacenUpdateService {
             
             taskAlmacenVO.setFgActive("1");
             taskAlmacenUpdateDAO.save(taskAlmacenVO);
+            LOGGER.info(String.format("Se ha generado tarea almacen para el evento id: %s, user id: %s",rentaId,user.getUsuarioId()));
             
         }
         

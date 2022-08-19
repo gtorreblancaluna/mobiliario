@@ -49,15 +49,17 @@ public class SystemService {
     
     public DatosGenerales getGeneralData(){
         if (IndexForm.generalDataGlobal == null ) {
-                DatosGenerales generalData = systemDao.getGeneralData();
-                IndexForm.generalDataGlobal = generalData;
-                Utility.pushNotification("Datos generales del sistema obtenidos de la base de datos.");
+            DatosGenerales generalData = systemDao.getGeneralData();
+            IndexForm.generalDataGlobal = generalData;
+            Utility.pushNotification("Datos generales del sistema obtenidos de la base de datos.");
         }
         return IndexForm.generalDataGlobal;
     }
     
     public void saveDatosGenerales(DatosGenerales datosGenerales){
         systemDao.saveDatosGenerales(datosGenerales);
+        DatosGenerales generalData = systemDao.getGeneralData();
+        IndexForm.generalDataGlobal = generalData;
     }
     
     public void updateInfoPDFSummary(DatosGenerales datosGenerales) throws DataOriginException{

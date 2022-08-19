@@ -464,17 +464,17 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     public void reporte() {
 
-        if (!txt_descuento.getText().toString().equals("")) {
-            descuento = EliminaCaracteres(txt_descuento.getText().toString(), "$");
+        if (!txt_descuento.getText().equals("")) {
+            descuento = EliminaCaracteres(txt_descuento.getText(), "$");
             descuento = descuento.replace(",", ".");
         } else {
             descuento = "0";
         }
 
-        if (txt_total_iva.getText().toString().equals("")) {
+        if (txt_total_iva.getText().equals("")) {
             iva = "0";
         } else {
-            iva = EliminaCaracteres(txt_total_iva.getText().toString(), "$");
+            iva = EliminaCaracteres(txt_total_iva.toString(), "$");
             iva = iva.replace(",", ".");
         }
 
@@ -493,9 +493,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             
             Map parametro = new HashMap<>();
             parametro.put("NOMBRE_EMPRESA",datosGenerales.getCompanyName());
-            parametro.put("DIRECCION_1",datosGenerales.getAddress1());
-            parametro.put("DIRECCION_2",datosGenerales.getAddress2());
-            parametro.put("DIRECCION_3",datosGenerales.getAddress3());
+            parametro.put("DIRECCION_1",datosGenerales.getAddress1() != null ? datosGenerales.getAddress1() : "");
+            parametro.put("DIRECCION_2",datosGenerales.getAddress2() != null ? datosGenerales.getAddress2() : "");
+            parametro.put("DIRECCION_3",datosGenerales.getAddress3() != null ? datosGenerales.getAddress3() : "");
             //guardamos el parámetro
             parametro.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
             System.out.println("id_renta: " + id_ultima_renta);
@@ -838,7 +838,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         fecha_sistema();
         String porcentajeDescuentoRenta;
-        if (!txt_descuento.getText().toString().equals("") && !txtPorcentajeDescuento.getText().toString().equals("")) {
+        if (!txt_descuento.getText().equals("") && !txtPorcentajeDescuento.getText().toString().equals("")) {
             descuento = EliminaCaracteres(txt_descuento.getText().toString(), "$");
             descuento = descuento.replace(",", ".");
             porcentajeDescuentoRenta = this.txtPorcentajeDescuento.getText()+"";
@@ -846,7 +846,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             porcentajeDescuentoRenta = "0";
             descuento = "0";
         }
-        if (!txt_iva.getText().toString().equals("")) {
+        if (!txt_iva.getText().equals("")) {
             iva = EliminaCaracteres(txt_iva.getText().toString(), "$");
             iva = iva.replace(",", ".");
         } else {
