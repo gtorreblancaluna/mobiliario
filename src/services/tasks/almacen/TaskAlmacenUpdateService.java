@@ -1,6 +1,5 @@
 package services.tasks.almacen;
 
-import common.constants.ApplicationConstants;
 import common.exceptions.DataOriginException;
 import common.exceptions.NoDataFoundException;
 import common.model.AttendAlmacenTaskTypeCatalogVO;
@@ -15,7 +14,9 @@ import common.services.UserService;
 import dao.task.almacen.TaskAlmacenUpdateDAO;
 import java.util.Date;
 import java.util.List;
+import model.tasks.TaskCatalogVO;
 import org.apache.log4j.Logger;
+import services.tasks.TaskUtilityValidateUpdateService;
 
 public class TaskAlmacenUpdateService {
     
@@ -25,6 +26,7 @@ public class TaskAlmacenUpdateService {
     private final UserService userService = UserService.getInstance();
     private final TaskAlmacenUpdateDAO taskAlmacenUpdateDAO = TaskAlmacenUpdateDAO.getInstance();
     private static final Logger LOGGER = Logger.getLogger(TaskAlmacenUpdateService.class.getName());
+    private final TaskUtilityValidateUpdateService taskUtilityValidateUpdateService = TaskUtilityValidateUpdateService.getInstance();
     
     public static TaskAlmacenUpdateService getInstance(){
         
@@ -36,61 +38,18 @@ public class TaskAlmacenUpdateService {
     
     public String saveWhenEventIsUpdated (EstadoEvento eventStatusChange, Tipo eventTypeChange, Renta currentRenta, Boolean updateItems)  throws NoDataFoundException, DataOriginException {
         
-        String message;
-        if (updateItems && eventTypeChange.getTipoId().toString().equals(ApplicationConstants.TIPO_PEDIDO)
-                && (eventStatusChange.getEstadoId().toString().equals(ApplicationConstants.ESTADO_APARTADO)))
-                {
-             // hubo cambios en los articulos
-                    message = save(Long.parseLong(currentRenta.getRentaId()+""), 
-                                StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_ITEMS_FOLIO,
-                                StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_ITEMS_FOLIO.getDescription());
-        } else if (currentRenta.getTipo().getTipoId().toString().equals(ApplicationConstants.TIPO_PEDIDO)
-                && !eventStatusChange.getEstadoId().toString().equals(currentRenta.getEstado().getEstadoId().toString())
-                && (
-                        eventStatusChange.getEstadoId().toString().equals(ApplicationConstants.ESTADO_APARTADO) ||
-                        eventStatusChange.getEstadoId().toString().equals(ApplicationConstants.ESTADO_CANCELADO)
-                )
-                ) {
-                    // cambio solo el estado del evento a apartado o cancelado
-                    message = save(Long.parseLong(currentRenta.getRentaId()+""), 
-                                StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_STATUS_FOLIO,
-                                StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_STATUS_FOLIO.getDescription() + " [" +
-                                   currentRenta.getEstado().getDescripcion() + " a " + eventStatusChange.getDescripcion() + "]"
-                    );
-                    
-        } else if (!eventTypeChange.getTipoId().toString().equals(currentRenta.getTipo().getTipoId().toString())
-                    && eventStatusChange.getEstadoId().toString().equals(currentRenta.getEstado().getEstadoId().toString())
-                ){
-                        // cambio solo el tipo de evento
-                    message = save(Long.parseLong(currentRenta.getRentaId()+""), 
-                                StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_TYPE_FOLIO,
-                                StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_TYPE_FOLIO.getDescription() + " [" +
-                                   currentRenta.getTipo().getTipo() + " a " + eventTypeChange.getTipo()+ "]");
-        } else if (!eventTypeChange.getTipoId().toString().equals(currentRenta.getTipo().getTipoId().toString())
-                    && !eventStatusChange.getEstadoId().toString().equals(currentRenta.getEstado().getEstadoId().toString())
-                    && (
-                            eventStatusChange.getEstadoId().toString().equals(ApplicationConstants.ESTADO_APARTADO) ||
-                            eventStatusChange.getEstadoId().toString().equals(ApplicationConstants.ESTADO_CANCELADO)
-                    )
-                ){
-                    // cambio estado y el tipo de evento
-                    message = save(Long.parseLong(currentRenta.getRentaId()+""), 
-                                StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_TYPE_AND_STATUS_FOLIO,
-                                StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_TYPE_AND_STATUS_FOLIO.getDescription() 
-                                        + " Tipo: [" +
-                                            currentRenta.getTipo().getTipo() + " a " + eventTypeChange.getTipo()
-                                            + "], Estado: [" +
-                                            currentRenta.getEstado().getDescripcion() + " a " + eventStatusChange.getDescripcion()+"]")
-                            ;
-        } else {
-           throw new NoDataFoundException("No se generó tarea de almacén, ya que no coincidio con las reglas operativas actuales");
-        }
-        return message;
+        TaskCatalogVO taskCatalogVO = taskUtilityValidateUpdateService.validateAndBuild(
+                eventStatusChange,
+                eventTypeChange,
+                currentRenta,
+                updateItems
+        );
+        return save (taskCatalogVO); 
     }
     
-    private String save (Long rentaId, StatusAlmacenTaskCatalog statusAlmacenTaskCatalog, String systemMessage) throws NoDataFoundException, DataOriginException{
+    private String save (TaskCatalogVO taskCatalogVO) throws NoDataFoundException, DataOriginException {
         List<Usuario> usersInCategories =
-                userService.getUsersInCategoriesAlmacenAndEvent(Integer.parseInt(rentaId.toString()));
+                userService.getUsersInCategoriesAlmacenAndEvent(Integer.parseInt(taskCatalogVO.getRentaId()));
         
         if (usersInCategories == null || usersInCategories.isEmpty()) {
             String message = "No se generó tarea de almacén, por que no se obtuvieron usuarios por categoria";
@@ -102,7 +61,9 @@ public class TaskAlmacenUpdateService {
         int count = 0;
         stringBuilder
                 .append("[")
-                .append(statusAlmacenTaskCatalog.getDescription())
+                .append(taskCatalogVO.getStatusAlmacenTaskCatalog().getDescription())
+                .append(". # ")
+                .append(taskCatalogVO.getEventFolio())
                 .append("]")
                 .append("\n");
         for (Usuario user : usersInCategories) {
@@ -110,12 +71,12 @@ public class TaskAlmacenUpdateService {
             TaskAlmacenVO taskAlmacenVO = new TaskAlmacenVO();
             // renta
             Renta renta = new Renta();
-            renta.setRentaId(Integer.parseInt(rentaId.toString()));
+            renta.setRentaId(Integer.parseInt(taskCatalogVO.getRentaId()));
             taskAlmacenVO.setRenta(renta);
 
             //status
             StatusAlmacenTaskCatalogVO statusAlmacenTaskCatalogVO = new StatusAlmacenTaskCatalogVO();
-            statusAlmacenTaskCatalogVO.setId(statusAlmacenTaskCatalog.getId());
+            statusAlmacenTaskCatalogVO.setId(taskCatalogVO.getStatusAlmacenTaskCatalog().getId());
             taskAlmacenVO.setStatusAlmacenTaskCatalogVO(statusAlmacenTaskCatalogVO);
 
             taskAlmacenVO.setUser(user);
@@ -126,7 +87,7 @@ public class TaskAlmacenUpdateService {
                     Long.parseLong(AttendAlmacenTaskTypeCatalogVO.AttendAlmacenTaskTypeCatalog.UN_ATTENDED.getId().toString())
             );
             taskAlmacenVO.setAttendAlmacenTaskTypeCatalogVO(attendAlmacenTaskTypeCatalogVO);
-            taskAlmacenVO.setSystemMessage(systemMessage);
+            taskAlmacenVO.setSystemMessage(taskCatalogVO.getSystemMessage());
             
 
             taskAlmacenVO.setCreatedAt(new Date());
@@ -135,22 +96,27 @@ public class TaskAlmacenUpdateService {
             stringBuilder.append("[")
                     .append(++count)
                     .append("]. ")
-                    .append("Tarea almacen generada, para el usuario: ")
-                    .append(user.getNombre()).append(" ").append(user.getApellidos());
+                    .append("Tarea almacen generada. para el usuario: ")
+                    .append(user.getNombre()).append(" ").append(user.getApellidos())
+                    ;
             stringBuilder.append("\n");
             
             taskAlmacenVO.setFgActive("1");
             taskAlmacenUpdateDAO.save(taskAlmacenVO);
-            LOGGER.info(String.format("Se ha generado tarea almacen para el evento id: %s, user id: %s",rentaId,user.getUsuarioId()));
+            LOGGER.info(String.format("Se ha generado tarea almacen para el evento id: %s, user id: %s",taskCatalogVO.getRentaId(),user.getUsuarioId()));
             
         }
         
         return stringBuilder.toString();
-    } 
-        
-    public String saveWhenIsNewEvent (Long rentaId) throws NoDataFoundException, DataOriginException{
-        return save(rentaId,StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.NEW_FOLIO,StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.NEW_FOLIO.getDescription());
-        
+    }
+    
+    public String saveWhenIsNewEvent (Long rentaId, String folio) throws NoDataFoundException, DataOriginException{
+        TaskCatalogVO taskCatalogVO = new TaskCatalogVO();
+        taskCatalogVO.setRentaId(rentaId+"");
+        taskCatalogVO.setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalog.NEW_FOLIO);
+        taskCatalogVO.setSystemMessage(StatusAlmacenTaskCatalog.NEW_FOLIO.getDescription());
+        taskCatalogVO.setEventFolio(folio);
+        return save(taskCatalogVO);
     }
     
 }

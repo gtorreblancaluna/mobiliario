@@ -45,7 +45,6 @@ import common.model.TipoAbono;
 import common.model.Usuario;
 import forms.inventario.VerDisponibilidadArticulos;
 import common.model.Color;
-import common.model.StatusAlmacenTaskCatalogVO;
 import model.querys.AvailabilityItemResult;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -57,6 +56,7 @@ import services.ItemService;
 import services.SaleService;
 import services.SystemService;
 import services.tasks.almacen.TaskAlmacenUpdateService;
+import services.tasks.deliveryChofer.TaskDeliveryChoferUpdateService;
 import utilities.Utility;
 
 public class AgregarRenta extends javax.swing.JInternalFrame {
@@ -88,6 +88,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     // valor de la fila a editar
     private Integer rowSelectedToEdit = null;
     private TaskAlmacenUpdateService taskAlmacenUpdateService;
+    private TaskDeliveryChoferUpdateService taskDeliveryChoferUpdateService;
 
     public AgregarRenta() {
         
@@ -815,7 +816,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         subTotal = 0;
         cant_abono = 0;
         String stock = "0";
-        String[] datos_folio = {"", ""};
+        
         int aux = 1;
         hora_entrega = cmb_hora.getSelectedItem().toString() +" a "+this.cmb_hora_dos.getSelectedItem()+"";
         hora_devolucion = this.cmb_hora_devolucion.getSelectedItem()+" a "+this.cmb_hora_devolucion_dos.getSelectedItem()+"";
@@ -923,24 +924,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             }
         }
         
-        
-        if (id_tipo.equals(ApplicationConstants.TIPO_PEDIDO)) {     
-            new Thread(() -> {
-                String message;
-                try {
-                    taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
-                    message = taskAlmacenUpdateService.saveWhenIsNewEvent(Long.parseLong(id_ultima_renta));
-                } catch (NoDataFoundException e) {
-                    message = "No se genero la tarea a almacen, por que no se encontraron usuarios asignados a una categoria, para el folio: "+folio;
-                    log.error(message);
-                } catch (DataOriginException e) {
-                    log.error(e.getMessage(),e);
-                    message = "Ocurrió un error al generar la tarea a almacén, DETALLE: "+e.getMessage();
-                }
-                Utility.pushNotification(message);
-            }).start();
-        }
-        
         if (check_generar_reporte.isSelected() == true)
             reporte();
 
@@ -951,6 +934,36 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         Utility.pushNotification(iniciar_sesion.usuarioGlobal.getNombre()+ " registró un evento de tipo "+cmb_tipo.getSelectedItem().toString()
                 +" con status "+cmb_estado.getSelectedItem().toString()
         );
+        
+        if (id_tipo.equals(ApplicationConstants.TIPO_PEDIDO)) {
+            new Thread(() -> {
+                String message;
+                try {
+                    taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
+                    message = taskAlmacenUpdateService.saveWhenIsNewEvent(Long.parseLong(id_ultima_renta), folio);
+                } catch (NoDataFoundException e) {
+                    message = e.getMessage();
+                    log.error(message);
+                } catch (DataOriginException e) {
+                    log.error(e.getMessage(),e);
+                    message = "Ocurrió un error al generar la tarea a almacén, DETALLE: "+e.getMessage();
+                }
+                Utility.pushNotification(message);
+            }).start();
+            
+            new Thread(() -> {
+                String message;
+                try {
+                    taskDeliveryChoferUpdateService = TaskDeliveryChoferUpdateService.getInstance();
+                    taskDeliveryChoferUpdateService.saveWhenIsNewEvent(Long.parseLong(id_ultima_renta), folio,id_chofer);
+                    message = String.format("Tarea 'entrega chofer' generada. Folio: %s, chofer: %s",folio,cmb_chofer.getSelectedItem());
+                } catch (DataOriginException | NoDataFoundException e) {
+                    message = e.getMessage();
+                    log.error(message);
+                }
+                Utility.pushNotification(message);
+            }).start();
+        }
 
         seleccion = JOptionPane.showOptionDialog(this, "¿Deseas agregar otro evento?", "Evento nuevo ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "No");
         

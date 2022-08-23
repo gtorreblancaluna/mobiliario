@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperTaskDeliveryChoferUpdate">
+      
+    <insert id="saveTaskDeliveryChofer" parameterType="common.model.TaskChoferDeliveryVO">
+        INSERT INTO tasks_chofer_delivery
+        (
+            renta_id,
+            status_almacen_tasks_catalog_id,
+            attend_almacen_tasks_type_catalog_id,
+            chofer_id,
+            system_message,
+            created_at,
+            updated_at,
+            fg_active
+        )
+        VALUES
+        (
+          #{renta.rentaId},
+          #{statusAlmacenTaskCatalogVO.id},
+          #{attendAlmacenTaskTypeCatalogVO.id},
+          #{chofer.usuarioId},
+          #{systemMessage},
+          #{createdAt},
+          #{updatedAt},
+          #{fgActive}
+        )
+    </insert>
+  
+</mapper>

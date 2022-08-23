@@ -41,6 +41,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         <mapper resource="data/MapperOrderTypeChanges.xml"/>
         <mapper resource="data/MapperOrderStatusChanges.xml"/>
         <mapper resource="data/task/almacen/MapperTaskAlmacenUpdate.xml"/>
+        <mapper resource="data/task/deliveryChofer/MapperTaskDeliveryChoferUpdate.xml"/>
         
     </mappers>
     
