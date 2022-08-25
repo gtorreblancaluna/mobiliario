@@ -1,5 +1,9 @@
 package mobiliario;
 
+import common.constants.ApplicationConstants;
+import common.exceptions.DataOriginException;
+import common.exceptions.NoDataFoundException;
+import common.model.Renta;
 import common.utilities.UtilityCommon;
 import forms.abonos.PaymentsForm;
 import forms.inventario.InventarioForm;
@@ -10,14 +14,18 @@ import forms.material.inventory.MaterialInventoryView;
 import forms.proveedores.ViewOrdersProviders;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import static mobiliario.iniciar_sesion.usuarioGlobal;
 import model.DatosGenerales;
+import services.SaleService;
 import services.SystemService;
+import services.tasks.almacen.TaskAlmacenUpdateService;
 import utilities.Utility;
 
 public class IndexForm extends javax.swing.JFrame {
@@ -52,6 +60,37 @@ public class IndexForm extends javax.swing.JFrame {
         LOGGER.info(">>> datos generales obtenidos: "+generalDataGlobal);
         this.setTitle(generalDataGlobal.getCompanyName().toUpperCase());
 
+    }
+    
+    private void generateTaskAlmacen () {
+        Map<String, Object> map = new HashMap<>();
+        
+        map.put("applyDiff", ApplicationConstants.ESTADO_CANCELADO);
+        map.put("systemDate", UtilityCommon.getSystemDate("/") );
+        map.put("type", ApplicationConstants.TIPO_PEDIDO );
+        map.put("statusId", ApplicationConstants.ESTADO_APARTADO );
+        map.put("limit", 100000 );
+        
+        SaleService saleService = SaleService.getInstance();
+        TaskAlmacenUpdateService taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
+        try {
+            List<Renta> rentas = saleService.obtenerRentasPorParametros(map);
+            LOGGER.info("RENTAS: "+rentas.size());
+            
+                for (Renta renta : rentas) {
+                    try {
+                        taskAlmacenUpdateService.saveWhenIsNewEvent(
+                            Long.parseLong(String.valueOf(renta.getRentaId())), 
+                            String.valueOf(renta.getFolio()));
+                    } catch (DataOriginException | NoDataFoundException e) {
+                        LOGGER.error(e);
+                    }
+                }
+
+        } catch (Exception e) {
+            LOGGER.error(e);
+        }
+    
     }
 
     public void abrir_ventana(JInternalFrame internalFrame) {

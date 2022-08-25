@@ -36,14 +36,16 @@ public class TaskAlmacenUpdateService {
         return SINGLE_INSTANCE;
     }
     
-    public String saveWhenEventIsUpdated (EstadoEvento eventStatusChange, Tipo eventTypeChange, Renta currentRenta, Boolean updateItems)  throws NoDataFoundException, DataOriginException {
+    public String saveWhenEventIsUpdated (EstadoEvento eventStatusChange, Tipo eventTypeChange, Renta currentRenta, Boolean updateItems, Boolean generalDataUpdated)  throws NoDataFoundException, DataOriginException {
         
         TaskCatalogVO taskCatalogVO = taskUtilityValidateUpdateService.validateAndBuild(
                 eventStatusChange,
                 eventTypeChange,
                 currentRenta,
-                updateItems
+                updateItems,
+                generalDataUpdated
         );
+        taskCatalogVO.setEventFolio(String.valueOf(currentRenta.getFolio()));
         return save (taskCatalogVO); 
     }
     

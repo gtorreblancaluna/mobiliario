@@ -2,6 +2,9 @@ package utilities;
 
 import common.utilities.RequestFocusListener;
 import common.constants.ApplicationConstants;
+import common.exceptions.BusinessException;
+import common.model.EstadoEvento;
+import common.model.Tipo;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -17,7 +20,18 @@ public abstract class Utility {
     
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     
-    
+    public static void validateStatusAndTypeEvent (EstadoEvento statusEvent, Tipo typeEvent) throws BusinessException {
+        if (typeEvent.getTipoId().toString().equals(ApplicationConstants.TIPO_COTIZACION)
+                &&
+                !statusEvent.getEstadoId().toString().equals(ApplicationConstants.ESTADO_PENDIENTE))
+        {
+            throw new BusinessException("Evento tipo 'COTIZACIÓN' debe tener estado 'PENDIENTE' ");
+        } else if (typeEvent.getTipoId().toString().equals(ApplicationConstants.TIPO_PEDIDO)
+                &&
+                statusEvent.getEstadoId().toString().equals(ApplicationConstants.ESTADO_PENDIENTE)) {
+            throw new BusinessException("Evento tipo 'PEDIDO' debe tener estado diferente a 'PENDIENTE' ");
+        }
+    }
     public static String getPathLocation()throws IOException,URISyntaxException{
    
         File file = new File(Utility.class.getProtectionDomain().getCodeSource().getLocation()

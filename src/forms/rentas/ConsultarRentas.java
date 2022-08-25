@@ -76,11 +76,13 @@ import common.services.TipoEventoService;
 import forms.inventario.VerDisponibilidadArticulos;
 import services.providers.OrderProviderService;
 import services.tasks.almacen.TaskAlmacenUpdateService;
+import services.tasks.deliveryChofer.TaskDeliveryChoferUpdateService;
 
 public class ConsultarRentas extends javax.swing.JInternalFrame {
     
     private Boolean updateItemsInFolio = false;
     private TaskAlmacenUpdateService taskAlmacenUpdateService;
+    private TaskDeliveryChoferUpdateService taskDeliveryChoferUpdateService;
     private OrderProviderForm orderProviderForm;
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ConsultarRentas.class.getName());
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
@@ -262,6 +264,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         map.put("systemDate", fecha_sistema );
         map.put("type", ApplicationConstants.TIPO_PEDIDO );
         tabla_consultar_renta(map);
+        jbtnGenerateTaskAlmacen.setVisible(false);
         
     }
         
@@ -787,7 +790,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             existe = false;
                 for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
                     System.out.println("lbl: " + lbl_eleccion.getText() + "  tabla: " + tabla_detalle.getValueAt(i, 3).toString());
-                    if (lbl_eleccion.getText().toString().equals(tabla_detalle.getValueAt(i, 3).toString())) {
+                    if (lbl_eleccion.getText().equals(tabla_detalle.getValueAt(i, 3).toString())) {
                         existe = true;
                         break;
                     }
@@ -808,7 +811,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                       //2018.11.16
                       // si el estado actual del evento es igual a EN RENTA, 
                       // procedemos a aumentar los articulos del contador en inventario "en_renta"                         
-                    float cantidad = Float.parseFloat(txt_cantidad.getText().toString());
+                    float cantidad = Float.parseFloat(txt_cantidad.getText());
                     String[] datos3 = { (articulo.getEnRenta()+cantidad+""), articulo.getArticuloId()+""};
                     
                     try {
@@ -1151,8 +1154,44 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
     }
     
+    private boolean checkGeneralDataUpdated () {
+        
+        boolean updated = false;
+        
+        String fechaEntrega = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
+        String fechaDevolucion = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
+        String fechaEvento = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_evento.getDate());
+        
+        String[] deliveryHourArray = globalRenta.getHoraEntrega().split("a");
+        if (!deliveryHourArray[0].trim().equals(cmb_hora.getSelectedItem())) {
+            updated = true;
+        }
+        if (!deliveryHourArray[1].trim().equals(cmb_hora_dos.getSelectedItem())) {
+            updated = true;
+        }
+        if (!fechaEntrega.equals(globalRenta.getFechaEntrega())) {
+            updated = true;
+        }
+        if (!fechaDevolucion.equals(globalRenta.getFechaDevolucion())) {
+            updated = true;
+        }
+        if (!fechaEvento.equals(globalRenta.getFechaEvento())) {
+            updated = true;
+        }
+        if (!txt_comentarios.getText().trim().equals(globalRenta.getComentario().trim())) {
+            updated = true;
+        }
+        if (!txt_descripcion.getText().trim().equals(globalRenta.getDescripcion().trim())) {
+            updated = true;
+        }
+        
+        return updated;
+        
+    }
+    
     public void actualizar() throws Exception {
         
+       
         // variable debe ser inicializada cuando se elige una renta a visualizar
         if (globalRenta == null) {
             JOptionPane.showMessageDialog(null, "Ocurrio un error inesperado, contacta a soporte tecnico.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1177,6 +1216,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         final EstadoEvento estadoEventoSelected = (EstadoEvento) cmb_estado1.getModel().getSelectedItem();
         final Tipo tipoSelected = (Tipo) cmb_tipo.getModel().getSelectedItem();
         
+        try {
+            Utility.validateStatusAndTypeEvent(estadoEventoSelected,tipoSelected);
+        } catch (BusinessException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         if (!estadoEventoSelected.getEstadoId().equals(globalRenta.getEstado().getEstadoId())) {
             String msg = String.format("Folio: %s, Usuario %s,  Realizó el cambio de Estado [%s] a [%s]",
                 globalRenta.getFolio()+"",
@@ -1252,13 +1297,15 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         tabla_articulos();
         checkNewItemsAndUpdateRenta();
+        boolean generalDataUpdated = checkGeneralDataUpdated();
+        
         descuento = txt_descuento.getText();
         
          new Thread(() -> {
             String messageSaveWhenEventIsUpdated;
             try {
                 messageSaveWhenEventIsUpdated = taskAlmacenUpdateService
-                    .saveWhenEventIsUpdated(estadoEventoSelected, tipoSelected, globalRenta, updateItemsInFolio);
+                    .saveWhenEventIsUpdated(estadoEventoSelected, tipoSelected, globalRenta, updateItemsInFolio, generalDataUpdated);
             } catch (NoDataFoundException e) {
                 messageSaveWhenEventIsUpdated = e.getMessage();
                 log.error(messageSaveWhenEventIsUpdated);
@@ -1268,6 +1315,21 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
             Utility.pushNotification(messageSaveWhenEventIsUpdated);
             updateItemsInFolio = false;
+        }).start();
+         
+        new Thread(() -> {
+            String message;
+            try {
+                taskDeliveryChoferUpdateService = TaskDeliveryChoferUpdateService.getInstance();
+                taskDeliveryChoferUpdateService.saveWhenEventIsUpdated(
+                        estadoEventoSelected, tipoSelected, globalRenta, updateItemsInFolio, id_chofer ,generalDataUpdated
+                );
+                message = String.format("Tarea 'entrega chofer' generada. Folio: %s, chofer: %s",globalRenta.getFolio(),cmb_chofer.getSelectedItem());
+            } catch (DataOriginException | NoDataFoundException e) {
+                message = e.getMessage();
+                log.error(message);
+            }
+            Utility.pushNotification(message);
         }).start();
         
         if (check_enviar_email.isSelected() == true){
@@ -2097,6 +2159,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jbtn_guardar = new javax.swing.JButton();
         jbtn_agregar_articulos = new javax.swing.JButton();
         jbtn_generar_reporte = new javax.swing.JButton();
+        jbtnGenerateTaskAlmacen = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
         jToolBar2 = new javax.swing.JToolBar();
         jbtn_nuevo_cliente = new javax.swing.JButton();
@@ -2318,8 +2381,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(189, 189, 189)
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(195, 195, 195)
                 .addComponent(jButton1)
                 .addContainerGap(523, Short.MAX_VALUE))
         );
@@ -3235,6 +3298,25 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         });
         jPanel4.add(jbtn_generar_reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 140, 40, 40));
 
+        jbtnGenerateTaskAlmacen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/lista-de-quehaceres-24.png"))); // NOI18N
+        jbtnGenerateTaskAlmacen.setMnemonic('R');
+        jbtnGenerateTaskAlmacen.setToolTipText("Generar tarea de almacen");
+        jbtnGenerateTaskAlmacen.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jbtnGenerateTaskAlmacen.setFocusable(false);
+        jbtnGenerateTaskAlmacen.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbtnGenerateTaskAlmacen.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jbtnGenerateTaskAlmacen.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jbtnGenerateTaskAlmacenMouseClicked(evt);
+            }
+        });
+        jbtnGenerateTaskAlmacen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbtnGenerateTaskAlmacenActionPerformed(evt);
+            }
+        });
+        jPanel4.add(jbtnGenerateTaskAlmacen, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 180, 40, 40));
+
         jTabbedPane1.addTab("Detalle...", jPanel4);
 
         jToolBar2.setFloatable(false);
@@ -3729,7 +3811,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             txt_cantidad.requestFocus();
             id_articulo = (String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString();
             txt_precio_unitario.setEditable(false);
-            
         }
 
     }//GEN-LAST:event_tabla_articulosMouseClicked
@@ -4416,11 +4497,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }
     
     public void editarDetalleRenta(){
-        if(!this.g_idTipoEvento.equals(ApplicationConstants.TIPO_COTIZACION)){
-             JOptionPane.showMessageDialog(null, "Solo puedes editar el detalle a una COTIZACION ", "ERROR", JOptionPane.ERROR_MESSAGE);
-             return;
-        }
-            
+                    
          this.g_idDetalleRenta = tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 0).toString();
          String porcentajeDescuento = EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 5).toString(), "$,");
          String cantidad = EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 1).toString(), "$,");
@@ -4524,7 +4601,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
              JOptionPane.showMessageDialog(null, "Selecciona una fila para editar el articulo ...", "ERROR", JOptionPane.INFORMATION_MESSAGE);
              return;
          }
-            editarDetalleRenta();
+         editarDetalleRenta();
         
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -4664,6 +4741,31 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btnGetItemsFromFolioActionPerformed
 
+    private void jbtnGenerateTaskAlmacenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jbtnGenerateTaskAlmacenMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jbtnGenerateTaskAlmacenMouseClicked
+
+    private void jbtnGenerateTaskAlmacenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnGenerateTaskAlmacenActionPerformed
+        
+        int seleccion = JOptionPane.showOptionDialog(this, "¿Generar tarea para almacen?", "Confirmar", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si");
+        if (seleccion != 0) {//presiono que no
+            return;
+        }
+        String message;
+        try {
+            taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
+            message = taskAlmacenUpdateService.saveWhenIsNewEvent(Long.parseLong(String.valueOf(globalRenta.getRentaId())), String.valueOf(globalRenta.getFolio()));
+        } catch (NoDataFoundException e) {
+            message = e.getMessage();
+            log.error(message);
+        } catch (DataOriginException e) {
+            log.error(e.getMessage(),e);
+            message = "Ocurrió un error al generar la tarea a almacén, DETALLE: "+e.getMessage();
+        }
+        Utility.pushNotification(message);
+        JOptionPane.showMessageDialog(this, message, "Tareas almacen", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_jbtnGenerateTaskAlmacenActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGetItemsFromFolio;
@@ -4765,6 +4867,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JToolBar jToolBar4;
     private javax.swing.JToolBar jToolBar5;
     public static javax.swing.JButton jbtnGenerarReporteEntregas;
+    public static javax.swing.JButton jbtnGenerateTaskAlmacen;
     private javax.swing.JButton jbtn_agregar_abono;
     private javax.swing.JButton jbtn_agregar_articulo;
     private javax.swing.JButton jbtn_agregar_articulos;

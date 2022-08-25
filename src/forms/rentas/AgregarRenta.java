@@ -45,6 +45,8 @@ import common.model.TipoAbono;
 import common.model.Usuario;
 import forms.inventario.VerDisponibilidadArticulos;
 import common.model.Color;
+import common.model.EstadoEvento;
+import common.model.Tipo;
 import model.querys.AvailabilityItemResult;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -832,6 +834,15 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         String id_chofer = funcion.GetData("id_usuarios", "Select id_usuarios from usuarios where CONCAT(nombre,\" \",apellidos)='" + cmb_chofer.getSelectedItem().toString() + "'");
         String id_tipo = funcion.GetData("id_tipo", "Select id_tipo from tipo where tipo='" + cmb_tipo.getSelectedItem().toString() + "'");
         System.out.println("ID TIPO: " + id_tipo);
+        
+        final EstadoEvento estadoEvento = new EstadoEvento(Integer.parseInt(id_estado));
+        final Tipo tipoEvento = new Tipo(Integer.parseInt(id_tipo));
+        try {
+            Utility.validateStatusAndTypeEvent(estadoEvento,tipoEvento);
+        } catch (BusinessException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         String folio = funcion.GetData("folio", "Select folio from datos_generales");
         String folio_cambio = funcion.GetData("folio_cambio", "Select folio_cambio from datos_generales");

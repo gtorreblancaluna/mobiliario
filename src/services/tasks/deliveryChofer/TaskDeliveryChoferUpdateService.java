@@ -31,13 +31,14 @@ public class TaskDeliveryChoferUpdateService {
         return SINGLE_INSTANCE;
     }
     
-    public String saveWhenEventIsUpdated (EstadoEvento eventStatusChange, Tipo eventTypeChange, Renta currentRenta, Boolean updateItems, String choferId)  throws NoDataFoundException, DataOriginException {
+    public String saveWhenEventIsUpdated (EstadoEvento eventStatusChange, Tipo eventTypeChange, Renta currentRenta, Boolean updateItems, String choferId, Boolean generalDataUpdated)  throws NoDataFoundException, DataOriginException {
         
         TaskCatalogVO taskCatalogVO = taskUtilityValidateUpdateService.validateAndBuild(
                 eventStatusChange,
                 eventTypeChange,
                 currentRenta,
-                updateItems
+                updateItems,
+                generalDataUpdated
         );
         taskCatalogVO.setChoferId(choferId);
         taskCatalogVO.setEventFolio(currentRenta.getFolio()+"");

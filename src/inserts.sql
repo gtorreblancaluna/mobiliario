@@ -34,6 +34,7 @@ INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio
 INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio tipo folio','1');
 INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio tipo y estado folio','1');
 INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio en articulos del folio','1');
+INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio en datos generales del folio','1');
 
 INSERT INTO attend_almacen_tasks_type_catalog (description,fg_active) VALUES ('Sin atender','1');
 INSERT INTO attend_almacen_tasks_type_catalog (description,fg_active) VALUES ('Atendido','1');
