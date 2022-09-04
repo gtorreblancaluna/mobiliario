@@ -89,7 +89,6 @@ public class TaskAlmacenUpdateService {
                     Long.parseLong(AttendAlmacenTaskTypeCatalogVO.AttendAlmacenTaskTypeCatalog.UN_ATTENDED.getId().toString())
             );
             taskAlmacenVO.setAttendAlmacenTaskTypeCatalogVO(attendAlmacenTaskTypeCatalogVO);
-            taskAlmacenVO.setSystemMessage(taskCatalogVO.getSystemMessage());
             
 
             taskAlmacenVO.setCreatedAt(new Date());
@@ -116,7 +115,6 @@ public class TaskAlmacenUpdateService {
         TaskCatalogVO taskCatalogVO = new TaskCatalogVO();
         taskCatalogVO.setRentaId(rentaId+"");
         taskCatalogVO.setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalog.NEW_FOLIO);
-        taskCatalogVO.setSystemMessage(StatusAlmacenTaskCatalog.NEW_FOLIO.getDescription());
         taskCatalogVO.setEventFolio(folio);
         return save(taskCatalogVO);
     }

@@ -286,3 +286,7 @@ INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio
 
 INSERT INTO attend_almacen_tasks_type_catalog (description,fg_active) VALUES ('Sin atender','1');
 INSERT INTO attend_almacen_tasks_type_catalog (description,fg_active) VALUES ('Atendido','1');
+
+
+ALTER TABLE tasks_almacen DROP COLUMN system_message;
+ALTER TABLE tasks_chofer_delivery DROP COLUMN system_message;

@@ -32,7 +32,7 @@
     </update>
     
     <update id="updateInfoPDFSummary" parameterType="model.DatosGenerales">
-        UPDATE datos_generales SET info_summary_folio=#{infoSummaryFolio} WHERE id_datos_generales = 2
+        UPDATE datos_generales SET info_summary_folio=#{infoSummaryFolio}
     </update>
     
     <select id="getDataConfigurationByKey" resultType="java.lang.String" parameterType="java.lang.String" >

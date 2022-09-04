@@ -26,6 +26,7 @@ import model.DatosGenerales;
 import services.SaleService;
 import services.SystemService;
 import services.tasks.almacen.TaskAlmacenUpdateService;
+import services.tasks.deliveryChofer.TaskDeliveryChoferUpdateService;
 import utilities.Utility;
 
 public class IndexForm extends javax.swing.JFrame {
@@ -59,6 +60,7 @@ public class IndexForm extends javax.swing.JFrame {
         generalDataGlobal = systemService.getGeneralData();
         LOGGER.info(">>> datos generales obtenidos: "+generalDataGlobal);
         this.setTitle(generalDataGlobal.getCompanyName().toUpperCase());
+        
 
     }
     
@@ -72,16 +74,19 @@ public class IndexForm extends javax.swing.JFrame {
         map.put("limit", 100000 );
         
         SaleService saleService = SaleService.getInstance();
-        TaskAlmacenUpdateService taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
+        //TaskAlmacenUpdateService taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
+        TaskDeliveryChoferUpdateService taskDeliveryChoferUpdateService = TaskDeliveryChoferUpdateService.getInstance();
         try {
             List<Renta> rentas = saleService.obtenerRentasPorParametros(map);
             LOGGER.info("RENTAS: "+rentas.size());
             
                 for (Renta renta : rentas) {
                     try {
-                        taskAlmacenUpdateService.saveWhenIsNewEvent(
+                        taskDeliveryChoferUpdateService.saveWhenIsNewEvent(
                             Long.parseLong(String.valueOf(renta.getRentaId())), 
-                            String.valueOf(renta.getFolio()));
+                            String.valueOf(renta.getFolio()),
+                            renta.getChofer().getUsuarioId().toString()
+                            );
                     } catch (DataOriginException | NoDataFoundException e) {
                         LOGGER.error(e);
                     }

@@ -41,14 +41,12 @@ public class TaskUtilityValidateUpdateService {
                 {
                     // hubo cambios en los datos generales
                     taskCatalogVO.setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.GENERAL_DATA_UPDATED);
-                    taskCatalogVO.setSystemMessage(StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.GENERAL_DATA_UPDATED.getDescription());
-                    
+                                        
         } else if (updateItems && eventTypeChange.getTipoId().toString().equals(ApplicationConstants.TIPO_PEDIDO)
                 && (eventStatusChange.getEstadoId().toString().equals(ApplicationConstants.ESTADO_APARTADO)))
                 {
                     // hubo cambios en los articulos
                     taskCatalogVO.setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_ITEMS_FOLIO);
-                    taskCatalogVO.setSystemMessage(StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_ITEMS_FOLIO.getDescription());
                     
         } else if (currentRenta.getTipo().getTipoId().toString().equals(ApplicationConstants.TIPO_PEDIDO)
                 && !eventStatusChange.getEstadoId().toString().equals(currentRenta.getEstado().getEstadoId().toString())
@@ -58,35 +56,19 @@ public class TaskUtilityValidateUpdateService {
                 ) {
                     // cambio solo el estado del evento diferente a PENDIENTE
                     taskCatalogVO.setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_STATUS_FOLIO);
-                    taskCatalogVO.setSystemMessage(
-                            StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_STATUS_FOLIO.getDescription() + " [" +
-                                   currentRenta.getEstado().getDescripcion() + " a " + eventStatusChange.getDescripcion() + "]"
-                    );
                                         
         } else if (!eventTypeChange.getTipoId().toString().equals(currentRenta.getTipo().getTipoId().toString())
                     && eventStatusChange.getEstadoId().toString().equals(currentRenta.getEstado().getEstadoId().toString())
                 ){
                     // cambio solo el tipo de evento
                     taskCatalogVO.setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_TYPE_FOLIO);
-                    taskCatalogVO.setSystemMessage(
-                            StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_TYPE_FOLIO.getDescription() + " [" +
-                                   currentRenta.getTipo().getTipo() + " a " + eventTypeChange.getTipo()+ "]"
-                    );
                     
         } else if (!eventTypeChange.getTipoId().toString().equals(currentRenta.getTipo().getTipoId().toString())
                     && !eventStatusChange.getEstadoId().toString().equals(currentRenta.getEstado().getEstadoId().toString())
                 ){
                     // cambio estado y el tipo de evento
                     
-                    taskCatalogVO.setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_TYPE_AND_STATUS_FOLIO);
-                    taskCatalogVO.setSystemMessage(
-                            StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_TYPE_AND_STATUS_FOLIO.getDescription() 
-                                        + " Tipo: [" +
-                                            currentRenta.getTipo().getTipo() + " a " + eventTypeChange.getTipo()
-                                            + "], Estado: [" +
-                                            currentRenta.getEstado().getDescripcion() + " a " + eventStatusChange.getDescripcion()+"]"
-                    );
-                    
+                    taskCatalogVO.setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_TYPE_AND_STATUS_FOLIO);                    
         } else {
            throw new NoDataFoundException(""
                    + "No se generaron tareas, ya que no coincidio con las reglas operativas actuales\n"

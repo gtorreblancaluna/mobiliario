@@ -7,7 +7,6 @@ public class TaskCatalogVO {
     private String rentaId;
     private String eventFolio;
     private StatusAlmacenTaskCatalog statusAlmacenTaskCatalog;
-    private String systemMessage;
     private String choferId;
 
     public String getEventFolio() {
@@ -41,15 +40,5 @@ public class TaskCatalogVO {
     public void setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalog statusAlmacenTaskCatalog) {
         this.statusAlmacenTaskCatalog = statusAlmacenTaskCatalog;
     }
-
-    public String getSystemMessage() {
-        return systemMessage;
-    }
-
-    public void setSystemMessage(String systemMessage) {
-        this.systemMessage = systemMessage;
-    }
-    
-    
     
 }

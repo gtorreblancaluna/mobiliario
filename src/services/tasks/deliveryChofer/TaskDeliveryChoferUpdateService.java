@@ -71,7 +71,6 @@ public class TaskDeliveryChoferUpdateService {
                 Long.parseLong(AttendAlmacenTaskTypeCatalogVO.AttendAlmacenTaskTypeCatalog.UN_ATTENDED.getId().toString())
         );
         taskChoferDeliveryVO.setAttendAlmacenTaskTypeCatalogVO(attendAlmacenTaskTypeCatalogVO);
-        taskChoferDeliveryVO.setSystemMessage(taskCatalogVO.getSystemMessage());
         
         taskChoferDeliveryVO.setCreatedAt(new Date());
         taskChoferDeliveryVO.setUpdatedAt(new Date());
@@ -89,7 +88,6 @@ public class TaskDeliveryChoferUpdateService {
         TaskCatalogVO taskCatalogVO = new TaskCatalogVO();
         taskCatalogVO.setRentaId(rentaId+"");
         taskCatalogVO.setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.NEW_FOLIO);
-        taskCatalogVO.setSystemMessage(StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.NEW_FOLIO.getDescription());
         taskCatalogVO.setEventFolio(eventFolio);
         taskCatalogVO.setChoferId(choferId);
         return save(taskCatalogVO);

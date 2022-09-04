@@ -12,7 +12,6 @@
             status_almacen_tasks_catalog_id,
             attend_almacen_tasks_type_catalog_id,
             user_id,
-            system_message,
             created_at,
             updated_at,
             fg_active
@@ -23,7 +22,6 @@
           #{statusAlmacenTaskCatalogVO.id},
           #{attendAlmacenTaskTypeCatalogVO.id},
           #{user.usuarioId},
-          #{systemMessage},
           #{createdAt},
           #{updatedAt},
           #{fgActive}
