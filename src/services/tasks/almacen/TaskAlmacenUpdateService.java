@@ -36,7 +36,12 @@ public class TaskAlmacenUpdateService {
         return SINGLE_INSTANCE;
     }
     
-    public String saveWhenEventIsUpdated (EstadoEvento eventStatusChange, Tipo eventTypeChange, Renta currentRenta, Boolean updateItems, Boolean generalDataUpdated)  throws NoDataFoundException, DataOriginException {
+    public String saveWhenEventIsUpdated (final EstadoEvento eventStatusChange, 
+            final Tipo eventTypeChange,
+            final Renta currentRenta,
+            final Boolean updateItems,
+            final Boolean generalDataUpdated,
+            final String userId)  throws NoDataFoundException, DataOriginException {
         
         TaskCatalogVO taskCatalogVO = taskUtilityValidateUpdateService.validateAndBuild(
                 eventStatusChange,
@@ -45,6 +50,7 @@ public class TaskAlmacenUpdateService {
                 updateItems,
                 generalDataUpdated
         );
+        taskCatalogVO.setUserId(userId);
         taskCatalogVO.setEventFolio(String.valueOf(currentRenta.getFolio()));
         return save (taskCatalogVO); 
     }
@@ -68,7 +74,7 @@ public class TaskAlmacenUpdateService {
                 .append(taskCatalogVO.getEventFolio())
                 .append("]")
                 .append("\n");
-        for (Usuario user : usersInCategories) {
+        for (Usuario userByCategory : usersInCategories) {
             
             TaskAlmacenVO taskAlmacenVO = new TaskAlmacenVO();
             // renta
@@ -80,8 +86,13 @@ public class TaskAlmacenUpdateService {
             StatusAlmacenTaskCatalogVO statusAlmacenTaskCatalogVO = new StatusAlmacenTaskCatalogVO();
             statusAlmacenTaskCatalogVO.setId(taskCatalogVO.getStatusAlmacenTaskCatalog().getId());
             taskAlmacenVO.setStatusAlmacenTaskCatalogVO(statusAlmacenTaskCatalogVO);
-
+            
+            //user
+            Usuario user = new Usuario();
+            user.setUsuarioId(Integer.parseInt(taskCatalogVO.getUserId()));
             taskAlmacenVO.setUser(user);
+
+            taskAlmacenVO.setUserByCategory(userByCategory);
             
             // attend
             AttendAlmacenTaskTypeCatalogVO attendAlmacenTaskTypeCatalogVO = new AttendAlmacenTaskTypeCatalogVO();
@@ -98,24 +109,25 @@ public class TaskAlmacenUpdateService {
                     .append(++count)
                     .append("]. ")
                     .append("Tarea almacen generada. para el usuario: ")
-                    .append(user.getNombre()).append(" ").append(user.getApellidos())
+                    .append(userByCategory.getNombre()).append(" ").append(userByCategory.getApellidos())
                     ;
             stringBuilder.append("\n");
             
             taskAlmacenVO.setFgActive("1");
             taskAlmacenUpdateDAO.save(taskAlmacenVO);
-            LOGGER.info(String.format("Se ha generado tarea almacen para el evento id: %s, user id: %s",taskCatalogVO.getRentaId(),user.getUsuarioId()));
+            LOGGER.info(String.format("Se ha generado tarea almacen para el evento id: %s, user by category id: %s",taskCatalogVO.getRentaId(),userByCategory.getUsuarioId()));
             
         }
         
         return stringBuilder.toString();
     }
     
-    public String saveWhenIsNewEvent (Long rentaId, String folio) throws NoDataFoundException, DataOriginException{
+    public String saveWhenIsNewEvent (Long rentaId, String folio, String userId) throws NoDataFoundException, DataOriginException{
         TaskCatalogVO taskCatalogVO = new TaskCatalogVO();
         taskCatalogVO.setRentaId(rentaId+"");
         taskCatalogVO.setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalog.NEW_FOLIO);
         taskCatalogVO.setEventFolio(folio);
+        taskCatalogVO.setUserId(userId);
         return save(taskCatalogVO);
     }
     

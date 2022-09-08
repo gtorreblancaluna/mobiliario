@@ -85,7 +85,8 @@ public class IndexForm extends javax.swing.JFrame {
                         taskDeliveryChoferUpdateService.saveWhenIsNewEvent(
                             Long.parseLong(String.valueOf(renta.getRentaId())), 
                             String.valueOf(renta.getFolio()),
-                            renta.getChofer().getUsuarioId().toString()
+                            renta.getChofer().getUsuarioId().toString(),
+                            iniciar_sesion.usuarioGlobal.getUsuarioId().toString()
                             );
                     } catch (DataOriginException | NoDataFoundException e) {
                         LOGGER.error(e);

@@ -31,7 +31,13 @@ public class TaskDeliveryChoferUpdateService {
         return SINGLE_INSTANCE;
     }
     
-    public String saveWhenEventIsUpdated (EstadoEvento eventStatusChange, Tipo eventTypeChange, Renta currentRenta, Boolean updateItems, String choferId, Boolean generalDataUpdated)  throws NoDataFoundException, DataOriginException {
+    public String saveWhenEventIsUpdated (final EstadoEvento eventStatusChange,
+            final Tipo eventTypeChange,
+            final Renta currentRenta,
+            final Boolean updateItems,
+            final String choferId,
+            final Boolean generalDataUpdated,
+            final String userId)  throws NoDataFoundException, DataOriginException {
         
         TaskCatalogVO taskCatalogVO = taskUtilityValidateUpdateService.validateAndBuild(
                 eventStatusChange,
@@ -42,6 +48,7 @@ public class TaskDeliveryChoferUpdateService {
         );
         taskCatalogVO.setChoferId(choferId);
         taskCatalogVO.setEventFolio(currentRenta.getFolio()+"");
+        taskCatalogVO.setUserId(userId);
         
         return save (taskCatalogVO); 
     }
@@ -65,6 +72,11 @@ public class TaskDeliveryChoferUpdateService {
         chofer.setUsuarioId(Integer.parseInt(taskCatalogVO.getChoferId()));
         taskChoferDeliveryVO.setChofer(chofer);
         
+        //user
+        Usuario user = new Usuario();
+        user.setUsuarioId(Integer.parseInt(taskCatalogVO.getUserId()));
+        taskChoferDeliveryVO.setUser(user);
+        
         // attend
         AttendAlmacenTaskTypeCatalogVO attendAlmacenTaskTypeCatalogVO = new AttendAlmacenTaskTypeCatalogVO();
         attendAlmacenTaskTypeCatalogVO.setId(
@@ -84,12 +96,16 @@ public class TaskDeliveryChoferUpdateService {
         return message;
     }
     
-     public String saveWhenIsNewEvent (Long rentaId, String eventFolio, String choferId) throws NoDataFoundException, DataOriginException{
+     public String saveWhenIsNewEvent (final Long rentaId,
+             final String eventFolio,
+             final String choferId,
+             final String userId) throws NoDataFoundException, DataOriginException{
         TaskCatalogVO taskCatalogVO = new TaskCatalogVO();
         taskCatalogVO.setRentaId(rentaId+"");
         taskCatalogVO.setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.NEW_FOLIO);
         taskCatalogVO.setEventFolio(eventFolio);
         taskCatalogVO.setChoferId(choferId);
+        taskCatalogVO.setUserId(userId);
         return save(taskCatalogVO);
     }
     

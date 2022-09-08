@@ -8,9 +8,29 @@ public class ParameterOrderProvider {
     private Integer limit;
     private Timestamp initDate;
     private Timestamp endDate;
+    private Timestamp initEventDate;
+    private Timestamp endEventDate;
     private String nameProvider;
     private String status;
     private Integer folioRenta;
+
+    public Timestamp getInitEventDate() {
+        return initEventDate;
+    }
+
+    public void setInitEventDate(Timestamp initEventDate) {
+        this.initEventDate = initEventDate;
+    }
+
+    public Timestamp getEndEventDate() {
+        return endEventDate;
+    }
+
+    public void setEndEventDate(Timestamp endEventDate) {
+        this.endEventDate = endEventDate;
+    }
+    
+    
 
     public Integer getOrderId() {
         return orderId;

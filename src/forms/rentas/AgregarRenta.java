@@ -951,7 +951,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 String message;
                 try {
                     taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
-                    message = taskAlmacenUpdateService.saveWhenIsNewEvent(Long.parseLong(id_ultima_renta), folio);
+                    message = taskAlmacenUpdateService.saveWhenIsNewEvent(Long.parseLong(id_ultima_renta), folio, iniciar_sesion.usuarioGlobal.getUsuarioId().toString());
                 } catch (NoDataFoundException e) {
                     message = e.getMessage();
                     log.error(message);
@@ -966,7 +966,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 String message;
                 try {
                     taskDeliveryChoferUpdateService = TaskDeliveryChoferUpdateService.getInstance();
-                    taskDeliveryChoferUpdateService.saveWhenIsNewEvent(Long.parseLong(id_ultima_renta), folio,id_chofer);
+                    taskDeliveryChoferUpdateService.saveWhenIsNewEvent(Long.parseLong(id_ultima_renta), folio,id_chofer, iniciar_sesion.usuarioGlobal.getUsuarioId().toString());
                     message = String.format("Tarea 'entrega chofer' generada. Folio: %s, chofer: %s",folio,cmb_chofer.getSelectedItem());
                 } catch (DataOriginException | NoDataFoundException e) {
                     message = e.getMessage();

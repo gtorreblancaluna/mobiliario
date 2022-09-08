@@ -11,20 +11,22 @@
             renta_id,
             status_almacen_tasks_catalog_id,
             attend_almacen_tasks_type_catalog_id,
-            user_id,
+            user_by_category_id,
             created_at,
             updated_at,
-            fg_active
+            fg_active,
+            user_id
         )
         VALUES
         (
           #{renta.rentaId},
           #{statusAlmacenTaskCatalogVO.id},
           #{attendAlmacenTaskTypeCatalogVO.id},
-          #{user.usuarioId},
+          #{userByCategory.usuarioId},
           #{createdAt},
           #{updatedAt},
-          #{fgActive}
+          #{fgActive},
+          #{user.usuarioId}
         )
     </insert>
   

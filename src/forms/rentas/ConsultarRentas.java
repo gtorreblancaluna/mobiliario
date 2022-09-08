@@ -1305,7 +1305,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             String messageSaveWhenEventIsUpdated;
             try {
                 messageSaveWhenEventIsUpdated = taskAlmacenUpdateService
-                    .saveWhenEventIsUpdated(estadoEventoSelected, tipoSelected, globalRenta, updateItemsInFolio, generalDataUpdated);
+                    .saveWhenEventIsUpdated(estadoEventoSelected, tipoSelected, globalRenta, updateItemsInFolio, generalDataUpdated, iniciar_sesion.usuarioGlobal.getUsuarioId().toString());
             } catch (NoDataFoundException e) {
                 messageSaveWhenEventIsUpdated = e.getMessage();
                 log.error(messageSaveWhenEventIsUpdated);
@@ -1322,7 +1322,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             try {
                 taskDeliveryChoferUpdateService = TaskDeliveryChoferUpdateService.getInstance();
                 taskDeliveryChoferUpdateService.saveWhenEventIsUpdated(
-                        estadoEventoSelected, tipoSelected, globalRenta, updateItemsInFolio, id_chofer ,generalDataUpdated
+                        estadoEventoSelected, tipoSelected, globalRenta, updateItemsInFolio, id_chofer ,generalDataUpdated,
+                        iniciar_sesion.usuarioGlobal.getUsuarioId().toString()
                 );
                 message = String.format("Tarea 'entrega chofer' generada. Folio: %s, chofer: %s",globalRenta.getFolio(),cmb_chofer.getSelectedItem());
             } catch (DataOriginException | NoDataFoundException e) {
@@ -1547,27 +1548,27 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         try {
             
             if(!this.txtPorcentajeDescuento.getText().equals(""))
-                fPorcentaejeDescuento = Float.parseFloat(this.txtPorcentajeDescuento.getText().toString().replaceAll(",", ""));
+                fPorcentaejeDescuento = Float.parseFloat(this.txtPorcentajeDescuento.getText().replaceAll(",", ""));
             
             if(!this.txt_subtotal.getText().equals("") )
-                fSubtotal = Float.parseFloat(this.txt_subtotal.getText().toString().replaceAll(",", ""));
+                fSubtotal = Float.parseFloat(this.txt_subtotal.getText().replaceAll(",", ""));
             
             if(!this.txt_descuento.getText().equals(""))
-                fDescuento = Float.parseFloat(this.txt_descuento.getText().toString().replaceAll(",", ""));
+                fDescuento = Float.parseFloat(this.txt_descuento.getText().replaceAll(",", ""));
             
             if(!this.txt_envioRecoleccion.getText().equals(""))
-                fEnvioRecoleccion = Float.parseFloat(this.txt_envioRecoleccion.getText().toString().replaceAll(",", ""));
+                fEnvioRecoleccion = Float.parseFloat(this.txt_envioRecoleccion.getText().replaceAll(",", ""));
             
             if(!this.txt_depositoGarantia.getText().equals(""))
-                fDepositoGarantia = Float.parseFloat(this.txt_depositoGarantia.getText().toString().replaceAll(",", ""));
+                fDepositoGarantia = Float.parseFloat(this.txt_depositoGarantia.getText().replaceAll(",", ""));
             
             if(!this.txt_abonos.getText().equals(""))
-                fAbonos = Float.parseFloat(this.txt_abonos.getText().toString().replaceAll(",", ""));      
+                fAbonos = Float.parseFloat(this.txt_abonos.getText().replaceAll(",", ""));      
             
             if(fPorcentaejeDescuento == 0)
                 this.txt_descuento.setText(decimalFormat.format(0));
             if(!this.txt_faltantes.equals(""))
-                fFaltantes = Float.parseFloat(this.txt_faltantes.getText().toString().replaceAll(",", ""));
+                fFaltantes = Float.parseFloat(this.txt_faltantes.getText().replaceAll(",", ""));
             
           
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento;
@@ -2618,9 +2619,19 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         panel_datos_generales.add(txt_descuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 40, 80, -1));
 
         txt_envioRecoleccion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_envioRecoleccion.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_envioRecoleccionKeyPressed(evt);
+            }
+        });
         panel_datos_generales.add(txt_envioRecoleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 60, 120, 20));
 
         txt_depositoGarantia.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_depositoGarantia.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_depositoGarantiaKeyPressed(evt);
+            }
+        });
         panel_datos_generales.add(txt_depositoGarantia, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 80, 120, 20));
 
         txt_total_iva.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -4374,7 +4385,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         if (evt.getKeyCode() == 10) {
             // presiono enter
             total();
-            // lbl_aviso.setText("Se aplico con exito el IVA ...");
             Toolkit.getDefaultToolkit().beep();
         }
     }//GEN-LAST:event_txt_ivaKeyPressed
@@ -4395,10 +4405,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
     private void txtPorcentajeDescuentoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPorcentajeDescuentoKeyPressed
         if (evt.getKeyCode() == 10) {
-            if (txt_subtotal.getText().toString().equals("")) {
+            if (txt_subtotal.getText().equals("")) {
                 JOptionPane.showMessageDialog(null, "Es necesario incluir subtotal para realizar el calculo", "ERROR", JOptionPane.INFORMATION_MESSAGE);
                 Toolkit.getDefaultToolkit().beep();
-
             } else {
                 total();
                 Toolkit.getDefaultToolkit().beep();
@@ -4754,7 +4763,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         String message;
         try {
             taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
-            message = taskAlmacenUpdateService.saveWhenIsNewEvent(Long.parseLong(String.valueOf(globalRenta.getRentaId())), String.valueOf(globalRenta.getFolio()));
+            message = taskAlmacenUpdateService.saveWhenIsNewEvent(Long.parseLong(String.valueOf(globalRenta.getRentaId())), String.valueOf(globalRenta.getFolio()), iniciar_sesion.usuarioGlobal.getUsuarioId().toString());
         } catch (NoDataFoundException e) {
             message = e.getMessage();
             log.error(message);
@@ -4765,6 +4774,20 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         Utility.pushNotification(message);
         JOptionPane.showMessageDialog(this, message, "Tareas almacen", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jbtnGenerateTaskAlmacenActionPerformed
+
+    private void txt_envioRecoleccionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_envioRecoleccionKeyPressed
+        if (evt.getKeyCode() == 10) {
+                total();
+                Toolkit.getDefaultToolkit().beep();
+        }
+    }//GEN-LAST:event_txt_envioRecoleccionKeyPressed
+
+    private void txt_depositoGarantiaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_depositoGarantiaKeyPressed
+       if (evt.getKeyCode() == 10) {
+                total();
+                Toolkit.getDefaultToolkit().beep();
+        }
+    }//GEN-LAST:event_txt_depositoGarantiaKeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

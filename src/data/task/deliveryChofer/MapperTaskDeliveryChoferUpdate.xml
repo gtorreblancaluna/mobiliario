@@ -14,7 +14,8 @@
             chofer_id,
             created_at,
             updated_at,
-            fg_active
+            fg_active,
+            user_id
         )
         VALUES
         (
@@ -24,7 +25,8 @@
           #{chofer.usuarioId},
           #{createdAt},
           #{updatedAt},
-          #{fgActive}
+          #{fgActive},
+          #{user.usuarioId}
         )
     </insert>
   

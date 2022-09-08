@@ -586,10 +586,11 @@ CREATE TABLE tasks_almacen (
   renta_id INT(11) NOT NULL,
   status_almacen_tasks_catalog_id INT(11) NOT NULL,
   attend_almacen_tasks_type_catalog_id INT(11) NOT NULL,
-  user_id INT(11) NOT NULL,
+  user_by_category_id INT(11) NOT NULL,
   created_at TIMESTAMP NULL DEFAULT NULL,
   updated_at TIMESTAMP NULL DEFAULT NULL,
   fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  user_id INT(11) NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT fk_tasks_almacen_renta
     FOREIGN KEY (renta_id)
@@ -607,6 +608,11 @@ CREATE TABLE tasks_almacen (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT fk_tasks_almacen_user_id
+    FOREIGN KEY (user_by_category_id)
+    REFERENCES usuarios (id_usuarios)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_tasks_almacen_user2_id
     FOREIGN KEY (user_id)
     REFERENCES usuarios (id_usuarios)
     ON DELETE NO ACTION
@@ -622,6 +628,7 @@ CREATE TABLE tasks_chofer_delivery (
   created_at TIMESTAMP NULL DEFAULT NULL,
   updated_at TIMESTAMP NULL DEFAULT NULL,
   fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  user_id INT(11) NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT fk_tasks_chofer_delivery_renta
     FOREIGN KEY (renta_id)
@@ -640,6 +647,11 @@ CREATE TABLE tasks_chofer_delivery (
     ON UPDATE NO ACTION,
   CONSTRAINT fk_tasks_chofer_delivery_chofer_id
     FOREIGN KEY (chofer_id)
+    REFERENCES usuarios (id_usuarios)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_tasks_chofer_delivery_user_id
+    FOREIGN KEY (user_id)
     REFERENCES usuarios (id_usuarios)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION

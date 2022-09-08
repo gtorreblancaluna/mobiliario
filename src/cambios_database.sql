@@ -266,7 +266,7 @@ INSERT INTO tipo_detalle_orden_proveedor (description,created_at,updated_at) VAL
 INSERT INTO tipo_detalle_orden_proveedor (description,created_at,updated_at) VALUES ('Renta','2022-04-22','2022-04-22');
 
 -- modificar id tipo de orden
-ALTER TABLE detalle_orden_proveedor CHANGE COLUMN tipo_orden tipo_orden_detalle_proveedor_id INT(11) NOT NULL;;
+ALTER TABLE detalle_orden_proveedor CHANGE COLUMN tipo_orden tipo_orden_detalle_proveedor_id INT(11) NOT NULL;
 
 ALTER TABLE detalle_orden_proveedor
 ADD CONSTRAINT FK_detalle_orden_proveedor_id FOREIGN KEY (tipo_orden_detalle_proveedor_id)
@@ -290,3 +290,14 @@ INSERT INTO attend_almacen_tasks_type_catalog (description,fg_active) VALUES ('A
 
 ALTER TABLE tasks_almacen DROP COLUMN system_message;
 ALTER TABLE tasks_chofer_delivery DROP COLUMN system_message;
+
+-- modificar columna
+ALTER TABLE tasks_almacen CHANGE COLUMN user_id user_by_category_id INT(11) NOT NULL;
+
+-- agregar columna 
+ALTER TABLE tasks_almacen ADD COLUMN user_id INT(11) NOT NULL DEFAULT 12 AFTER fg_active,
+ADD FOREIGN KEY fk_tasks_almacen_user2_id(user_id) REFERENCES usuarios(id_usuarios) ON DELETE CASCADE;
+
+-- agregar columna 
+ALTER TABLE tasks_chofer_delivery ADD COLUMN user_id INT(11) NOT NULL DEFAULT 12 AFTER fg_active,
+ADD FOREIGN KEY fk_tasks_chofer_delivery_user_id(user_id) REFERENCES usuarios(id_usuarios) ON DELETE CASCADE;

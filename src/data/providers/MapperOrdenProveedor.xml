@@ -133,6 +133,9 @@
         </if>  
         <if test="initDate != null and endDate != null ">
             AND o.creado BETWEEN #{initDate} AND #{endDate}
+        </if>
+        <if test="initEventDate != null and endEventDate != null ">
+            AND STR_TO_DATE(r.fecha_evento,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initEventDate},'%d/%m/%Y') AND STR_TO_DATE(#{endEventDate},'%d/%m/%Y')
         </if>  
         <if test="status != null and status != '' ">
             AND o.status = #{status}
