@@ -985,31 +985,30 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             Toolkit.getDefaultToolkit().beep();
             return;
         }
-                String fechaPago = "";
-                if (cmb_fecha_pago.getDate() != null )
-                    fechaPago = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_pago.getDate());            
-                fecha_sistema();
-                // funcion.conectate();
-                String tipoAbonoId = funcion.GetData("id_tipo_abono", "SELECT id_tipo_abono FROM tipo_abono "
-                    + "WHERE descripcion='" + cmbTipoPago.getSelectedItem().toString() + "'");
-                String datos[] = {id_renta, iniciar_sesion.id_usuario_global, fecha_sistema, txt_abono.getText().toString(),
-                    txt_comentario.getText(),fechaPago,tipoAbonoId};
-                try {
-                     funcion.InsertarRegistro(datos, "INSERT INTO abonos (id_renta,id_usuario,fecha,abono,comentario,fecha_pago,id_tipo_abono) VALUES (?,?,?,?,?,?,?)");
-                } catch (SQLException ex) {                
-                    JOptionPane.showMessageDialog(null, "Error al insertar registro "+ex, "Error", JOptionPane.ERROR);                    
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR);
-                }
-               
-                // funcion.desconecta();
-                tabla_abonos(id_renta);
-                calcularAbonos();
-                
-                subTotal();
-                total();
-                editar_abonos = false;
-                txt_abono.setText("0");
+        String fechaPago = "";
+        if (cmb_fecha_pago.getDate() != null )
+            fechaPago = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_pago.getDate());            
+        fecha_sistema();
+        // funcion.conectate();
+        String tipoAbonoId = funcion.GetData("id_tipo_abono", "SELECT id_tipo_abono FROM tipo_abono "
+            + "WHERE descripcion='" + cmbTipoPago.getSelectedItem().toString() + "'");
+        String datos[] = {id_renta, iniciar_sesion.id_usuario_global, fecha_sistema, txt_abono.getText().toString(),
+            txt_comentario.getText(),fechaPago,tipoAbonoId};
+        try {
+             funcion.InsertarRegistro(datos, "INSERT INTO abonos (id_renta,id_usuario,fecha,abono,comentario,fecha_pago,id_tipo_abono) VALUES (?,?,?,?,?,?,?)");
+        } catch (SQLException ex) {                
+            JOptionPane.showMessageDialog(null, "Error al insertar registro "+ex, "Error", JOptionPane.ERROR);                    
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR);
+        }
+
+        tabla_abonos(id_renta);
+        calcularAbonos();
+
+        subTotal();
+        total();
+        editar_abonos = false;
+        cleanPaymentsDataForm();
            
             
         
@@ -3791,10 +3790,17 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             
             datos_cliente(Integer.parseInt(globalRenta.getCliente().getId().toString()));
             disableEvent();
+            cleanPaymentsDataForm();
             
         }
     }//GEN-LAST:event_tabla_prox_rentasMouseClicked
 
+    private void cleanPaymentsDataForm () {
+        cmbTipoPago.setSelectedIndex(0);
+        txt_abono.setText("");
+        txt_comentario.setText("");
+        cmb_fecha_pago.setDate(null);
+    }
     private void jbtn_refrescarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_refrescarActionPerformed
        initalData();
     }//GEN-LAST:event_jbtn_refrescarActionPerformed
