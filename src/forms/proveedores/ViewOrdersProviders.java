@@ -12,6 +12,7 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -150,7 +151,8 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                         "id_renta",
                         "Subtotal",
                         "Pagos",
-                        "Total"
+                        "Total",
+                        "Fecha Evento"
         };
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
         this.tableViewOrdersProviders.setModel(tableModel);
@@ -158,7 +160,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
         tableViewOrdersProviders.setRowSorter(ordenarTabla);
 
-        int[] anchos = {20,20,80,40,40, 80,100,100,20,80,60,60};
+        int[] anchos = {20,20,80,40,40, 80,100,100,20,80,60,60,60};
 
         for (int inn = 0; inn < tableViewOrdersProviders.getColumnCount(); inn++) {
             tableViewOrdersProviders.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -238,8 +240,15 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
             parameter.setEndDate(new Timestamp(txtSearchEndDate.getDate().getTime()));
         }
         if(this.txtSearchInitialEventDate.getDate() != null && this.txtSearchEndEventDate.getDate() != null){
-            parameter.setInitDate(new Timestamp(txtSearchInitialEventDate.getDate().getTime()));
-            parameter.setEndDate(new Timestamp(txtSearchEndEventDate.getDate().getTime()));
+            try {
+                String formatDate = "dd/MM/yyyy";
+                parameter.setInitEventDate(UtilityCommon.getStringFromDate(txtSearchInitialEventDate.getDate(),formatDate));
+                parameter.setEndEventDate(UtilityCommon.getStringFromDate(txtSearchEndEventDate.getDate(),formatDate));
+            } catch (ParseException e) {
+                LOGGER.error(e);
+                JOptionPane.showMessageDialog(null, e, "ERROR", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         }
         if(!this.cmbStatus.getModel().getSelectedItem().equals(ApplicationConstants.CMB_SELECCIONE)){
             parameter.setStatus(this.cmbStatus.getSelectedItem().toString());
@@ -280,7 +289,8 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
               orden.getRenta().getRentaId(),             
               decimalFormat.format(orden.getTotal()),
               decimalFormat.format(orden.getAbonos()),
-              decimalFormat.format((orden.getTotal() - orden.getAbonos()))
+              decimalFormat.format((orden.getTotal() - orden.getAbonos())),
+              orden.getRenta().getFechaEvento()
             };
             tableModel.addRow(fila);
      

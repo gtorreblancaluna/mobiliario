@@ -8,27 +8,30 @@ public class ParameterOrderProvider {
     private Integer limit;
     private Timestamp initDate;
     private Timestamp endDate;
-    private Timestamp initEventDate;
-    private Timestamp endEventDate;
+    private String initEventDate;
+    private String endEventDate;
     private String nameProvider;
     private String status;
     private Integer folioRenta;
 
-    public Timestamp getInitEventDate() {
+    public String getInitEventDate() {
         return initEventDate;
     }
 
-    public void setInitEventDate(Timestamp initEventDate) {
+    public void setInitEventDate(String initEventDate) {
         this.initEventDate = initEventDate;
     }
 
-    public Timestamp getEndEventDate() {
+    public String getEndEventDate() {
         return endEventDate;
     }
 
-    public void setEndEventDate(Timestamp endEventDate) {
+    public void setEndEventDate(String endEventDate) {
         this.endEventDate = endEventDate;
     }
+
+   
+
     
     
 

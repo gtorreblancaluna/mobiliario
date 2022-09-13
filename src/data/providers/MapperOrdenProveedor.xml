@@ -44,6 +44,8 @@
         <result property="renta.rentaId" column="renta_id"/>
         <result property="renta.folio" column="renta_folio"/>
         <result property="renta.descripcion" column="renta_descripcion"/>
+        <result property="renta.descripcion" column="renta_descripcion"/>
+        <result property="renta.fechaEvento" column="renta_fecha_evento"/>
         <!-- datos usuario -->
         <result property="usuario.nombre" column="usuario_nombre"/>
         <result property="usuario.apellidos" column="usuario_apellidos"/>
@@ -99,6 +101,7 @@
             r.id_renta AS renta_id,
             r.folio AS renta_folio,
             r.descripcion AS renta_descripcion,
+            r.fecha_evento AS renta_fecha_evento,
             u.nombre AS usuario_nombre,
             u.apellidos AS usuario_apellidos,
             p.id AS proveedor_id,

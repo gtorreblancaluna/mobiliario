@@ -21,7 +21,7 @@ public class OrdenProveedor {
     private List<DetalleOrdenProveedor> detalleOrdenProveedorList;
     private List<PagosProveedor> pagosProveedor;
     private String comentario;
-    
+
     // estas variables son para calcular y mostrar en la vista
     private Float abonos;
     private Float total;
