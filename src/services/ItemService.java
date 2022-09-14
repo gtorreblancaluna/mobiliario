@@ -279,8 +279,7 @@ public class ItemService {
                                     (articulo.getAccidenteTrabajo() != null ? articulo.getAccidenteTrabajo() : 0F )
                                 ) +
                                         (articulo.getDevolucion() != null ? articulo.getDevolucion() : 0F ) + 
-                                        (articulo.getTotalCompras() != null ? articulo.getTotalCompras() : 0F  )+
-                                        (articulo.getTotalShopProvider() != null ? articulo.getTotalShopProvider() : 0F );
+                                        (articulo.getTotalCompras() != null ? articulo.getTotalCompras() : 0F  );
     }
     
     public List<Articulo> obtenerArticulosBusquedaInventario(Map<String,Object> map) throws DataOriginException {
@@ -296,8 +295,7 @@ public class ItemService {
         if(!articulos.isEmpty()){
             for(Articulo articulo : articulos){    
                 articulo.setUtiles(utilesCalculate(articulo));
-                articulo.setTotalCompras( (articulo.getTotalCompras() != null ? articulo.getTotalCompras() : 0F) + 
-                            (articulo.getTotalShopProvider() != null ? articulo.getTotalShopProvider() : 0F ));
+                articulo.setTotalCompras( (articulo.getTotalCompras() != null ? articulo.getTotalCompras() : 0F));
             } // end for articulos
         }
          
