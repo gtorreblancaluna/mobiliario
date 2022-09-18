@@ -276,6 +276,7 @@ public class ItemService {
                                     (articulo.getCantidad() != null ? articulo.getCantidad() : 0F)  -
                                     (articulo.getFaltantes() != null ? articulo.getFaltantes() : 0F) -
                                     (articulo.getReparacion() != null ? articulo.getReparacion() : 0F ) -
+                                    (articulo.getRentados()!= null ? articulo.getRentados() : 0F ) -
                                     (articulo.getAccidenteTrabajo() != null ? articulo.getAccidenteTrabajo() : 0F )
                                 ) +
                                         (articulo.getDevolucion() != null ? articulo.getDevolucion() : 0F ) + 
@@ -289,13 +290,22 @@ public class ItemService {
        map.put("statusOrderFinish", ApplicationConstants.STATUS_ORDER_PROVIDER_FINISH);
        map.put("statusOrder", ApplicationConstants.STATUS_ORDER_PROVIDER_ORDER);
        map.put("typeOrderDetail", ApplicationConstants.TYPE_DETAIL_ORDER_SHOPPING);
+       
+       map.put("estado_renta", ApplicationConstants.ESTADO_EN_RENTA);
+       map.put("tipo_pedido", ApplicationConstants.TIPO_PEDIDO);
         
         List<Articulo> articulos = itemDao.obtenerArticulosBusquedaInventario(map);
         
         if(!articulos.isEmpty()){
-            for(Articulo articulo : articulos){    
+            for(Articulo articulo : articulos){
                 articulo.setUtiles(utilesCalculate(articulo));
                 articulo.setTotalCompras( (articulo.getTotalCompras() != null ? articulo.getTotalCompras() : 0F));
+                articulo.setDevolucion((articulo.getDevolucion() != null ? articulo.getDevolucion() : 0F));
+                articulo.setCantidad((articulo.getCantidad() != null ? articulo.getCantidad() : 0F));
+                articulo.setFaltantes((articulo.getFaltantes() != null ? articulo.getFaltantes() : 0F));
+                articulo.setReparacion((articulo.getReparacion() != null ? articulo.getReparacion() : 0F));
+                articulo.setRentados((articulo.getRentados() != null ? articulo.getRentados() : 0F));
+                articulo.setAccidenteTrabajo((articulo.getAccidenteTrabajo() != null ? articulo.getAccidenteTrabajo() : 0F));
             } // end for articulos
         }
          

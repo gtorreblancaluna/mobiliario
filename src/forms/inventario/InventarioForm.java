@@ -56,6 +56,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     // variable para mandar a la ventana de agregar articulo
     private List<Articulo> articulos = new ArrayList<>();
     private final UtilityService utilityService = UtilityService.getInstance();
+    private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0" );
 
     public InventarioForm() {
 
@@ -204,9 +205,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         map.put("categoria", categoria);
         map.put("color", color);
         map.put("descripcion", txt_descripcion2.getText());
-           
-        map.put("estado_renta", ApplicationConstants.ESTADO_EN_RENTA);
-        map.put("tipo_pedido", ApplicationConstants.TIPO_PEDIDO);
         
         List<Articulo> articulos = null;
         try {
@@ -231,14 +229,17 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             Object fila[] = {
                   articulo.getArticuloId()+"",
                   articulo.getCodigo(),
-                  articulo.getCantidad(),
-                  articulo.getRentados(),
-                  articulo.getFaltantes(),
-                  articulo.getReparacion(),
-                  articulo.getAccidenteTrabajo(),
-                  articulo.getDevolucion(),
-                  articulo.getTotalCompras(),
-                  articulo.getUtiles(),
+                  articulo.getCantidad() != 0 ? decimalFormat.format(articulo.getCantidad()) : "",
+                  articulo.getRentados() != 0 ? decimalFormat.format(articulo.getRentados()) : "",
+                  
+                  articulo.getFaltantes() != 0 ? decimalFormat.format(articulo.getFaltantes()) : "",
+                  articulo.getReparacion() != 0 ? decimalFormat.format(articulo.getReparacion()) : "",
+                  articulo.getAccidenteTrabajo() != 0 ? decimalFormat.format(articulo.getAccidenteTrabajo()) : "",
+                  articulo.getDevolucion() != 0 ? decimalFormat.format(articulo.getDevolucion()) : "",
+                  articulo.getTotalCompras() != 0 ? decimalFormat.format(articulo.getTotalCompras()) : "",
+                  articulo.getUtiles() != 0 ? decimalFormat.format(articulo.getUtiles()) : "",
+                  
+                 
                   articulo.getCategoria().getDescripcion(),
                   articulo.getDescripcion(),
                   articulo.getColor().getColor(),

@@ -100,6 +100,7 @@ public class TaskDeliveryChoferUpdateService {
              final String eventFolio,
              final String choferId,
              final String userId) throws NoDataFoundException, DataOriginException{
+        
         TaskCatalogVO taskCatalogVO = new TaskCatalogVO();
         taskCatalogVO.setRentaId(rentaId+"");
         taskCatalogVO.setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.NEW_FOLIO);

@@ -71,12 +71,7 @@ public class TaskUtilityValidateUpdateService {
                     taskCatalogVO.setStatusAlmacenTaskCatalog(StatusAlmacenTaskCatalogVO.StatusAlmacenTaskCatalog.UPDATE_TYPE_AND_STATUS_FOLIO);                    
         } else {
            throw new NoDataFoundException(""
-                   + "No se generaron tareas, ya que no coincidio con las reglas operativas actuales\n"
-//                   + "1. [Modf. datos generales]-[Tipo=Pedido]-[Estado=apartado]\n"
-//                   + "2. [Modf. articulos]-[Tipo=Pedido]-[Estado=apartado]\n"
-//                   + "3. [Tipo=Pedido]-[Estado diff PENDIENTE]\n"
-//                   + "4. [Tipo=CAMBIO]-[Estado=NO CAMBIO]\n"
-//                   + "5. [Tipo=CAMBIO]-[Estado=CAMBIO]"
+                   + "No se generaron tareas, ya que no coincidio con las reglas operativas actuales"
                    + "");
         }
         

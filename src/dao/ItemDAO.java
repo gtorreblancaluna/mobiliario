@@ -73,7 +73,7 @@ public class ItemDAO {
             }
             
             
-            item.setRentados( session.selectOne("MapperArticulos.obtenerEnRenta",map).toString());
+            // item.setRentados( session.selectOne("MapperArticulos.obtenerEnRenta",map).toString());
             item.setFaltantes(Float.parseFloat(session.selectOne("MapperArticulos.obtenerFaltantes",map).toString()));
             item.setReparacion(Float.parseFloat(session.selectOne("MapperArticulos.obtenerReparacion",map).toString()));
             item.setAccidenteTrabajo(Float.parseFloat(session.selectOne("MapperArticulos.obtenerAccidenteTrabajo",map).toString()));
