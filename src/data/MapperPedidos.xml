@@ -420,12 +420,12 @@
             color.color AS item_color,
             articulo.codigo AS item_codigo,
             (
-                SELECT SUM(detalle.cantidad) AS cantidad
-                FROM renta renta
-                    INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta)
-                WHERE detalle.id_articulo = detalle.id_articulo
-                AND renta.id_estado = #{estado_renta}
-                AND renta.id_tipo = #{tipo_pedido}
+                SELECT SUM(d.cantidad) AS cantidad
+                FROM renta r
+                    INNER JOIN detalle_renta d ON (d.id_renta = r.id_renta)
+                WHERE d.id_articulo = detalle.id_articulo
+                AND r.id_estado = #{estado_renta}
+                AND r.id_tipo = #{tipo_pedido}
             ) AS rentados,
             (
                 SELECT SUM(faltante.cantidad)
@@ -514,12 +514,12 @@
             color.color AS item_color,
             articulo.codigo AS item_codigo,
             (
-                SELECT SUM(detalle.cantidad) AS cantidad
-                FROM renta renta
-                    INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta)
-                WHERE detalle.id_articulo = detalle.id_articulo
-                AND renta.id_estado = #{estado_renta}
-                AND renta.id_tipo = #{tipo_pedido}
+                SELECT SUM(d.cantidad) AS cantidad
+                FROM renta r
+                    INNER JOIN detalle_renta d ON (d.id_renta = r.id_renta)
+                WHERE d.id_articulo = detalle.id_articulo
+                AND r.id_estado = #{estado_renta}
+                AND r.id_tipo = #{tipo_pedido}
             ) AS rentados,
             (
                 SELECT SUM(faltante.cantidad)
@@ -608,12 +608,12 @@
             color.color AS item_color,
             articulo.codigo AS item_codigo,
             (
-                SELECT SUM(detalle.cantidad) AS cantidad
-                FROM renta renta
-                    INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta)
-                WHERE detalle.id_articulo = detalle.id_articulo
-                AND renta.id_estado = #{estado_renta}
-                AND renta.id_tipo = #{tipo_pedido}
+                SELECT SUM(d.cantidad) AS cantidad
+                FROM renta r
+                    INNER JOIN detalle_renta d ON (d.id_renta = r.id_renta)
+                WHERE d.id_articulo = detalle.id_articulo
+                AND r.id_estado = #{estado_renta}
+                AND r.id_tipo = #{tipo_pedido}
             ) AS rentados,
             (
                 SELECT SUM(faltante.cantidad)
@@ -706,12 +706,12 @@
             color.color AS item_color,
             articulo.codigo AS item_codigo,
             (
-                SELECT SUM(detalle.cantidad) AS cantidad
-                FROM renta renta
-                    INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta)
-                WHERE detalle.id_articulo = detalle.id_articulo
-                AND renta.id_estado = #{estado_renta}
-                AND renta.id_tipo = #{tipo_pedido}
+                SELECT SUM(d.cantidad) AS cantidad
+                FROM renta r
+                    INNER JOIN detalle_renta d ON (d.id_renta = r.id_renta)
+                WHERE d.id_articulo = detalle.id_articulo
+                AND r.id_estado = #{estado_renta}
+                AND r.id_tipo = #{tipo_pedido}
             ) AS rentados,
             (
                 SELECT SUM(faltante.cantidad)
@@ -803,12 +803,12 @@
             color.color AS item_color,
             articulo.codigo AS item_codigo,
             (
-                SELECT SUM(detalle.cantidad) AS cantidad
-                FROM renta renta
-                    INNER JOIN detalle_renta detalle ON (detalle.id_renta = renta.id_renta)
-                WHERE detalle.id_articulo = detalle.id_articulo
-                AND renta.id_estado = #{estado_renta}
-                AND renta.id_tipo = #{tipo_pedido}
+                SELECT SUM(d.cantidad) AS cantidad
+                FROM renta r
+                    INNER JOIN detalle_renta d ON (d.id_renta = r.id_renta)
+                WHERE d.id_articulo = detalle.id_articulo
+                AND r.id_estado = #{estado_renta}
+                AND r.id_tipo = #{tipo_pedido}
             ) AS rentados,
             (
                 SELECT SUM(faltante.cantidad)
