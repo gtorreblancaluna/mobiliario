@@ -1,6 +1,9 @@
 package parametersVO;
 
 import java.sql.Timestamp;
+import java.util.Calendar;
+
+
 
 public class ParameterOrderProvider {
     
@@ -70,6 +73,13 @@ public class ParameterOrderProvider {
     }
 
     public void setInitDate(Timestamp initDate) {
+        Calendar now = Calendar.getInstance();
+        now.setTimeInMillis(initDate.getTime());
+        now.set(Calendar.HOUR_OF_DAY, 0);
+        now.set(Calendar.MINUTE, 0);
+        now.set(Calendar.SECOND, 0);
+        now.set(Calendar.MILLISECOND, 1);
+        initDate.setTime(now.getTimeInMillis());
         this.initDate = initDate;
     }
 
@@ -78,6 +88,13 @@ public class ParameterOrderProvider {
     }
 
     public void setEndDate(Timestamp endDate) {
+        Calendar now = Calendar.getInstance();
+        now.setTimeInMillis(endDate.getTime());
+        now.set(Calendar.HOUR_OF_DAY, 23);
+        now.set(Calendar.MINUTE, 23);
+        now.set(Calendar.SECOND, 59);
+        now.set(Calendar.MILLISECOND, 59);
+        endDate.setTime(now.getTimeInMillis());
         this.endDate = endDate;
     }
 
