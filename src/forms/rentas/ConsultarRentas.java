@@ -1,6 +1,6 @@
 package forms.rentas;
 
-import services.ItemService;
+import common.services.ItemService;
 import services.SaleService;
 import services.SystemService;
 import common.services.UserService;
@@ -804,23 +804,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     
                     
                 
-                 String estadoActualPedido = funcion.GetData("id_estado", "SELECT id_estado FROM renta WHERE id_renta=" + id_renta + "");
-                  Articulo articulo = itemService.obtenerArticuloPorId(funcion, Integer.parseInt(id_articulo)); 
-                 if( (ApplicationConstants.ESTADO_EN_RENTA.equals(estadoActualPedido )
-                  ) ){         
-                      //2018.11.16
-                      // si el estado actual del evento es igual a EN RENTA, 
-                      // procedemos a aumentar los articulos del contador en inventario "en_renta"                         
-                    float cantidad = Float.parseFloat(txt_cantidad.getText());
-                    String[] datos3 = { (articulo.getEnRenta()+cantidad+""), articulo.getArticuloId()+""};
-                    
-                    try {
-                        funcion.UpdateRegistro(datos3, "UPDATE articulo SET en_renta=? WHERE id_articulo=?");
-                     } catch (Exception e) {
-                         JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-                     }
-                 }
-                    
+                 
+                   Articulo articulo = itemService.obtenerArticuloPorId(Integer.parseInt(id_articulo)); 
+                                     
                     String datos[] = {id_renta, txt_cantidad.getText().toString(), id_articulo, txt_precio_unitario.getText().toString(),porcentajeDescuento+""};
 
                    int lastId = saleService.insertarDetalleRenta(datos, funcion);

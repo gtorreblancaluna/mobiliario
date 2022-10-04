@@ -17,7 +17,8 @@ import javax.swing.table.TableRowSorter;
 import common.model.DetalleRenta;
 import model.Faltante;
 import common.model.Renta;
-import services.ItemService;
+import common.services.ItemService;
+import services.FaltanteService;
 
 /**
  *
@@ -37,6 +38,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
     private final ItemService itemService = ItemService.getInstance();
     public static String g_rentaId;
     public static int g_articuloId;
+    private final FaltanteService faltanteService = FaltanteService.getInstance();
    
     
     public String conviertemoneda(String valor) {
@@ -222,7 +224,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
     
     public void llenar_tabla_articulos_faltantes(){
         this.formato_tabla_articulos_faltantes();
-        List<Faltante> faltantes = itemService.obtenerFaltantesPorArticuloId(funcion, InventarioForm.g_articuloId);
+        List<Faltante> faltantes = faltanteService.obtenerFaltantesPorArticuloId(funcion, InventarioForm.g_articuloId);
         
         if(faltantes == null || faltantes.size()<= 0)
             return;

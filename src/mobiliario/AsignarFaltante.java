@@ -11,7 +11,7 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 import common.model.DetalleRenta;
 import common.model.Renta;
-import services.ItemService;
+import common.services.ItemService;
 import services.SystemService;
 
 /**

@@ -36,7 +36,7 @@ import common.model.Articulo;
 import common.model.CategoriaDTO;
 import common.model.Color;
 import services.CategoryService;
-import services.ItemService;
+import common.services.ItemService;
 import static mobiliario.IndexForm.jDesktopPane1;
 
 public class InventarioForm extends javax.swing.JInternalFrame {

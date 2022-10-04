@@ -21,14 +21,16 @@ import common.model.Articulo;
 import common.model.DetalleRenta;
 import model.Faltante;
 import common.model.Renta;
-import services.ItemService;
+import common.services.ItemService;
+import services.FaltanteService;
 import services.SystemService;
 
 public class VerFaltantes extends java.awt.Dialog {
 
     private final sqlclass funcion = new sqlclass();
     
-    Object[][] dtconduc;      
+    Object[][] dtconduc;
+    private final FaltanteService faltanteService = FaltanteService.getInstance();
     private final SaleService saleService;
     private final SystemService systemService = SystemService.getInstance();
     private ItemService itemService = ItemService.getInstance();
@@ -125,7 +127,7 @@ public class VerFaltantes extends java.awt.Dialog {
              Articulo articulo = null;
              
              try {
-                articulo = itemService.obtenerArticuloPorId( funcion , itemId);
+                articulo = itemService.obtenerArticuloPorId(itemId);
            } catch (Exception e) {
                Logger.getLogger(VerFaltantes.class.getName()).log(Level.SEVERE, null, e);
                JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
@@ -157,7 +159,7 @@ public class VerFaltantes extends java.awt.Dialog {
         
         
         try {
-             faltantes = itemService.obtenerFaltantesPorRentaId(funcion, Integer.parseInt(g_rentaId));
+             faltantes = faltanteService.obtenerFaltantesPorRentaId(funcion, Integer.parseInt(g_rentaId));
         } catch (Exception e) {
             Logger.getLogger(VerFaltantes.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 

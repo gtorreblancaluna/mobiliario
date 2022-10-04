@@ -5,7 +5,6 @@ import common.services.UserService;
 import clases.Mail;
 import clases.conectate;
 import clases.sqlclass;
-import com.mysql.jdbc.MysqlDataTruncation;
 import common.constants.ApplicationConstants;
 import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
@@ -54,7 +53,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
 import services.CustomerService;
-import services.ItemService;
+import common.services.ItemService;
 import services.SaleService;
 import services.SystemService;
 import services.tasks.almacen.TaskAlmacenUpdateService;
@@ -171,7 +170,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog( rootPane,"No se puede establecer la comunicacion con la bd:\n"+e);
         }  catch (Exception e) {
-             JOptionPane.showMessageDialog( rootPane,"Ocurrio un error inesperado, porfavor intentalo de nuevo, verifica tu conexion a internet\n"+e);
+            log.error(e);
+            JOptionPane.showMessageDialog( rootPane,"Ocurrio un error inesperado, porfavor intentalo de nuevo, verifica tu conexion a internet\n"+e);
         }
     }
 
@@ -512,8 +512,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
             // funcion.conectate();
             jasperPrint = JasperFillManager.fillReport(masterReport, parametro, funcion.getConnection());
-            JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_NUEVO_PEDIDO);
-            File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_NUEVO_PEDIDO);
+            JasperExportManager.exportReportToPdfFile(jasperPrint, String.join("",pathLocation,ApplicationConstants.NOMBRE_REPORTE_NUEVO_PEDIDO));
+            File file2 = new File(String.join("",pathLocation,ApplicationConstants.NOMBRE_REPORTE_NUEVO_PEDIDO));
             Desktop.getDesktop().open(file2);
         } catch (NoClassDefFoundError j) {
             Logger.getLogger(AgregarRenta.class.getName()).log(Level.SEVERE, null, j);
@@ -772,15 +772,13 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
              try { 
                  agregar_renta();
              } catch (SQLNonTransientConnectionException e) {
+                log.error(e);
                 System.out.println("la conexion se ha cerrado "+e);
                 funcion.conectate();
                 System.out.println("volvemos abrir la conexion ");
-                JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n", "Error", JOptionPane.ERROR_MESSAGE); 
-             } catch (MysqlDataTruncation e) {
-                 JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-             } catch (SQLException e) {
-                 JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);             
+                JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n", "Error", JOptionPane.ERROR_MESSAGE);       
              } catch (Exception e) {
+                 log.error(e);
                  JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE);
              }
             }
@@ -789,15 +787,13 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
              try { 
                  agregar_renta();
              } catch (SQLNonTransientConnectionException e) {
+                 log.error(e);
                 System.out.println("la conexion se ha cerrado, intenta de nuevo\n "+e);
                 funcion.conectate();
                  System.out.println("volvemos abrir la conexion ");
-                 JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n", "Error", JOptionPane.ERROR_MESSAGE); 
-             } catch (MysqlDataTruncation e) {
-                 JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-             } catch (SQLException e) {
-                 JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE);             
+                 JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n", "Error", JOptionPane.ERROR_MESSAGE);       
              } catch (Exception e) {
+                 log.error(e);
                  JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE);
              }
         }
@@ -840,6 +836,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         try {
             Utility.validateStatusAndTypeEvent(estadoEvento,tipoEvento);
         } catch (BusinessException e) {
+            log.error(e);
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }

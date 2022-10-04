@@ -11,7 +11,7 @@ import model.material.inventory.MaterialInventory;
 import model.material.inventory.MaterialSaleItem;
 import model.providers.Proveedor;
 import org.apache.log4j.Priority;
-import services.ItemService;
+import common.services.ItemService;
 import services.material.inventory.MaterialInventoryService;
 
 public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
