@@ -19,6 +19,9 @@
 	<parameter name="DIRECCION_1" class="java.lang.String"/>
 	<parameter name="DIRECCION_2" class="java.lang.String"/>
 	<parameter name="DIRECCION_3" class="java.lang.String"/>
+	<parameter name="DEPOSITO_GARANTIA" class="java.lang.String"/>
+	<parameter name="ENVIO_RECOLECCION" class="java.lang.String"/>
+	<parameter name="TOTAL" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT IF(d.porcentaje_descuento > 0 , (d.cantidad * d.p_unitario) * (d.porcentaje_descuento / 100) , 0 ) AS totalDescuento,
      CONCAT(u.`nombre`," ",u.`apellidos`) AS Usuario,
@@ -317,13 +320,6 @@ WHERE
 				</textElement>
 				<textFieldExpression><![CDATA["Fecha evento: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_evento}))]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
-				<reportElement x="581" y="163" width="72" height="16" uuid="36772927-c467-41a9-90fe-fce8288b8510"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{subTotal}))-new Float(String.valueOf($P{abonos}))-new Float(String.valueOf($P{descuento}))+ new Float(String.valueOf($P{iva})) + new Float(String.valueOf($F{envio_recoleccion})) + new Float(String.valueOf($F{deposito_garantia}))]]></textFieldExpression>
-			</textField>
 			<staticText>
 				<reportElement x="477" y="163" width="102" height="16" uuid="b679da62-74d8-4a22-a5d8-2065ea1216db"/>
 				<textElement>
@@ -336,7 +332,7 @@ WHERE
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($F{deposito_garantia})) <= 0 ? "" : new Float(String.valueOf($F{deposito_garantia}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($P{DEPOSITO_GARANTIA})) <= 0 ? "" : new Float(String.valueOf($P{DEPOSITO_GARANTIA}))]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00">
 				<reportElement x="579" y="78" width="73" height="16" uuid="808ad874-1282-4e68-a6d8-52f211198e30"/>
@@ -350,7 +346,7 @@ WHERE
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($F{envio_recoleccion})) <= 0 ? "" : new Float(String.valueOf($F{envio_recoleccion}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($P{ENVIO_RECOLECCION})) <= 0 ? "" : new Float(String.valueOf($P{ENVIO_RECOLECCION}))]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00">
 				<reportElement x="579" y="125" width="74" height="16" uuid="e8ac2a14-7138-4a61-81fe-ce33b28f5d52"/>
@@ -395,14 +391,14 @@ WHERE
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($F{envio_recoleccion})) <= 0 ? "" : "Envio y recolecciòn:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($P{ENVIO_RECOLECCION})) <= 0 ? "" : "Envio y recolecciòn:"]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
 				<reportElement x="477" y="109" width="100" height="16" uuid="7d8eedb1-0641-46fb-93bc-8e5338939ef4"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($F{deposito_garantia})) <= 0 ? "" : "Depòsito en garantìa:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new Float(String.valueOf($P{DEPOSITO_GARANTIA})) <= 0 ? "" : "Depòsito en garantìa:"]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
 				<reportElement x="476" y="125" width="101" height="16" uuid="40c98f5f-9267-45a5-a529-f18c77361149"/>
@@ -417,6 +413,13 @@ WHERE
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new Float(String.valueOf($P{abonos})) <= 0 ? "" : "Pagos:"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="579" y="161" width="73" height="20" uuid="983b8ed1-ada0-4c9d-a4fa-2a0ff3168960"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL}]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnFooter>

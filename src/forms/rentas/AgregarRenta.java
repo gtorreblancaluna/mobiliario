@@ -474,10 +474,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             descuento = "0";
         }
 
-        if (txt_total_iva.getText().equals("")) {
+        if (txt_total_iva.getText().isEmpty()) {
             iva = "0";
         } else {
-            iva = EliminaCaracteres(txt_total_iva.toString(), "$");
+            iva = EliminaCaracteres(txt_total_iva.getText(), "$");
             iva = iva.replace(",", ".");
         }
 
@@ -509,6 +509,14 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             parametro.put("descuento", descuento);
             parametro.put("iva", iva);
             parametro.put("INFO_SUMMARY_FOLIO",datosGenerales.getInfoSummaryFolio());
+            
+            Float envioRecoleccion = txt_envioRecoleccion.getText().isEmpty() ? 0F : Float.parseFloat(txt_envioRecoleccion.getText());
+            Float depositoGarantia = txt_depositoGarantia.getText().isEmpty() ? 0F : Float.parseFloat(txt_depositoGarantia.getText());
+            parametro.put("ENVIO_RECOLECCION", String.valueOf(envioRecoleccion));
+            parametro.put("DEPOSITO_GARANTIA",String.valueOf(depositoGarantia));
+            // new Float(String.valueOf($P{subTotal}))-new Float(String.valueOf($P{abonos}))-new Float(String.valueOf($P{descuento}))+ new Float(String.valueOf($P{iva})) + new Float(String.valueOf($P{ENVIO_RECOLECCION})) + new Float(String.valueOf($P{DEPOSITO_GARANTIA}))
+            Float total = subTotal - cant_abono - Float.parseFloat(descuento) + Float.parseFloat(iva) + envioRecoleccion + depositoGarantia;
+            parametro.put("TOTAL", decimalFormat.format(total));
 
             // funcion.conectate();
             jasperPrint = JasperFillManager.fillReport(masterReport, parametro, funcion.getConnection());
