@@ -1029,6 +1029,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     try {
                         funcion.DeleteRegistro("detalle_renta", "id_detalle_renta", tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 0).toString());
                         updateItemsInFolio = true;
+                        log.info("el usuario: "+iniciar_sesion.usuarioGlobal.getNombre()+" "
+                            +iniciar_sesion.usuarioGlobal.getApellidos()+" a eliminado el articulo id: "+tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 0).toString() + 
+                                ", renta_id: "+id_renta);
                      } catch (Exception e) {
                          JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
                      }
