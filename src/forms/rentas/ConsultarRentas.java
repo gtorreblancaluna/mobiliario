@@ -70,12 +70,12 @@ import common.model.Tipo;
 import common.services.UtilityService;
 import model.providers.OrdenProveedor;
 import parametersVO.ParameterOrderProvider;
-import services.OrderStatusChangeService;
+import common.services.OrderStatusChangeService;
 import services.OrderTypeChangeService;
 import common.services.TipoEventoService;
 import forms.inventario.VerDisponibilidadArticulos;
 import services.providers.OrderProviderService;
-import services.tasks.almacen.TaskAlmacenUpdateService;
+import common.services.TaskAlmacenUpdateService;
 import services.tasks.deliveryChofer.TaskDeliveryChoferUpdateService;
 
 public class ConsultarRentas extends javax.swing.JInternalFrame {
@@ -351,8 +351,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         win.show();
     }
     
-    public void mostrar_faltantes() {
-        VerFaltantes ventana_faltantes = new VerFaltantes(null, true);
+    public void mostrar_faltantes(String rentaId) {
+        VerFaltantes ventana_faltantes = new VerFaltantes(null, true,rentaId);
         ventana_faltantes.setVisible(true);
         ventana_faltantes.setLocationRelativeTo(null);
     }
@@ -4616,7 +4616,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
              return;
         }
         this.g_idRenta = id_renta;
-        mostrar_faltantes();
+        mostrar_faltantes(id_renta);
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jbtn_editar_abonosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jbtn_editar_abonosMouseClicked
@@ -4630,7 +4630,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
            return;
        }
         this.g_idRenta = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
-        mostrar_faltantes();
+        mostrar_faltantes(this.g_idRenta);
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void txtEmailToSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEmailToSendActionPerformed

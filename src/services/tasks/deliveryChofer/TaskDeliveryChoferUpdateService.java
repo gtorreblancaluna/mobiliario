@@ -11,9 +11,9 @@ import common.model.Tipo;
 import common.model.Usuario;
 import dao.task.deliveryChofer.TaskDeliveryChoferUpdateDAO;
 import java.util.Date;
-import model.tasks.TaskCatalogVO;
+import common.model.TaskCatalogVO;
 import org.apache.log4j.Logger;
-import services.tasks.TaskUtilityValidateUpdateService;
+import common.services.TaskUtilityValidateUpdateService;
 
 public class TaskDeliveryChoferUpdateService {
     

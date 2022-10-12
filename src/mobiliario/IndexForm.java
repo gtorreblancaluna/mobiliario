@@ -25,7 +25,7 @@ import static mobiliario.iniciar_sesion.usuarioGlobal;
 import model.DatosGenerales;
 import services.SaleService;
 import services.SystemService;
-import services.tasks.almacen.TaskAlmacenUpdateService;
+import common.services.TaskAlmacenUpdateService;
 import services.tasks.deliveryChofer.TaskDeliveryChoferUpdateService;
 import utilities.Utility;
 

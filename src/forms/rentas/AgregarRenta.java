@@ -56,7 +56,7 @@ import services.CustomerService;
 import common.services.ItemService;
 import services.SaleService;
 import services.SystemService;
-import services.tasks.almacen.TaskAlmacenUpdateService;
+import common.services.TaskAlmacenUpdateService;
 import services.tasks.deliveryChofer.TaskDeliveryChoferUpdateService;
 import utilities.Utility;
 

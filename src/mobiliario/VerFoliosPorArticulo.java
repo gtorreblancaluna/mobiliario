@@ -61,8 +61,8 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
         return entero2;
 
     }
-     public void mostrar_faltantes() {
-        VerFaltantes ventana_faltantes = new VerFaltantes(null, true);
+     public void mostrar_faltantes(String rentaId) {
+        VerFaltantes ventana_faltantes = new VerFaltantes(null, true, rentaId);
         ventana_faltantes.setVisible(true);
         ventana_faltantes.setLocationRelativeTo(null);
     }
@@ -546,7 +546,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
         if (evt.getClickCount() == 2) {
             this.g_rentaId = tablaArticulosFaltantes.getValueAt(tablaArticulosFaltantes.getSelectedRow(), 0).toString();
             g_articuloId = Integer.parseInt(tablaArticulosFaltantes.getValueAt(tablaArticulosFaltantes.getSelectedRow(), 1).toString());
-            this.mostrar_faltantes();
+            this.mostrar_faltantes(this.g_rentaId);
         }
     }//GEN-LAST:event_tablaArticulosFaltantesMouseClicked
 

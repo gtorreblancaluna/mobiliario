@@ -1,6 +1,5 @@
 package mobiliario;
 
-import forms.rentas.ConsultarRentas;
 import services.SaleService;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
@@ -78,8 +77,9 @@ public class VerFaltantes extends java.awt.Dialog {
         return entero2;
 
     }
-    public VerFaltantes(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);        
+    public VerFaltantes(java.awt.Frame parent, boolean modal, String rentaId) {
+        super(parent, modal); 
+        this.g_rentaId = rentaId;
         initComponents();
         saleService = SaleService.getInstance();
         funcion.conectate();
@@ -97,15 +97,6 @@ public class VerFaltantes extends java.awt.Dialog {
     
     public void llenar_tabla_articulos(){
         
-        if(ConsultarRentas.g_idRenta != null && !ConsultarRentas.g_idRenta.equals("")){
-             g_rentaId = ConsultarRentas.g_idRenta;
-        }
-        else if (VerFoliosPorArticulo.g_rentaId !=null && !VerFoliosPorArticulo.g_rentaId.equals("")){
-             g_rentaId = VerFoliosPorArticulo.g_rentaId;
-        }
-        else{
-             g_rentaId = AsignarFaltante.g_rentaId+"";
-        }
         Renta renta = null;
         try{
             renta = saleService.obtenerRentaPorIdSinSumas(Integer.parseInt(g_rentaId));
@@ -765,7 +756,7 @@ public class VerFaltantes extends java.awt.Dialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                VerFaltantes dialog = new VerFaltantes(new java.awt.Frame(), true);
+                VerFaltantes dialog = new VerFaltantes(new java.awt.Frame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

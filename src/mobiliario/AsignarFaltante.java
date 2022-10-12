@@ -12,12 +12,7 @@ import javax.swing.JOptionPane;
 import common.model.DetalleRenta;
 import common.model.Renta;
 import common.services.ItemService;
-import services.SystemService;
 
-/**
- *
- * @author Gerardo Torreblanca
- */
 public class AsignarFaltante extends java.awt.Dialog {
 
     sqlclass funcion = new sqlclass();
@@ -178,8 +173,8 @@ public class AsignarFaltante extends java.awt.Dialog {
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog
-     public void mostrar_faltantes() {
-        VerFaltantes ventana_faltantes = new VerFaltantes(null, true);
+     public void mostrar_faltantes(String rentaId) {
+        VerFaltantes ventana_faltantes = new VerFaltantes(null, true, rentaId);
         ventana_faltantes.setVisible(true);
         ventana_faltantes.setLocationRelativeTo(null);
     }   
@@ -216,10 +211,10 @@ public class AsignarFaltante extends java.awt.Dialog {
                 return;
             }
             this.g_rentaId = renta.getRentaId();
-            mostrar_faltantes();
+            mostrar_faltantes(this.g_rentaId+"");
         }else if(this.checkAccidenteLaboral.isSelected() && folio.equals("")){
             this.g_rentaId = 0;
-            mostrar_faltantes();
+            mostrar_faltantes(this.g_rentaId+"");
         }else{
             JOptionPane.showMessageDialog(null, "Selecciona solo una opci\u00F3n ", "Error", JOptionPane.INFORMATION_MESSAGE);
             return;
