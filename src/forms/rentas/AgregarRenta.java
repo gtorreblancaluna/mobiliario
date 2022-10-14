@@ -57,7 +57,7 @@ import common.services.ItemService;
 import services.SaleService;
 import services.SystemService;
 import common.services.TaskAlmacenUpdateService;
-import services.tasks.deliveryChofer.TaskDeliveryChoferUpdateService;
+import common.services.TaskDeliveryChoferUpdateService;
 import utilities.Utility;
 
 public class AgregarRenta extends javax.swing.JInternalFrame {

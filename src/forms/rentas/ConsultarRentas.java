@@ -76,7 +76,7 @@ import common.services.TipoEventoService;
 import forms.inventario.VerDisponibilidadArticulos;
 import services.providers.OrderProviderService;
 import common.services.TaskAlmacenUpdateService;
-import services.tasks.deliveryChofer.TaskDeliveryChoferUpdateService;
+import common.services.TaskDeliveryChoferUpdateService;
 
 public class ConsultarRentas extends javax.swing.JInternalFrame {
     
@@ -1211,42 +1211,44 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             return;
         }
         if (!estadoEventoSelected.getEstadoId().equals(globalRenta.getEstado().getEstadoId())) {
-            String msg = String.format("Folio: %s, Usuario %s,  Realizó el cambio de Estado [%s] a [%s]",
-                globalRenta.getFolio()+"",
-                iniciar_sesion.nombre_usuario_global + " " + iniciar_sesion.apellidos_usuario_global,
-                globalRenta.getEstado().getDescripcion(),
-                estadoEventoSelected.getDescripcion()
-            );
+            
             
             new Thread(() -> {
+                String msg = String.format("Folio: %s, Usuario %s,  Realizó el cambio de Estado [%s] a [%s]",
+                    globalRenta.getFolio()+"",
+                    iniciar_sesion.nombre_usuario_global + " " + iniciar_sesion.apellidos_usuario_global,
+                    globalRenta.getEstado().getDescripcion(),
+                    estadoEventoSelected.getDescripcion()
+                );
                 try {
                     orderStatusChangeService.insert(globalRenta.getRentaId(), globalRenta.getEstado().getEstadoId() , estadoEventoSelected.getEstadoId(),iniciar_sesion.usuarioGlobal.getUsuarioId());
                     log.info(msg);
-                    Utility.pushNotification(msg);
-                } catch (BusinessException e) {
+                } catch (BusinessException | DataOriginException e) {
                     log.error(e.getMessage(),e);
-                    Utility.pushNotification(e.getMessage());
+                    msg = e.getMessage();
                 }
+                Utility.pushNotification(msg);
             }).start();
         }
         
         if (!tipoSelected.getTipoId().equals(globalRenta.getTipo().getTipoId())) {
-            String msg = String.format("Folio: %s, Usuario %s,  Realizó el cambio de Tipo [%s] a [%s]", 
-                globalRenta.getFolio()+"",
-                iniciar_sesion.nombre_usuario_global + " " + iniciar_sesion.apellidos_usuario_global,
-                globalRenta.getTipo().getTipo(),
-                tipoSelected.getTipo()
-            );
+            
            
             new Thread(() -> {
+                    String msg = String.format("Folio: %s, Usuario %s,  Realizó el cambio de Tipo [%s] a [%s]", 
+                        globalRenta.getFolio()+"",
+                        iniciar_sesion.nombre_usuario_global + " " + iniciar_sesion.apellidos_usuario_global,
+                        globalRenta.getTipo().getTipo(),
+                        tipoSelected.getTipo()
+                    );
                 try {
                     orderTypeChangeService.insert(globalRenta.getRentaId(), globalRenta.getTipo().getTipoId() , tipoSelected.getTipoId(),iniciar_sesion.usuarioGlobal.getUsuarioId());
                     log.info(msg);
-                    Utility.pushNotification(msg);
                 } catch (BusinessException e) {
                     log.error(e.getMessage(),e);
-                    Utility.pushNotification(e.getMessage());
+                    msg = e.getMessage();
                 }
+                Utility.pushNotification(msg);
             }).start();
         }
         
