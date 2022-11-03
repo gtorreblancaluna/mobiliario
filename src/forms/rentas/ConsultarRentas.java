@@ -203,10 +203,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }
     
        public void tableFormatOrderProvider() {
-        Object[][] data = {{"","","","","","","","","","","",""}};
+        Object[][] data = {{"","","","","","","","","",""}};
         String[] columnNames = {          
                         "No orden",
-                        "Folio renta", 
                         "Usuario",
                         "Proveedor", 
                         "Status",                        
@@ -224,7 +223,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
         tableOrdersProvider.setRowSorter(ordenarTabla);
 
-        int[] anchos = {20,20,80,40,40, 80,100,100,20,80,60,60};
+        int[] anchos = {20,60,60,30,70,70,80,20,40,40,40};
 
         for (int inn = 0; inn < tableOrdersProvider.getColumnCount(); inn++) {
             tableOrdersProvider.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -247,10 +246,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         tableOrdersProvider.getColumnModel().getColumn(8).setPreferredWidth(0);
      
         tableOrdersProvider.getColumnModel().getColumn(0).setCellRenderer(centrar);
-        tableOrdersProvider.getColumnModel().getColumn(1).setCellRenderer(centrar);
+        tableOrdersProvider.getColumnModel().getColumn(8).setCellRenderer(right);
         tableOrdersProvider.getColumnModel().getColumn(9).setCellRenderer(right);
         tableOrdersProvider.getColumnModel().getColumn(10).setCellRenderer(right);
-        tableOrdersProvider.getColumnModel().getColumn(11).setCellRenderer(right);
         
     }
     
@@ -1211,8 +1209,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             return;
         }
         if (!estadoEventoSelected.getEstadoId().equals(globalRenta.getEstado().getEstadoId())) {
-            
-            
             new Thread(() -> {
                 String msg = String.format("Folio: %s, Usuario %s,  Realizó el cambio de Estado [%s] a [%s]",
                     globalRenta.getFolio()+"",
@@ -1232,8 +1228,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
         
         if (!tipoSelected.getTipoId().equals(globalRenta.getTipo().getTipoId())) {
-            
-           
             new Thread(() -> {
                     String msg = String.format("Folio: %s, Usuario %s,  Realizó el cambio de Tipo [%s] a [%s]", 
                         globalRenta.getFolio()+"",
@@ -2145,6 +2139,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jScrollPane8 = new javax.swing.JScrollPane();
         tableOrdersProvider = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
         lblInformationOrdersProvider = new javax.swing.JLabel();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        listStatusOrderProvider = new javax.swing.JList<>();
+        btnStatusOrderProviderFinished = new javax.swing.JButton();
+        btnStatusOrderProviderInProgress = new javax.swing.JButton();
+        btnStatusOrderProviderPending = new javax.swing.JButton();
         jToolBar5 = new javax.swing.JToolBar();
         jbtn_editar = new javax.swing.JButton();
         jbtn_guardar = new javax.swing.JButton();
@@ -3210,6 +3209,25 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         lblInformationOrdersProvider.setFont(new java.awt.Font("Arial", 3, 14)); // NOI18N
         lblInformationOrdersProvider.setForeground(new java.awt.Color(204, 0, 51));
 
+        listStatusOrderProvider.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane9.setViewportView(listStatusOrderProvider);
+
+        btnStatusOrderProviderFinished.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        btnStatusOrderProviderFinished.setText("Finalizado");
+        btnStatusOrderProviderFinished.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        btnStatusOrderProviderInProgress.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        btnStatusOrderProviderInProgress.setText("En progreso");
+        btnStatusOrderProviderInProgress.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        btnStatusOrderProviderPending.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        btnStatusOrderProviderPending.setText("Pendiente");
+        btnStatusOrderProviderPending.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -3217,19 +3235,33 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 857, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(10, 10, Short.MAX_VALUE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 561, Short.MAX_VALUE))
-                    .addComponent(jScrollPane8, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addComponent(btnStatusOrderProviderInProgress)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnStatusOrderProviderPending)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnStatusOrderProviderFinished, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane9))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnStatusOrderProviderFinished)
+                        .addComponent(btnStatusOrderProviderInProgress)
+                        .addComponent(btnStatusOrderProviderPending)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                    .addComponent(jScrollPane9))
                 .addContainerGap())
         );
 
@@ -3657,7 +3689,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             for(OrdenProveedor orden : list){      
             Object fila[] = {                                          
                 orden.getId(),
-                orden.getRenta().getFolio(),
                 orden.getUsuario().getNombre()+" "+orden.getUsuario().getApellidos(),
                 orden.getProveedor().getNombre()+" "+orden.getProveedor().getApellidos(),
                 orden.getStatusDescription(),
@@ -4472,14 +4503,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         try {                   
            funcion.UpdateRegistro(datos1, "UPDATE detalle_renta SET cantidad=?,p_unitario=?,porcentaje_descuento=? WHERE id_detalle_renta=?");
-
+           updateItemsInFolio = true;
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
         }
         limpiarBotonesEdicion();               
         this.formato_tabla_detalles();
-        
-      
         try {
             Renta renta = saleService.obtenerRentaPorId(Integer.parseInt(id_renta));
             this.llenarTablaDetalle(renta,ITEM_ALREADY);
@@ -4488,7 +4517,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         } catch (Exception e) {
             Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-            return;
         }
 
     }
@@ -4790,6 +4818,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGetItemsFromFolio;
     public static javax.swing.JButton btnInventoryMaterialReport;
+    private javax.swing.JButton btnStatusOrderProviderFinished;
+    private javax.swing.JButton btnStatusOrderProviderInProgress;
+    private javax.swing.JButton btnStatusOrderProviderPending;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;
@@ -4879,6 +4910,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JToolBar jToolBar1;
@@ -4917,6 +4949,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lbl_folio;
     public static javax.swing.JLabel lbl_infoItems;
     public static javax.swing.JLabel lbl_sel;
+    private javax.swing.JList<String> listStatusOrderProvider;
     private javax.swing.JPanel panel_abonos;
     private javax.swing.JPanel panel_articulos;
     private javax.swing.JPanel panel_conceptos;

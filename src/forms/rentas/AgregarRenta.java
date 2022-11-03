@@ -947,9 +947,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             enviar_email();               
         }
         JOptionPane.showMessageDialog(null, "Pedido registrado con éxito... =)");
-        Utility.pushNotification(iniciar_sesion.usuarioGlobal.getNombre()+ " registró un evento de tipo "+cmb_tipo.getSelectedItem().toString()
-                +" con status "+cmb_estado.getSelectedItem().toString()
-        );
+        String messageSuccess = iniciar_sesion.usuarioGlobal.getNombre()+ " registró un evento de tipo "+cmb_tipo.getSelectedItem().toString()
+                +" con status "+cmb_estado.getSelectedItem().toString()+ ", id: "+id_ultima_renta;
+        Utility.pushNotification(messageSuccess);
+        log.info(messageSuccess);
         
         if (id_tipo.equals(ApplicationConstants.TIPO_PEDIDO)) {
             new Thread(() -> {
@@ -957,12 +958,13 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 try {
                     taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
                     message = taskAlmacenUpdateService.saveWhenIsNewEvent(Long.parseLong(id_ultima_renta), folio, iniciar_sesion.usuarioGlobal.getUsuarioId().toString());
+                    log.info(message);
                 } catch (NoDataFoundException e) {
                     message = e.getMessage();
                     log.error(message);
-                } catch (DataOriginException e) {
+                } catch (DataOriginException e) {         
+                    message = "Ocurrió un error al generar la tarea a almacén, id: "+id_ultima_renta +", DETALLE: "+e.getMessage();
                     log.error(e.getMessage(),e);
-                    message = "Ocurrió un error al generar la tarea a almacén, DETALLE: "+e.getMessage();
                 }
                 Utility.pushNotification(message);
             }).start();
