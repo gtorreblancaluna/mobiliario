@@ -4470,9 +4470,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         float precio=0f;
         float descuento=0f;
         
-        String sCantidad = this.txt_editar_cantidad.getText().toString().equals("") ? "0" : this.txt_editar_cantidad.getText().toString();
-        String sPrecioU = this.txt_editar_precio_unitario.getText().toString().equals("") ? "0" : this.txt_editar_precio_unitario.getText().toString();
-        String sDescuento = this.txt_editar_porcentaje_descuento.getText().toString().equals("") ? "0" : this.txt_editar_porcentaje_descuento.getText().toString();
+        String sCantidad = this.txt_editar_cantidad.getText().equals("") ? "0" : this.txt_editar_cantidad.getText();
+        String sPrecioU = this.txt_editar_precio_unitario.getText().equals("") ? "0" : this.txt_editar_precio_unitario.getText();
+        String sDescuento = this.txt_editar_porcentaje_descuento.getText().equals("") ? "0" : this.txt_editar_porcentaje_descuento.getText();
         try {
             cantidad = Float.parseFloat(sCantidad);
             precio = Float.parseFloat(sPrecioU);
@@ -4492,7 +4492,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             Toolkit.getDefaultToolkit().beep();
             return;
         }
-        
         if(descuento > 100f){
             JOptionPane.showMessageDialog(null, "El porcentaje descuento debe ser menor a 100 ", "ERROR", JOptionPane.INFORMATION_MESSAGE);
             Toolkit.getDefaultToolkit().beep();
