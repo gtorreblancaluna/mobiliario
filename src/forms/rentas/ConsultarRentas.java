@@ -1762,7 +1762,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             "Envio Rec.",
             "IVA",
             "faltantes",
-            "faltantes por cubrir",
+            "Costos proveedor", //15
             "Pagos",
             "Saldo",
             "SubTotal/Descuentos"
@@ -1861,16 +1861,15 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     renta.getTipo().getTipo(),
                     renta.getDescripcionCobranza(),
                     renta.getUsuario().getNombre()+" "+renta.getUsuario().getApellidos(),
-                    decimalFormat.format(renta.getSubTotal()),
-                    decimalFormat.format(renta.getDepositoGarantia()),
-                    decimalFormat.format(renta.getEnvioRecoleccion()),
-                    decimalFormat.format(renta.getCalculoIVA()),
-                    decimalFormat.format(renta.getTotalFaltantes()),
-                    decimalFormat.format(renta.getTotalFaltantesPorCubrir()),
-                    decimalFormat.format(renta.getTotalAbonos()),
-                    decimalFormat.format(renta.getTotal()),
-                    decimalFormat.format(renta.getSubTotal() - renta.getCalculoDescuento())
-                         
+                    ( renta.getSubTotal() > 0 ? decimalFormat.format(renta.getSubTotal()) : ""),
+                    ( renta.getDepositoGarantia() > 0 ? decimalFormat.format(renta.getDepositoGarantia()) : ""),
+                    ( renta.getEnvioRecoleccion() > 0 ? decimalFormat.format(renta.getEnvioRecoleccion()) : "") ,
+                    ( renta.getCalculoIVA() > 0 ? decimalFormat.format(renta.getCalculoIVA()) : ""),
+                    ( renta.getTotalFaltantes() > 0 ? decimalFormat.format(renta.getTotalFaltantes()) : ""),
+                    ( renta.getTotalOrdersProvider() > 0 ? decimalFormat.format(renta.getTotalOrdersProvider()) : ""),
+                    ( renta.getTotalAbonos() > 0 ? decimalFormat.format(renta.getTotalAbonos()) : ""),
+                    ( renta.getTotal() > 0 ? decimalFormat.format(renta.getTotal()) : ""),
+                    ( (renta.getSubTotal() - renta.getCalculoDescuento()) > 0 ? decimalFormat.format(renta.getSubTotal() - renta.getCalculoDescuento()) : "" )
                 };
                 tableModel.addRow(fila);
         }
@@ -2139,11 +2138,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jScrollPane8 = new javax.swing.JScrollPane();
         tableOrdersProvider = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
         lblInformationOrdersProvider = new javax.swing.JLabel();
-        jScrollPane9 = new javax.swing.JScrollPane();
-        listStatusOrderProvider = new javax.swing.JList<>();
-        btnStatusOrderProviderFinished = new javax.swing.JButton();
-        btnStatusOrderProviderInProgress = new javax.swing.JButton();
-        btnStatusOrderProviderPending = new javax.swing.JButton();
         jToolBar5 = new javax.swing.JToolBar();
         jbtn_editar = new javax.swing.JButton();
         jbtn_guardar = new javax.swing.JButton();
@@ -3209,25 +3203,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         lblInformationOrdersProvider.setFont(new java.awt.Font("Arial", 3, 14)); // NOI18N
         lblInformationOrdersProvider.setForeground(new java.awt.Color(204, 0, 51));
 
-        listStatusOrderProvider.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane9.setViewportView(listStatusOrderProvider);
-
-        btnStatusOrderProviderFinished.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        btnStatusOrderProviderFinished.setText("Finalizado");
-        btnStatusOrderProviderFinished.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        btnStatusOrderProviderInProgress.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        btnStatusOrderProviderInProgress.setText("En progreso");
-        btnStatusOrderProviderInProgress.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        btnStatusOrderProviderPending.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        btnStatusOrderProviderPending.setText("Pendiente");
-        btnStatusOrderProviderPending.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -3235,33 +3210,19 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 857, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10, 10, Short.MAX_VALUE)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(btnStatusOrderProviderInProgress)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnStatusOrderProviderPending)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnStatusOrderProviderFinished, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane9))
+                        .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 561, Short.MAX_VALUE))
+                    .addComponent(jScrollPane8))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnStatusOrderProviderFinished)
-                        .addComponent(btnStatusOrderProviderInProgress)
-                        .addComponent(btnStatusOrderProviderPending)))
+                .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
-                    .addComponent(jScrollPane9))
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -4817,9 +4778,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGetItemsFromFolio;
     public static javax.swing.JButton btnInventoryMaterialReport;
-    private javax.swing.JButton btnStatusOrderProviderFinished;
-    private javax.swing.JButton btnStatusOrderProviderInProgress;
-    private javax.swing.JButton btnStatusOrderProviderPending;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;
@@ -4909,7 +4867,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
-    private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JToolBar jToolBar1;
@@ -4948,7 +4905,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lbl_folio;
     public static javax.swing.JLabel lbl_infoItems;
     public static javax.swing.JLabel lbl_sel;
-    private javax.swing.JList<String> listStatusOrderProvider;
     private javax.swing.JPanel panel_abonos;
     private javax.swing.JPanel panel_articulos;
     private javax.swing.JPanel panel_conceptos;

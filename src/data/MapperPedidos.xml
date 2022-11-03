@@ -79,7 +79,7 @@
         <result property="totalAbonos" column="total_abonos"/>
         <result property="totalFaltantes" column="total_faltantes"/>
         <result property="subTotal" column="sub_total"/>
-          
+        <result property="totalOrdersProvider" column="total_orders_provider"/>
     </resultMap>
   
     <resultMap id="resultMapTipoAbono" type="common.model.TipoAbono">        
@@ -324,7 +324,15 @@
                 (SUM( (cantidad*p_unitario) - ((cantidad*p_unitario) * (porcentaje_descuento / 100) ))),
                 (SUM( (cantidad*p_unitario) ))) AS suma
                 FROM detalle_renta WHERE id_renta = r.id_renta
-            ) AS sub_total
+            ) AS sub_total,
+            (
+                SELECT COALESCE(SUM(detalle_orden_proveedor.cantidad * detalle_orden_proveedor.precio),0)
+                FROM orden_proveedor orden_proveedor
+                    INNER JOIN detalle_orden_proveedor detalle_orden_proveedor ON (detalle_orden_proveedor.id_orden_proveedor = orden_proveedor.id)
+                WHERE orden_proveedor.id_renta = r.id_renta
+                AND orden_proveedor.fg_activo = '1'
+                AND detalle_orden_proveedor.fg_activo = '1'
+            ) AS total_orders_provider
         FROM renta r
             INNER JOIN estado e ON (e.id_estado = r.id_estado)
             INNER JOIN clientes c ON (c.id_clientes = r.id_clientes)
