@@ -1797,6 +1797,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             tabla_prox_rentas.getColumnModel().getColumn(15).setCellRenderer(right);
             tabla_prox_rentas.getColumnModel().getColumn(16).setCellRenderer(right);
             tabla_prox_rentas.getColumnModel().getColumn(17).setCellRenderer(right);
+            tabla_prox_rentas.getColumnModel().getColumn(18).setCellRenderer(right);
             
              FormatoTabla ft = new FormatoTabla(3);
             tabla_prox_rentas.setDefaultRenderer(Object.class, ft);
