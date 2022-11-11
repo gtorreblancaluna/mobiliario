@@ -117,10 +117,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         
         if(articulo == null)
             return false;
-        
-//        String idArticulo = dtconduc[0][0].toString();
+
         String dato = null;
-//         int cant_filas = tablaDisponibilidadArticulos.getRowCount();
          
          // verificamos que el elemento no se encuentre en la lista
         for (int i = 0; i < tablaDisponibilidadArticulos.getRowCount(); i++) {
@@ -312,12 +310,10 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         String initDate = new SimpleDateFormat("dd/MM/yyyy").format(txtDisponibilidadFechaInicial.getDate());
         String endDate = new SimpleDateFormat("dd/MM/yyyy").format(txtDisponibilidadFechaFinal.getDate());
         List<Long> itemsId = new ArrayList<>();
-        if (!jcheckIncluirTodos.isSelected()) {
-            for (int i = 0; i < InventarioForm.tablaDisponibilidadArticulos.getRowCount(); i++) {
-                itemsId.add(Long.parseLong(tablaDisponibilidadArticulos.getValueAt(i, 0).toString()));
-            }
+        for (int i = 0; i < InventarioForm.tablaDisponibilidadArticulos.getRowCount(); i++) {
+            itemsId.add(Long.parseLong(tablaDisponibilidadArticulos.getValueAt(i, 0).toString()));
         }
-        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,initDate,endDate,check_solo_negativos.isSelected(),radioBtnFechaEntrega.isSelected(),radioBtnFechaDevolucion.isSelected(), jcheckIncluirTodos.isSelected(),itemsId, null);
+        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,initDate,endDate,check_solo_negativos.isSelected(),radioBtnFechaEntrega.isSelected(),radioBtnFechaDevolucion.isSelected(), itemsId, null);
         ventanaVerDisponibilidad.setVisible(true);
         ventanaVerDisponibilidad.setLocationRelativeTo(null);
     }
@@ -614,7 +610,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         radioBtnFechaDevolucion = new javax.swing.JRadioButton();
         radioBtnFechaEntrega = new javax.swing.JRadioButton();
         check_solo_negativos = new javax.swing.JCheckBox();
-        jcheckIncluirTodos = new javax.swing.JCheckBox();
 
         setClosable(true);
         setTitle("Inventario");
@@ -1092,15 +1087,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             }
         });
 
-        jcheckIncluirTodos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jcheckIncluirTodos.setText("incluir todos los articulos");
-        jcheckIncluirTodos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jcheckIncluirTodos.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jcheckIncluirTodosActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -1111,10 +1097,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                     .addComponent(jScrollPane2)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(check_solo_negativos, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jcheckIncluirTodos, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(check_solo_negativos, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(txtDisponibilidadFechaInicial, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1131,7 +1114,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                                 .addComponent(radioBtnFechaDevolucion, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 104, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -1155,11 +1138,9 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                                 .addComponent(radioBtnFechaDevolucion)
                                 .addComponent(radioBtnFechaEntrega)))))
                 .addGap(7, 7, 7)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(check_solo_negativos)
-                    .addComponent(jcheckIncluirTodos))
+                .addComponent(check_solo_negativos)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1368,10 +1349,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtCodigoActionPerformed
 
-    private void jcheckIncluirTodosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcheckIncluirTodosActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jcheckIncluirTodosActionPerformed
-
     private void jbtnBuscarDisponibilidadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnBuscarDisponibilidadActionPerformed
         
     }//GEN-LAST:event_jbtnBuscarDisponibilidadActionPerformed
@@ -1392,8 +1369,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
              if(initDate.isAfter(endDate))
                   mensaje.append(++contador + ". Fecha inicial debe ser menor a fecha final.\n");
         }
-        if(this.tablaDisponibilidadArticulos.getRowCount() == 0 && !jcheckIncluirTodos.isSelected())
-            mensaje.append(++contador + ". Al menos agrega un articulo a la tabla para continuar.\n");
         
         if(!mensaje.toString().equals(""))
               JOptionPane.showMessageDialog(null, mensaje.toString(), "Error", JOptionPane.INFORMATION_MESSAGE);
@@ -1521,7 +1496,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JButton jbtn_editar;
     private javax.swing.JButton jbtn_guardar;
     private javax.swing.JButton jbtn_nuevo;
-    public static javax.swing.JCheckBox jcheckIncluirTodos;
     private javax.swing.JButton jtbnDisponibilidadAgregarArticulo;
     private javax.swing.JLabel lbl_buscar;
     private javax.swing.JLabel lbl_categoria;

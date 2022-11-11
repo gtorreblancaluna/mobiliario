@@ -82,7 +82,6 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
             Boolean showOnlyNegatives,
             Boolean showByDeliveryDate,
             Boolean showByReturnDate,
-            Boolean includeAll,
             List<Long> filterByItems,
             List<AvailabilityItemResult> itemsFromNewFolio
     ) {
@@ -108,7 +107,6 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
                 showOnlyNegatives,
                 showByDeliveryDate,
                 showByReturnDate,
-                includeAll,
                 filterByItems
         );
         
@@ -163,7 +161,7 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
            temp.addRow(nuevo);
     }
     
-    private void executeMainProccess(String initialDate, String endDate, Boolean showOnlyNegatives, Boolean showByDeliveryDate, Boolean showByReturnDate, Boolean includeAll, List<Long> filterByItems){       
+    private void executeMainProccess(String initialDate, String endDate, Boolean showOnlyNegatives, Boolean showByDeliveryDate, Boolean showByReturnDate, List<Long> filterByItems){       
         
         StringBuilder mensaje = new StringBuilder();
         Map<String,Object> parameters = new HashMap<>();
@@ -177,11 +175,13 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
         
         List<AvailabilityItemResult> availabilityItemResults;
         
-        parameters.put("typePedido", ApplicationConstants.TIPO_PEDIDO);
-        parameters.put("statusApartado", ApplicationConstants.ESTADO_APARTADO);
-        parameters.put("statusEnRenta", ApplicationConstants.ESTADO_EN_RENTA);
+        parameters.put("tipo_pedido_id", ApplicationConstants.TIPO_PEDIDO);
+        parameters.put("estado_apartado_id", ApplicationConstants.ESTADO_APARTADO);
+        parameters.put("estado_en_renta_id", ApplicationConstants.ESTADO_EN_RENTA);
         parameters.put("initDate", initialDate);
         parameters.put("endDate", endDate);
+        if (!filterByItems.isEmpty())
+            parameters.put("filterByItems", filterByItems);
         
         try {
             availabilityItemResults = saleService.obtenerDisponibilidadRentaPorConsulta(parameters);
@@ -200,22 +200,6 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
           
          for(AvailabilityItemResult availabilityItemResult : availabilityItemResults){
             
-              String id = availabilityItemResult.getItem().getArticuloId()+"";
-                
-              boolean itemFound = false;
-                if (!includeAll) {
-                    for (Long itemId : filterByItems) {
-                        if (id.equals(String.valueOf(itemId))) {
-                            itemFound = true;
-                            break;
-                        }
-                    }
-                }
-                
-                
-                if (!includeAll && !itemFound) {
-                    continue;
-                }    
                 // vamos agregar el articulo encontrado en la tabla detalle
                 addAvailabilityItemResultToDetailTable(availabilityItemResult);
 
@@ -481,7 +465,7 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                VerDisponibilidadArticulos dialog = new VerDisponibilidadArticulos(new java.awt.Frame(), true, "", "",false, false, false, false, null, null);
+                VerDisponibilidadArticulos dialog = new VerDisponibilidadArticulos(new java.awt.Frame(), true, "", "",false, false, false, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

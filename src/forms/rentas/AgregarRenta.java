@@ -221,7 +221,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             availabilityItemResults.add(availabilityItemResult);
         }
         
-        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,deliveryDateOrder,returnDateOrder,false,true,false, false,itemsId,availabilityItemResults);
+        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,deliveryDateOrder,returnDateOrder,false,true,false,itemsId,availabilityItemResults);
         ventanaVerDisponibilidad.setVisible(true);
         ventanaVerDisponibilidad.setLocationRelativeTo(null);
     }

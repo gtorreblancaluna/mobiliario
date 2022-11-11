@@ -201,8 +201,8 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
            articulo.setArticuloId(Integer.parseInt(articuloId));
            
            detail.setArticulo(articulo);
-           detail.setCantidad(Float.parseFloat(cantidad));
-           detail.setPrecio(Float.parseFloat(precio));
+           detail.setCantidad(Float.parseFloat(UtilityCommon.deleteCharacters(cantidad,"$,")));
+           detail.setPrecio(Float.parseFloat(UtilityCommon.deleteCharacters(precio,"$,")));
            
            detail.setDetailOrderProviderType(
                    new DetailOrderProviderType(Long.parseLong(jTableOrderProvider.getValueAt(i, HD_ORDEN_PROVEEDOR_TIPO_ORDEN_ID).toString()))

@@ -241,9 +241,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         DefaultTableCellRenderer right = new DefaultTableCellRenderer();
         right.setHorizontalAlignment(SwingConstants.RIGHT);
 
-        tableOrdersProvider.getColumnModel().getColumn(8).setMaxWidth(0);
-        tableOrdersProvider.getColumnModel().getColumn(8).setMinWidth(0);
-        tableOrdersProvider.getColumnModel().getColumn(8).setPreferredWidth(0);
+        tableOrdersProvider.getColumnModel().getColumn(7).setMaxWidth(0);
+        tableOrdersProvider.getColumnModel().getColumn(7).setMinWidth(0);
+        tableOrdersProvider.getColumnModel().getColumn(7).setPreferredWidth(0);
      
         tableOrdersProvider.getColumnModel().getColumn(0).setCellRenderer(centrar);
         tableOrdersProvider.getColumnModel().getColumn(8).setCellRenderer(right);
@@ -335,7 +335,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             itemsId.add(Long.parseLong(tabla_detalle.getValueAt(i, 2).toString()));
         }
         
-        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,initDate,endDate,false,true,false, false,itemsId, null);
+        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,initDate,endDate,false,true,false, itemsId, null);
         ventanaVerDisponibilidad.setVisible(true);
         ventanaVerDisponibilidad.setLocationRelativeTo(null);
         
@@ -4697,7 +4697,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private void tableOrdersProviderMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableOrdersProviderMouseClicked
         // TODO add your handling code here:
         if (evt.getClickCount() == 2) {
-            String rentaId = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 8).toString();
+            String rentaId = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 7).toString();
             String orderId = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 0).toString();
             String folio = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 1).toString();
         

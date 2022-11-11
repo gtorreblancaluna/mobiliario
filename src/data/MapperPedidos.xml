@@ -432,8 +432,9 @@
                 FROM renta r
                     INNER JOIN detalle_renta d ON (d.id_renta = r.id_renta)
                 WHERE d.id_articulo = detalle.id_articulo
-                AND r.id_estado = #{estado_renta}
-                AND r.id_tipo = #{tipo_pedido}
+                AND r.id_renta = detalle.id_renta
+                AND r.id_estado = #{estado_en_renta_id}
+                AND r.id_tipo = #{tipo_pedido_id}
             ) AS rentados,
             (
                 SELECT SUM(faltante.cantidad)
@@ -499,8 +500,14 @@
             INNER JOIN color color ON (color.id_color = articulo.id_color)
         WHERE
             STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
-            AND renta.id_tipo = #{typePedido}
-            AND renta.id_estado IN (#{statusApartado},#{statusEnRenta})
+            AND renta.id_tipo = #{tipo_pedido_id}
+            AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+            <if test="filterByItems != null">
+                <foreach item="item" index="index" collection="filterByItems"
+                    open="AND detalle.id_articulo IN (" separator="," close=")" >
+                        #{item}
+                </foreach>
+            </if>
         UNION
         SELECT
             detalle.cantidad AS number_of_items,
@@ -526,8 +533,9 @@
                 FROM renta r
                     INNER JOIN detalle_renta d ON (d.id_renta = r.id_renta)
                 WHERE d.id_articulo = detalle.id_articulo
-                AND r.id_estado = #{estado_renta}
-                AND r.id_tipo = #{tipo_pedido}
+                AND r.id_renta = detalle.id_renta
+                AND r.id_estado = #{estado_en_renta_id}
+                AND r.id_tipo = #{tipo_pedido_id}
             ) AS rentados,
             (
                 SELECT SUM(faltante.cantidad)
@@ -593,8 +601,14 @@
             INNER JOIN color color ON (color.id_color = articulo.id_color)
         WHERE
             STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
-            AND renta.id_tipo = #{typePedido}
-            AND renta.id_estado IN (#{statusApartado},#{statusEnRenta})
+            AND renta.id_tipo = #{tipo_pedido_id}
+            AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+            <if test="filterByItems != null">
+                <foreach item="item" index="index" collection="filterByItems"
+                    open="AND detalle.id_articulo IN (" separator="," close=")" >
+                        #{item}
+                </foreach>
+            </if>
         UNION
         SELECT
             detalle.cantidad AS number_of_items,
@@ -620,8 +634,9 @@
                 FROM renta r
                     INNER JOIN detalle_renta d ON (d.id_renta = r.id_renta)
                 WHERE d.id_articulo = detalle.id_articulo
-                AND r.id_estado = #{estado_renta}
-                AND r.id_tipo = #{tipo_pedido}
+                AND r.id_renta = detalle.id_renta
+                AND r.id_estado = #{estado_en_renta_id}
+                AND r.id_tipo = #{tipo_pedido_id}
             ) AS rentados,
             (
                 SELECT SUM(faltante.cantidad)
@@ -687,8 +702,14 @@
             INNER JOIN color color ON (color.id_color = articulo.id_color)
         WHERE
             STR_TO_DATE(#{endDate},'%d/%m/%Y') BETWEEN STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') AND STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y')
-            AND renta.id_tipo = #{typePedido}
-            AND renta.id_estado IN (#{statusApartado},#{statusEnRenta})
+            AND renta.id_tipo = #{tipo_pedido_id}
+            AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+            <if test="filterByItems != null">
+                <foreach item="item" index="index" collection="filterByItems"
+                    open="AND detalle.id_articulo IN (" separator="," close=")" >
+                        #{item}
+                </foreach>
+            </if>
     </select>
     
     
@@ -718,8 +739,9 @@
                 FROM renta r
                     INNER JOIN detalle_renta d ON (d.id_renta = r.id_renta)
                 WHERE d.id_articulo = detalle.id_articulo
-                AND r.id_estado = #{estado_renta}
-                AND r.id_tipo = #{tipo_pedido}
+                AND r.id_renta = detalle.id_renta
+                AND r.id_estado = #{estado_en_renta_id}
+                AND r.id_tipo = #{tipo_pedido_id}
             ) AS rentados,
             (
                 SELECT SUM(faltante.cantidad)
@@ -785,8 +807,14 @@
             INNER JOIN color color ON (color.id_color = articulo.id_color)
         WHERE
             STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
-            AND renta.id_tipo = #{typePedido}
-            AND renta.id_estado IN (#{statusApartado},#{statusEnRenta})
+            AND renta.id_tipo = #{tipo_pedido_id}
+            AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+            <if test="filterByItems != null">
+                <foreach item="item" index="index" collection="filterByItems"
+                    open="AND detalle.id_articulo IN (" separator="," close=")" >
+                        #{item}
+                </foreach>
+            </if>
     </select>
     
     <!-- Esta consulta se ocupa en disponibilidad -->
@@ -815,8 +843,9 @@
                 FROM renta r
                     INNER JOIN detalle_renta d ON (d.id_renta = r.id_renta)
                 WHERE d.id_articulo = detalle.id_articulo
-                AND r.id_estado = #{estado_renta}
-                AND r.id_tipo = #{tipo_pedido}
+                AND r.id_renta = detalle.id_renta
+                AND r.id_estado = #{estado_en_renta_id}
+                AND r.id_tipo = #{tipo_pedido_id}
             ) AS rentados,
             (
                 SELECT SUM(faltante.cantidad)
@@ -882,8 +911,14 @@
             INNER JOIN color color ON (color.id_color = articulo.id_color)
         WHERE
             STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
-            AND renta.id_tipo = #{typePedido}
-            AND renta.id_estado IN (#{statusApartado},#{statusEnRenta})
+            AND renta.id_tipo = #{tipo_pedido_id}
+            AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+            <if test="filterByItems != null">
+                <foreach item="item" index="index" collection="filterByItems"
+                    open="AND detalle.id_articulo IN (" separator="," close=")" >
+                        #{item}
+                </foreach>
+            </if>
     </select>
   
 </mapper>
