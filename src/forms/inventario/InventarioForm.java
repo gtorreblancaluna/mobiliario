@@ -80,23 +80,103 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         this.setTitle(TITLE);
     }
     
-    public void formato_tabla() {
-        Object[][] data = {{"", "", "", "", ""}};
-        String[] columnNames = {"Id", "Categoria", "Descripcion", "Color", "P.Unitario", "Stock"};       
-        DefaultTableModel TableModel = new DefaultTableModel(data, columnNames);
-        tablaDisponibilidadArticulos.setModel(TableModel);
+    private enum Column{
+        
+        BOOLEAN(0,"",Boolean.class, true),
+        ID(1,"id",String.class, false),
+        CODE(2,"Codigo",String.class,false),
+        CATEGORY(3,"Categoria",String.class, false),
+        DESCRIPTION(4,"Descripcion",String.class, false),
+        COLOR(5,"Color",String.class, false),
+        PRICE(6,"P.Unitario",String.class, false),
+        STOCK(7,"Stock",String.class, false)
+        ;
+        
+        Column (Integer number, String description, Class clazz, Boolean isEditable) {
+            this.number = number;
+            this.description = description;
+            this.clazz = clazz;
+            this.isEditable = isEditable;
+        }
+        private final Integer number;
+        private final String description;
+        private final Class clazz;
+        private final Boolean isEditable;
+        
+        public Boolean getIsEditable() {
+            return isEditable;
+        }
+        
+        public Class getClazz () {
+            return clazz;
+        }
 
-        int[] anchos = {10, 120, 250, 100, 40, 40};
+        public Integer getNumber() {
+            return number;
+        }
+        
+        public String getDescription () {
+            return description;
+        }
+        
+    }
+    
+    public void formato_tabla() {
+        
+        String[] columnNames = {
+            
+            Column.BOOLEAN.getDescription(),
+            Column.ID.getDescription(),
+            Column.CODE.getDescription(), 
+            Column.CATEGORY.getDescription(),
+            Column.DESCRIPTION.getDescription(), 
+            Column.COLOR.getDescription(),                        
+            Column.PRICE.getDescription(),
+            Column.STOCK.getDescription()
+            
+        };
+        Class[] types = {
+            Column.BOOLEAN.getClazz(),
+            Column.ID.getClazz(),
+            Column.CODE.getClazz(), 
+            Column.CATEGORY.getClazz(),
+            Column.DESCRIPTION.getClazz(), 
+            Column.COLOR.getClazz(),                        
+            Column.PRICE.getClazz(),
+            Column.STOCK.getClazz()            
+        };
+        
+        boolean[] editable = {
+            
+            Column.BOOLEAN.getIsEditable(),
+            Column.ID.getIsEditable(),
+            Column.CODE.getIsEditable(), 
+            Column.CATEGORY.getIsEditable(),
+            Column.DESCRIPTION.getIsEditable(),
+            Column.COLOR.getIsEditable(),                        
+            Column.PRICE.getIsEditable(),
+            Column.STOCK.getIsEditable()
+        };
+        
+  
+        // customize column types
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0){
+            @Override
+            public Class getColumnClass(int column) {
+                return types[column];
+            }
+            
+            @Override
+            public boolean isCellEditable (int row, int column) {
+                return editable[column];
+            }
+        };
+        tablaDisponibilidadArticulos.setModel(tableModel);
+        int[] anchos = {10,20, 120, 250, 100, 40, 40,40};
 
         for (int inn = 0; inn < tablaDisponibilidadArticulos.getColumnCount(); inn++) {
             tablaDisponibilidadArticulos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
-        }        
-
-        DefaultTableCellRenderer TablaRenderer = new DefaultTableCellRenderer();
-        TablaRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
-
-        DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
-        centrar.setHorizontalAlignment(SwingConstants.CENTER);
+        }
 
         try {
             DefaultTableModel temp = (DefaultTableModel) tablaDisponibilidadArticulos.getModel();
@@ -104,14 +184,25 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         } catch (ArrayIndexOutOfBoundsException e) {
             ;
         }
-        tablaDisponibilidadArticulos.getColumnModel().getColumn(0).setMaxWidth(0);
-        tablaDisponibilidadArticulos.getColumnModel().getColumn(0).setMinWidth(0);
-        tablaDisponibilidadArticulos.getColumnModel().getColumn(0).setPreferredWidth(0);
-        tablaDisponibilidadArticulos.getColumnModel().getColumn(5).setCellRenderer(centrar);
-        tablaDisponibilidadArticulos.getColumnModel().getColumn(4).setCellRenderer(centrar);
+        tablaDisponibilidadArticulos.getColumnModel().getColumn(Column.ID.getNumber()).setMaxWidth(0);
+        tablaDisponibilidadArticulos.getColumnModel().getColumn(Column.ID.getNumber()).setMinWidth(0);
+        tablaDisponibilidadArticulos.getColumnModel().getColumn(Column.ID.getNumber()).setPreferredWidth(0);
+        
+        tablaDisponibilidadArticulos.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                // int row = table.rowAtPoint(evt.getPoint());
+                int col = tablaDisponibilidadArticulos.columnAtPoint(evt.getPoint());
+                String name = tablaDisponibilidadArticulos.getColumnName(col);
+                System.out.println("Column index selected " + col + " " + name);
+                if (col == Column.BOOLEAN.getNumber()) {
+                    System.out.println("BOOLEAN");
+                }
+            }
+        });
     }
     
-    public static boolean agregarArticulo(String id){
+    public static boolean agregarArticulo (String id) {
         
         Articulo articulo = itemService.obtenerArticuloPorId(Integer.parseInt(id));
         
@@ -122,9 +213,9 @@ public class InventarioForm extends javax.swing.JInternalFrame {
          
          // verificamos que el elemento no se encuentre en la lista
         for (int i = 0; i < tablaDisponibilidadArticulos.getRowCount(); i++) {
-            dato = tablaDisponibilidadArticulos.getValueAt(i, 0).toString();
+            dato = tablaDisponibilidadArticulos.getValueAt(i, Column.ID.getNumber()).toString();
             System.out.println("dato seleccionado" + " " + " - " + dato + " - ");
-            if (dato.equals(articulo.getArticuloId())) {
+            if (dato.equals(String.valueOf(articulo.getArticuloId()))) {
                  JOptionPane.showMessageDialog(null, "Ya se encuentra el elemento en la lista  ", "Error", JOptionPane.INFORMATION_MESSAGE);
                  return false;
             }
@@ -132,14 +223,14 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         
          DefaultTableModel temp = (DefaultTableModel) tablaDisponibilidadArticulos.getModel();
          Object fila[] = {
+               false,
                articulo.getArticuloId(),
+               articulo.getCodigo(),
                articulo.getCategoria().getDescripcion(),
                articulo.getDescripcion(),
                articulo.getColor().getColor(),
                articulo.getPrecioRenta(),
                articulo.getCantidad()
-//             dtconduc[0][0].toString(),dtconduc[0][1].toString(), dtconduc[0][2].toString(), 
-//             dtconduc[0][3].toString(), dtconduc[0][4].toString(),dtconduc[0][5].toString()
          };
          temp.addRow(fila);         
         return true;
@@ -598,7 +689,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         btnMostrarAgregarCompra = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
         txtDisponibilidadFechaInicial = new com.toedter.calendar.JDateChooser();
         txtDisponibilidadFechaFinal = new com.toedter.calendar.JDateChooser();
         jLabel10 = new javax.swing.JLabel();
@@ -610,6 +700,9 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         radioBtnFechaDevolucion = new javax.swing.JRadioButton();
         radioBtnFechaEntrega = new javax.swing.JRadioButton();
         check_solo_negativos = new javax.swing.JCheckBox();
+        jButton6 = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tablaDisponibilidadArticulos = new javax.swing.JTable();
 
         setClosable(true);
         setTitle("Inventario");
@@ -969,21 +1062,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("agregar, editar articulos", jPanel3);
 
-        tablaDisponibilidadArticulos.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
-        tablaDisponibilidadArticulos.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tablaDisponibilidadArticulos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jScrollPane2.setViewportView(tablaDisponibilidadArticulos);
-
         txtDisponibilidadFechaInicial.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         txtDisponibilidadFechaInicial.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1087,6 +1165,34 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             }
         });
 
+        jButton6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jButton6.setText("Quitar elemento");
+        jButton6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
+        tablaDisponibilidadArticulos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        tablaDisponibilidadArticulos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tablaDisponibilidadArticulos.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tablaDisponibilidadArticulosKeyPressed(evt);
+            }
+        });
+        jScrollPane3.setViewportView(tablaDisponibilidadArticulos);
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -1094,28 +1200,32 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(12, 12, 12)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(check_solo_negativos, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton6))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(check_solo_negativos, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtDisponibilidadFechaInicial, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel10))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel11)
-                                    .addComponent(txtDisponibilidadFechaFinal, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(radioBtnTodos, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(radioBtnFechaEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(radioBtnFechaDevolucion, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 104, Short.MAX_VALUE)))
-                .addContainerGap())
+                            .addComponent(txtDisponibilidadFechaInicial, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel10))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel11)
+                            .addComponent(txtDisponibilidadFechaFinal, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(radioBtnTodos, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(radioBtnFechaEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(radioBtnFechaDevolucion, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(116, Short.MAX_VALUE))
+            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel4Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 1276, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1137,11 +1247,16 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                                 .addComponent(radioBtnTodos)
                                 .addComponent(radioBtnFechaDevolucion)
                                 .addComponent(radioBtnFechaEntrega)))))
-                .addGap(7, 7, 7)
-                .addComponent(check_solo_negativos)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGap(4, 4, 4)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(check_solo_negativos)
+                    .addComponent(jButton6))
+                .addGap(450, 450, 450))
+            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel4Layout.createSequentialGroup()
+                    .addGap(89, 89, 89)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 412, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(24, Short.MAX_VALUE)))
         );
 
         jTabbedPane1.addTab("consultar disponibilidad", jPanel4);
@@ -1456,6 +1571,19 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         win.show();
     }//GEN-LAST:event_jButton5ActionPerformed
 
+    private void tablaDisponibilidadArticulosKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tablaDisponibilidadArticulosKeyPressed
+        UtilityCommon.selectCheckBoxWhenKeyPressedIsSpace(evt,tablaDisponibilidadArticulos,Column.BOOLEAN.getNumber());
+    }//GEN-LAST:event_tablaDisponibilidadArticulosKeyPressed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+       DefaultTableModel temp = (DefaultTableModel) tablaDisponibilidadArticulos.getModel();
+        for (int i = 0; i < tablaDisponibilidadArticulos.getRowCount(); i++) {
+            if (Boolean.parseBoolean(tablaDisponibilidadArticulos.getValueAt(i, Column.BOOLEAN.getNumber()).toString())) {
+                temp.removeRow(i);
+            }
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnMostrarAgregarCompra;
@@ -1470,6 +1598,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1487,7 +1616,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
@@ -1503,7 +1632,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     public static javax.swing.JRadioButton radioBtnFechaDevolucion;
     public static javax.swing.JRadioButton radioBtnFechaEntrega;
     public static javax.swing.JRadioButton radioBtnTodos;
-    public static final javax.swing.JTable tablaDisponibilidadArticulos = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
+    public static javax.swing.JTable tablaDisponibilidadArticulos;
     private javax.swing.JTable tabla_articulos;
     private javax.swing.JTextField txtCodigo;
     public static com.toedter.calendar.JDateChooser txtDisponibilidadFechaFinal;
