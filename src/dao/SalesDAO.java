@@ -116,8 +116,6 @@ public class SalesDAO {
         try {
             
             List<AvailabilityItemResult> availabilityItemResults;
-            parameters.put("estado_renta", ApplicationConstants.ESTADO_EN_RENTA);
-            parameters.put("tipo_pedido", ApplicationConstants.TIPO_PEDIDO);
             
             parameters.put("statusOrderFinish", ApplicationConstants.STATUS_ORDER_PROVIDER_FINISH);
             parameters.put("statusOrder", ApplicationConstants.STATUS_ORDER_PROVIDER_ORDER);

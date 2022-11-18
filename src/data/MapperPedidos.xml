@@ -502,6 +502,24 @@
             STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
             AND renta.id_tipo = #{tipo_pedido_id}
             AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+            <choose>
+                <when test="includeRentaId != null">
+                  AND renta.id_renta IN (
+                    SELECT renta_in_1.id_renta
+                    FROM renta AS renta_in_1
+                    WHERE renta_in_1.id_renta = #{includeRentaId}
+                    UNION
+                    SELECT renta_in.id_renta 
+                    FROM renta AS renta_in
+                    WHERE renta_in.id_tipo = #{tipo_pedido_id}
+                    AND renta_in.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+                  )
+                </when>
+                <otherwise>
+                  AND renta.id_tipo = #{tipo_pedido_id}
+                  AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+                </otherwise>
+            </choose>
             <if test="filterByItems != null">
                 <foreach item="item" index="index" collection="filterByItems"
                     open="AND detalle.id_articulo IN (" separator="," close=")" >
@@ -603,6 +621,24 @@
             STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
             AND renta.id_tipo = #{tipo_pedido_id}
             AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+            <choose>
+                <when test="includeRentaId != null">
+                  AND renta.id_renta IN (
+                    SELECT renta_in_1.id_renta
+                    FROM renta AS renta_in_1
+                    WHERE renta_in_1.id_renta = #{includeRentaId}
+                    UNION
+                    SELECT renta_in.id_renta 
+                    FROM renta AS renta_in
+                    WHERE renta_in.id_tipo = #{tipo_pedido_id}
+                    AND renta_in.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+                  )
+                </when>
+                <otherwise>
+                  AND renta.id_tipo = #{tipo_pedido_id}
+                  AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+                </otherwise>
+            </choose>
             <if test="filterByItems != null">
                 <foreach item="item" index="index" collection="filterByItems"
                     open="AND detalle.id_articulo IN (" separator="," close=")" >
@@ -704,6 +740,24 @@
             STR_TO_DATE(#{endDate},'%d/%m/%Y') BETWEEN STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') AND STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y')
             AND renta.id_tipo = #{tipo_pedido_id}
             AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+            <choose>
+                <when test="includeRentaId != null">
+                  AND renta.id_renta IN (
+                    SELECT renta_in_1.id_renta
+                    FROM renta AS renta_in_1
+                    WHERE renta_in_1.id_renta = #{includeRentaId}
+                    UNION
+                    SELECT renta_in.id_renta 
+                    FROM renta AS renta_in
+                    WHERE renta_in.id_tipo = #{tipo_pedido_id}
+                    AND renta_in.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+                  )
+                </when>
+                <otherwise>
+                  AND renta.id_tipo = #{tipo_pedido_id}
+                  AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+                </otherwise>
+            </choose>
             <if test="filterByItems != null">
                 <foreach item="item" index="index" collection="filterByItems"
                     open="AND detalle.id_articulo IN (" separator="," close=")" >
@@ -807,8 +861,24 @@
             INNER JOIN color color ON (color.id_color = articulo.id_color)
         WHERE
             STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
-            AND renta.id_tipo = #{tipo_pedido_id}
-            AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+            <choose>
+                <when test="includeRentaId != null">
+                  AND renta.id_renta IN (
+                    SELECT renta_in_1.id_renta
+                    FROM renta AS renta_in_1
+                    WHERE renta_in_1.id_renta = #{includeRentaId}
+                    UNION
+                    SELECT renta_in.id_renta 
+                    FROM renta AS renta_in
+                    WHERE renta_in.id_tipo = #{tipo_pedido_id}
+                    AND renta_in.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+                  )
+                </when>
+                <otherwise>
+                  AND renta.id_tipo = #{tipo_pedido_id}
+                  AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+                </otherwise>
+            </choose>
             <if test="filterByItems != null">
                 <foreach item="item" index="index" collection="filterByItems"
                     open="AND detalle.id_articulo IN (" separator="," close=")" >
@@ -913,6 +983,24 @@
             STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
             AND renta.id_tipo = #{tipo_pedido_id}
             AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+            <choose>
+                <when test="includeRentaId != null">
+                  AND renta.id_renta IN (
+                    SELECT renta_in_1.id_renta
+                    FROM renta AS renta_in_1
+                    WHERE renta_in_1.id_renta = #{includeRentaId}
+                    UNION
+                    SELECT renta_in.id_renta 
+                    FROM renta AS renta_in
+                    WHERE renta_in.id_tipo = #{tipo_pedido_id}
+                    AND renta_in.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+                  )
+                </when>
+                <otherwise>
+                  AND renta.id_tipo = #{tipo_pedido_id}
+                  AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
+                </otherwise>
+            </choose>
             <if test="filterByItems != null">
                 <foreach item="item" index="index" collection="filterByItems"
                     open="AND detalle.id_articulo IN (" separator="," close=")" >

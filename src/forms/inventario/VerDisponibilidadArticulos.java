@@ -83,7 +83,8 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
             Boolean showByDeliveryDate,
             Boolean showByReturnDate,
             List<Long> filterByItems,
-            List<AvailabilityItemResult> itemsFromNewFolio
+            List<AvailabilityItemResult> itemsFromNewFolio,
+            Long includeRentaId
     ) {
         super(parent, modal);
         initComponents();    
@@ -107,7 +108,8 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
                 showOnlyNegatives,
                 showByDeliveryDate,
                 showByReturnDate,
-                filterByItems
+                filterByItems,
+                includeRentaId
         );
         
     }
@@ -161,10 +163,15 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
            temp.addRow(nuevo);
     }
     
-    private void executeMainProccess(String initialDate, String endDate, Boolean showOnlyNegatives, Boolean showByDeliveryDate, Boolean showByReturnDate, List<Long> filterByItems){       
+    private void executeMainProccess(String initialDate, 
+            String endDate, Boolean showOnlyNegatives, 
+            Boolean showByDeliveryDate, Boolean showByReturnDate, List<Long> filterByItems,
+            Long includeRentaId
+    ){       
         
         StringBuilder mensaje = new StringBuilder();
         Map<String,Object> parameters = new HashMap<>();
+        parameters.put("includeRentaId", includeRentaId);
         // MOSTRAR POR FECHA DE ENTREGA
         parameters.put("showByDeliveryDate", showByDeliveryDate);
         
@@ -465,7 +472,7 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                VerDisponibilidadArticulos dialog = new VerDisponibilidadArticulos(new java.awt.Frame(), true, "", "",false, false, false, null, null);
+                VerDisponibilidadArticulos dialog = new VerDisponibilidadArticulos(new java.awt.Frame(), true, "", "",false, false, false, null, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

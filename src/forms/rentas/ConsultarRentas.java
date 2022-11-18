@@ -335,7 +335,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             itemsId.add(Long.parseLong(tabla_detalle.getValueAt(i, 2).toString()));
         }
         
-        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,initDate,endDate,false,true,false, itemsId, null);
+        VerDisponibilidadArticulos ventanaVerDisponibilidad = 
+                new VerDisponibilidadArticulos(null, true,initDate,endDate,false,true,false, itemsId, null, Long.parseLong(globalRenta.getRentaId()+""));
         ventanaVerDisponibilidad.setVisible(true);
         ventanaVerDisponibilidad.setLocationRelativeTo(null);
         

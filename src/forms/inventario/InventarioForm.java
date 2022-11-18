@@ -439,7 +439,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         for (int i = 0; i < InventarioForm.tablaDisponibilidadArticulos.getRowCount(); i++) {
             itemsId.add(Long.parseLong(tablaDisponibilidadArticulos.getValueAt(i, Column.ID.getNumber()).toString()));
         }
-        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,initDate,endDate,check_solo_negativos.isSelected(),radioBtnFechaEntrega.isSelected(),radioBtnFechaDevolucion.isSelected(), itemsId, null);
+        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,initDate,endDate,check_solo_negativos.isSelected(),radioBtnFechaEntrega.isSelected(),radioBtnFechaDevolucion.isSelected(), itemsId, null, null);
         ventanaVerDisponibilidad.setVisible(true);
         ventanaVerDisponibilidad.setLocationRelativeTo(null);
     }
