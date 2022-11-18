@@ -657,3 +657,41 @@ CREATE TABLE tasks_chofer_delivery (
     ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- tabla para el estatus de la ordenes para proveedor de un folio
+
+CREATE TABLE status_orders_provider_by_renta_catalog (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  description VARCHAR(145) NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE status_orders_provider_by_renta (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  renta_id INT(11) NOT NULL,
+  status_provider_orders_by_renta_catalog_id INT(11) NOT NULL,
+  user_id INT(11) NOT NULL,
+  comment VARCHAR(700) NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id),
+  CONSTRAINT fk_status_provider_orders_by_renta_renta_id
+    FOREIGN KEY (renta_id)
+    REFERENCES renta (id_renta)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_status_provider_orders_by_renta_catalog_id
+    FOREIGN KEY (status_provider_orders_by_renta_catalog_id)
+    REFERENCES status_provider_orders_by_renta_catalog (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_status_provider_orders_by_renta_user_id
+    FOREIGN KEY (user_id)
+    REFERENCES usuarios (id_usuarios)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
