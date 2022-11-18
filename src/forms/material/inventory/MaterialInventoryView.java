@@ -61,7 +61,6 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         System.out.println("GET INFO");
         MeasurementUnit measurementUnit = (MeasurementUnit) cmbMeasurementUnit.getSelectedItem();
         MeasurementUnit measurementUnitPurchaseUnit = (MeasurementUnit) cmbMeasurementPurchaseUnit.getSelectedItem();
-        String result = "";
         String total = txtPurchaseAmount.getText().isEmpty() ? "0" : txtPurchaseAmount.getText();
         if (measurementUnit.getId() != 0 && measurementUnitPurchaseUnit.getId() != 0) {
             lblMeasurementUnitInfo.setText(

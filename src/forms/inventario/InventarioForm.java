@@ -37,6 +37,7 @@ import common.model.CategoriaDTO;
 import common.model.Color;
 import services.CategoryService;
 import common.services.ItemService;
+import java.beans.PropertyChangeEvent;
 import static mobiliario.IndexForm.jDesktopPane1;
 
 public class InventarioForm extends javax.swing.JInternalFrame {
@@ -78,8 +79,41 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         }        
         formato_tabla();
         this.setTitle(TITLE);
+        lblInfoConsultarDisponibilidad.setText("");
+        
+        txtDisponibilidadFechaInicial.getDateEditor().addPropertyChangeListener((PropertyChangeEvent e) -> {
+            if ("date".equals(e.getPropertyName())) {
+                setLblInfoStatusChange();
+            }
+        });
+        txtDisponibilidadFechaFinal.getDateEditor().addPropertyChangeListener((PropertyChangeEvent e) -> {
+            if ("date".equals(e.getPropertyName())) {
+                setLblInfoStatusChange();
+            }
+        });
+        
     }
     
+    private static void setLblInfoStatusChange () {
+        
+        final String FORMAT_DATE = "dd/MM/yy"; 
+        int rowCount = tablaDisponibilidadArticulos.getRowCount();
+        String initDate = txtDisponibilidadFechaInicial.getDate() != null ? new SimpleDateFormat(FORMAT_DATE).format(txtDisponibilidadFechaInicial.getDate()) : null;
+        String endDate = txtDisponibilidadFechaFinal.getDate() != null ? new SimpleDateFormat(FORMAT_DATE).format(txtDisponibilidadFechaFinal.getDate()) : null;
+        
+        String message = "";
+        
+        if (initDate != null && endDate != null) {
+            if (rowCount > 0) {
+                message = String.format("Articulos a mostrar %s entre el dia %s y %s",rowCount,initDate,endDate);
+            } else {
+                message = String.format("Mostrar todos los articulos entre el dia %s y %s", initDate,endDate);
+            }
+        }
+        
+        lblInfoConsultarDisponibilidad.setText(message);
+        
+    }
     private enum Column{
         
         BOOLEAN(0,"",Boolean.class, true),
@@ -232,7 +266,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                articulo.getPrecioRenta(),
                articulo.getCantidad()
          };
-         temp.addRow(fila);         
+         temp.addRow(fila);
+         setLblInfoStatusChange();
         return true;
     }
 
@@ -402,7 +437,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         String endDate = new SimpleDateFormat("dd/MM/yyyy").format(txtDisponibilidadFechaFinal.getDate());
         List<Long> itemsId = new ArrayList<>();
         for (int i = 0; i < InventarioForm.tablaDisponibilidadArticulos.getRowCount(); i++) {
-            itemsId.add(Long.parseLong(tablaDisponibilidadArticulos.getValueAt(i, 0).toString()));
+            itemsId.add(Long.parseLong(tablaDisponibilidadArticulos.getValueAt(i, Column.ID.getNumber()).toString()));
         }
         VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,initDate,endDate,check_solo_negativos.isSelected(),radioBtnFechaEntrega.isSelected(),radioBtnFechaDevolucion.isSelected(), itemsId, null);
         ventanaVerDisponibilidad.setVisible(true);
@@ -689,22 +724,26 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         btnMostrarAgregarCompra = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        btnAddItem = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
+        check_solo_negativos = new javax.swing.JCheckBox();
+        btnShowAvailivity = new javax.swing.JButton();
+        lblInfoConsultarDisponibilidad = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tablaDisponibilidadArticulos = new javax.swing.JTable();
+        jPanel7 = new javax.swing.JPanel();
         txtDisponibilidadFechaInicial = new com.toedter.calendar.JDateChooser();
         txtDisponibilidadFechaFinal = new com.toedter.calendar.JDateChooser();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        jToolBar2 = new javax.swing.JToolBar();
-        jtbnDisponibilidadAgregarArticulo = new javax.swing.JButton();
-        jbtnBuscarDisponibilidad = new javax.swing.JButton();
         radioBtnTodos = new javax.swing.JRadioButton();
         radioBtnFechaDevolucion = new javax.swing.JRadioButton();
         radioBtnFechaEntrega = new javax.swing.JRadioButton();
-        check_solo_negativos = new javax.swing.JCheckBox();
-        jButton6 = new javax.swing.JButton();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        tablaDisponibilidadArticulos = new javax.swing.JTable();
 
         setClosable(true);
+        setResizable(true);
         setTitle("Inventario");
         setFont(new java.awt.Font("Microsoft Sans Serif", 1, 12)); // NOI18N
         setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Inventory-icon.png"))); // NOI18N
@@ -878,7 +917,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lbl_buscar))
                             .addComponent(jLabel12))
-                        .addGap(0, 441, Short.MAX_VALUE)))
+                        .addGap(0, 355, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -1051,7 +1090,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
             .addGroup(jPanel3Layout.createSequentialGroup()
@@ -1061,6 +1100,113 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         );
 
         jTabbedPane1.addTab("agregar, editar articulos", jPanel3);
+
+        btnAddItem.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        btnAddItem.setText("Agregar");
+        btnAddItem.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnAddItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddItemActionPerformed(evt);
+            }
+        });
+
+        jButton6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jButton6.setText("Quitar");
+        jButton6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
+        check_solo_negativos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        check_solo_negativos.setText("Mostrar solo faltantes");
+        check_solo_negativos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                check_solo_negativosActionPerformed(evt);
+            }
+        });
+
+        btnShowAvailivity.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        btnShowAvailivity.setText("Mostrar disponibilidad");
+        btnShowAvailivity.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnShowAvailivity.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnShowAvailivityActionPerformed(evt);
+            }
+        });
+
+        lblInfoConsultarDisponibilidad.setFont(new java.awt.Font("Arial", 3, 12)); // NOI18N
+        lblInfoConsultarDisponibilidad.setForeground(new java.awt.Color(204, 0, 51));
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(check_solo_negativos, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnAddItem)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnShowAvailivity)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblInfoConsultarDisponibilidad, javax.swing.GroupLayout.PREFERRED_SIZE, 694, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnAddItem)
+                            .addComponent(jButton6)
+                            .addComponent(check_solo_negativos)
+                            .addComponent(btnShowAvailivity)))
+                    .addComponent(lblInfoConsultarDisponibilidad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        tablaDisponibilidadArticulos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        tablaDisponibilidadArticulos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tablaDisponibilidadArticulos.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tablaDisponibilidadArticulosKeyPressed(evt);
+            }
+        });
+        jScrollPane3.setViewportView(tablaDisponibilidadArticulos);
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3)
+                .addContainerGap())
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
         txtDisponibilidadFechaInicial.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         txtDisponibilidadFechaInicial.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -1092,43 +1238,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         jLabel11.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel11.setText("Fecha Final");
 
-        jToolBar2.setFloatable(false);
-        jToolBar2.setRollover(true);
-        jToolBar2.setBorderPainted(false);
-
-        jtbnDisponibilidadAgregarArticulo.setText("Agregar articulo");
-        jtbnDisponibilidadAgregarArticulo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jtbnDisponibilidadAgregarArticulo.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jtbnDisponibilidadAgregarArticuloMouseClicked(evt);
-            }
-        });
-        jtbnDisponibilidadAgregarArticulo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtbnDisponibilidadAgregarArticuloActionPerformed(evt);
-            }
-        });
-        jtbnDisponibilidadAgregarArticulo.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                jtbnDisponibilidadAgregarArticuloKeyPressed(evt);
-            }
-        });
-        jToolBar2.add(jtbnDisponibilidadAgregarArticulo);
-
-        jbtnBuscarDisponibilidad.setText("Mostrar disponibilidad");
-        jbtnBuscarDisponibilidad.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jbtnBuscarDisponibilidad.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jbtnBuscarDisponibilidadMouseClicked(evt);
-            }
-        });
-        jbtnBuscarDisponibilidad.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbtnBuscarDisponibilidadActionPerformed(evt);
-            }
-        });
-        jToolBar2.add(jbtnBuscarDisponibilidad);
-
         buttonGroup1.add(radioBtnTodos);
         radioBtnTodos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         radioBtnTodos.setSelected(true);
@@ -1157,106 +1266,69 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             }
         });
 
-        check_solo_negativos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        check_solo_negativos.setText("Mostrar solo faltantes");
-        check_solo_negativos.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                check_solo_negativosActionPerformed(evt);
-            }
-        });
-
-        jButton6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jButton6.setText("Quitar elemento");
-        jButton6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
-            }
-        });
-
-        tablaDisponibilidadArticulos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        tablaDisponibilidadArticulos.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tablaDisponibilidadArticulos.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                tablaDisponibilidadArticulosKeyPressed(evt);
-            }
-        });
-        jScrollPane3.setViewportView(tablaDisponibilidadArticulos);
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtDisponibilidadFechaInicial, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel10))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel11)
+                    .addComponent(txtDisponibilidadFechaFinal, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioBtnTodos, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioBtnFechaEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioBtnFechaDevolucion, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel10)
+                            .addComponent(jLabel11))
+                        .addGap(1, 1, 1)
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtDisponibilidadFechaFinal, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtDisponibilidadFechaInicial, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(radioBtnTodos)
+                        .addComponent(radioBtnFechaDevolucion)
+                        .addComponent(radioBtnFechaEntrega))))
+        );
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(12, 12, 12)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(check_solo_negativos, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton6))
+                        .addContainerGap()
+                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtDisponibilidadFechaInicial, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel10))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel11)
-                            .addComponent(txtDisponibilidadFechaFinal, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioBtnTodos, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioBtnFechaEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioBtnFechaDevolucion, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(116, Short.MAX_VALUE))
-            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel4Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 1276, Short.MAX_VALUE)
-                    .addContainerGap()))
+                        .addContainerGap()
+                        .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel10)
-                                    .addComponent(jLabel11))
-                                .addGap(1, 1, 1)
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtDisponibilidadFechaFinal, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtDisponibilidadFechaInicial, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(radioBtnTodos)
-                                .addComponent(radioBtnFechaDevolucion)
-                                .addComponent(radioBtnFechaEntrega)))))
-                .addGap(4, 4, 4)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(check_solo_negativos)
-                    .addComponent(jButton6))
-                .addGap(450, 450, 450))
-            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel4Layout.createSequentialGroup()
-                    .addGap(89, 89, 89)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 412, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(24, Short.MAX_VALUE)))
+                .addContainerGap()
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("consultar disponibilidad", jPanel4);
@@ -1266,16 +1338,15 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1305, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1219, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 552, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(8, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -1432,64 +1503,9 @@ public class InventarioForm extends javax.swing.JInternalFrame {
       
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void txtDisponibilidadFechaInicialMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtDisponibilidadFechaInicialMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtDisponibilidadFechaInicialMouseClicked
-
-    private void txtDisponibilidadFechaInicialKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDisponibilidadFechaInicialKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtDisponibilidadFechaInicialKeyPressed
-
-    private void txtDisponibilidadFechaFinalMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtDisponibilidadFechaFinalMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtDisponibilidadFechaFinalMouseClicked
-
-    private void txtDisponibilidadFechaFinalKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDisponibilidadFechaFinalKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtDisponibilidadFechaFinalKeyPressed
-
-    private void jtbnDisponibilidadAgregarArticuloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtbnDisponibilidadAgregarArticuloActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jtbnDisponibilidadAgregarArticuloActionPerformed
-
-    private void jtbnDisponibilidadAgregarArticuloKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtbnDisponibilidadAgregarArticuloKeyPressed
-       
-    }//GEN-LAST:event_jtbnDisponibilidadAgregarArticuloKeyPressed
-
-    private void jtbnDisponibilidadAgregarArticuloMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtbnDisponibilidadAgregarArticuloMouseClicked
-        mostrar_agregar_articulo();
-    }//GEN-LAST:event_jtbnDisponibilidadAgregarArticuloMouseClicked
-
     private void txtCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodigoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtCodigoActionPerformed
-
-    private void jbtnBuscarDisponibilidadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnBuscarDisponibilidadActionPerformed
-        
-    }//GEN-LAST:event_jbtnBuscarDisponibilidadActionPerformed
-
-    private void jbtnBuscarDisponibilidadMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jbtnBuscarDisponibilidadMouseClicked
-        StringBuilder mensaje = new StringBuilder();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
-        int contador = 0;
-        if ((txtDisponibilidadFechaInicial.getDate() == null 
-                || txtDisponibilidadFechaFinal.getDate() == null)) {
-            mensaje.append(++contador + ". Fecha inicial y final son requeridos.\n");
-        }else{          
-            // 2018-12-04 verificamos que la fecha inicial sea menor a la fecha final
-             LocalDate initDate = LocalDate.parse(sdf.format(txtDisponibilidadFechaInicial.getDate()),formatter);
-             LocalDate endDate = LocalDate.parse(sdf.format(txtDisponibilidadFechaFinal.getDate()),formatter);
-             
-             if(initDate.isAfter(endDate))
-                  mensaje.append(++contador + ". Fecha inicial debe ser menor a fecha final.\n");
-        }
-        
-        if(!mensaje.toString().equals(""))
-              JOptionPane.showMessageDialog(null, mensaje.toString(), "Error", JOptionPane.INFORMATION_MESSAGE);
-        else
-            this.mostrar_ver_disponibilidad_articulos();
-    }//GEN-LAST:event_jbtnBuscarDisponibilidadMouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
        utilityService.exportarExcel(tabla_articulos);
@@ -1507,18 +1523,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         if (evt.getClickCount() == 2)
             this.mostrarVentanaFoliosPorArticulos();
     }//GEN-LAST:event_tabla_articulosMouseClicked
-
-    private void radioBtnTodosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioBtnTodosActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_radioBtnTodosActionPerformed
-
-    private void radioBtnFechaDevolucionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioBtnFechaDevolucionActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_radioBtnFechaDevolucionActionPerformed
-
-    private void radioBtnFechaEntregaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioBtnFechaEntregaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_radioBtnFechaEntregaActionPerformed
 
     private void check_solo_negativosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_check_solo_negativosActionPerformed
         // TODO add your handling code here:
@@ -1577,16 +1581,74 @@ public class InventarioForm extends javax.swing.JInternalFrame {
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
        DefaultTableModel temp = (DefaultTableModel) tablaDisponibilidadArticulos.getModel();
-        for (int i = 0; i < tablaDisponibilidadArticulos.getRowCount(); i++) {
+        for( int i = temp.getRowCount() - 1; i >= 0; i-- ){
             if (Boolean.parseBoolean(tablaDisponibilidadArticulos.getValueAt(i, Column.BOOLEAN.getNumber()).toString())) {
                 temp.removeRow(i);
             }
         }
+        setLblInfoStatusChange();
     }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void btnAddItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddItemActionPerformed
+        mostrar_agregar_articulo();
+    }//GEN-LAST:event_btnAddItemActionPerformed
+
+    private void btnShowAvailivityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowAvailivityActionPerformed
+        StringBuilder mensaje = new StringBuilder();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+        int contador = 0;
+        if ((txtDisponibilidadFechaInicial.getDate() == null 
+                || txtDisponibilidadFechaFinal.getDate() == null)) {
+            mensaje.append(++contador).append(". Fecha inicial y final son requeridos.\n");
+        }else{          
+            // 2018-12-04 verificamos que la fecha inicial sea menor a la fecha final
+             LocalDate initDate = LocalDate.parse(sdf.format(txtDisponibilidadFechaInicial.getDate()),formatter);
+             LocalDate endDate = LocalDate.parse(sdf.format(txtDisponibilidadFechaFinal.getDate()),formatter);
+             
+             if(initDate.isAfter(endDate))
+                  mensaje.append(++contador).append(". Fecha inicial debe ser menor a fecha final.\n");
+        }
+        
+        if(!mensaje.isEmpty())
+              JOptionPane.showMessageDialog(null, mensaje.toString(), "Error", JOptionPane.INFORMATION_MESSAGE);
+        else
+            this.mostrar_ver_disponibilidad_articulos();
+    }//GEN-LAST:event_btnShowAvailivityActionPerformed
+
+    private void radioBtnFechaEntregaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioBtnFechaEntregaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_radioBtnFechaEntregaActionPerformed
+
+    private void radioBtnFechaDevolucionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioBtnFechaDevolucionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_radioBtnFechaDevolucionActionPerformed
+
+    private void radioBtnTodosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioBtnTodosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_radioBtnTodosActionPerformed
+
+    private void txtDisponibilidadFechaFinalKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDisponibilidadFechaFinalKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDisponibilidadFechaFinalKeyPressed
+
+    private void txtDisponibilidadFechaFinalMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtDisponibilidadFechaFinalMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDisponibilidadFechaFinalMouseClicked
+
+    private void txtDisponibilidadFechaInicialKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDisponibilidadFechaInicialKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDisponibilidadFechaInicialKeyPressed
+
+    private void txtDisponibilidadFechaInicialMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtDisponibilidadFechaInicialMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDisponibilidadFechaInicialMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAddItem;
     private javax.swing.JButton btnMostrarAgregarCompra;
+    private javax.swing.JButton btnShowAvailivity;
     private javax.swing.ButtonGroup buttonGroup1;
     public static javax.swing.JCheckBox check_solo_negativos;
     private javax.swing.JComboBox<CategoriaDTO> cmb_categoria;
@@ -1615,28 +1677,29 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JToolBar jToolBar2;
-    private javax.swing.JButton jbtnBuscarDisponibilidad;
     private javax.swing.JButton jbtn_agregar;
     private javax.swing.JButton jbtn_editar;
     private javax.swing.JButton jbtn_guardar;
     private javax.swing.JButton jbtn_nuevo;
-    private javax.swing.JButton jtbnDisponibilidadAgregarArticulo;
+    private static javax.swing.JLabel lblInfoConsultarDisponibilidad;
     private javax.swing.JLabel lbl_buscar;
     private javax.swing.JLabel lbl_categoria;
     private javax.swing.JLabel lbl_color;
-    public static javax.swing.JRadioButton radioBtnFechaDevolucion;
-    public static javax.swing.JRadioButton radioBtnFechaEntrega;
-    public static javax.swing.JRadioButton radioBtnTodos;
+    private javax.swing.JRadioButton radioBtnFechaDevolucion;
+    private javax.swing.JRadioButton radioBtnFechaEntrega;
+    private javax.swing.JRadioButton radioBtnTodos;
     public static javax.swing.JTable tablaDisponibilidadArticulos;
     private javax.swing.JTable tabla_articulos;
     private javax.swing.JTextField txtCodigo;
-    public static com.toedter.calendar.JDateChooser txtDisponibilidadFechaFinal;
-    public static com.toedter.calendar.JDateChooser txtDisponibilidadFechaInicial;
+    private static com.toedter.calendar.JDateChooser txtDisponibilidadFechaFinal;
+    private static com.toedter.calendar.JDateChooser txtDisponibilidadFechaInicial;
     private javax.swing.JTextField txt_cantidad;
     private javax.swing.JTextField txt_descripcion;
     private javax.swing.JTextField txt_descripcion2;
