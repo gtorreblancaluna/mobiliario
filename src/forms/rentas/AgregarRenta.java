@@ -952,7 +952,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         Utility.pushNotification(messageSuccess);
         log.info(messageSuccess);
         
-        if (id_tipo.equals(ApplicationConstants.TIPO_PEDIDO)) {
+        if (id_tipo.equals(ApplicationConstants.TIPO_PEDIDO) || id_tipo.equals(ApplicationConstants.TIPO_FABRICACION)) {
             new Thread(() -> {
                 String message;
                 try {
