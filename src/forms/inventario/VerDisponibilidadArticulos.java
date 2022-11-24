@@ -84,6 +84,7 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
             Boolean showByReturnDate,
             List<Long> filterByItems,
             List<AvailabilityItemResult> itemsFromNewFolio,
+            // incluir la renta id
             Long includeRentaId
     ) {
         super(parent, modal);
