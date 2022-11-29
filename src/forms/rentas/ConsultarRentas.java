@@ -77,6 +77,8 @@ import forms.inventario.VerDisponibilidadArticulos;
 import services.providers.OrderProviderService;
 import common.services.TaskAlmacenUpdateService;
 import common.services.TaskDeliveryChoferUpdateService;
+import utilities.OptionPaneService;
+import utilities.dtos.ResultDataShowByDeliveryOrReturnDate;
 
 public class ConsultarRentas extends javax.swing.JInternalFrame {
     
@@ -326,6 +328,16 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             return;
         }
         
+        OptionPaneService optionPaneService = OptionPaneService.getInstance();
+        ResultDataShowByDeliveryOrReturnDate resultDataShowByDeliveryOrReturnDate;
+        try {
+            resultDataShowByDeliveryOrReturnDate = 
+                    optionPaneService.getOptionPaneShowByDeliveryOrReturnDateItemsAvailivity(this);   
+        } catch (BusinessException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;            
+        }
+        
         String initDate = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
         String endDate = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
 
@@ -336,7 +348,18 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
         
         VerDisponibilidadArticulos ventanaVerDisponibilidad = 
-                new VerDisponibilidadArticulos(null, true,initDate,endDate,false,true,false, itemsId, null, Long.parseLong(globalRenta.getRentaId()+""));
+                new VerDisponibilidadArticulos(
+                        null,
+                        true,
+                        initDate,
+                        endDate,
+                        false,
+                        resultDataShowByDeliveryOrReturnDate.getShowByDeliveryDate(),
+                        resultDataShowByDeliveryOrReturnDate.getShowByReturnDate(),
+                        itemsId,
+                        null,
+                        Long.parseLong(globalRenta.getRentaId()+"")
+                );
         ventanaVerDisponibilidad.setVisible(true);
         ventanaVerDisponibilidad.setLocationRelativeTo(null);
         

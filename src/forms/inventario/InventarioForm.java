@@ -439,7 +439,18 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         for (int i = 0; i < InventarioForm.tablaDisponibilidadArticulos.getRowCount(); i++) {
             itemsId.add(Long.parseLong(tablaDisponibilidadArticulos.getValueAt(i, Column.ID.getNumber()).toString()));
         }
-        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,initDate,endDate,check_solo_negativos.isSelected(),radioBtnFechaEntrega.isSelected(),radioBtnFechaDevolucion.isSelected(), itemsId, null, null);
+        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(
+                null,
+                true,
+                initDate,
+                endDate,
+                check_solo_negativos.isSelected(),
+                radioBtnFechaEntrega.isSelected(),
+                radioBtnFechaDevolucion.isSelected(),
+                itemsId,
+                null,
+                null
+        );
         ventanaVerDisponibilidad.setVisible(true);
         ventanaVerDisponibilidad.setLocationRelativeTo(null);
     }
@@ -1610,7 +1621,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                   mensaje.append(++contador).append(". Fecha inicial debe ser menor a fecha final.\n");
         }
         
-        if(!mensaje.isEmpty())
+        if(!mensaje.toString().isEmpty())
               JOptionPane.showMessageDialog(null, mensaje.toString(), "Error", JOptionPane.INFORMATION_MESSAGE);
         else
             this.mostrar_ver_disponibilidad_articulos();

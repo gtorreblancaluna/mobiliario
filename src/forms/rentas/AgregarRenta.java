@@ -58,7 +58,9 @@ import services.SaleService;
 import services.SystemService;
 import common.services.TaskAlmacenUpdateService;
 import common.services.TaskDeliveryChoferUpdateService;
+import utilities.OptionPaneService;
 import utilities.Utility;
+import utilities.dtos.ResultDataShowByDeliveryOrReturnDate;
 
 public class AgregarRenta extends javax.swing.JInternalFrame {
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AgregarRenta.class.getName());
@@ -187,6 +189,17 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             return;
         }
         
+        OptionPaneService optionPaneService = OptionPaneService.getInstance();
+        ResultDataShowByDeliveryOrReturnDate resultDataShowByDeliveryOrReturnDate;
+        try {
+            resultDataShowByDeliveryOrReturnDate = 
+                    optionPaneService.getOptionPaneShowByDeliveryOrReturnDateItemsAvailivity(this);   
+        } catch (BusinessException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;            
+        }
+        
+        
         String deliveryDateOrder = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
         String returnDateOrder = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
 
@@ -221,7 +234,18 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             availabilityItemResults.add(availabilityItemResult);
         }
         
-        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(null, true,deliveryDateOrder,returnDateOrder,false,true,false,itemsId,availabilityItemResults, null);
+        VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(
+                null,
+                true,
+                deliveryDateOrder,
+                returnDateOrder,
+                false,
+                resultDataShowByDeliveryOrReturnDate.getShowByDeliveryDate(),
+                resultDataShowByDeliveryOrReturnDate.getShowByReturnDate(),
+                itemsId,
+                availabilityItemResults,
+                null
+        );
         ventanaVerDisponibilidad.setVisible(true);
         ventanaVerDisponibilidad.setLocationRelativeTo(null);
     }
@@ -231,7 +255,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         try{
             UtilityCommon.isEmail(email);
         }catch(MessagingException e){
-            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR);
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR);
             return;            
         }
         String asunto;

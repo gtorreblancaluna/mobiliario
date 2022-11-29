@@ -75,17 +75,18 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
     }
     
    
-    public VerDisponibilidadArticulos(java.awt.Frame parent, 
-            boolean modal,
-            String initialDate,
-            String endDate,
-            Boolean showOnlyNegatives,
-            Boolean showByDeliveryDate,
-            Boolean showByReturnDate,
-            List<Long> filterByItems,
-            List<AvailabilityItemResult> itemsFromNewFolio,
+    public VerDisponibilidadArticulos(
+            java.awt.Frame parent, //0
+            boolean modal,//1
+            String initialDate,//2
+            String endDate,//3
+            Boolean showOnlyNegatives,//4
+            Boolean showByDeliveryDate, //5
+            Boolean showByReturnDate,//6
+            List<Long> filterByItems,//7
+            List<AvailabilityItemResult> itemsFromNewFolio,//8
             // incluir la renta id
-            Long includeRentaId
+            Long includeRentaId//9
     ) {
         super(parent, modal);
         initComponents();    
@@ -104,13 +105,13 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
         }
         
         executeMainProccess(
-                initialDate,
-                endDate,
-                showOnlyNegatives,
-                showByDeliveryDate,
-                showByReturnDate,
-                filterByItems,
-                includeRentaId
+                initialDate,//0
+                endDate,//1
+                showOnlyNegatives,//2
+                showByDeliveryDate,//3
+                showByReturnDate,//4
+                filterByItems,//5
+                includeRentaId//6
         );
         
     }
@@ -164,10 +165,14 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
            temp.addRow(nuevo);
     }
     
-    private void executeMainProccess(String initialDate, 
-            String endDate, Boolean showOnlyNegatives, 
-            Boolean showByDeliveryDate, Boolean showByReturnDate, List<Long> filterByItems,
-            Long includeRentaId
+    private void executeMainProccess(
+            String initialDate,//0
+            String endDate,//1
+            Boolean showOnlyNegatives,//2
+            Boolean showByDeliveryDate,//3
+            Boolean showByReturnDate,//4
+            List<Long> filterByItems,//5
+            Long includeRentaId//6
     ){       
         
         StringBuilder mensaje = new StringBuilder();
@@ -178,8 +183,15 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
         
         // MOSTRAR POR FECHA DE DEVOLUCION
         parameters.put("showByReturnDate", showByReturnDate);
-       
-        mensaje.append(showByDeliveryDate ? "Se incluyen por fecha de entrega - " : "Se incluyen por fecha devolucion - ");
+        
+        if (showByDeliveryDate) {
+            mensaje.append("Se incluyen por fecha de entrega -");
+        } else if (showByReturnDate) {
+            mensaje.append("Se incluyen por fecha de devolucion -");
+        } else {
+            mensaje.append("Se incluyen por fecha de entrega y fecha de devolucion -");
+        }
+        
         
         List<AvailabilityItemResult> availabilityItemResults;
         
