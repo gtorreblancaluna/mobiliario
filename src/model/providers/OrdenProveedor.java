@@ -6,7 +6,9 @@ import java.sql.Timestamp;
 import java.util.List;
 import common.model.Renta;
 import common.model.Usuario;
+import lombok.Data;
 
+@Data
 public class OrdenProveedor {
     
     private Long id;
@@ -21,103 +23,11 @@ public class OrdenProveedor {
     private List<DetalleOrdenProveedor> detalleOrdenProveedorList;
     private List<PagosProveedor> pagosProveedor;
     private String comentario;
-
     // estas variables son para calcular y mostrar en la vista
     private Float abonos;
     private Float total;
 
-    public Float getAbonos() {
-        return abonos;
-    }
-
-    public void setAbonos(Float abonos) {
-        this.abonos = abonos;
-    }
-
-    public Float getTotal() {
-        return total;
-    }
-
-    public void setTotal(Float total) {
-        this.total = total;
-    }
     
-    
-
-    public String getStatusDescription() {
-        return statusDescription;
-    }
-
-    public void setStatusDescription(String statusDescription) {
-          
-        this.statusDescription = statusDescription;
-    }
-    
-    
-
-    public List<PagosProveedor> getPagosProveedor() {
-        return pagosProveedor;
-    }
-
-    public void setPagosProveedor(List<PagosProveedor> pagosProveedor) {
-        this.pagosProveedor = pagosProveedor;
-    }
-    
-    
-
-    public String getComentario() {
-        return comentario;
-    }
-
-    public void setComentario(String comentario) {
-        this.comentario = comentario;
-    }
-    
-    
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Renta getRenta() {
-        return renta;
-    }
-
-    public void setRenta(Renta renta) {
-        this.renta = renta;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-
-    public Proveedor getProveedor() {
-        return proveedor;
-    }
-
-    public void setProveedor(Proveedor proveedor) {
-        this.proveedor = proveedor;
-    }
-
-    public String getFgActivo() {
-        return fgActivo;
-    }
-
-    public void setFgActivo(String fgActivo) {
-        this.fgActivo = fgActivo;
-    }
-
-    public String getStatus() {
-        return status;
-    }
 
     public void setStatus(String status) {
         
@@ -138,30 +48,6 @@ public class OrdenProveedor {
         
       this.status = status;
        
-    }
-
-    public Timestamp getCreado() {
-        return creado;
-    }
-
-    public void setCreado(Timestamp creado) {
-        this.creado = creado;
-    }
-
-    public Timestamp getActualizado() {
-        return actualizado;
-    }
-
-    public void setActualizado(Timestamp actualizado) {
-        this.actualizado = actualizado;
-    }
-
-    public List<DetalleOrdenProveedor> getDetalleOrdenProveedorList() {
-        return detalleOrdenProveedorList;
-    }
-
-    public void setDetalleOrdenProveedorList(List<DetalleOrdenProveedor> detalleOrdenProveedorList) {
-        this.detalleOrdenProveedorList = detalleOrdenProveedorList;
     }
     
     

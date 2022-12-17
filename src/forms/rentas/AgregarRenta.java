@@ -236,7 +236,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         
         VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(
                 null,
-                true,
+                false,
                 deliveryDateOrder,
                 returnDateOrder,
                 false,
@@ -247,7 +247,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 null
         );
         ventanaVerDisponibilidad.setVisible(true);
-        ventanaVerDisponibilidad.setLocationRelativeTo(null);
+        ventanaVerDisponibilidad.setLocationRelativeTo(this);
     }
 
     public void enviar_email() {

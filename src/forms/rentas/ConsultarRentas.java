@@ -350,7 +350,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         VerDisponibilidadArticulos ventanaVerDisponibilidad = 
                 new VerDisponibilidadArticulos(
                         null,
-                        true,
+                        false,
                         initDate,
                         endDate,
                         false,
@@ -361,7 +361,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                         Long.parseLong(globalRenta.getRentaId()+"")
                 );
         ventanaVerDisponibilidad.setVisible(true);
-        ventanaVerDisponibilidad.setLocationRelativeTo(null);
+        ventanaVerDisponibilidad.setLocationRelativeTo(this);
         
     }
     

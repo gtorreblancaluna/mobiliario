@@ -27,7 +27,7 @@ import common.utilities.UtilityCommon;
 import model.querys.AvailabilityItemResult;
 
 public class SaleService {
-    private static Logger log = Logger.getLogger(SaleService.class.getName());
+    private static final Logger log = Logger.getLogger(SaleService.class.getName());
     private final SalesDAO salesDao;
     private final UserService userService = UserService.getInstance();
     private final ItemService itemService = ItemService.getInstance();

@@ -500,8 +500,6 @@
             INNER JOIN color color ON (color.id_color = articulo.id_color)
         WHERE
             STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
-            AND renta.id_tipo = #{tipo_pedido_id}
-            AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
             <choose>
                 <when test="includeRentaId != null">
                   AND renta.id_renta IN (
@@ -619,8 +617,6 @@
             INNER JOIN color color ON (color.id_color = articulo.id_color)
         WHERE
             STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
-            AND renta.id_tipo = #{tipo_pedido_id}
-            AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
             <choose>
                 <when test="includeRentaId != null">
                   AND renta.id_renta IN (
@@ -738,8 +734,6 @@
             INNER JOIN color color ON (color.id_color = articulo.id_color)
         WHERE
             STR_TO_DATE(#{endDate},'%d/%m/%Y') BETWEEN STR_TO_DATE(renta.fecha_entrega,'%d/%m/%Y') AND STR_TO_DATE(renta.fecha_devolucion,'%d/%m/%Y')
-            AND renta.id_tipo = #{tipo_pedido_id}
-            AND renta.id_estado IN (#{estado_apartado_id},#{estado_en_renta_id})
             <choose>
                 <when test="includeRentaId != null">
                   AND renta.id_renta IN (
