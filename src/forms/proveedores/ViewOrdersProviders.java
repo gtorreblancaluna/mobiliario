@@ -263,37 +263,34 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         return;
      }
      Toolkit.getDefaultToolkit().beep();
-     if(list == null || list.size()<=0){
-         this.lblInfoGeneral.setText("No se han obtenido resultados :(");
-         return;
-     }
-     if(list.size() == 1){
-        this.lblInfoGeneral.setText("Se obtuvo "+list.size()+" resultado");
-     }else{
-        this.lblInfoGeneral.setText("Se obtuvieron "+list.size()+" resultados");
-     }
+     if(!list.isEmpty()){
+         this.lblInfoGeneral.setText("Registros obtenidos: "+list.size()+", con un límite de: "+
+                 this.cmbLimit.getSelectedItem().toString());
      
-     DefaultTableModel tableModel = (DefaultTableModel) this.tableViewOrdersProviders.getModel();
-     
-     for(OrdenProveedor orden : list){      
-         
-          Object fila[] = {                                          
-              orden.getId(),
-              orden.getRenta().getFolio(),
-              orden.getUsuario().getNombre()+" "+orden.getUsuario().getApellidos(),
-              orden.getProveedor().getNombre()+" "+orden.getProveedor().getApellidos(),
-              orden.getStatusDescription(),
-              orden.getCreado(),
-              orden.getActualizado(),
-              orden.getComentario(),
-              orden.getRenta().getRentaId(),             
-              decimalFormat.format(orden.getTotal()),
-              decimalFormat.format(orden.getAbonos()),
-              decimalFormat.format((orden.getTotal() - orden.getAbonos())),
-              orden.getRenta().getFechaEvento()
-            };
-            tableModel.addRow(fila);
-     
+        DefaultTableModel tableModel = (DefaultTableModel) this.tableViewOrdersProviders.getModel();
+
+        for(OrdenProveedor orden : list){      
+
+             Object fila[] = {                                          
+                 orden.getId(),
+                 orden.getRenta().getFolio(),
+                 orden.getUsuario().getNombre()+" "+orden.getUsuario().getApellidos(),
+                 orden.getProveedor().getNombre()+" "+orden.getProveedor().getApellidos(),
+                 orden.getStatusDescription(),
+                 orden.getCreado(),
+                 orden.getActualizado(),
+                 orden.getComentario(),
+                 orden.getRenta().getRentaId(),             
+                 decimalFormat.format(orden.getTotal()),
+                 decimalFormat.format(orden.getAbonos()),
+                 decimalFormat.format((orden.getTotal() - orden.getAbonos())),
+                 orden.getRenta().getFechaEvento()
+               };
+               tableModel.addRow(fila);
+
+        }
+     } else {
+          this.lblInfoGeneral.setText("No se han obtenido resultados :(");
      }
    }
 

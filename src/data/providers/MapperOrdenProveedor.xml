@@ -132,7 +132,7 @@
             AND r.folio = #{folioRenta}
         </if> 
         <if test="nameProvider != null and nameProvider != '' ">
-            AND p.nombre LIKE CONCAT('%',#{nameProvider},'%')
+            AND UPPER(CONCAT(p.nombre," ",p.apellidos)) LIKE UPPER(CONCAT('%',#{nameProvider},'%'))
         </if>  
         <if test="initDate != null and endDate != null ">
             AND o.creado BETWEEN #{initDate} AND #{endDate}

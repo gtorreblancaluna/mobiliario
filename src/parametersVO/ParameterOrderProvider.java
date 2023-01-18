@@ -104,7 +104,7 @@ public class ParameterOrderProvider {
     }
 
     public void setNameProvider(String nameProvider) {
-        this.nameProvider = nameProvider;
+        this.nameProvider = nameProvider.toUpperCase().trim();
     }
 
     public String getStatus() {
