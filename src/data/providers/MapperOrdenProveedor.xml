@@ -5,6 +5,23 @@
   
 <mapper namespace="MapperOrdenProveedor">
     
+    <resultMap id="resultDetailOrderSupplierCustomize" type="model.providers.customize.DetailOrderSupplierCustomize">
+        <result property="orderSupplierId" column="orden_proveedor_id"/>
+        <result property="orderSupplierDetailId" column="detalle_orden_proveedor_id"/>        
+        <result property="rentaId" column="renta_id"/>
+        <result property="folio" column="renta_folio"/>        
+        <result property="product" column="articulo_description"/>
+        <result property="amount" column="cantidad_articulo"/>        
+        <result property="price" column="precio_articulo"/>
+        <result property="eventDate" column="renta_fecha_evento"/>
+        <result property="user" column="usuario_nombre"/>
+        <result property="supplier" column="proveedor_nombre"/>
+        <result property="orderComment" column="comentario"/>
+        <result property="orderDetailType" column="tipo_detalle_orden"/>
+        <result property="creado" column="creado"/>
+        
+    </resultMap>
+    
     <resultMap id="resultMapTypeDetailOrderProvider" type="model.providers.DetailOrderProviderType">
         <result property="id" column="id"/>
         <result property="description" column="description"/>
@@ -57,6 +74,51 @@
         
            
     </resultMap>
+    
+    <select id= "getDetailOrderSupplierCustomize" resultMap="resultDetailOrderSupplierCustomize" parameterType="parametersVO.ParameterOrderProvider">
+         SELECT
+            o.id AS orden_proveedor_id,
+            d.id AS detalle_orden_proveedor_id,
+            r.id_renta AS renta_id,
+            r.folio AS renta_folio,
+            CONCAT(a.descripcion," ",color.color)AS articulo_description,
+            d.cantidad AS cantidad_articulo,
+            d.precio AS precio_articulo,
+            r.fecha_evento AS renta_fecha_evento,
+            CONCAT(u.nombre," ",u.apellidos) AS usuario_nombre,
+            CONCAT(p.nombre," ",p.apellidos) AS proveedor_nombre,
+            o.comentario,
+            tipo_detalle.description AS tipo_detalle_orden,
+            o.creado
+        FROM detalle_orden_proveedor d
+        INNER JOIN orden_proveedor o ON (o.id = d.id_orden_proveedor)
+        INNER JOIN renta r ON (r.id_renta = o.id_renta)
+        INNER JOIN usuarios u ON (u.id_usuarios = o.id_usuario)
+        INNER JOIN proveedores p ON (p.id = o.id_proveedores)
+        INNER JOIN articulo a ON (a.id_articulo = d.id_articulo)
+        INNER JOIN color color ON (a.id_color = color.id_color)
+        INNER JOIN tipo_detalle_orden_proveedor tipo_detalle ON (tipo_detalle.id = d.tipo_orden_detalle_proveedor_id)
+        WHERE o.fg_activo = '1'
+        <if test="orderId != null and orderId != '' ">
+            AND o.id = #{orderId}
+        </if> 
+        <if test="folioRenta != null and folioRenta != '' ">
+            AND r.folio = #{folioRenta}
+        </if> 
+        <if test="nameProvider != null and nameProvider != '' ">
+            AND UPPER(CONCAT(p.nombre," ",p.apellidos)) LIKE UPPER(CONCAT('%',#{nameProvider},'%'))
+        </if>  
+        <if test="initDate != null and endDate != null ">
+            AND o.creado BETWEEN #{initDate} AND #{endDate}
+        </if>
+        <if test="initEventDate != null and endEventDate != null ">
+            AND STR_TO_DATE(r.fecha_evento,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initEventDate},'%d/%m/%Y') AND STR_TO_DATE(#{endEventDate},'%d/%m/%Y')
+        </if>  
+        <if test="status != null and status != '' ">
+            AND o.status = #{status}
+        </if>
+        ORDER BY o.id DESC LIMIT #{limit}
+    </select>
     
     <select id= "getOrderByRentaId" resultMap="resultOrderProvider" parameterType="java.lang.Integer">
          SELECT o.*,

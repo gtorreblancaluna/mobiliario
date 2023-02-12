@@ -1,3 +1,6 @@
 build/
 dist/
+dist.*
 logs/
+
+nbproject/private/private.xml

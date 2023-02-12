@@ -5,12 +5,14 @@ import dao.providers.OrderProviderDAO;
 import dao.providers.ProvidersPaymentsDAO;
 import common.exceptions.BusinessException;
 import common.exceptions.DataOriginException;
+import common.exceptions.NoDataFoundException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import model.providers.DetalleOrdenProveedor;
 import model.providers.OrdenProveedor;
 import model.providers.DetailOrderProviderType;
+import model.providers.customize.DetailOrderSupplierCustomize;
 import parametersVO.ParameterOrderProvider;
 
 
@@ -27,6 +29,26 @@ public class OrderProviderService {
     
     private final OrderProviderDAO orderProviderDAO = OrderProviderDAO.getInstance();
     private final ProvidersPaymentsDAO providersPaymentsDAO = ProvidersPaymentsDAO.getInstance();
+    
+    public List<DetailOrderSupplierCustomize> getDetailOrderSupplierCustomize(ParameterOrderProvider parameter)throws BusinessException{
+        try {
+            List<DetailOrderSupplierCustomize> detailOrderSupplierCustomizes =
+                    orderProviderDAO.getDetailOrderSupplierCustomize(parameter);
+            
+            detailOrderSupplierCustomizes.stream().parallel()
+                    .forEach(t -> t.setTotal(t.getAmount()*t.getPrice()));
+            
+            if (detailOrderSupplierCustomizes.isEmpty()) {
+                throw new NoDataFoundException(ApplicationConstants.NO_DATA_FOUND_EXCEPTION);
+            }
+            
+            return detailOrderSupplierCustomizes;
+            
+        } catch (DataOriginException e) {
+            throw new BusinessException(e.getMessage(),e.getCause());
+        }
+    
+    }
     
     public String changeStatusDetailOrderById(Long id)throws BusinessException{
         
@@ -126,7 +148,11 @@ public class OrderProviderService {
     public List<OrdenProveedor> getOrdersByParameters(ParameterOrderProvider parameter)throws BusinessException{
 
         try{
-            return orderProviderDAO.getOrdersByParameters(parameter);           
+            List<OrdenProveedor> list = orderProviderDAO.getOrdersByParameters(parameter);
+            if (list.isEmpty()) {
+                throw new NoDataFoundException(ApplicationConstants.NO_DATA_FOUND_EXCEPTION);
+            }
+            return list;
         }catch(DataOriginException e){
           throw new BusinessException(e.getMessage(),e.getCause());
         }

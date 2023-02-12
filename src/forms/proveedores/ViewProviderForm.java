@@ -16,10 +16,6 @@ import javax.swing.table.TableRowSorter;
 import model.providers.Proveedor;
 import services.providers.ProvidersService;
 
-/**
- *
- * @author gerardo torreblanca
- */
 public class ViewProviderForm extends javax.swing.JDialog {
 
     private final ProvidersService providersService = ProvidersService.getInstance();

@@ -261,7 +261,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
      public void showPaymentsProvidersForm() {
          
         if (UtilityCommon.verifyIfInternalFormIsOpen(paymentsProvidersForm,IndexForm.jDesktopPane1)) {
-            paymentsProvidersForm = new PaymentsProvidersForm();
+            paymentsProvidersForm = new PaymentsProvidersForm(orderId);
 //            orderProviderForm.setLocation(this.getWidth() / 2 - orderProviderForm.getWidth() / 2, this.getHeight() / 2 - orderProviderForm.getHeight() / 2 - 20);
             IndexForm.jDesktopPane1.add(paymentsProvidersForm);
             paymentsProvidersForm.show();

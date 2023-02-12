@@ -25,8 +25,9 @@ import static mobiliario.iniciar_sesion.usuarioGlobal;
 import model.DatosGenerales;
 import services.SaleService;
 import services.SystemService;
-import common.services.TaskAlmacenUpdateService;
 import common.services.TaskDeliveryChoferUpdateService;
+import java.awt.Image;
+import javax.swing.ImageIcon;
 import utilities.Utility;
 
 public class IndexForm extends javax.swing.JFrame {
@@ -49,7 +50,6 @@ public class IndexForm extends javax.swing.JFrame {
     public IndexForm() {
 
         initComponents();
-        UtilityCommon.getSystemDate("/");
         this.setExtendedState(this.MAXIMIZED_BOTH);
         lbl_logueo.setText(iniciar_sesion.usuarioGlobal.getNombre()+" "+iniciar_sesion.usuarioGlobal.getApellidos());
         lblPuesto.setText(iniciar_sesion.usuarioGlobal.getPuesto().getDescripcion());
@@ -59,9 +59,8 @@ public class IndexForm extends javax.swing.JFrame {
         
         generalDataGlobal = systemService.getGeneralData();
         LOGGER.info(">>> datos generales obtenidos: "+generalDataGlobal);
-        this.setTitle(generalDataGlobal.getCompanyName().toUpperCase());
+        this.setTitle(generalDataGlobal.getCompanyName().toUpperCase());        
         
-
     }
     
     private void generateTaskAlmacen () {

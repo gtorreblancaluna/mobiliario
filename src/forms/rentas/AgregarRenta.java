@@ -1183,8 +1183,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                             .filter(customer -> Objects.nonNull(customer))
                             .filter(customer -> Objects.nonNull(customer.getNombre()))
                             .filter(customer -> Objects.nonNull(customer.getApellidos()))
-                            .filter(customer -> customer.getNombre().toLowerCase().trim().contains(txt_nombre.getText().toLowerCase().trim()))
-                            .filter(customer -> customer.getApellidos().toLowerCase().trim().contains(txt_apellidos.getText().toLowerCase().trim()))
+                            .filter(customer -> UtilityCommon.removeAccents(customer.getNombre().toLowerCase().trim()).contains(txt_nombre.getText().toLowerCase().trim()))
+                            .filter(customer -> UtilityCommon.removeAccents(customer.getApellidos().toLowerCase().trim()).contains(txt_apellidos.getText().toLowerCase().trim()))
                             .collect(Collectors.toList());
             fillTableCustomers(filterCustomers);
         } catch (Exception e){
@@ -1390,7 +1390,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         tabla_articulos.setModel(tableModel);
 
-        int[] anchos = {10,40, 120, 250, 100,90,20};
+        int[] anchos = {10,120, 120, 250, 100,90,20};
 
         for (int inn = 0; inn < tabla_articulos.getColumnCount(); inn++) {
             tabla_articulos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -1445,14 +1445,19 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     public void tabla_articulos_like() {
         
+        String textToSearch = txt_buscar.getText().toLowerCase().trim();
+        
         List<Articulo> filterItems =
                 articulos.stream()
                     .filter(item -> Objects.nonNull(item))
                     .filter(item -> Objects.nonNull(item.getDescripcion()))
                     .filter(item -> Objects.nonNull(item.getColor()))
-                    .filter(item -> 
-                        (item.getDescripcion().toLowerCase().trim() + " " + item.getColor().getColor().toLowerCase().trim())
-                                .contains(txt_buscar.getText().toLowerCase().trim()))
+                    .filter(item -> (
+                            UtilityCommon.removeAccents(
+                                item.getDescripcion().trim().toLowerCase() + " " + item.getColor().getColor().trim().toLowerCase())
+                            ).contains(textToSearch) 
+                            || item.getCodigo().trim().toLowerCase().contains(textToSearch)
+                    )
                 .collect(Collectors.toList());
         
         fillTableItems(filterItems);

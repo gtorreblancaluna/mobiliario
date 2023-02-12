@@ -11,7 +11,11 @@ import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import mobiliario.iniciar_sesion;
 import mobiliario.IndexForm;
 
@@ -19,6 +23,28 @@ import mobiliario.IndexForm;
 public abstract class Utility {
     
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    
+    public static void addJtableToPane (int sizeVertical, int sizeHorizontal, JPanel jPanel,JTable tableToAdd ) {
+        
+        JScrollPane jScrollPane = new JScrollPane();
+        jScrollPane.setViewportView(tableToAdd);
+        
+        javax.swing.GroupLayout tabPanelGeneralLayout = new javax.swing.GroupLayout(jPanel);
+        jPanel.setLayout(tabPanelGeneralLayout);
+        tabPanelGeneralLayout.setHorizontalGroup(
+            tabPanelGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabPanelGeneralLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, sizeVertical, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        tabPanelGeneralLayout.setVerticalGroup(
+            tabPanelGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabPanelGeneralLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, sizeHorizontal, Short.MAX_VALUE))
+        );
+    }
     
     public static void validateStatusAndTypeEvent (EstadoEvento statusEvent, Tipo typeEvent) throws BusinessException {
         if (typeEvent.getTipoId().toString().equals(ApplicationConstants.TIPO_COTIZACION)

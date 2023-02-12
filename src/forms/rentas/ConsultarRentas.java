@@ -1901,8 +1901,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }
     
     public void tabla_articulos() {
-        Object[][] data = {{"", "", "", "", "", "", "",""}};       
-        String[] columNames = {"Id", "Categoria", "Descripcion", "Color", "P.Unitario", "Stock"};
+        Object[][] data = {{"","", "", "", "", "", "", "",""}};       
+        String[] columNames = {"Id", "Coódigo","Categoria", "Descripcion", "Color", "P.Unitario", "Stock"};
  
         DefaultTableModel tableModel = new DefaultTableModel(data, columNames);
         tabla_articulos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -1915,7 +1915,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
         centrar.setHorizontalAlignment(SwingConstants.CENTER);
         
-        int[] anchos = {10, 120, 250, 100, 90, 90};
+        int[] anchos = {10,100, 120, 250, 100, 90, 90};
         
         for (int inn = 0; inn < tabla_articulos.getColumnCount(); inn++) {
             tabla_articulos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
@@ -1931,12 +1931,17 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     public void tabla_articulos_like() {
         
         tabla_articulos();
-        
+        String textToSearch = txt_buscar.getText().toLowerCase().trim();
         List<Articulo> filterArticulos = articulos.stream()
                     .filter(articulo -> Objects.nonNull(articulo))
                     .filter(articulo -> Objects.nonNull(articulo.getDescripcion()))
                     .filter(articulo -> Objects.nonNull(articulo.getColor()))
-                    .filter(articulo -> (articulo.getDescripcion().trim().toLowerCase() + " " + articulo.getColor().getColor().trim().toLowerCase()).contains(txt_buscar.getText().toLowerCase().trim()))
+                    .filter(articulo -> (
+                            UtilityCommon.removeAccents(
+                                    articulo.getDescripcion().trim().toLowerCase() + " " + 
+                                            articulo.getColor().getColor().trim().toLowerCase()
+                            )).contains(textToSearch)
+                            || articulo.getCodigo().trim().toLowerCase().contains(textToSearch))
                     .collect(Collectors.toList());
         
         DefaultTableModel tableModel = (DefaultTableModel) tabla_articulos.getModel();
@@ -1944,6 +1949,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         filterArticulos.forEach(articulo -> {
             Object fila[] = {                                          
                 articulo.getArticuloId(),
+                articulo.getCodigo().toUpperCase(),
                 articulo.getCategoria().getDescripcion(),
                 articulo.getDescripcion(),
                 articulo.getColor().getColor(),
@@ -3665,14 +3671,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         try {
             List<OrdenProveedor> list = orderService.getOrdersByParameters(parameter);
-            if (list.isEmpty()) {
-                lblInformationOrdersProvider.setText("No se obtuvieron ordenes al proveedor");
-            } else if (list.size() == 1) {
-                lblInformationOrdersProvider.setText("Se obtuvo una orden al proveedor");
-            } else {
-                lblInformationOrdersProvider.setText("Se obtuvieron "+ list.size() +" ordenes al proveedor");
-            }
-            for(OrdenProveedor orden : list){      
+            lblInformationOrdersProvider.setText("Registros obtenidos: "+list.size()+".");
+            for(OrdenProveedor orden : list){
             Object fila[] = {                                          
                 orden.getId(),
                 orden.getUsuario().getNombre()+" "+orden.getUsuario().getApellidos(),
@@ -3688,8 +3688,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
               };
               tableModel.addRow(fila);
             }
-        } catch (BusinessException e) {
-            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado al obtener las ordenes del proveedor\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+        } catch (NoDataFoundException e) {
+            log.error(e.getMessage(),e);
+            lblInformationOrdersProvider.setText("No se obtuvieron ordenes al proveedor.");
+        } catch (Exception e) {
+            log.error(e.getMessage(),e);
+            JOptionPane.showMessageDialog(this, "Ocurrio un inesperado al obtener las ordenes del proveedor\n "+e, "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     private void tabla_prox_rentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_prox_rentasMouseClicked

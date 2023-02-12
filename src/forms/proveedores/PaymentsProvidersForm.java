@@ -44,7 +44,8 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
     private static final int HEADER_UPDATED = 7;
     
 
-    public PaymentsProvidersForm() {
+    public PaymentsProvidersForm(String orderId) {
+        g_idOrder = orderId;
         funcion.conectate();
         initComponents();
         saleService = SaleService.getInstance();
@@ -52,36 +53,19 @@ public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
         tableFormat();
         fillPaymentsType();
         getPayments();
+        
     }
     
     public void getPayments(){
         
-        if(!OrderProviderForm.orderId.equals("")){
-            // viene de ver detalle orden
+        
             try{
-                ordenProveedorGlobal = orderService.getOrderById(Long.parseLong(OrderProviderForm.orderId));
+                ordenProveedorGlobal = orderService.getOrderById(Long.parseLong(g_idOrder));
             }catch(BusinessException e){
                 JOptionPane.showMessageDialog(null, e.getMessage()+"\n"+e.getCause(), "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-        }else if(ViewOrdersProviders.g_idOrder != null &&
-                    !ViewOrdersProviders.g_idOrder.equals("")
-                ){
-            
-            // viene de ver ordenes en general
-                    try{
-                        ordenProveedorGlobal = 
-                            orderService.getOrderById(Long.parseLong(ViewOrdersProviders.g_idOrder));
-                    }catch(BusinessException e){
-                        JOptionPane.showMessageDialog(null, e.getMessage()+"\n"+e.getCause(), "ERROR", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-            
         
-        }else{
-                JOptionPane.showMessageDialog(null,"No se recibio la orden, porfavor reinicia la ventana", "ERROR", JOptionPane.ERROR_MESSAGE);
-                return;
-        }
         
        
         if(ordenProveedorGlobal.getPagosProveedor() != null 

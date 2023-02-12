@@ -1,14 +1,19 @@
-
 package forms.proveedores;
-
 
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
 import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
+import common.exceptions.NoDataFoundException;
 import common.services.UtilityService;
+import forms.proveedores.clazz.TableViewOrdersProviders;
+import forms.proveedores.clazz.TableViewOrdersProvidersDetail;
+import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
@@ -17,14 +22,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.JTable;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import mobiliario.IndexForm;
 import model.DatosGenerales;
 import model.providers.OrdenProveedor;
+import model.providers.customize.DetailOrderSupplierCustomize;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -42,18 +47,86 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
     private final OrderProviderService orderService = OrderProviderService.getInstance();
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
     private PaymentsProvidersForm paymentsProvidersForm = null;
-    public static String g_idRenta=null;
-    public static String g_idOrder=null;    
+    public static String g_idRenta=null;  
     private OrderProviderForm orderProviderForm = null;  
     private sqlclass funcion = new sqlclass();  
-    private SystemService systemService = SystemService.getInstance();
+    private final SystemService systemService = SystemService.getInstance();
+    private int indexTabPanelActive = 0;
+    private final TableViewOrdersProviders tableViewOrdersProviders;
+    private final TableViewOrdersProvidersDetail tableViewOrdersProvidersDetail;
 
     public ViewOrdersProviders() {
         initComponents();
         this.setTitle("Ordenes al proveedor");
         initComboBox();
-        tableFormat();
         funcion.conectate();
+        eventListener();
+        tableViewOrdersProviders = new TableViewOrdersProviders();
+        tableViewOrdersProvidersDetail = new TableViewOrdersProvidersDetail();
+        Utility.addJtableToPane(937, 305, tabPanelGeneral, tableViewOrdersProviders);
+        Utility.addJtableToPane(937, 305, tabPanelDetail, tableViewOrdersProvidersDetail);
+        
+        tableViewOrdersProvidersDetail.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent mouseEvent) {
+                JTable table =(JTable) mouseEvent.getSource();
+                if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                    showPaymentsProvidersForm();
+                }
+            }
+        });
+        
+        tableViewOrdersProviders.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent mouseEvent) {
+                JTable table =(JTable) mouseEvent.getSource();
+                if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                    showPaymentsProvidersForm();
+                }
+            }
+        });
+    }
+
+    
+    private enum ColumnToGetValue {
+        RENTA_ID,
+        ORDER_ID,
+        FOLIO;
+    }
+    
+    private enum IndexTabPanel {
+        
+        TAB_PANEL_GENERAL(0),
+        TAB_PANEL_DETAIL(1);
+        
+        private final int index;
+        
+        IndexTabPanel (int index) {
+            this.index = index;
+        }
+        
+        public int getIndex () {
+            return this.index;
+        }
+        
+        public static IndexTabPanel getEnum (int value) {
+            for (IndexTabPanel indexTabPanel : IndexTabPanel.values()) {
+                if ( (indexTabPanel.index+"").equals(value+"")) {
+                    return indexTabPanel;
+                }
+            }
+            return TAB_PANEL_GENERAL;
+        }
+    }
+    
+    private void eventListener () {
+        tabGeneral.addMouseListener(new MouseAdapter(){
+        @Override
+        public void mousePressed(MouseEvent e) {
+            Component c = tabGeneral.getComponentAt(new Point(e.getX(), e.getY()));
+                //TODO Find the right label and print it! :-)
+                indexTabPanelActive = tabGeneral.getSelectedIndex();            
+            }
+        });
+    
     }
     
      public void showProviders() {
@@ -65,9 +138,20 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
     
      public void mostrar_agregar_orden_proveedor() {
          
-        String rentaId = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 8).toString();
-        String orderId = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 0).toString();
-        String folio = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 1).toString();
+        String rentaId;
+        String orderId;
+        String folio;
+       try {
+            rentaId = getValueIdBySelectedRow(ColumnToGetValue.RENTA_ID);
+            orderId = getValueIdBySelectedRow(ColumnToGetValue.ORDER_ID);
+            folio = getValueIdBySelectedRow(ColumnToGetValue.FOLIO);
+       } catch (BusinessException e) {
+           LOGGER.error(e);
+           JOptionPane.showMessageDialog(this, e, "ERROR", JOptionPane.ERROR_MESSAGE);
+           return;
+       }
+        
+        
          
         if (UtilityCommon.verifyIfInternalFormIsOpen(orderProviderForm,IndexForm.jDesktopPane1)) {
             orderProviderForm = new OrderProviderForm(folio, orderId, rentaId);
@@ -80,14 +164,16 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
 
      public void reportPDF(){
          
-         if (this.tableViewOrdersProviders.getSelectedRow() == - 1) {
-            JOptionPane.showMessageDialog(null, "Selecciona una fila para continuar ", "Error", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+       String orderId;
+       try {
+            orderId = getValueIdBySelectedRow(ColumnToGetValue.ORDER_ID);
+       } catch (BusinessException e) {
+           LOGGER.error(e);
+           JOptionPane.showMessageDialog(this, e, "ERROR", JOptionPane.ERROR_MESSAGE);
+           return;
+       }
          
-        String idOrder = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 0).toString();
-         
-         JasperPrint jasperPrint;
+        JasperPrint jasperPrint;
         try {
            
             String pathLocation = Utility.getPathLocation();
@@ -102,7 +188,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
             DatosGenerales datosGenerales = systemService.getGeneralData();
             
             Map parametros = new HashMap<>();
-            parametros.put("ID_ORDEN",idOrder);
+            parametros.put("ID_ORDEN",orderId);
             parametros.put("NOMBRE_EMPRESA",datosGenerales.getCompanyName());
             parametros.put("DIRECCION_EMPRESA",datosGenerales.getAddress1());
             parametros.put("TELEFONOS_EMPRESA",datosGenerales.getAddress2());
@@ -137,70 +223,19 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
    
    }
    
-   public void tableFormat() {
-        Object[][] data = {{"","","","","","","","","","","",""}};
-        String[] columnNames = {          
-                        "No orden",
-                        "Folio renta", 
-                        "Usuario",
-                        "Proveedor", 
-                        "Status",                        
-                        "Creado",
-                        "Actualizado",
-                        "Comentario",
-                        "id_renta",
-                        "Subtotal",
-                        "Pagos",
-                        "Total",
-                        "Fecha Evento"
-        };
-        DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
-        this.tableViewOrdersProviders.setModel(tableModel);
-        
-        TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
-        tableViewOrdersProviders.setRowSorter(ordenarTabla);
-
-        int[] anchos = {20,20,80,40,40, 80,100,100,20,80,60,60,60};
-
-        for (int inn = 0; inn < tableViewOrdersProviders.getColumnCount(); inn++) {
-            tableViewOrdersProviders.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
-        }
-
-        try {
-            DefaultTableModel temp = (DefaultTableModel) tableViewOrdersProviders.getModel();
-            temp.removeRow(temp.getRowCount() - 1);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            ;
-        }
-        DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
-        centrar.setHorizontalAlignment(SwingConstants.CENTER);
-        
-        DefaultTableCellRenderer right = new DefaultTableCellRenderer();
-        right.setHorizontalAlignment(SwingConstants.RIGHT);
-
-        tableViewOrdersProviders.getColumnModel().getColumn(8).setMaxWidth(0);
-        tableViewOrdersProviders.getColumnModel().getColumn(8).setMinWidth(0);
-        tableViewOrdersProviders.getColumnModel().getColumn(8).setPreferredWidth(0);
-     
-        tableViewOrdersProviders.getColumnModel().getColumn(0).setCellRenderer(centrar);
-        tableViewOrdersProviders.getColumnModel().getColumn(1).setCellRenderer(centrar);
-        tableViewOrdersProviders.getColumnModel().getColumn(9).setCellRenderer(right);
-        tableViewOrdersProviders.getColumnModel().getColumn(10).setCellRenderer(right);
-        tableViewOrdersProviders.getColumnModel().getColumn(11).setCellRenderer(right);
-        
-    }
    
    public void showPaymentsProvidersForm() {
-       
-       if (this.tableViewOrdersProviders.getSelectedRow() == - 1) {
-            JOptionPane.showMessageDialog(null, "Selecciona una fila para continuar ", "Error", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-       g_idOrder = this.tableViewOrdersProviders.getValueAt(tableViewOrdersProviders.getSelectedRow(), 0).toString();
+       String orderId;
+       try {
+            orderId = getValueIdBySelectedRow(ColumnToGetValue.ORDER_ID);
+       } catch (BusinessException e) {
+           LOGGER.error(e);
+           JOptionPane.showMessageDialog(this, e, "ERROR", JOptionPane.ERROR_MESSAGE);
+           return;
+       }
        
         if (UtilityCommon.verifyIfInternalFormIsOpen(paymentsProvidersForm,IndexForm.jDesktopPane1)) {
-            paymentsProvidersForm = new PaymentsProvidersForm();
+            paymentsProvidersForm = new PaymentsProvidersForm(orderId);
             IndexForm.jDesktopPane1.add(paymentsProvidersForm);
             paymentsProvidersForm.show();
         } else {
@@ -208,10 +243,8 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         }
     }
    
-   public void search(){
-     tableFormat();
-   
-     ParameterOrderProvider parameter = new ParameterOrderProvider();
+   private ParameterOrderProvider getParameters () {
+    ParameterOrderProvider parameter = new ParameterOrderProvider();
      
      Integer folioRenta = null;
      Integer orderNumber = null;
@@ -227,9 +260,9 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
          System.out.println(e);
      }
      
-     if(folioRenta != null && !folioRenta.equals("")){
+     if(folioRenta != null && !folioRenta.toString().equals("")){
          parameter.setFolioRenta(folioRenta);
-     }else if(orderNumber != null && !orderNumber.equals("")){
+     }else if(orderNumber != null && !orderNumber.toString().equals("")){
          parameter.setOrderId(orderNumber);
      }else{
         if(!this.txtSearchByNameProvider.getText().equals("")){
@@ -246,8 +279,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                 parameter.setEndEventDate(UtilityCommon.getStringFromDate(txtSearchEndEventDate.getDate(),formatDate));
             } catch (ParseException e) {
                 LOGGER.error(e);
-                JOptionPane.showMessageDialog(null, e, "ERROR", JOptionPane.ERROR_MESSAGE);
-                return;
+                JOptionPane.showMessageDialog(this, e, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
         }
         if(!this.cmbStatus.getModel().getSelectedItem().equals(ApplicationConstants.CMB_SELECCIONE)){
@@ -255,43 +287,183 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         }
      }
      parameter.setLimit(Integer.parseInt(this.cmbLimit.getSelectedItem().toString()));
+     return parameter;
+   }
+   
+   private void fillTableTabPanelDetail () {
+       ParameterOrderProvider parameter = getParameters();
+       List<DetailOrderSupplierCustomize> list;
+       tableViewOrdersProvidersDetail.format();
+       
+        try{
+            list = orderService.getDetailOrderSupplierCustomize(parameter);
+        }catch(NoDataFoundException e){
+            this.lblInfoGeneral.setText("No se han obtenido resultados :(");
+            return;
+        }catch(BusinessException e){
+            LOGGER.error(e);
+            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        return;
+        }finally{
+           Toolkit.getDefaultToolkit().beep();
+        }
+
+        this.lblInfoGeneral.setText("Registros: "+list.size()+". Límite: "+
+                this.cmbLimit.getSelectedItem().toString());
+
+       DefaultTableModel tableModel = (DefaultTableModel) tableViewOrdersProvidersDetail.getModel();
+
+       for(DetailOrderSupplierCustomize detail : list){
+            Object fila[] = {                                          
+                detail.getOrderSupplierId(),
+                detail.getOrderSupplierDetailId(),
+                detail.getRentaId(),
+                detail.getFolio(),
+                detail.getProduct(),
+                detail.getAmount(),
+                detail.getPrice() <= 0 ? "" : decimalFormat.format(detail.getPrice()),
+                detail.getTotal() <= 0 ? "" : decimalFormat.format(detail.getTotal()),
+                detail.getEventDate(),
+                detail.getUser(),
+                detail.getSupplier(),
+                detail.getOrderComment(),
+                detail.getOrderDetailType(),
+                detail.getCreado()
+              };
+              tableModel.addRow(fila);
+
+       }
+        
+       
+       
+   }
+   
+   private void fillTableTabPanelGeneral () {
+       
+     ParameterOrderProvider parameter = getParameters();
      List<OrdenProveedor> list;
+     tableViewOrdersProviders.format();
+     
      try{
         list = orderService.getOrdersByParameters(parameter);
+     }catch(NoDataFoundException e){
+         this.lblInfoGeneral.setText("No se han obtenido resultados :(");
+         return;
      }catch(BusinessException e){
-        JOptionPane.showMessageDialog(null, e.getMessage()+"\n"+e.getCause(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        LOGGER.error(e);
+        JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
         return;
+     }finally {
+        Toolkit.getDefaultToolkit().beep();
      }
-     Toolkit.getDefaultToolkit().beep();
-     if(!list.isEmpty()){
-         this.lblInfoGeneral.setText("Registros obtenidos: "+list.size()+", con un límite de: "+
-                 this.cmbLimit.getSelectedItem().toString());
+
      
-        DefaultTableModel tableModel = (DefaultTableModel) this.tableViewOrdersProviders.getModel();
+        this.lblInfoGeneral.setText("Registros: "+list.size()+". Límite: "+
+                this.cmbLimit.getSelectedItem().toString());
 
-        for(OrdenProveedor orden : list){      
+       DefaultTableModel tableModel = (DefaultTableModel) tableViewOrdersProviders.getModel();
 
-             Object fila[] = {                                          
-                 orden.getId(),
-                 orden.getRenta().getFolio(),
-                 orden.getUsuario().getNombre()+" "+orden.getUsuario().getApellidos(),
-                 orden.getProveedor().getNombre()+" "+orden.getProveedor().getApellidos(),
-                 orden.getStatusDescription(),
-                 orden.getCreado(),
-                 orden.getActualizado(),
-                 orden.getComentario(),
-                 orden.getRenta().getRentaId(),             
-                 decimalFormat.format(orden.getTotal()),
-                 decimalFormat.format(orden.getAbonos()),
-                 decimalFormat.format((orden.getTotal() - orden.getAbonos())),
-                 orden.getRenta().getFechaEvento()
-               };
-               tableModel.addRow(fila);
+       for(OrdenProveedor orden : list){      
 
-        }
-     } else {
-          this.lblInfoGeneral.setText("No se han obtenido resultados :(");
-     }
+            Object fila[] = {                                          
+                orden.getId(),
+                orden.getRenta().getFolio(),
+                orden.getUsuario().getNombre()+" "+orden.getUsuario().getApellidos(),
+                orden.getProveedor().getNombre()+" "+orden.getProveedor().getApellidos(),
+                orden.getStatusDescription(),
+                orden.getCreado(),
+                orden.getActualizado(),
+                orden.getComentario(),
+                orden.getRenta().getRentaId(),             
+                decimalFormat.format(orden.getTotal()),
+                decimalFormat.format(orden.getAbonos()),
+                decimalFormat.format((orden.getTotal() - orden.getAbonos())),
+                orden.getRenta().getFechaEvento()
+              };
+              tableModel.addRow(fila);
+
+       }
+     
+   
+   }
+      
+   
+   private String getValueIdBySelectedRow (ColumnToGetValue columnToGetValue)throws BusinessException {
+       
+       JTable tableActive;
+       int columnNumber=0;
+       switch (IndexTabPanel.getEnum(indexTabPanelActive)) {
+           case TAB_PANEL_GENERAL:
+               tableActive = this.tableViewOrdersProviders;
+               switch (columnToGetValue) {
+                    case ORDER_ID:
+                        columnNumber = TableViewOrdersProviders.Column.ORDER_NUM.getNumber();
+                    break;
+                    case RENTA_ID:
+                        columnNumber = TableViewOrdersProviders.Column.RENTA_ID.getNumber();
+                        break;
+                    case FOLIO:
+                        columnNumber = TableViewOrdersProviders.Column.FOLIO_RENTA.getNumber();
+                        break;
+                    default:
+                        throw new AssertionError();
+                }
+               break;
+           case TAB_PANEL_DETAIL:
+               tableActive = this.tableViewOrdersProvidersDetail;
+               switch (columnToGetValue) {
+                    case ORDER_ID:
+                        columnNumber = TableViewOrdersProvidersDetail.Column.ORDER_SUPPLIER_ID.getNumber();
+                    break;
+                    case RENTA_ID:
+                        columnNumber = TableViewOrdersProvidersDetail.Column.RENTA_ID.getNumber();
+                        break;
+                    case FOLIO:
+                        columnNumber = TableViewOrdersProvidersDetail.Column.FOLIO.getNumber();
+                        break;
+                    default:
+                        throw new AssertionError();
+                }
+               break;
+           default:
+               throw new AssertionError();
+       }
+       
+       if (tableActive.getSelectedRow() == - 1) {
+           throw new BusinessException(ApplicationConstants.SELECT_A_ROW_NECCESSARY);
+       }
+       
+       return tableActive.getValueAt(tableActive.getSelectedRow(), columnNumber).toString(); 
+   }
+   
+   
+   private void exportToExcel () {
+   
+    switch (IndexTabPanel.getEnum(indexTabPanelActive)) {
+           case TAB_PANEL_GENERAL:
+               utilityService.exportarExcel(tableViewOrdersProviders);
+               break;
+           case TAB_PANEL_DETAIL:
+               utilityService.exportarExcel(tableViewOrdersProvidersDetail);
+               break;
+           default:
+               throw new AssertionError();
+       }
+   
+   }
+   
+   private void search () {
+              
+       switch (IndexTabPanel.getEnum(indexTabPanelActive)) {
+           case TAB_PANEL_GENERAL:
+               fillTableTabPanelGeneral();
+               break;
+           case TAB_PANEL_DETAIL:
+               fillTableTabPanelDetail();
+               break;
+           default:
+               throw new AssertionError();
+       }
    }
 
     /**
@@ -330,9 +502,10 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         txtSearchInitialEventDate = new com.toedter.calendar.JDateChooser();
         txtSearchEndEventDate = new com.toedter.calendar.JDateChooser();
         jPanel2 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tableViewOrdersProviders = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
         lblInfoGeneral = new javax.swing.JLabel();
+        tabGeneral = new javax.swing.JTabbedPane();
+        tabPanelGeneral = new javax.swing.JPanel();
+        tabPanelDetail = new javax.swing.JPanel();
 
         jLabel9.setText("jLabel9");
 
@@ -393,8 +566,9 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         jLabel4.setText("Limitar resultados a:");
 
         jbtnSearch.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jbtnSearch.setText("Buscar");
-        jbtnSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jbtnSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/search-24.png"))); // NOI18N
+        jbtnSearch.setToolTipText("Buscar");
+        jbtnSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jbtnSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbtnSearchActionPerformed(evt);
@@ -402,6 +576,11 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         });
 
         txtSearchByNameProvider.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtSearchByNameProvider.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchByNameProviderKeyPressed(evt);
+            }
+        });
 
         jLabel5.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel5.setText("Folio renta:");
@@ -417,8 +596,9 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         jLabel6.setText("Número de orden:");
 
         jButton1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jButton1.setText("Pagos");
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/beneficios-money-24.png"))); // NOI18N
+        jButton1.setToolTipText("Pagos");
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -426,8 +606,9 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         });
 
         jButton2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jButton2.setText("Exportar EXCEL");
-        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/excel-24.png"))); // NOI18N
+        jButton2.setToolTipText("Exportar Excel");
+        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -435,8 +616,9 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         });
 
         jButton3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jButton3.setText("Detalle");
-        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/searching-24.png"))); // NOI18N
+        jButton3.setToolTipText("Detalle");
+        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -444,8 +626,9 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         });
 
         jButton4.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jButton4.setText("Proveedores");
-        jButton4.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/truck-24.png"))); // NOI18N
+        jButton4.setToolTipText("Proveedores");
+        jButton4.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -453,8 +636,9 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         });
 
         jButton5.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jButton5.setText("Exportar PDF");
-        jButton5.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/pdf-24.png"))); // NOI18N
+        jButton5.setToolTipText("Exportar PDF");
+        jButton5.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
@@ -493,59 +677,55 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGap(6, 6, 6)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jButton1)
-                        .addGap(3, 3, 3)
-                        .addComponent(jButton3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jbtnSearch))
+                        .addComponent(jLabel1)
+                        .addGap(28, 28, 28)
+                        .addComponent(jLabel5))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addGap(28, 28, 28)
-                                .addComponent(jLabel5))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(txtSearchByNameProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(7, 7, 7)
+                                .addComponent(txtSearchFolioRenta, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(11, 11, 11)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtSearchFolioRenta, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGap(85, 85, 85)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(txtSearchOrderNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jLabel3))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addComponent(txtSearchInitialDate, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(txtSearchEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addComponent(jLabel2)
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addComponent(txtSearchInitialEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(txtSearchEndEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addComponent(jLabel7))))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(cmbLimit, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addGap(34, 34, 34))
+                                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtSearchOrderNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel3)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jbtnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cmbLimit, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(txtSearchInitialDate, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtSearchEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel2)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(txtSearchInitialEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtSearchEndEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel7))))
+                .addContainerGap(157, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -555,8 +735,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                     .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel3)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4))
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(3, 3, 3)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -565,72 +744,97 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                         .addComponent(txtSearchOrderNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(txtSearchEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtSearchInitialDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(3, 3, 3)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtSearchEndEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtSearchInitialEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jbtnSearch)
-                    .addComponent(jButton1)
-                    .addComponent(jButton3)
-                    .addComponent(jButton4)
-                    .addComponent(jButton2)
-                    .addComponent(jButton5)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4))
+                        .addGap(3, 3, 3)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtSearchEndEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtSearchInitialEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(46, 46, 46))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jbtnSearch, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jButton5)
+                                .addComponent(jButton4)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jButton3, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addComponent(jButton2)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 970, 140));
-
-        tableViewOrdersProviders.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
-        tableViewOrdersProviders.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tableViewOrdersProviders.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        tableViewOrdersProviders.setRowHeight(14);
-        tableViewOrdersProviders.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tableViewOrdersProvidersMouseClicked(evt);
-            }
-        });
-        jScrollPane2.setViewportView(tableViewOrdersProviders);
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 980, 130));
 
         lblInfoGeneral.setFont(new java.awt.Font("Arial", 1, 11)); // NOI18N
+
+        tabGeneral.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabGeneralMouseClicked(evt);
+            }
+        });
+
+        tabPanelGeneral.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabPanelGeneralMouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout tabPanelGeneralLayout = new javax.swing.GroupLayout(tabPanelGeneral);
+        tabPanelGeneral.setLayout(tabPanelGeneralLayout);
+        tabPanelGeneralLayout.setHorizontalGroup(
+            tabPanelGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 961, Short.MAX_VALUE)
+        );
+        tabPanelGeneralLayout.setVerticalGroup(
+            tabPanelGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 318, Short.MAX_VALUE)
+        );
+
+        tabGeneral.addTab("General", tabPanelGeneral);
+
+        javax.swing.GroupLayout tabPanelDetailLayout = new javax.swing.GroupLayout(tabPanelDetail);
+        tabPanelDetail.setLayout(tabPanelDetailLayout);
+        tabPanelDetailLayout.setHorizontalGroup(
+            tabPanelDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 961, Short.MAX_VALUE)
+        );
+        tabPanelDetailLayout.setVerticalGroup(
+            tabPanelDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 318, Short.MAX_VALUE)
+        );
+
+        tabGeneral.addTab("Detalle", tabPanelDetail);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addComponent(lblInfoGeneral, javax.swing.GroupLayout.PREFERRED_SIZE, 441, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(511, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tabGeneral)
+                    .addComponent(lblInfoGeneral, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblInfoGeneral, javax.swing.GroupLayout.DEFAULT_SIZE, 14, Short.MAX_VALUE)
+                .addComponent(lblInfoGeneral, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18))
+                .addComponent(tabGeneral)
+                .addContainerGap())
         );
 
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, 970, 340));
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, 990, 400));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -650,13 +854,6 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
     private void txtSearchEndDateKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchEndDateKeyPressed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtSearchEndDateKeyPressed
-
-    private void tableViewOrdersProvidersMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableViewOrdersProvidersMouseClicked
-        // TODO add your handling code here:
-        if (evt.getClickCount() == 2) {
-            mostrar_agregar_orden_proveedor();
-        }
-    }//GEN-LAST:event_tableViewOrdersProvidersMouseClicked
 
     private void jbtnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnSearchActionPerformed
         // TODO add your handling code here:
@@ -682,7 +879,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        utilityService.exportarExcel(tableViewOrdersProviders);
+        exportToExcel();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -713,6 +910,20 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtSearchEndEventDateKeyPressed
 
+    private void tabGeneralMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabGeneralMouseClicked
+
+    }//GEN-LAST:event_tabGeneralMouseClicked
+
+    private void tabPanelGeneralMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabPanelGeneralMouseClicked
+
+    }//GEN-LAST:event_tabPanelGeneralMouseClicked
+
+    private void txtSearchByNameProviderKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchByNameProviderKeyPressed
+         if (evt.getKeyCode() == 10 ) {
+            this.search();
+        } 
+    }//GEN-LAST:event_txtSearchByNameProviderKeyPressed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
@@ -734,10 +945,11 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton jbtnSearch;
     private javax.swing.JLabel lblInfoGeneral;
-    private javax.swing.JTable tableViewOrdersProviders;
+    private javax.swing.JTabbedPane tabGeneral;
+    private javax.swing.JPanel tabPanelDetail;
+    private javax.swing.JPanel tabPanelGeneral;
     private javax.swing.JTextField txtSearchByNameProvider;
     private com.toedter.calendar.JDateChooser txtSearchEndDate;
     private com.toedter.calendar.JDateChooser txtSearchEndEventDate;
