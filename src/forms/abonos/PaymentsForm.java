@@ -1,7 +1,7 @@
 package forms.abonos;
 
-import common.utilities.UtilityCommon;
 import common.exceptions.DataOriginException;
+import common.exceptions.NoDataFoundException;
 import common.services.UtilityService;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -15,15 +15,20 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import common.model.Abono;
+import lombok.extern.log4j.Log4j;
+import mobiliario.iniciar_sesion;
+import model.abonos.CustomizePayment;
 import services.AbonosService;
+import utilities.Utility;
 
+@Log4j
 public class PaymentsForm extends javax.swing.JInternalFrame {
 
     
     private final AbonosService abonosService = AbonosService.getInstance();
-    private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
-    private final UtilityService utilityService = UtilityService.getInstance();
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat( "#,###,###,##0.00" );
+    private static final DecimalFormat NUMBER_FORMAT = new DecimalFormat( "#,###,###,##0" );
+    private UtilityService utilityService;
     
     public PaymentsForm() {
         this.setClosable(true);
@@ -62,22 +67,29 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
         parameters.put("paymentInitDate", paymentInitDate);
         parameters.put("paymentEndDate", paymentEndDate);
         
-        List<Abono> abonos;
+        List<CustomizePayment> abonos;
         try {
-            abonos = abonosService.getByParameters(parameters);
+            abonos = abonosService.getByParametersAndCalculcatePrepaidAndCurrentPay(parameters);
+            lblInfo.setText("Total de registros: "+NUMBER_FORMAT.format(abonos.size()));
+            final String MSG_LOGGING = "Total de registros obtenidos en el modulo de PAGOS: "
+                    + NUMBER_FORMAT.format(abonos.size())
+                    + ", Usuario: "
+                    + iniciar_sesion.nombre_usuario_global + " " + iniciar_sesion.apellidos_usuario_global;
+            
+            log.info(MSG_LOGGING);
+            
+            Utility.pushNotification(MSG_LOGGING);
+        } catch (NoDataFoundException e) {
+            lblInfo.setText("No se obtubieron resultados.");
+            return;
         } catch (DataOriginException e) {
             JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (abonos.isEmpty()) {
-            lblInfo.setText("No se obtubieron resultados");
-        } else {
-            lblInfo.setText("Total de pagos: "+abonos.size());
-        }
 
-        for(Abono abono : abonos){
+        float total = 0;
+        for(CustomizePayment abono : abonos){
               DefaultTableModel temp = (DefaultTableModel) tabla_abonos.getModel();
-
                Object fila[] = {
                         abono.getRenta().getRentaId()+"",
                         abono.getRenta().getFolio(),
@@ -85,24 +97,39 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
                         abono.getRenta().getDescripcion(),
                         abono.getFecha(),
                         abono.getUsuario().getNombre()+" "+abono.getUsuario().getApellidos(), 
-                        decimalFormat.format(abono.getAbono()),
+                        DECIMAL_FORMAT.format(abono.getAbono()),
                         abono.getComentario(),
                         abono.getFechaPago(),
-                        abono.getTipoAbono().getDescripcion()
+                        abono.getRenta().getFechaEvento(),
+                        abono.getTypePaymentDescription(),
+                        abono.getTipoAbono().getDescripcion(),
                     };
                     temp.addRow(fila);
-        }      
-        
-        total();
+                    total += abono.getAbono();
+        }
+
+        lblTotal.setText("Pagos: "+DECIMAL_FORMAT.format(total));
         
     }
     
     private void formatoTabla() {
         
-        Object[][] data = {{"","", "", "", "", "","","","",""}};
-        String[] columNames = {"Id","Folio", "Cliente", "Descripción pedido", "Fecha creación", "Recibio", "Pago", "Comentario","Fecha pago","Tipo"};    
+        String[] columNames = {
+            "Id",
+            "Folio",
+            "Cliente",
+            "Descripción pedido",
+            "Fecha creación",
+            "Recibio",
+            "Pago",
+            "Comentario",
+            "Fecha pago",
+            "Fecha evento",
+            "Anticipo/Cobro",
+            "Tipo"
+        };    
         
-        DefaultTableModel TableModel = new DefaultTableModel(data, columNames);
+        DefaultTableModel TableModel = new DefaultTableModel(null,columNames);
         tabla_abonos.setModel(TableModel);
         
         TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(TableModel); 
@@ -114,7 +141,7 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
         DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
         centrar.setHorizontalAlignment(SwingConstants.CENTER);
 
-         int[] anchos = {10,20,80, 80, 100, 100, 50, 80,80,80};
+         int[] anchos = {10,20,80, 80, 100, 100, 50, 80,80,80,80,80};
 
         for (int inn = 0; inn < tabla_abonos.getColumnCount(); inn++)
             tabla_abonos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]); 
@@ -136,15 +163,6 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
         tabla_abonos.getColumnModel().getColumn(6).setCellRenderer(alignRight);  
 
     }
-    
-    private void total() {
-        float total = 0;
-        for (int i = 0; i < tabla_abonos.getRowCount(); i++) {
-            total = total + Float.parseFloat(UtilityCommon.deleteCharacters(tabla_abonos.getValueAt(i, 6).toString(), "$,"));
-        }
-        lblTotal.setText("Pagos: $"+decimalFormat.format(total));
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -203,7 +221,9 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
         txtPaymentEndDate.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
 
         jButton1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jButton1.setText("Buscar");
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/search-24.png"))); // NOI18N
+        jButton1.setToolTipText("Buscar");
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -211,7 +231,9 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
         });
 
         jButton2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jButton2.setText("Exportar Excel");
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/excel-24.png"))); // NOI18N
+        jButton2.setToolTipText("Exportar Excel");
+        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -227,7 +249,7 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(cmb_fecha_inicial, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(18, 18, 18)
                         .addComponent(cmb_fecha_final, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel1))
                 .addGap(18, 18, 18)
@@ -237,13 +259,11 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtPaymentEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 199, Short.MAX_VALUE)
-                        .addComponent(jButton2))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -263,13 +283,13 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(cmb_fecha_final, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtPaymentEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jButton1)
-                                .addComponent(jButton2)))))
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jButton1)))))
                 .addContainerGap())
         );
 
-        tabla_abonos.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        tabla_abonos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         tabla_abonos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -292,7 +312,8 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
 
         lblTotal.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
-        lblInfo.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        lblInfo.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        lblInfo.setForeground(new java.awt.Color(255, 0, 51));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -302,12 +323,15 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 559, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(22, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 1141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -347,7 +371,8 @@ public class PaymentsForm extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-         utilityService.exportarExcel(tabla_abonos);
+        utilityService = UtilityService.getInstance();
+        utilityService.exportarExcel(tabla_abonos);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void tabla_abonosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_abonosMouseClicked

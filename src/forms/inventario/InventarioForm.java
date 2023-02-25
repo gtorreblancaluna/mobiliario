@@ -1,6 +1,9 @@
 package forms.inventario;
 
 import common.constants.ApplicationConstants;
+import common.exceptions.BusinessException;
+import common.exceptions.DataOriginException;
+import common.exceptions.InvalidDataException;
 import common.services.UtilityService;
 import common.utilities.UtilityCommon;
 import forms.compras.AgregarCompraFormDialog;
@@ -35,10 +38,23 @@ import mobiliario.iniciar_sesion;
 import common.model.Articulo;
 import common.model.CategoriaDTO;
 import common.model.Color;
+import common.model.EstadoEvento;
+import common.model.Tipo;
+import common.services.EstadoEventoService;
 import services.CategoryService;
 import common.services.ItemService;
+import common.services.TipoEventoService;
+import forms.inventario.tables.TableItemsByFolio;
+import java.awt.Component;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import static mobiliario.IndexForm.jDesktopPane1;
+import model.querys.rentas.ItemByFolioResultQuery;
+import model.querys.rentas.SearchItemByFolioParams;
+import services.SaleService;
+import utilities.Utility;
 
 public class InventarioForm extends javax.swing.JInternalFrame {
     
@@ -58,6 +74,13 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private List<Articulo> articulos = new ArrayList<>();
     private final UtilityService utilityService = UtilityService.getInstance();
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0" );
+    private List<Tipo> eventTypes = new ArrayList<>();
+    private List<EstadoEvento> eventStatus = new ArrayList<>();
+    private final EstadoEventoService estadoEventoService = EstadoEventoService.getInstance();
+    private final TipoEventoService tipoEventoService = TipoEventoService.getInstance();
+    private final TableItemsByFolio tableItemsByFolio;
+    private final SaleService saleService = SaleService.getInstance();
+    
 
     public InventarioForm() {
 
@@ -92,6 +115,113 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             }
         });
         
+        tableItemsByFolio = new TableItemsByFolio();
+        Utility.addJtableToPane(937, 305, panelTableItemsByFolio, tableItemsByFolio);
+        eventListener();
+        setCmbLimit();
+    }
+    
+    private void fillParametersSearchByItemsByFolio () {
+        log.info("In fillParametersSearchByItemsByFolio..");
+            if (eventTypes.isEmpty()) {
+                new Thread(() -> {
+                    try {
+                        eventTypes = tipoEventoService.get();
+                        cmbEventType.removeAllItems();
+                        cmbEventType.addItem(
+                            new Tipo(0, ApplicationConstants.CMB_SELECCIONE)
+                        );
+                        eventTypes.stream().forEach(t -> {
+                            cmbEventType.addItem(t);
+                        });
+                    } catch (DataOriginException e) {
+                        log.error(e.getMessage(),e);
+                        JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);  
+                    }
+                }).start();
+            }
+
+            if (eventStatus.isEmpty()) {
+                new Thread(() -> {
+                    try {
+                        eventStatus = estadoEventoService.get();
+                        cmbStatus.removeAllItems();
+                        cmbStatus.addItem(
+                            new EstadoEvento(0, ApplicationConstants.CMB_SELECCIONE)
+                        );
+                        eventStatus.stream().forEach(t -> {
+                            cmbStatus.addItem(t);
+                        });
+                    } catch (DataOriginException e) {
+                        log.error(e.getMessage(),e);
+                        JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);  
+                    }
+                }).start();
+            }
+        
+        
+        
+    }
+    
+    private void setCmbLimit () {
+        cmbLimit.removeAllItems();
+        cmbLimit.addItem("100");
+        cmbLimit.addItem("1000");
+        cmbLimit.addItem("5000");
+        cmbLimit.addItem("10000");
+    }
+    
+    private void eventListener () {
+        tabGeneral.addMouseListener(new MouseAdapter(){
+        @Override
+        public void mousePressed(MouseEvent e) {
+            Component c = tabGeneral.getComponentAt(new Point(e.getX(), e.getY()));
+                //TODO Find the right label and print it! :-)
+                System.out.println("Selected Index: "+tabGeneral.getSelectedIndex());
+                if (tabGeneral.getSelectedIndex() == 2 ) {
+                    fillParametersSearchByItemsByFolio();
+                }
+            }
+        });
+    }
+    
+    private SearchItemByFolioParams getParametersToSearchItemsByFolio () throws InvalidDataException{
+        
+        SearchItemByFolioParams searchItemByFolioParams = new SearchItemByFolioParams();
+         
+        final String FORMAT_DATE = "dd/MM/yyyy"; 
+         
+         searchItemByFolioParams.setInitCreatedAtEvent(
+                 txtSearchInitialDate.getDate() != null ? new SimpleDateFormat(FORMAT_DATE).format(txtSearchInitialDate.getDate()) : null
+         );
+         searchItemByFolioParams.setEndCreatedAtEvent(
+                 txtSearchEndDate.getDate() != null ? new SimpleDateFormat(FORMAT_DATE).format(txtSearchEndDate.getDate()) : null
+         );
+         searchItemByFolioParams.setInitialEventDate(
+                txtSearchInitialEventDate.getDate() != null ? new SimpleDateFormat(FORMAT_DATE).format(txtSearchInitialEventDate.getDate()) : null
+         );
+         searchItemByFolioParams.setEndEventDate(
+                 txtSearchEndEventDate.getDate() != null ? new SimpleDateFormat(FORMAT_DATE).format(txtSearchEndEventDate.getDate()) : null
+         );
+         
+         EstadoEvento estadoEvento = (EstadoEvento) cmbStatus.getModel().getSelectedItem();
+         Tipo eventType = (Tipo) cmbEventType.getModel().getSelectedItem();
+         
+         searchItemByFolioParams.setEventStatusId(estadoEvento.getEstadoId());
+         searchItemByFolioParams.setEventTypeId(eventType.getTipoId());
+         searchItemByFolioParams.setLikeItemDescription(txtSearchLikeItemDescription.getText());
+         
+         searchItemByFolioParams.setLimit(Integer.parseInt(cmbLimit.getSelectedItem().toString()));
+         try {
+             if (!txtSearchFolioRenta.getText().isEmpty()){
+                searchItemByFolioParams.setFolio(Long.parseLong(txtSearchFolioRenta.getText()));
+             }
+         } catch (NumberFormatException e) {
+           throw new InvalidDataException("Folio no valido.");
+         }
+         
+         return searchItemByFolioParams;
+    
     }
     
     private static void setLblInfoStatusChange () {
@@ -694,7 +824,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        tabGeneral = new javax.swing.JTabbedPane();
         jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         txt_precio_renta = new javax.swing.JTextField();
@@ -752,6 +882,29 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         radioBtnTodos = new javax.swing.JRadioButton();
         radioBtnFechaDevolucion = new javax.swing.JRadioButton();
         radioBtnFechaEntrega = new javax.swing.JRadioButton();
+        panelItemsByFolio = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
+        jbtnSearch = new javax.swing.JButton();
+        jLabel13 = new javax.swing.JLabel();
+        txtSearchInitialDate = new com.toedter.calendar.JDateChooser();
+        txtSearchEndDate = new com.toedter.calendar.JDateChooser();
+        txtSearchInitialEventDate = new com.toedter.calendar.JDateChooser();
+        jLabel14 = new javax.swing.JLabel();
+        txtSearchEndEventDate = new com.toedter.calendar.JDateChooser();
+        jLabel16 = new javax.swing.JLabel();
+        txtSearchFolioRenta = new javax.swing.JTextField();
+        jLabel17 = new javax.swing.JLabel();
+        cmbLimit = new javax.swing.JComboBox();
+        cmbStatus = new javax.swing.JComboBox<>();
+        jLabel18 = new javax.swing.JLabel();
+        cmbEventType = new javax.swing.JComboBox<>();
+        jLabel19 = new javax.swing.JLabel();
+        jButton7 = new javax.swing.JButton();
+        txtSearchLikeItemDescription = new javax.swing.JTextField();
+        jLabel20 = new javax.swing.JLabel();
+        jPanel10 = new javax.swing.JPanel();
+        lblInfoGeneral = new javax.swing.JLabel();
+        panelTableItemsByFolio = new javax.swing.JPanel();
 
         setClosable(true);
         setResizable(true);
@@ -759,7 +912,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         setFont(new java.awt.Font("Microsoft Sans Serif", 1, 12)); // NOI18N
         setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Inventory-icon.png"))); // NOI18N
 
-        jTabbedPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        tabGeneral.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Panel de seleccion"));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -928,7 +1081,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lbl_buscar))
                             .addComponent(jLabel12))
-                        .addGap(0, 355, Short.MAX_VALUE)))
+                        .addGap(0, 385, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -945,7 +1098,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                     .addComponent(cmb_color2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbl_buscar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
         );
 
         jToolBar1.setBorder(null);
@@ -1101,7 +1254,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
             .addGroup(jPanel3Layout.createSequentialGroup()
@@ -1110,7 +1263,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("agregar, editar articulos", jPanel3);
+        tabGeneral.addTab("Agregar o editar articulos", jPanel3);
 
         btnAddItem.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         btnAddItem.setText("Agregar");
@@ -1215,7 +1368,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1322,13 +1475,12 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -1342,7 +1494,266 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("consultar disponibilidad", jPanel4);
+        tabGeneral.addTab("Disponibilidad", jPanel4);
+
+        jbtnSearch.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jbtnSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/search-24.png"))); // NOI18N
+        jbtnSearch.setToolTipText("Buscar");
+        jbtnSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbtnSearchActionPerformed(evt);
+            }
+        });
+
+        jLabel13.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel13.setText("Fecha de creación:");
+
+        txtSearchInitialDate.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtSearchInitialDate.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtSearchInitialDateMouseClicked(evt);
+            }
+        });
+        txtSearchInitialDate.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchInitialDateKeyPressed(evt);
+            }
+        });
+
+        txtSearchEndDate.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtSearchEndDate.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtSearchEndDateMouseClicked(evt);
+            }
+        });
+        txtSearchEndDate.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchEndDateKeyPressed(evt);
+            }
+        });
+
+        txtSearchInitialEventDate.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtSearchInitialEventDate.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtSearchInitialEventDateMouseClicked(evt);
+            }
+        });
+        txtSearchInitialEventDate.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchInitialEventDateKeyPressed(evt);
+            }
+        });
+
+        jLabel14.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel14.setText("Fecha del evento:");
+
+        txtSearchEndEventDate.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtSearchEndEventDate.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtSearchEndEventDateMouseClicked(evt);
+            }
+        });
+        txtSearchEndEventDate.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchEndEventDateKeyPressed(evt);
+            }
+        });
+
+        jLabel16.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel16.setText("Folio:");
+
+        txtSearchFolioRenta.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtSearchFolioRenta.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchFolioRentaKeyPressed(evt);
+            }
+        });
+
+        jLabel17.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel17.setText("Limitar resultados a:");
+
+        cmbLimit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmbLimit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        cmbStatus.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmbStatus.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        jLabel18.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel18.setText("Estado del evento:");
+
+        cmbEventType.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmbEventType.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        jLabel19.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel19.setText("Tipo de evento:");
+
+        jButton7.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jButton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/excel-24.png"))); // NOI18N
+        jButton7.setToolTipText("Exportar Excel");
+        jButton7.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+
+        txtSearchLikeItemDescription.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtSearchLikeItemDescription.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchLikeItemDescriptionKeyPressed(evt);
+            }
+        });
+
+        jLabel20.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel20.setText("Articulo:");
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(144, 144, 144)
+                        .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(42, 42, 42)
+                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(txtSearchInitialDate, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(7, 7, 7)
+                        .addComponent(txtSearchEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(7, 7, 7)
+                        .addComponent(cmbEventType, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(7, 7, 7)
+                        .addComponent(txtSearchLikeItemDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel9Layout.createSequentialGroup()
+                                .addComponent(txtSearchInitialEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(7, 7, 7)
+                                .addComponent(txtSearchEndEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(7, 7, 7)
+                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(7, 7, 7)
+                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtSearchFolioRenta, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(7, 7, 7)
+                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(7, 7, 7)
+                        .addComponent(jbtnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(7, 7, 7)
+                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))))
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addGap(4, 4, 4)
+                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel19)
+                            .addComponent(jLabel20))))
+                .addGap(7, 7, 7)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtSearchInitialDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtSearchEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbEventType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addGap(1, 1, 1)
+                        .addComponent(txtSearchLikeItemDescription, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(7, 7, 7)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel14)
+                        .addGap(7, 7, 7)
+                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtSearchInitialEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtSearchEndEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel18)
+                        .addGap(7, 7, 7)
+                        .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel16)
+                        .addGap(7, 7, 7)
+                        .addComponent(txtSearchFolioRenta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel17)
+                        .addGap(7, 7, 7)
+                        .addComponent(cmbLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jbtnSearch)
+                            .addComponent(jButton7)))))
+        );
+
+        lblInfoGeneral.setFont(new java.awt.Font("Arial", 1, 11)); // NOI18N
+
+        javax.swing.GroupLayout panelTableItemsByFolioLayout = new javax.swing.GroupLayout(panelTableItemsByFolio);
+        panelTableItemsByFolio.setLayout(panelTableItemsByFolioLayout);
+        panelTableItemsByFolioLayout.setHorizontalGroup(
+            panelTableItemsByFolioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        panelTableItemsByFolioLayout.setVerticalGroup(
+            panelTableItemsByFolioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 443, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
+        jPanel10.setLayout(jPanel10Layout);
+        jPanel10Layout.setHorizontalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelTableItemsByFolio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblInfoGeneral, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel10Layout.setVerticalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblInfoGeneral, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelTableItemsByFolio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout panelItemsByFolioLayout = new javax.swing.GroupLayout(panelItemsByFolio);
+        panelItemsByFolio.setLayout(panelItemsByFolioLayout);
+        panelItemsByFolioLayout.setHorizontalGroup(
+            panelItemsByFolioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelItemsByFolioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelItemsByFolioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        panelItemsByFolioLayout.setVerticalGroup(
+            panelItemsByFolioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelItemsByFolioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        tabGeneral.addTab("Articulos por folio", panelItemsByFolio);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -1350,14 +1761,14 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1219, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(tabGeneral, javax.swing.GroupLayout.PREFERRED_SIZE, 1219, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 552, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(tabGeneral)
+                .addContainerGap())
         );
 
         pack();
@@ -1571,6 +1982,9 @@ public class InventarioForm extends javax.swing.JInternalFrame {
          
     }//GEN-LAST:event_btnMostrarAgregarCompraActionPerformed
 
+    private void exportToExcelItemsByFolio () {
+        utilityService.exportarExcel(tableItemsByFolio);
+    }
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         
         if (tabla_articulos.getSelectedRow() == - 1) {
@@ -1590,6 +2004,42 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         UtilityCommon.selectCheckBoxWhenKeyPressedIsSpace(evt,tablaDisponibilidadArticulos,Column.BOOLEAN.getNumber());
     }//GEN-LAST:event_tablaDisponibilidadArticulosKeyPressed
 
+    private void searchItemsByFolio () {
+        try {
+            SearchItemByFolioParams searchItemByFolioParams
+                    = getParametersToSearchItemsByFolio();
+            List<ItemByFolioResultQuery> itemByFolioResultQuerys = saleService.getItemsByFolio(searchItemByFolioParams);
+            tableItemsByFolio.format();
+            if (!itemByFolioResultQuerys.isEmpty()) {
+                lblInfoGeneral.setText("Total: "+itemByFolioResultQuerys.size()+", Limite de resultados: "+cmbLimit.getSelectedItem());
+                DefaultTableModel tableModel = (DefaultTableModel) tableItemsByFolio.getModel();
+                
+                    for(ItemByFolioResultQuery item : itemByFolioResultQuerys){
+                        Object fila[] = {
+                            item.getEventId(),
+                            item.getEventFolio(),
+                            item.getItemAmount(),
+                            item.getItemDescription(),
+                            decimalFormat.format(item.getItemUnitPrice()),
+                            item.getItemDiscountRate() > 0 ? decimalFormat.format(item.getItemDiscountRate()) : "",
+                            item.getItemSubTotal() > 0 ? decimalFormat.format(item.getItemSubTotal()) : "",
+                            item.getEventDeliveryDate(),
+                            item.getEventCreatedAtDate(),
+                            item.getEventType(),
+                            item.getEventStatus()
+                        };
+                    tableModel.addRow(fila);
+                }
+            } else {
+                lblInfoGeneral.setText("No se obtuvieron resultados.");
+            }
+        } catch (BusinessException | DataOriginException e) {
+            log.error(e.getMessage(),e);
+            JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);
+        }finally{
+           Toolkit.getDefaultToolkit().beep();
+        }
+    }
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
        DefaultTableModel temp = (DefaultTableModel) tablaDisponibilidadArticulos.getModel();
         for( int i = temp.getRowCount() - 1; i >= 0; i-- ){
@@ -1655,6 +2105,60 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtDisponibilidadFechaInicialMouseClicked
 
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        exportToExcelItemsByFolio();
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void txtSearchFolioRentaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchFolioRentaKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == 10 ) {
+            this.searchItemsByFolio();
+        }
+    }//GEN-LAST:event_txtSearchFolioRentaKeyPressed
+
+    private void txtSearchEndEventDateKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchEndEventDateKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchEndEventDateKeyPressed
+
+    private void txtSearchEndEventDateMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchEndEventDateMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchEndEventDateMouseClicked
+
+    private void txtSearchInitialEventDateKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchInitialEventDateKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchInitialEventDateKeyPressed
+
+    private void txtSearchInitialEventDateMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchInitialEventDateMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchInitialEventDateMouseClicked
+
+    private void txtSearchEndDateKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchEndDateKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchEndDateKeyPressed
+
+    private void txtSearchEndDateMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchEndDateMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchEndDateMouseClicked
+
+    private void txtSearchInitialDateKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchInitialDateKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchInitialDateKeyPressed
+
+    private void txtSearchInitialDateMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchInitialDateMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchInitialDateMouseClicked
+
+    private void jbtnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnSearchActionPerformed
+        // TODO add your handling code here:
+        this.searchItemsByFolio();
+    }//GEN-LAST:event_jbtnSearchActionPerformed
+
+    private void txtSearchLikeItemDescriptionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchLikeItemDescriptionKeyPressed
+        if (evt.getKeyCode() == 10 ) {
+            this.searchItemsByFolio();
+        }
+    }//GEN-LAST:event_txtSearchLikeItemDescriptionKeyPressed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddItem;
@@ -1662,6 +2166,9 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnShowAvailivity;
     private javax.swing.ButtonGroup buttonGroup1;
     public static javax.swing.JCheckBox check_solo_negativos;
+    private javax.swing.JComboBox<Tipo> cmbEventType;
+    private javax.swing.JComboBox cmbLimit;
+    private javax.swing.JComboBox<EstadoEvento> cmbStatus;
     private javax.swing.JComboBox<CategoriaDTO> cmb_categoria;
     private javax.swing.JComboBox<CategoriaDTO> cmb_categoria2;
     public static javax.swing.JComboBox<Color> cmb_color;
@@ -1672,11 +2179,19 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1685,32 +2200,44 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JButton jbtnSearch;
     private javax.swing.JButton jbtn_agregar;
     private javax.swing.JButton jbtn_editar;
     private javax.swing.JButton jbtn_guardar;
     private javax.swing.JButton jbtn_nuevo;
     private static javax.swing.JLabel lblInfoConsultarDisponibilidad;
+    private javax.swing.JLabel lblInfoGeneral;
     private javax.swing.JLabel lbl_buscar;
     private javax.swing.JLabel lbl_categoria;
     private javax.swing.JLabel lbl_color;
-    private javax.swing.JRadioButton radioBtnFechaDevolucion;
-    private javax.swing.JRadioButton radioBtnFechaEntrega;
-    private javax.swing.JRadioButton radioBtnTodos;
+    private javax.swing.JPanel panelItemsByFolio;
+    private javax.swing.JPanel panelTableItemsByFolio;
+    public static javax.swing.JRadioButton radioBtnFechaDevolucion;
+    public static javax.swing.JRadioButton radioBtnFechaEntrega;
+    public static javax.swing.JRadioButton radioBtnTodos;
+    private javax.swing.JTabbedPane tabGeneral;
     public static javax.swing.JTable tablaDisponibilidadArticulos;
     private javax.swing.JTable tabla_articulos;
     private javax.swing.JTextField txtCodigo;
     private static com.toedter.calendar.JDateChooser txtDisponibilidadFechaFinal;
     private static com.toedter.calendar.JDateChooser txtDisponibilidadFechaInicial;
+    private com.toedter.calendar.JDateChooser txtSearchEndDate;
+    private com.toedter.calendar.JDateChooser txtSearchEndEventDate;
+    private javax.swing.JTextField txtSearchFolioRenta;
+    private com.toedter.calendar.JDateChooser txtSearchInitialDate;
+    private com.toedter.calendar.JDateChooser txtSearchInitialEventDate;
+    private javax.swing.JTextField txtSearchLikeItemDescription;
     private javax.swing.JTextField txt_cantidad;
     private javax.swing.JTextField txt_descripcion;
     private javax.swing.JTextField txt_descripcion2;

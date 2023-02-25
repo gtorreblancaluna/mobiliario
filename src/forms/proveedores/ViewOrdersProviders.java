@@ -6,8 +6,8 @@ import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
 import common.exceptions.NoDataFoundException;
 import common.services.UtilityService;
-import forms.proveedores.clazz.TableViewOrdersProviders;
-import forms.proveedores.clazz.TableViewOrdersProvidersDetail;
+import forms.proveedores.tables.TableViewOrdersProviders;
+import forms.proveedores.tables.TableViewOrdersProvidersDetail;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Point;
@@ -23,13 +23,11 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import mobiliario.IndexForm;
 import model.DatosGenerales;
 import model.providers.OrdenProveedor;
-import model.providers.customize.DetailOrderSupplierCustomize;
+import model.providers.queryresult.DetailOrderSupplierQueryResult;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -126,7 +124,6 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                 indexTabPanelActive = tabGeneral.getSelectedIndex();            
             }
         });
-    
     }
     
      public void showProviders() {
@@ -292,7 +289,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
    
    private void fillTableTabPanelDetail () {
        ParameterOrderProvider parameter = getParameters();
-       List<DetailOrderSupplierCustomize> list;
+       List<DetailOrderSupplierQueryResult> list;
        tableViewOrdersProvidersDetail.format();
        
         try{
@@ -313,7 +310,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
 
        DefaultTableModel tableModel = (DefaultTableModel) tableViewOrdersProvidersDetail.getModel();
 
-       for(DetailOrderSupplierCustomize detail : list){
+       for(DetailOrderSupplierQueryResult detail : list){
             Object fila[] = {                                          
                 detail.getOrderSupplierId(),
                 detail.getOrderSupplierDetailId(),
@@ -376,7 +373,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                 orden.getComentario(),
                 orden.getRenta().getRentaId(),             
                 decimalFormat.format(orden.getTotal()),
-                decimalFormat.format(orden.getAbonos()),
+                orden.getAbonos() > 0 ? decimalFormat.format(orden.getAbonos()) : "",
                 decimalFormat.format((orden.getTotal() - orden.getAbonos())),
                 orden.getRenta().getFechaEvento()
               };

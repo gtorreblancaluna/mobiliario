@@ -34,6 +34,7 @@
        <result property="renta.rentaId" column="renta_id"/>
        <result property="renta.folio" column="renta_folio"/>
        <result property="renta.tipo.tipo" column="renta_tipo"/>
+       <result property="renta.fechaEvento" column="renta_fecha_evento"/>
        
        <result property="renta.cliente.nombre" column="nombre_cliente"/>
        <result property="renta.cliente.apellidos" column="apellidos_cliente"/>
@@ -59,6 +60,7 @@
             usuarios.apellidos AS usuario_apellidos,
             renta.id_renta AS renta_id,
             renta.folio AS renta_folio,
+            renta.fecha_evento AS renta_fecha_evento,
             tipo_renta.tipo AS renta_tipo,
             clientes.nombre AS nombre_cliente,
             clientes.apellidos AS apellidos_cliente

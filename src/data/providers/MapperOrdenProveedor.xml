@@ -5,7 +5,7 @@
   
 <mapper namespace="MapperOrdenProveedor">
     
-    <resultMap id="resultDetailOrderSupplierCustomize" type="model.providers.customize.DetailOrderSupplierCustomize">
+    <resultMap id="resultDetailOrderSupplierCustomize" type="model.providers.queryresult.DetailOrderSupplierQueryResult">
         <result property="orderSupplierId" column="orden_proveedor_id"/>
         <result property="orderSupplierDetailId" column="detalle_orden_proveedor_id"/>        
         <result property="rentaId" column="renta_id"/>

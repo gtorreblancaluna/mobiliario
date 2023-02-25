@@ -10,7 +10,7 @@ import java.util.Map;
 import model.providers.DetalleOrdenProveedor;
 import model.providers.OrdenProveedor;
 import model.providers.DetailOrderProviderType;
-import model.providers.customize.DetailOrderSupplierCustomize;
+import model.providers.queryresult.DetailOrderSupplierQueryResult;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
@@ -30,7 +30,7 @@ public class OrderProviderDAO {
         return SINGLE_INSTANCE;
     }
     
-    public List<DetailOrderSupplierCustomize> getDetailOrderSupplierCustomize(ParameterOrderProvider parameter)throws DataOriginException{
+    public List<DetailOrderSupplierQueryResult> getDetailOrderSupplierCustomize(ParameterOrderProvider parameter)throws DataOriginException{
          
         SqlSession session = sqlSessionFactory.openSession();
         try{

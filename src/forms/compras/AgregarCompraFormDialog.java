@@ -18,7 +18,6 @@ import common.model.Articulo;
 import model.Compra;
 import services.ComprasService;
 import services.ContabilidadServices;
-import services.SystemService;
 
 /**
  *
@@ -27,7 +26,6 @@ import services.SystemService;
 public class AgregarCompraFormDialog extends java.awt.Dialog {
     
     ContabilidadServices contabilidadServices = new ContabilidadServices();
-    private final SystemService systemService = SystemService.getInstance();
     private final ComprasService comprasService = new ComprasService();
     public static Articulo articulo = null;
    
