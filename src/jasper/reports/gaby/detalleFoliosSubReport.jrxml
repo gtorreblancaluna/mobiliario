@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="detalleFoliosSubReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="4" bottomMargin="4" uuid="5db1660a-23b1-461b-b330-c8337f293a0c">
+	<property name="ireport.zoom" value="5.054470284992962"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDS" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+             d.cantidad,
+             CONCAT(a.descripcion," ",color.color) AS articulo,
+             categoria.descripcion AS categoria
+        FROM detalle_renta d
+             INNER JOIN articulo a ON d.id_articulo = a.id_articulo
+             INNER JOIN color color ON a.id_color = color.id_color
+             INNER JOIN categoria categoria ON a.id_categoria = categoria.id_categoria
+        WHERE
+             d.id_renta IN ($P!{IDS})
+        ORDER BY a.descripcion]]>
+	</queryString>
+	<field name="cantidad" class="java.lang.String"/>
+	<field name="articulo" class="java.lang.String"/>
+	<field name="categoria" class="java.lang.String"/>
+	<columnHeader>
+		<band height="8">
+			<staticText>
+				<reportElement x="0" y="0" width="29" height="8" uuid="a7811af9-1d25-40ee-ada6-730906e19c88"/>
+				<textElement>
+					<font fontName="Arial" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="85" y="0" width="222" height="8" uuid="3f17b02b-4ca0-4264-85ff-ae1919ef1733"/>
+				<textElement>
+					<font fontName="Arial" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Articulo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="29" y="0" width="56" height="8" uuid="a31a9230-47f9-4d8f-ace9-122fffaceb71"/>
+				<textElement>
+					<font fontName="Arial" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Categoría]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="9" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="19" height="8" uuid="d69f8177-5491-4c00-ac64-36f87082a769"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="85" y="0" width="510" height="8" uuid="ff490a3f-8d16-4e34-a1a8-5af6fb875074"/>
+				<textElement>
+					<font fontName="Arial" size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{articulo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="29" y="0" width="56" height="8" uuid="651a03d2-af7f-4bc0-b317-6478d32a7292"/>
+				<textElement>
+					<font fontName="Arial" size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{categoria}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="8" width="595" height="1" forecolor="#D6D6D6" uuid="0ba7023d-c027-431f-86ba-4fdf5dc00c2f"/>
+			</line>
+		</band>
+	</detail>
+</jasperReport>

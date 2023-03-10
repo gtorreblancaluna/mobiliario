@@ -1,9 +1,5 @@
 package mobiliario;
 
-import common.constants.ApplicationConstants;
-import common.exceptions.DataOriginException;
-import common.exceptions.NoDataFoundException;
-import common.model.Renta;
 import common.utilities.UtilityCommon;
 import forms.abonos.PaymentsForm;
 import forms.inventario.InventarioForm;
@@ -14,20 +10,14 @@ import forms.material.inventory.MaterialInventoryView;
 import forms.proveedores.ViewOrdersProviders;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import static mobiliario.iniciar_sesion.usuarioGlobal;
 import model.DatosGenerales;
-import services.SaleService;
 import services.SystemService;
-import common.services.TaskDeliveryChoferUpdateService;
-import java.awt.Image;
-import javax.swing.ImageIcon;
 import utilities.Utility;
 
 public class IndexForm extends javax.swing.JFrame {
@@ -61,41 +51,6 @@ public class IndexForm extends javax.swing.JFrame {
         LOGGER.info(">>> datos generales obtenidos: "+generalDataGlobal);
         this.setTitle(generalDataGlobal.getCompanyName().toUpperCase());        
         
-    }
-    
-    private void generateTaskAlmacen () {
-        Map<String, Object> map = new HashMap<>();
-        
-        map.put("applyDiff", ApplicationConstants.ESTADO_CANCELADO);
-        map.put("systemDate", UtilityCommon.getSystemDate("/") );
-        map.put("type", ApplicationConstants.TIPO_PEDIDO );
-        map.put("statusId", ApplicationConstants.ESTADO_APARTADO );
-        map.put("limit", 100000 );
-        
-        SaleService saleService = SaleService.getInstance();
-        //TaskAlmacenUpdateService taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
-        TaskDeliveryChoferUpdateService taskDeliveryChoferUpdateService = TaskDeliveryChoferUpdateService.getInstance();
-        try {
-            List<Renta> rentas = saleService.obtenerRentasPorParametros(map);
-            LOGGER.info("RENTAS: "+rentas.size());
-            
-                for (Renta renta : rentas) {
-                    try {
-                        taskDeliveryChoferUpdateService.saveWhenIsNewEvent(
-                            Long.parseLong(String.valueOf(renta.getRentaId())), 
-                            String.valueOf(renta.getFolio()),
-                            renta.getChofer().getUsuarioId().toString(),
-                            iniciar_sesion.usuarioGlobal.getUsuarioId().toString()
-                            );
-                    } catch (DataOriginException | NoDataFoundException e) {
-                        LOGGER.error(e);
-                    }
-                }
-
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-    
     }
 
     public void abrir_ventana(JInternalFrame internalFrame) {

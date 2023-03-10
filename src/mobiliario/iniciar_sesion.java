@@ -2,8 +2,6 @@ package mobiliario;
 
 import common.constants.ApplicationConstants;
 import common.exceptions.DataOriginException;
-import java.awt.Image;
-import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
@@ -11,14 +9,17 @@ import static mobiliario.IndexForm.lbl_logueo;
 import static mobiliario.IndexForm.lblPuesto;
 import common.model.Usuario;
 import org.apache.log4j.Logger;
-import org.jvnet.substance.SubstanceLookAndFeel;
 import common.services.UserService;
-import javax.swing.ImageIcon;
+import common.constants.PropertyConstant;
+import common.constants.SubstanceThemeConstant;
+import java.io.IOException;
+import org.jvnet.substance.SubstanceLookAndFeel;
+import utilities.PropertySystemUtil;
 import utilities.Utility;
 
 public class iniciar_sesion extends javax.swing.JFrame {
-//initializing the logger
-private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
+
+    private static final Logger log = Logger.getLogger(iniciar_sesion.class.getName());
 
     private IndexForm ventana_principal;
     private static final UserService userService = UserService.getInstance();
@@ -34,17 +35,22 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
     public iniciar_sesion() {
 
         initComponents();
-        //Image icon = Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png"));
-        //setIconImage(icon);
-        
         this.setLocationRelativeTo(null);
         JFrame.setDefaultLookAndFeelDecorated(true);
-        SubstanceLookAndFeel.setSkin("org.jvnet.substance.skin.MistAquaSkin");
         this.setTitle("Iniciar sesión.");
+        setLookAndFeel();
         
     }
 
-
+    private void setLookAndFeel () {
+        try{
+            SubstanceLookAndFeel.setSkin(PropertySystemUtil.get(PropertyConstant.SYSTEM_THEME));
+        }catch(IOException e){
+            log.error(e);
+            SubstanceLookAndFeel.setSkin(SubstanceThemeConstant.BUSINESS_SKIN);
+            JOptionPane.showMessageDialog(this, e, ApplicationConstants.MESSAGE_UNEXPECTED_ERROR, JOptionPane.ERROR_MESSAGE);
+        } 
+    }
 
     public void esconder() {
         this.setVisible(false);

@@ -5,19 +5,29 @@ import clases.JCMail_enviar_prueba;
 import clases.conectate;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
-import common.exceptions.BusinessException;
 import common.exceptions.DataOriginException;
+import common.constants.PropertyConstant;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.sql.Statement;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
-
+import javax.swing.SwingUtilities;
 import model.DatosGenerales;
+import org.jvnet.substance.SubstanceLookAndFeel;
+import org.jvnet.substance.skin.SkinInfo;
 import services.SystemService;
+import utilities.PropertySystemUtil;
 
 public class utilerias extends java.awt.Dialog {
 
@@ -29,6 +39,7 @@ public class utilerias extends java.awt.Dialog {
     String id_categoria;
     public static boolean utiliza_conexion_TLS = false, utiliza_autenticacion = false, status;
     private final SystemService systemService = SystemService.getInstance();
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(utilerias.class.getName());
 
     /**
      * Creates new form Colores
@@ -53,7 +64,6 @@ public class utilerias extends java.awt.Dialog {
         
 
         jbtn_guardar.setEnabled(false);
-        this.btnSaveConfiguration.setEnabled(false);
         
         // informacion de lanzamientos de version
         this.info.setText("VERSION RELEASE [1.3] 2019.01.20 GTL\n"
@@ -108,22 +118,30 @@ public class utilerias extends java.awt.Dialog {
         );
         // fin informacion de version
         this.info.setEditable(false);
+        addSkinsToPanel();
+        
     }
     
     public void initFormDataConfiguration(){
         this.btnSave.setEnabled(false);
-        this.txtEmailCompras.setEnabled(false);
     }
     
-    public void getDataConfiguration(){
-        String emailCompras=null;
-        try{
-            emailCompras = 
-                    systemService.getDataConfigurationByKey(ApplicationConstants.SYSTEM_EMAIL_COMPRAS);
-        }catch(BusinessException e){
-            JOptionPane.showMessageDialog( this,e.getMessage());
+    private void getDataConfiguration(){
+        
+        try {
+            Boolean generateTaskAlmacen = 
+                    Boolean.parseBoolean(PropertySystemUtil.get(PropertyConstant.GENERATE_TASK_ALMACEN));
+            Boolean generateTaskChofer = 
+                    Boolean.parseBoolean(PropertySystemUtil.get(PropertyConstant.GENERATE_TASK_CHOFER));
+            this.checkGenerateTaskAlmacen.setSelected(generateTaskAlmacen);
+            this.checkGenerateTaskChofer.setSelected(generateTaskChofer);
+        } catch (FileNotFoundException e) {
+            log.error(e);
+            JOptionPane.showMessageDialog(this,e, "Error", JOptionPane.ERROR_MESSAGE); 
+        } catch (IOException e) {
+            log.error(e);
+            JOptionPane.showMessageDialog(this,e, "Error", JOptionPane.ERROR_MESSAGE); 
         }
-        this.txtEmailCompras.setText(emailCompras);
         
     }
 
@@ -352,14 +370,15 @@ public class utilerias extends java.awt.Dialog {
         btnSave = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        txtEmailCompras = new javax.swing.JTextField();
-        btnSaveConfiguration = new javax.swing.JButton();
-        btnEditConfiguration = new javax.swing.JButton();
+        jPanel9 = new javax.swing.JPanel();
+        checkGenerateTaskAlmacen = new javax.swing.JCheckBox();
+        checkGenerateTaskChofer = new javax.swing.JCheckBox();
         jPanel8 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtInfoPDFSummary = new javax.swing.JTextArea();
         btnEditPdfSummary = new javax.swing.JButton();
+        panelLookAndFeel = new javax.swing.JPanel();
+        panelInnerLookAndFeel = new javax.swing.JPanel();
 
         setLocationRelativeTo(jLabel1);
         setTitle("Utilerias");
@@ -715,58 +734,58 @@ public class utilerias extends java.awt.Dialog {
 
         jPanel7.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
 
-        jLabel2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel2.setText("Email compras:");
-
-        txtEmailCompras.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-
-        btnSaveConfiguration.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        btnSaveConfiguration.setText("Guardar");
-        btnSaveConfiguration.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnSaveConfiguration.addActionListener(new java.awt.event.ActionListener() {
+        checkGenerateTaskAlmacen.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        checkGenerateTaskAlmacen.setText("Generar tareas almacen");
+        checkGenerateTaskAlmacen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveConfigurationActionPerformed(evt);
+                checkGenerateTaskAlmacenActionPerformed(evt);
             }
         });
 
-        btnEditConfiguration.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        btnEditConfiguration.setText("Editar");
-        btnEditConfiguration.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnEditConfiguration.addActionListener(new java.awt.event.ActionListener() {
+        checkGenerateTaskChofer.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        checkGenerateTaskChofer.setText("Generar tareas chofer");
+        checkGenerateTaskChofer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditConfigurationActionPerformed(evt);
+                checkGenerateTaskChoferActionPerformed(evt);
             }
         });
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(checkGenerateTaskAlmacen, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(checkGenerateTaskChofer, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(536, Short.MAX_VALUE))
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(checkGenerateTaskAlmacen)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(checkGenerateTaskChofer)
+                .addContainerGap(174, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
-                .addGap(48, 48, 48)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtEmailCompras, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addComponent(btnSaveConfiguration, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnEditConfiguration, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(279, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
-                .addGap(40, 40, 40)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtEmailCompras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 301, Short.MAX_VALUE)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSaveConfiguration)
-                    .addComponent(btnEditConfiguration))
-                .addGap(142, 142, 142))
+                .addContainerGap()
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(276, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Configuración", jPanel7);
@@ -809,6 +828,36 @@ public class utilerias extends java.awt.Dialog {
         );
 
         jTabbedPane1.addTab("Info PDF resumen", jPanel8);
+
+        javax.swing.GroupLayout panelInnerLookAndFeelLayout = new javax.swing.GroupLayout(panelInnerLookAndFeel);
+        panelInnerLookAndFeel.setLayout(panelInnerLookAndFeelLayout);
+        panelInnerLookAndFeelLayout.setHorizontalGroup(
+            panelInnerLookAndFeelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 751, Short.MAX_VALUE)
+        );
+        panelInnerLookAndFeelLayout.setVerticalGroup(
+            panelInnerLookAndFeelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 390, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout panelLookAndFeelLayout = new javax.swing.GroupLayout(panelLookAndFeel);
+        panelLookAndFeel.setLayout(panelLookAndFeelLayout);
+        panelLookAndFeelLayout.setHorizontalGroup(
+            panelLookAndFeelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelLookAndFeelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panelInnerLookAndFeel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        panelLookAndFeelLayout.setVerticalGroup(
+            panelLookAndFeelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelLookAndFeelLayout.createSequentialGroup()
+                .addGap(120, 120, 120)
+                .addComponent(panelInnerLookAndFeel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Apariencia", panelLookAndFeel);
 
         jPanel2.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 780, 550));
         jTabbedPane1.getAccessibleContext().setAccessibleName("Folio");
@@ -972,7 +1021,35 @@ public class utilerias extends java.awt.Dialog {
         // panel_enviar_prueba.setVisible(false);
 
     }//GEN-LAST:event_Jbnt_enviar_pruebaActionPerformed
+    private void addSkinsToPanel(){
 
+            panelInnerLookAndFeel.removeAll();
+            panelInnerLookAndFeel.setLayout(new GridLayout(20, 200));
+            panelInnerLookAndFeel.setMaximumSize(new Dimension(400, 400));
+            Map<String, SkinInfo> skins = SubstanceLookAndFeel.getAllSkins();
+            log.info("getting skins ("+skins.size()+")");
+             for (SkinInfo skinInfo : skins.values()){
+                System.out.println("adding button "+skinInfo.getDisplayName());
+                JButton button = new JButton(skinInfo.getDisplayName());
+                button.setSize(20, 15);
+                button.setFont(new java.awt.Font("Arial", 1, 11));
+                button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+                button.addActionListener((java.awt.event.ActionEvent e) -> {
+                    try {
+                        PropertySystemUtil.save(PropertyConstant.SYSTEM_THEME.getKey(), skinInfo.getClassName());
+                        SubstanceLookAndFeel.setSkin(skinInfo.getClassName());
+                        SwingUtilities.updateComponentTreeUI(this);
+                    } catch (IOException ex) {
+                        log.error(ex);
+                        JOptionPane.showMessageDialog(null, ex, ApplicationConstants.MESSAGE_UNEXPECTED_ERROR, JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+               panelInnerLookAndFeel.add(button);
+             }
+
+        }
+    
     private void Jbtn_editar_emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Jbtn_editar_emailActionPerformed
         // TODO add your handling code here:
         editarDatosEmail();
@@ -1094,13 +1171,6 @@ public class utilerias extends java.awt.Dialog {
          }
     }//GEN-LAST:event_txtTelsKeyPressed
 
-    private void btnEditConfigurationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditConfigurationActionPerformed
-        // TODO add your handling code here:
-        
-        this.btnSaveConfiguration.setEnabled(true);
-        this.txtEmailCompras.setEnabled(true);
-    }//GEN-LAST:event_btnEditConfigurationActionPerformed
-
     private void btnEditPdfSummaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditPdfSummaryActionPerformed
         String textButton = btnEditPdfSummary.getText();
         if (textButton.equals("Editar")) {
@@ -1120,9 +1190,29 @@ public class utilerias extends java.awt.Dialog {
         }
     }//GEN-LAST:event_btnEditPdfSummaryActionPerformed
 
-    private void btnSaveConfigurationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveConfigurationActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnSaveConfigurationActionPerformed
+    private void checkGenerateTaskAlmacenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkGenerateTaskAlmacenActionPerformed
+        System.out.println("CHECK");
+        System.out.println(this.checkGenerateTaskAlmacen.isSelected());
+        try {
+            PropertySystemUtil.save(PropertyConstant.GENERATE_TASK_ALMACEN.getKey(), this.checkGenerateTaskAlmacen.isSelected()+"");
+        
+        } catch (IOException e) {
+            log.error(e);
+            JOptionPane.showMessageDialog(this,e, "Error", JOptionPane.ERROR_MESSAGE); 
+        }
+    }//GEN-LAST:event_checkGenerateTaskAlmacenActionPerformed
+
+    private void checkGenerateTaskChoferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkGenerateTaskChoferActionPerformed
+        System.out.println("CHECK");
+        System.out.println(this.checkGenerateTaskChofer.isSelected());
+        try {
+            PropertySystemUtil.save(PropertyConstant.GENERATE_TASK_CHOFER.getKey(), this.checkGenerateTaskChofer.isSelected()+"");
+        
+        } catch (IOException e) {
+            log.error(e);
+            JOptionPane.showMessageDialog(this,e, "Error", JOptionPane.ERROR_MESSAGE); 
+        }
+    }//GEN-LAST:event_checkGenerateTaskChoferActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1148,11 +1238,11 @@ public class utilerias extends java.awt.Dialog {
     private javax.swing.JButton Jbtn_editar_email;
     private javax.swing.JButton Jbtn_guardar_email;
     private javax.swing.JButton btnEdit;
-    private javax.swing.JButton btnEditConfiguration;
     private javax.swing.JButton btnEditPdfSummary;
     private javax.swing.JButton btnSave;
-    private javax.swing.JButton btnSaveConfiguration;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JCheckBox checkGenerateTaskAlmacen;
+    private javax.swing.JCheckBox checkGenerateTaskChofer;
     private javax.swing.JCheckBox check_autenticacion;
     private javax.swing.JCheckBox check_conexion_tls;
     private javax.swing.JCheckBox check_gmail;
@@ -1162,7 +1252,6 @@ public class utilerias extends java.awt.Dialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel100;
     private javax.swing.JLabel jLabel101;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel93;
     private javax.swing.JLabel jLabel94;
     private javax.swing.JLabel jLabel95;
@@ -1177,6 +1266,7 @@ public class utilerias extends java.awt.Dialog {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane21;
@@ -1188,11 +1278,12 @@ public class utilerias extends java.awt.Dialog {
     private javax.swing.JLabel lblAdress;
     private javax.swing.JLabel lblCompanyName;
     private javax.swing.JLabel lblTels;
+    private javax.swing.JPanel panelInnerLookAndFeel;
+    private javax.swing.JPanel panelLookAndFeel;
     private javax.swing.JPanel panel_enviar_prueba;
     private javax.swing.JPanel subPanel_configuracion_email;
     private javax.swing.JTextField txtAdress;
     private javax.swing.JTextField txtCompanyName;
-    private javax.swing.JTextField txtEmailCompras;
     private javax.swing.JTextArea txtInfoPDFSummary;
     private javax.swing.JTextField txtTels;
     public static javax.swing.JTextField txt_asunto;

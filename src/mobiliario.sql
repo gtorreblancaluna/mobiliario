@@ -1,3 +1,72 @@
+CREATE TABLE tipo_detalle_orden_proveedor (
+  id INT(10) NOT NULL AUTO_INCREMENT,
+  description VARCHAR(145) NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE status_almacen_tasks_catalog (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  description VARCHAR(145) NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE attend_almacen_tasks_type_catalog (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  description VARCHAR(145) NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE material_area (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  description VARCHAR(455) NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE measurement_units (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  description VARCHAR(455) NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS datos_generales;
+CREATE TABLE datos_generales (
+  id_datos_generales int(10) unsigned NOT NULL AUTO_INCREMENT,
+  nombre_empresa varchar(455) DEFAULT NULL,
+  direccion1 varchar(900) DEFAULT NULL,
+  direccion2 varchar(900) DEFAULT NULL,
+  direccion3 varchar(900) DEFAULT NULL,
+  folio int(10) unsigned NOT NULL,
+  folio_cambio varchar(2) DEFAULT NULL,
+   info_summary_folio VARCHAR(9028) DEFAULT NULL,
+  PRIMARY KEY (id_datos_generales)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS configuracion;
+CREATE TABLE configuracion (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  llave varchar(455) NOT NULL,
+  valor varchar(455) NOT NULL,
+  fg_activo enum('1','0') NOT NULL DEFAULT '1',
+  creado timestamp NULL DEFAULT NULL,
+  actualizado timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE cuenta (
   id int(11) NOT NULL AUTO_INCREMENT,
   descripcion varchar(150) DEFAULT NULL,
@@ -18,6 +87,24 @@ CREATE TABLE tipo (
   id_tipo int(10) unsigned NOT NULL AUTO_INCREMENT,
   tipo varchar(45) NOT NULL,
   PRIMARY KEY (id_tipo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS categoria_contabilidad;
+CREATE TABLE categoria_contabilidad (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  descripcion varchar(150) DEFAULT NULL,
+  fg_activo enum('1','0') NOT NULL DEFAULT '1',
+  fecha_registro timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS color;
+CREATE TABLE color (
+  id_color int(11) NOT NULL AUTO_INCREMENT,
+  color varchar(45) DEFAULT NULL,
+  tono varchar(45) DEFAULT NULL,
+  comentario varchar(75) DEFAULT NULL,
+  PRIMARY KEY (id_color)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS email;
@@ -104,24 +191,6 @@ CREATE TABLE tipo_abono (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS categoria_contabilidad;
-CREATE TABLE categoria_contabilidad (
-  id int(11) NOT NULL AUTO_INCREMENT,
-  descripcion varchar(150) DEFAULT NULL,
-  fg_activo enum('1','0') NOT NULL DEFAULT '1',
-  fecha_registro timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS color;
-CREATE TABLE color (
-  id_color int(11) NOT NULL AUTO_INCREMENT,
-  color varchar(45) DEFAULT NULL,
-  tono varchar(45) DEFAULT NULL,
-  comentario varchar(75) DEFAULT NULL,
-  PRIMARY KEY (id_color)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 DROP TABLE IF EXISTS usuarios;
 CREATE TABLE usuarios (
   id_usuarios int(11) NOT NULL AUTO_INCREMENT,
@@ -197,17 +266,6 @@ CREATE TABLE compras (
   CONSTRAINT fk_compras_articulo_id FOREIGN KEY (id_articulo) REFERENCES articulo (id_articulo)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS configuracion;
-CREATE TABLE configuracion (
-  id int(11) NOT NULL AUTO_INCREMENT,
-  llave varchar(455) NOT NULL,
-  valor varchar(455) NOT NULL,
-  fg_activo enum('1','0') NOT NULL DEFAULT '1',
-  creado timestamp NULL DEFAULT NULL,
-  actualizado timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 DROP TABLE IF EXISTS sub_categoria_contabilidad;
 CREATE TABLE sub_categoria_contabilidad (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -240,22 +298,6 @@ CONSTRAINT fk_contabilidad_cuenta FOREIGN KEY (cuenta_id) REFERENCES cuenta (id)
 CONSTRAINT fk_contabilidad_sub_categoria_contablidad FOREIGN KEY (id_sub_categoria_contabilidad) REFERENCES sub_categoria_contabilidad (id),
 CONSTRAINT fk_contabilidad_usuario FOREIGN KEY (id_usuarios) REFERENCES usuarios (id_usuarios)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-
-DROP TABLE IF EXISTS datos_generales;
-CREATE TABLE datos_generales (
-  id_datos_generales int(10) unsigned NOT NULL AUTO_INCREMENT,
-  nombre_empresa varchar(455) DEFAULT NULL,
-  direccion1 varchar(900) DEFAULT NULL,
-  direccion2 varchar(900) DEFAULT NULL,
-  direccion3 varchar(900) DEFAULT NULL,
-  folio int(10) unsigned NOT NULL,
-  folio_cambio varchar(2) DEFAULT NULL,
-   info_summary_folio VARCHAR(9028) DEFAULT NULL,
-  PRIMARY KEY (id_datos_generales)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 DROP TABLE IF EXISTS renta;
 CREATE TABLE renta (
@@ -374,8 +416,6 @@ CREATE TABLE faltantes (
   CONSTRAINT fk_faltantes_usuario FOREIGN KEY (id_usuarios) REFERENCES usuarios (id_usuarios)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
-
 DROP TABLE IF EXISTS pagos_proveedor;
 CREATE TABLE pagos_proveedor (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -410,24 +450,6 @@ CREATE TABLE abonos (
   CONSTRAINT FK_id_renta FOREIGN KEY (id_renta) REFERENCES renta (id_renta),
   CONSTRAINT FK_id_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuarios),
   CONSTRAINT abonos_ibfk_1 FOREIGN KEY (id_tipo_abono) REFERENCES tipo_abono (id_tipo_abono) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE material_area (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  description VARCHAR(455) NOT NULL,
-  created_at TIMESTAMP NULL DEFAULT NULL,
-  updated_at TIMESTAMP NULL DEFAULT NULL,
-  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE measurement_units (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  description VARCHAR(455) NOT NULL,
-  created_at TIMESTAMP NULL DEFAULT NULL,
-  updated_at TIMESTAMP NULL DEFAULT NULL,
-  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
-  PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE material_inventory (
@@ -554,32 +576,6 @@ CREATE TABLE order_status_changes (
     ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE tipo_detalle_orden_proveedor (
-  id INT(10) NOT NULL AUTO_INCREMENT,
-  description VARCHAR(145) NOT NULL,
-  created_at TIMESTAMP NULL DEFAULT NULL,
-  updated_at TIMESTAMP NULL DEFAULT NULL,
-  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE status_almacen_tasks_catalog (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  description VARCHAR(145) NOT NULL,
-  created_at TIMESTAMP NULL DEFAULT NULL,
-  updated_at TIMESTAMP NULL DEFAULT NULL,
-  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE attend_almacen_tasks_type_catalog (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  description VARCHAR(145) NOT NULL,
-  created_at TIMESTAMP NULL DEFAULT NULL,
-  updated_at TIMESTAMP NULL DEFAULT NULL,
-  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE tasks_almacen (
   id INT(11) NOT NULL AUTO_INCREMENT,
@@ -651,44 +647,6 @@ CREATE TABLE tasks_chofer_delivery (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT fk_tasks_chofer_delivery_user_id
-    FOREIGN KEY (user_id)
-    REFERENCES usuarios (id_usuarios)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- tabla para el estatus de la ordenes para proveedor de un folio
-
-CREATE TABLE status_orders_provider_by_renta_catalog (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  description VARCHAR(145) NOT NULL,
-  created_at TIMESTAMP NULL DEFAULT NULL,
-  updated_at TIMESTAMP NULL DEFAULT NULL,
-  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE status_orders_provider_by_renta (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  renta_id INT(11) NOT NULL,
-  status_provider_orders_by_renta_catalog_id INT(11) NOT NULL,
-  user_id INT(11) NOT NULL,
-  comment VARCHAR(700) NULL,
-  created_at TIMESTAMP NULL DEFAULT NULL,
-  updated_at TIMESTAMP NULL DEFAULT NULL,
-  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
-  PRIMARY KEY (id),
-  CONSTRAINT fk_status_provider_orders_by_renta_renta_id
-    FOREIGN KEY (renta_id)
-    REFERENCES renta (id_renta)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT fk_status_provider_orders_by_renta_catalog_id
-    FOREIGN KEY (status_provider_orders_by_renta_catalog_id)
-    REFERENCES status_provider_orders_by_renta_catalog (id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT fk_status_provider_orders_by_renta_user_id
     FOREIGN KEY (user_id)
     REFERENCES usuarios (id_usuarios)
     ON DELETE NO ACTION

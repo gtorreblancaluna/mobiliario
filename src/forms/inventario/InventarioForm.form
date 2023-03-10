@@ -1131,7 +1131,7 @@
                                   <EmptySpace min="7" pref="7" max="-2" attributes="0"/>
                                   <Component id="txtSearchLikeItemDescription" min="-2" pref="200" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="jLabel14" min="-2" pref="179" max="-2" attributes="0"/>
                                       <Group type="102" attributes="0">
@@ -1155,12 +1155,13 @@
                                       <Component id="jLabel17" min="-2" pref="130" max="-2" attributes="0"/>
                                       <Component id="cmbLimit" min="-2" pref="130" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="7" pref="7" max="-2" attributes="0"/>
-                                  <Component id="jbtnSearch" min="-2" pref="37" max="-2" attributes="0"/>
-                                  <EmptySpace min="7" pref="7" max="-2" attributes="0"/>
-                                  <Component id="jButton7" min="-2" pref="35" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="jbtnSearch" min="-2" pref="32" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="jButton7" min="-2" pref="32" max="-2" attributes="0"/>
                               </Group>
                           </Group>
+                          <EmptySpace pref="473" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>

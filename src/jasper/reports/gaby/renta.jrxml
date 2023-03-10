@@ -44,10 +44,9 @@
      c.tel_movil,
      c.tel_fijo,
      r.fecha_evento,
-r.envio_recoleccion,
-r.deposito_garantia,
-r.mostrar_precios_pdf
-
+    r.envio_recoleccion,
+    r.deposito_garantia,
+    r.mostrar_precios_pdf
 FROM
      `renta` r INNER JOIN `usuarios` u ON r.`id_usuarios` = u.`id_usuarios`
      INNER JOIN `detalle_renta` d ON r.`id_renta` = d.`id_renta`
