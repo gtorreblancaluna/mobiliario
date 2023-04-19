@@ -17,6 +17,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +42,7 @@ public class utilerias extends java.awt.Dialog {
     public static boolean utiliza_conexion_TLS = false, utiliza_autenticacion = false, status;
     private final SystemService systemService = SystemService.getInstance();
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(utilerias.class.getName());
+    private List<JButton> buttonsInPanel = new ArrayList<>();
 
     /**
      * Creates new form Colores
@@ -1023,6 +1026,14 @@ public class utilerias extends java.awt.Dialog {
     }//GEN-LAST:event_Jbnt_enviar_pruebaActionPerformed
     private void addSkinsToPanel(){
 
+            String themeSelected;
+            try {
+                themeSelected = PropertySystemUtil.get(PropertyConstant.SYSTEM_THEME);
+            
+            } catch (IOException iOException) {
+                themeSelected = null;
+                // nothing to do.
+            }
             panelInnerLookAndFeel.removeAll();
             panelInnerLookAndFeel.setLayout(new GridLayout(20, 200));
             panelInnerLookAndFeel.setMaximumSize(new Dimension(400, 400));
@@ -1034,17 +1045,26 @@ public class utilerias extends java.awt.Dialog {
                 button.setSize(20, 15);
                 button.setFont(new java.awt.Font("Arial", 1, 11));
                 button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                
+                if (themeSelected != null && 
+                        themeSelected.toLowerCase().trim().equals(skinInfo.getClassName().toLowerCase().trim())) {
+                    button.setSelected(true);
+                }
 
                 button.addActionListener((java.awt.event.ActionEvent e) -> {
                     try {
                         PropertySystemUtil.save(PropertyConstant.SYSTEM_THEME.getKey(), skinInfo.getClassName());
                         SubstanceLookAndFeel.setSkin(skinInfo.getClassName());
                         SwingUtilities.updateComponentTreeUI(this);
+                        buttonsInPanel.stream().forEach(btn -> btn.setSelected(false));
+                        JButton source = (JButton) e.getSource();
+                        source.setSelected(true);
                     } catch (IOException ex) {
                         log.error(ex);
                         JOptionPane.showMessageDialog(null, ex, ApplicationConstants.MESSAGE_UNEXPECTED_ERROR, JOptionPane.ERROR_MESSAGE);
                     }
                 });
+               buttonsInPanel.add(button);
                panelInnerLookAndFeel.add(button);
              }
 

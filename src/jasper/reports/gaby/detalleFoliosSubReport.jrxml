@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="detalleFoliosSubReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="4" bottomMargin="4" uuid="5db1660a-23b1-461b-b330-c8337f293a0c">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="detalleFoliosSubReport" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="4" bottomMargin="4" uuid="5db1660a-23b1-461b-b330-c8337f293a0c">
 	<property name="ireport.zoom" value="5.054470284992962"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<parameter name="IDS" class="java.lang.String"/>
+	<parameter name="ID_RENTA" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT
              d.cantidad,
@@ -14,7 +14,7 @@
              INNER JOIN color color ON a.id_color = color.id_color
              INNER JOIN categoria categoria ON a.id_categoria = categoria.id_categoria
         WHERE
-             d.id_renta IN ($P!{IDS})
+             d.id_renta IN ($P!{ID_RENTA})
         ORDER BY a.descripcion]]>
 	</queryString>
 	<field name="cantidad" class="java.lang.String"/>
@@ -68,9 +68,6 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{categoria}]]></textFieldExpression>
 			</textField>
-			<line>
-				<reportElement x="0" y="8" width="595" height="1" forecolor="#D6D6D6" uuid="0ba7023d-c027-431f-86ba-4fdf5dc00c2f"/>
-			</line>
 		</band>
 	</detail>
 </jasperReport>

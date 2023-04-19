@@ -78,7 +78,11 @@ import forms.inventario.VerDisponibilidadArticulos;
 import services.providers.OrderProviderService;
 import common.services.TaskAlmacenUpdateService;
 import common.services.TaskDeliveryChoferUpdateService;
+import common.utilities.CheckBoxHeader;
+import common.utilities.ItemListenerHeaderCheckbox;
 import java.io.IOException;
+import javax.swing.table.TableColumn;
+import lombok.Getter;
 import utilities.OptionPaneService;
 import utilities.PropertySystemUtil;
 import utilities.dtos.ResultDataShowByDeliveryOrReturnDate;
@@ -425,31 +429,44 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
     }
     
-    public void reporte() throws RuntimeException {
+    private String getRentaIdFromConsultarRentaTableOnlyOneRowSelected () throws BusinessException{
         
-        String rentaId="";
-        if (fgConsultaTabla && tabla_prox_rentas.getSelectedRow() != - 1 ) {
-            // a dado clic desde la tabla de consultar renta
-            rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
-        }else if(fgConsultaTabla && tabla_prox_rentas.getSelectedRow() == - 1){
-            JOptionPane.showMessageDialog(null, "Selecciona una fila para generar el reporte ", "ERROR", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }else{
-            rentaId = id_renta;
+        List<String> ids = 
+                getColumnsByBooleanSelected(
+                        tabla_prox_rentas,
+                        ColumConsultarRentaTable.BOOLEAN.getNumber(),
+                        ColumConsultarRentaTable.ID.getNumber()
+                );
+        
+        if (ids.isEmpty() || (!ids.isEmpty() && ids.size() > 1)) {
+            throw new BusinessException("Selecciona una fila para continuar.");
         }
-            
+        
+        return ids.get(0);
+    }
+    
+    public void reporte() throws RuntimeException {
+        String rentaId;
+        
+        try {
+            rentaId = getRentaIdFromConsultarRentaTableOnlyOneRowSelected();
+        } catch (BusinessException e) {
+            JOptionPane.showMessageDialog(
+                    this,e.getMessage(), "ERROR", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }    
         Renta renta;
 
         try {
             renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
         } catch (Exception e) {
             Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
-            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+            JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE); 
             return;
         }
 
         if(renta == null){
-            JOptionPane.showMessageDialog(null, "No se obtuvieron resultados, porfavor cierra y abre la aplicacion ", "ERROR", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "No se obtuvieron resultados, por favor cierra y abre la aplicación.", "ERROR", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         
@@ -1791,30 +1808,70 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         return fechafinal;
     }
     
+    @Getter
+    private enum ColumConsultarRentaTable {
+        
+        BOOLEAN(0,20,"",Boolean.class, true),
+        ID(1,20,"id",String.class, false),
+        FOLIO(2,20,"Folio",String.class, false),
+        CUSTOMER(3,80,"Cliente",String.class, false),
+        STATUS(4,40,"Estado",String.class, false),
+        ELABORATION_DATE(5,60,"Fecha Elaboración",String.class, false),
+        EVENT_DATE(6,60,"Fecha Evento",String.class, false),
+        DELIVERY_DATE(7,60,"Fecha Entrega",String.class, false),
+        EVENT_TYPE(8,60,"Tipo",String.class, false),
+        PAYMENT_STATUS(9,40,"Estado Pagado",String.class, false),
+        ATTENDED(10,60,"Atendió",String.class, false),
+        SUBTOTAL(11,40,"Subtotal",String.class, false),
+        GUARANTEE_DEPOSIT(12,40,"Dep. Garantía",String.class, false),
+        RECOLECTION_SENT(13,40,"Envio Rec.",String.class, false),
+        IVA(14,40,"IVA",String.class, false),
+        FALTANTES(15,40,"Faltantes",String.class, false),
+        SUPPLIER_COST(16,40,"Costos proveedor",String.class, false),
+        PAYMENTS(17,40,"Pagos",String.class, false),
+        SALDO(18,40,"Saldo",String.class, false),
+        SUBTOTAL_DESCUENTOS(19,40,"SubTotal/Descuentos",String.class, false);
+        
+        private final int number;
+        private final int size;
+        private final String name;
+        private final Class clazzType;
+        private final Boolean isEditable;
+
+        private ColumConsultarRentaTable(int number, int size, String name, Class clazzType, Boolean isEditable) {
+            this.number = number;
+            this.size = size;
+            this.name = name;
+            this.clazzType = clazzType;
+            this.isEditable = isEditable;
+        }
+        
+        public static String[] getColumnNames () {
+            List<String> columnNames = new ArrayList<>();
+            for (ColumConsultarRentaTable column : ColumConsultarRentaTable.values()) {
+                columnNames.add(column.getName());
+            }
+            return columnNames.toArray(new String[0]);
+        }
+        
+        
+    }
+    
     public static void tabla_consultar_renta(Map<String,Object> parameters) {   // funcion para llenar al abrir la ventana   
-        Object[][] data = {{"","","","","","","", "", "", "", "", "","","","","","","",""}};
-        String[] columNames = {
-            "Id", 
-            "Folio", 
-            "Cliente", 
-            "Estado",
-            "Fecha Elaboración",
-            "Fecha Evento",
-            "Fecha Entrega", 
-            "Tipo",
-            "Estado Pagado",
-            "Atendió",
-            "Subtotal",
-            "Dep. Garantía",
-            "Envio Rec.",
-            "IVA",
-            "faltantes",
-            "Costos proveedor", //15
-            "Pagos",
-            "Saldo",
-            "SubTotal/Descuentos"
-        };
-            DefaultTableModel tableModel = new DefaultTableModel(data, columNames);
+        
+            // customize column types
+            DefaultTableModel tableModel = new DefaultTableModel(ColumConsultarRentaTable.getColumnNames(), 0){
+                @Override
+                public Class getColumnClass(int column) {
+                    return ColumConsultarRentaTable.values()[column].getClazzType();
+                }
+
+                @Override
+                public boolean isCellEditable (int row, int column) {
+                    return ColumConsultarRentaTable.values()[column].getIsEditable();
+                }
+
+            };
             tabla_prox_rentas.setModel(tableModel);
 
             TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
@@ -1826,30 +1883,37 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             DefaultTableCellRenderer right = new DefaultTableCellRenderer();
             right.setHorizontalAlignment(SwingConstants.RIGHT);
             
-            int[] anchos = {40,30,120,60,70,70,70,70,70,70,60,60,60,60,60,60,60,60,70};
             
-            for (int inn = 0; inn < tabla_prox_rentas.getColumnCount(); inn++){
-                tabla_prox_rentas.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
+                    
+            for (ColumConsultarRentaTable column : ColumConsultarRentaTable.values()) {
+                tabla_prox_rentas.getColumnModel()
+                        .getColumn(column.getNumber())
+                        .setPreferredWidth(column.getSize());
             }
-                      
-            tabla_prox_rentas.getColumnModel().getColumn(0).setMaxWidth(0);
-            tabla_prox_rentas.getColumnModel().getColumn(0).setMinWidth(0);
-            tabla_prox_rentas.getColumnModel().getColumn(0).setPreferredWidth(0);
             
-            tabla_prox_rentas.getColumnModel().getColumn(1).setCellRenderer(centrar);
-            tabla_prox_rentas.getColumnModel().getColumn(11).setCellRenderer(right);
-            tabla_prox_rentas.getColumnModel().getColumn(12).setCellRenderer(right);
-            tabla_prox_rentas.getColumnModel().getColumn(13).setCellRenderer(right);
-            tabla_prox_rentas.getColumnModel().getColumn(14).setCellRenderer(right);
-            tabla_prox_rentas.getColumnModel().getColumn(15).setCellRenderer(right);
-            tabla_prox_rentas.getColumnModel().getColumn(16).setCellRenderer(right);
-            tabla_prox_rentas.getColumnModel().getColumn(17).setCellRenderer(right);
-            tabla_prox_rentas.getColumnModel().getColumn(18).setCellRenderer(right);
             
-             FormatoTabla ft = new FormatoTabla(3);
-            tabla_prox_rentas.setDefaultRenderer(Object.class, ft);
+            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.ID.getNumber()).setMaxWidth(0);
+            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.ID.getNumber()).setMinWidth(0);
+            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.ID.getNumber()).setPreferredWidth(0);
             
-        
+            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.FOLIO.getNumber()).setCellRenderer(centrar);
+            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.SUBTOTAL.getNumber()).setCellRenderer(right);
+            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.GUARANTEE_DEPOSIT.getNumber()).setCellRenderer(right);
+            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.RECOLECTION_SENT.getNumber()).setCellRenderer(right);
+            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.IVA.getNumber()).setCellRenderer(right);
+            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.FALTANTES.getNumber()).setCellRenderer(right);
+            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.SUPPLIER_COST.getNumber()).setCellRenderer(right);
+            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.PAYMENTS.getNumber()).setCellRenderer(right);
+            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.SALDO.getNumber()).setCellRenderer(right);
+            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.SUBTOTAL_DESCUENTOS.getNumber()).setCellRenderer(right);
+            
+             //FormatoTabla ft = new FormatoTabla(3);
+            //tabla_prox_rentas.setDefaultRenderer(Object.class, ft);
+            
+            // adding checkbox in header table
+            TableColumn tc = tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.BOOLEAN.getNumber());
+            tc.setCellEditor(tabla_prox_rentas.getDefaultEditor(Boolean.class)); 
+            tc.setHeaderRenderer(new CheckBoxHeader(new ItemListenerHeaderCheckbox(ColumConsultarRentaTable.BOOLEAN.getNumber(),tabla_prox_rentas)));
 
             jPanel2.setVisible(true);
 
@@ -1899,6 +1963,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         for(Renta renta : rentas){
             
                  Object fila[] = {
+                    false,
                     renta.getRentaId()+"",
                     renta.getFolio()+"",
                     renta.getCliente().getNombre()+" "+renta.getCliente().getApellidos(),              
@@ -2064,7 +2129,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tabla_prox_rentas = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
+        tabla_prox_rentas = new javax.swing.JTable();
         lblInformation = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
@@ -2076,6 +2141,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jButton2 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         btnInventoryMaterialReport = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         lbl_aviso_resultados = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
@@ -2258,9 +2324,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Proximas rentas", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 11))); // NOI18N
-        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        tabla_prox_rentas.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        tabla_prox_rentas.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         tabla_prox_rentas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2273,7 +2338,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
         ));
         tabla_prox_rentas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        tabla_prox_rentas.setRowHeight(14);
         tabla_prox_rentas.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tabla_prox_rentasMouseClicked(evt);
@@ -2281,11 +2345,28 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         });
         jScrollPane2.setViewportView(tabla_prox_rentas);
 
-        jPanel2.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 1150, 450));
-
         lblInformation.setFont(new java.awt.Font("Arial", 3, 16)); // NOI18N
         lblInformation.setForeground(new java.awt.Color(204, 0, 51));
-        jPanel2.add(lblInformation, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 590, 30));
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(4, 4, 4)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 1160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblInformation, javax.swing.GroupLayout.PREFERRED_SIZE, 514, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addComponent(lblInformation, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 1190, 550));
 
@@ -2402,6 +2483,19 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         });
         jToolBar1.add(btnInventoryMaterialReport);
 
+        jButton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons32/papel32.png"))); // NOI18N
+        jButton7.setToolTipText("Reporte Detalle Folio");
+        jButton7.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton7.setFocusable(false);
+        jButton7.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton7.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton7);
+
         jButton1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jButton1.setText("Buscar por folio");
         jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -2417,8 +2511,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(195, 195, 195)
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 512, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton1)
                 .addContainerGap(523, Short.MAX_VALUE))
         );
@@ -3762,7 +3856,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             tabla_clientes();
             obtenerArticulosGlobalesAsincrono();
                        
-            String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
+            String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), ColumConsultarRentaTable.ID.getNumber()).toString();
             globalRenta = null;
             try {
                 globalRenta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
@@ -4298,34 +4392,93 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private void txt_cantidadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_cantidadActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_cantidadActionPerformed
+    private List<String> getColumnsByBooleanSelected (JTable table, int columnNumberBoolean, int columnNumberId) {
+        List<String> columnsSelected = new ArrayList<>();
 
+         for (int i = 0; i < table.getRowCount(); i++) {
+             if (Boolean.parseBoolean(table.getValueAt(i, columnNumberBoolean).toString())) {
+                 columnsSelected.add(
+                         table.getValueAt(i, columnNumberId).toString()
+                 );
+             }
+         }
+         return columnsSelected;
+    }
+    
+    private void generateDetalleFoliosPDF () {
+        int LIMIT_ROWS_SELECTED = 100;       
+        List<String> folios = getColumnsByBooleanSelected(
+                        tabla_prox_rentas, 
+                        ColumConsultarRentaTable.BOOLEAN.getNumber(), 
+                        ColumConsultarRentaTable.FOLIO.getNumber()
+                );
+             
+        List<String> ids = getColumnsByBooleanSelected(
+                        tabla_prox_rentas, 
+                        ColumConsultarRentaTable.BOOLEAN.getNumber(), 
+                        ColumConsultarRentaTable.ID.getNumber()
+                );
+        
+        if (ids.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Selecciona al menos fila para generar el reporte...", "Reporte", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        if (ids.size() > LIMIT_ROWS_SELECTED) {
+            JOptionPane.showMessageDialog(this, "Limite de folios seleccionados. Selecciona menos de: "+LIMIT_ROWS_SELECTED+" folios.", "Reporte", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        String totalFolios = String.join(",", folios);
+        String title = 
+                String.format("Reporte detalle de folios. %s", totalFolios);
+        
+        try {      
+            JasperPrint jasperPrint;
+            String pathLocation = Utility.getPathLocation();
+           
+            JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(pathLocation+ApplicationConstants.JASPER_REPORT_DETALLE_FOLIOS);  
+            // enviamos los parametros
+            Map map = new HashMap<>();
+            map.put("IDS", String.join(",", ids));
+            map.put("TITLE", title);
+            map.put("URL_SUB_REPORT_CONSULTA", pathLocation+ApplicationConstants.URL_SUB_REPORT_CONSULTA);
+
+            jasperPrint = JasperFillManager.fillReport(masterReport, map, funcion.getConnection());
+            JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_DETALLE_FOLIOS);
+            File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_DETALLE_FOLIOS);
+            
+            Desktop.getDesktop().open(file2);
+
+        } catch (Exception e) {
+            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, e);
+        }
+    }
     private void jbtnGenerarReporteEntregasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnGenerarReporteEntregasActionPerformed
         
-            
-        if (tabla_prox_rentas.getSelectedRow() == - 1){
-            JOptionPane.showMessageDialog(null, "Selecciona una fila para generar el reporte...", "Reporte", JOptionPane.INFORMATION_MESSAGE);
+        String rentaId;
+        
+        try {
+            rentaId = getRentaIdFromConsultarRentaTableOnlyOneRowSelected();
+        } catch (BusinessException e) {
+            JOptionPane.showMessageDialog(
+                    this,e.getMessage(), "ERROR", JOptionPane.INFORMATION_MESSAGE);
             return;
-         }
-             
-        String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
+        }         
 
-        if(rentaId == null || rentaId.equals("") || rentaId.equals("0")){
-            JOptionPane.showMessageDialog(rootPane, "No se recibio correctamente el id de la renta, porfavor reincia el sistema :P");
-            return;
-        }            
-
-        Renta renta = null;
+        Renta renta;
         
         try {
             renta = saleService.obtenerRentaPorIdSinDetalle(Integer.parseInt(rentaId));
         } catch (Exception e) {
             Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
-            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+            JOptionPane.showMessageDialog(this, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
             return;
         }
 
         if(renta == null ){
-           JOptionPane.showMessageDialog(rootPane, "No se obtuvo los datos de manuera correcta, intentalo de nuevo o reinicia el sistema ");
+           JOptionPane.showMessageDialog(this, "No se obtuvo los datos de manuera correcta, intentalo de nuevo o reinicia el sistema ");
            return;
         }
 
@@ -4351,8 +4504,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             Desktop.getDesktop().open(file2);
 
         } catch (Exception e) {
-            Logger.getLogger(IndexForm.class.getName()).log(Level.SEVERE, null, e);
-            JOptionPane.showMessageDialog(rootPane, e);
+            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, e);
         }
             
          
@@ -4370,7 +4523,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             return;
         }
         
-        String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
+        String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), ColumConsultarRentaTable.ID.getNumber()).toString();
         
         try {
             
@@ -4407,9 +4560,15 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
        
-       
-        String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
-        String folio = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 1).toString();
+        String rentaId;
+        try {
+            rentaId = getRentaIdFromConsultarRentaTableOnlyOneRowSelected();
+        } catch (BusinessException e) {
+            JOptionPane.showMessageDialog(
+                    this,e.getMessage(), "ERROR", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }    
+        String folio = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), ColumConsultarRentaTable.FOLIO.getNumber()).toString();
             
         try {
           final List<Usuario> usersInCategoriesAlmacen = userService.getUsersInCategoriesAlmacenAndEvent(Integer.parseInt(rentaId));
@@ -4689,12 +4848,16 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // TODO add your handling code here:
-       if (tabla_prox_rentas.getSelectedRow() == - 1) {
-           JOptionPane.showMessageDialog(null, "Selecciona una fila para continuar ", "ERROR", JOptionPane.INFORMATION_MESSAGE);
-           return;
-       }
-        this.g_idRenta = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
-        mostrar_faltantes(this.g_idRenta);
+       String rentaId;
+        
+        try {
+            rentaId = getRentaIdFromConsultarRentaTableOnlyOneRowSelected();
+        } catch (BusinessException e) {
+            JOptionPane.showMessageDialog(
+                    this,e.getMessage(), "ERROR", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }    
+        mostrar_faltantes(rentaId);
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void txtEmailToSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEmailToSendActionPerformed
@@ -4719,12 +4882,15 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
     private void btnInventoryMaterialReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInventoryMaterialReportActionPerformed
         
-        if (tabla_prox_rentas.getSelectedRow() == - 1) {
-           JOptionPane.showMessageDialog(null, "Selecciona una fila para continuar ", "ERROR", JOptionPane.INFORMATION_MESSAGE);
-           return;
-       }
-        String id = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), 0).toString();
-        showMaterialSaleItemsWindow(id);
+        String rentaId;
+        try {
+            rentaId = getRentaIdFromConsultarRentaTableOnlyOneRowSelected();
+        } catch (BusinessException e) {
+            JOptionPane.showMessageDialog(
+                    this,e.getMessage(), "ERROR", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        showMaterialSaleItemsWindow(rentaId);
         
     }//GEN-LAST:event_btnInventoryMaterialReportActionPerformed
 
@@ -4862,6 +5028,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_txt_depositoGarantiaKeyPressed
 
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        generateDetalleFoliosPDF();
+    }//GEN-LAST:event_jButton7ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGetItemsFromFolio;
@@ -4893,6 +5063,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     public static javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

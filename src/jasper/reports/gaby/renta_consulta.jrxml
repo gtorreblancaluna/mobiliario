@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="renta" pageWidth="695" pageHeight="900" columnWidth="655" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="af0ab36d-faf5-45a3-a784-d9f82f7a9acc">
-	<property name="ireport.zoom" value="3.797498335832421"/>
+	<property name="ireport.zoom" value="2.593742460100007"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="670"/>
+	<property name="ireport.y" value="227"/>
 	<parameter name="id_renta" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["C:\\Users\\Carlos Alberto\\Documents\\NetBeansProjects\\mobiliario\\reportes\\"]]></defaultValueExpression>
