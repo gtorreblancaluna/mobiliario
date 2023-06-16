@@ -653,3 +653,38 @@ CREATE TABLE tasks_chofer_delivery (
     ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE catalog_status_provider (
+  id INT(10) NOT NULL AUTO_INCREMENT,
+  description VARCHAR(145) NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE status_provider_by_renta (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  renta_id INT(11) NOT NULL,
+  user_id INT(11) NOT NULL,
+  catalog_status_provider_id INT(10) NOT NULL,
+  comment VARCHAR (455) DEFAULT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id),
+  CONSTRAINT fk_status_provider_by_renta_renta
+    FOREIGN KEY (renta_id)
+    REFERENCES renta (id_renta)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_status_provider_by_renta_users
+    FOREIGN KEY (user_id)
+    REFERENCES usuarios (id_usuarios)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_status_provider_by_renta_catalog_status_provider
+    FOREIGN KEY (catalog_status_provider_id)
+    REFERENCES catalog_status_provider (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

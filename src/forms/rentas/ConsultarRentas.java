@@ -4,7 +4,6 @@ import common.services.ItemService;
 import services.SaleService;
 import services.SystemService;
 import common.services.UserService;
-import clases.FormatoTabla;
 import clases.Mail;
 import clases.sqlclass;
 import com.mysql.jdbc.MysqlDataTruncation;
@@ -80,9 +79,15 @@ import common.services.TaskAlmacenUpdateService;
 import common.services.TaskDeliveryChoferUpdateService;
 import common.utilities.CheckBoxHeader;
 import common.utilities.ItemListenerHeaderCheckbox;
+import forms.proveedores.ProviderStatusBitacoraDialog;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.font.TextAttribute;
 import java.io.IOException;
 import javax.swing.table.TableColumn;
 import lombok.Getter;
+import model.providers.StatusProviderByRenta;
+import services.providers.ProviderStatusBitacoraService;
 import utilities.OptionPaneService;
 import utilities.PropertySystemUtil;
 import utilities.dtos.ResultDataShowByDeliveryOrReturnDate;
@@ -95,6 +100,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private OrderProviderForm orderProviderForm;
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ConsultarRentas.class.getName());
     private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
+    private static final SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy");
     // variable global para almacenar el id detalle de renta
     public static String g_idDetalleRenta;
     // variable global para almacenar el tipo de estado de la renta
@@ -109,6 +115,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private final ItemService itemService;
     private static SaleService saleService;
     private final UserService userService = UserService.getInstance();
+    private final ProviderStatusBitacoraService providerStatusBitacoraService;
     private final SystemService systemService = SystemService.getInstance();
     CategoryService categoryService = new CategoryService();
     Object[][] dtconduc, datos_cliente;
@@ -164,6 +171,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         initComponents();
         saleService = SaleService.getInstance();
         itemService = ItemService.getInstance();
+        providerStatusBitacoraService = ProviderStatusBitacoraService.getInstance();
        
         
         jTabbedPane1.setEnabledAt(1, false);
@@ -1129,13 +1137,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "Falta fecha de devolucion ", "Error", JOptionPane.INFORMATION_MESSAGE);
         } else if (cmb_fecha_evento.getDate() == null) {
             JOptionPane.showMessageDialog(null, "Falta fecha del evento ", "Error", JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_hora.getSelectedIndex() == 0) {
+        } else if (!Utility.validateHour(txtInitDeliveryHour.getText())) {
             JOptionPane.showMessageDialog(null, "Falta seleccionar hora ", "Error", JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_hora_dos.getSelectedIndex() == 0) {
+        } else if (!Utility.validateHour(txtEndDeliveryHour.getText())) {
             JOptionPane.showMessageDialog(null, "Falta seleccionar segunda hora ", "Error", JOptionPane.INFORMATION_MESSAGE);
-        } else if (this.cmb_hora_devolucion.getSelectedIndex() == 0) {
+        } else if (!Utility.validateHour(txtInitReturnHour.getText())) {
             JOptionPane.showMessageDialog(null, "Falta seleccionar hora devolucion ", "Error", JOptionPane.INFORMATION_MESSAGE);
-          } else if (this.cmb_hora_devolucion_dos.getSelectedIndex() == 0) {
+          } else if (!Utility.validateHour(txtEndReturnHour.getText())) {
             JOptionPane.showMessageDialog(null, "Falta seleccionar segunda hora devolucion ", "Error", JOptionPane.INFORMATION_MESSAGE);
         } else if (cmb_chofer.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(null, "Falta seleccionar chofer", "Error", JOptionPane.INFORMATION_MESSAGE);
@@ -1189,10 +1197,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         String fechaEvento = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_evento.getDate());
         
         String[] deliveryHourArray = globalRenta.getHoraEntrega().split("a");
-        if (!deliveryHourArray[0].trim().equals(cmb_hora.getSelectedItem())) {
+        if (!deliveryHourArray[0].trim().equals(txtInitDeliveryHour.getText())) {
             updated = true;
         }
-        if (!deliveryHourArray[1].trim().equals(cmb_hora_dos.getSelectedItem())) {
+        if (!deliveryHourArray[1].trim().equals(txtEndDeliveryHour.getText())) {
             updated = true;
         }
         if (!fechaEntrega.equals(globalRenta.getFechaEntrega())) {
@@ -1234,7 +1242,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
            }
         }
         
-        String hora_entrega = cmb_hora.getSelectedItem().toString()+" a "+cmb_hora_dos.getSelectedItem().toString();
+        String hora_entrega = txtInitDeliveryHour.getText()+" a "+txtEndDeliveryHour.getText();
         String fecha_entrega = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
         String fecha_devolucion = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
         String fecha_evento = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_evento.getDate());
@@ -1309,7 +1317,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         String mostrarPrecios = check_mostrar_precios.isSelected() == true ? "1" : "0";
         String envioRecoleccion = this.txt_envioRecoleccion.getText().equals("") ? "0" : this.txt_envioRecoleccion.getText().replaceAll(",", "");
         String depositoGarantia = this.txt_depositoGarantia.getText().equals("") ? "0" : this.txt_depositoGarantia.getText().replaceAll(",", "");; 
-        String hora_devolucion = this.cmb_hora_devolucion.getSelectedItem()+" a "+this.cmb_hora_devolucion_dos.getSelectedItem();
+        String hora_devolucion = this.txtInitReturnHour.getText()+" a "+this.txtEndReturnHour.getText();
         String datos[] = {estadoEventoSelected.getEstadoId()+"", fecha_entrega, hora_entrega, fecha_devolucion, txt_descripcion.getText(),porcentajeDescuentoRenta,cantidadDescuento, txt_comentarios.getText(), id_chofer, tipoSelected.getTipoId()+"", hora_devolucion,fecha_evento,depositoGarantia,envioRecoleccion,iva,mostrarPrecios,id_renta};
         funcion.UpdateRegistro(datos, "update renta set id_estado=?,fecha_entrega=?,hora_entrega=?,fecha_devolucion=?,descripcion=?,descuento=?,cantidad_descuento=?,comentario=?,id_usuario_chofer=?,id_tipo=?,hora_devolucion=?,fecha_evento=?,deposito_garantia=?,envio_recoleccion=?,iva=?,mostrar_precios_pdf=? where id_renta=?");
         String messageLogInfo = iniciar_sesion.usuarioGlobal.getNombre() + " actualizó con éxito el folio "+this.lbl_folio.getText();
@@ -2164,12 +2172,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel34 = new javax.swing.JLabel();
-        cmb_hora_devolucion = new javax.swing.JComboBox();
-        cmb_hora = new javax.swing.JComboBox();
         jLabel35 = new javax.swing.JLabel();
         jLabel36 = new javax.swing.JLabel();
-        cmb_hora_devolucion_dos = new javax.swing.JComboBox();
-        cmb_hora_dos = new javax.swing.JComboBox();
         jLabel33 = new javax.swing.JLabel();
         jLabel37 = new javax.swing.JLabel();
         jLabel38 = new javax.swing.JLabel();
@@ -2197,6 +2201,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         txt_abonos = new javax.swing.JTextField();
         txt_faltantes = new javax.swing.JTextField();
         txt_total = new javax.swing.JTextField();
+        txtEndDeliveryHour = new javax.swing.JFormattedTextField();
+        txtEndReturnHour = new javax.swing.JFormattedTextField();
+        txtInitDeliveryHour = new javax.swing.JFormattedTextField();
+        txtInitReturnHour = new javax.swing.JFormattedTextField();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel6 = new javax.swing.JPanel();
         jToolBar3 = new javax.swing.JToolBar();
@@ -2256,6 +2264,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jScrollPane8 = new javax.swing.JScrollPane();
         tableOrdersProvider = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
         lblInformationOrdersProvider = new javax.swing.JLabel();
+        lblLastStatusProvider = new javax.swing.JLabel();
+        btnReloadGetLastStatusProvider = new javax.swing.JButton();
         jToolBar5 = new javax.swing.JToolBar();
         jbtn_editar = new javax.swing.JButton();
         jbtn_guardar = new javax.swing.JButton();
@@ -2612,31 +2622,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jLabel34.setText("Hora devolución:");
         panel_datos_generales.add(jLabel34, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 110, 20));
 
-        cmb_hora_devolucion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_hora_devolucion.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_devolucion.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_hora_devolucion, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 60, -1));
-
-        cmb_hora.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_hora.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_hora, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 140, 60, -1));
-
         jLabel35.setText("a");
         panel_datos_generales.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 140, 20, 20));
 
         jLabel36.setText("a");
         panel_datos_generales.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 170, 20, 20));
-
-        cmb_hora_devolucion_dos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_hora_devolucion_dos.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_devolucion_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_hora_devolucion_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 170, -1, -1));
-
-        cmb_hora_dos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_hora_dos.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_hora_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 140, -1, -1));
 
         jLabel33.setText("Hrs.");
         panel_datos_generales.add(jLabel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 140, -1, -1));
@@ -2777,6 +2767,34 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         txt_total.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         panel_datos_generales.add(txt_total, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 180, 120, 20));
+
+        try {
+            txtEndDeliveryHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+        panel_datos_generales.add(txtEndDeliveryHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 140, 60, -1));
+
+        try {
+            txtEndReturnHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+        panel_datos_generales.add(txtEndReturnHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 170, 60, -1));
+
+        try {
+            txtInitDeliveryHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+        panel_datos_generales.add(txtInitDeliveryHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 140, 60, -1));
+
+        try {
+            txtInitReturnHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+        panel_datos_generales.add(txtInitReturnHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 60, -1));
 
         jPanel4.add(panel_datos_generales, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 1120, 210));
 
@@ -3381,6 +3399,23 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         lblInformationOrdersProvider.setFont(new java.awt.Font("Arial", 3, 14)); // NOI18N
         lblInformationOrdersProvider.setForeground(new java.awt.Color(204, 0, 51));
 
+        lblLastStatusProvider.setFont(new java.awt.Font("Arial", 3, 12)); // NOI18N
+        lblLastStatusProvider.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblLastStatusProvider.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblLastStatusProviderMouseClicked(evt);
+            }
+        });
+
+        btnReloadGetLastStatusProvider.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/refresh-24.png"))); // NOI18N
+        btnReloadGetLastStatusProvider.setToolTipText("");
+        btnReloadGetLastStatusProvider.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnReloadGetLastStatusProvider.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReloadGetLastStatusProviderActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -3390,7 +3425,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 561, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                        .addComponent(btnReloadGetLastStatusProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 487, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane8))
                 .addContainerGap())
         );
@@ -3398,9 +3436,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnReloadGetLastStatusProvider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(10, 10, 10)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -3809,7 +3850,34 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
    
+    private void getLastStatusOrderProviders () {
+        try {
+            StatusProviderByRenta statusProviderByRenta
+                    = providerStatusBitacoraService.getLastStatusProviderByRenta(Long.parseLong(globalRenta.getRentaId()+""));
+            
+                Font font = lblLastStatusProvider.getFont();
+                Map attributes = font.getAttributes();
+                attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+                lblLastStatusProvider.setFont(font.deriveFont(attributes));
+                
+            if (statusProviderByRenta != null) {
+                
+                lblLastStatusProvider.setText("Ultimo estatus: "
+                        +statusProviderByRenta.getCatalogStatusProvider().getDescription().toUpperCase()+
+                        " - Usuario: "+statusProviderByRenta.getUser().getNombre()+" " +
+                        " - " + formatDate.format(statusProviderByRenta.getCreatedAt())
+                        );
+            } else {
+                lblLastStatusProvider.setText("Aún no se obtuvo un registro. Da clic aqui para registrar uno.");
+            }
+        } catch (DataOriginException e) {
+        
+        }
+        
+    }
+    
     private void fillOrdersProvider (Integer folioRenta) {
+          
         tableFormatOrderProvider();
         ParameterOrderProvider parameter = new ParameterOrderProvider();
         parameter.setFolioRenta(folioRenta);
@@ -3871,6 +3939,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                  fillOrdersProvider(folioRenta);
             }).start();
             
+            new Thread(() -> {
+                getLastStatusOrderProviders();
+            }).start();
+            
             if(globalRenta.getMostrarPreciosPdf().equals("1"))
                 this.check_mostrar_precios.setSelected(true);
             else
@@ -3913,14 +3985,14 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
             cmb_tipo.getModel().setSelectedItem(globalRenta.getTipo());
                   
-            String[] horaSplit = globalRenta.getHoraEntrega().split("a");            
+            String[] horaEntregaSplit = globalRenta.getHoraEntrega().split("a");
+            String[] horaDevolucionSplit = globalRenta.getHoraDevolucion().split("a");
 
-            String hora_devolucion = globalRenta.getHoraDevolucion();
-            String[] horaDevolucionSplit = hora_devolucion.split("a");
-            this.cmb_hora_devolucion.setSelectedItem(horaDevolucionSplit[0].replaceAll(" ", ""));
-            this.cmb_hora_devolucion_dos.setSelectedItem(horaDevolucionSplit[1].replaceAll(" ", ""));
-            cmb_hora.setSelectedItem(horaSplit[0].replaceAll(" ", ""));
-            cmb_hora_dos.setSelectedItem(horaSplit[1].replaceAll(" ", ""));
+            txtInitDeliveryHour.setText(horaEntregaSplit[0].replaceAll(" ", ""));
+            txtEndDeliveryHour.setText(horaEntregaSplit[1].replaceAll(" ", ""));
+            
+            txtInitReturnHour.setText(horaDevolucionSplit[0].replaceAll(" ", ""));
+            txtEndReturnHour.setText(horaDevolucionSplit[1].replaceAll(" ", ""));
             
             lbl_atiende.setText("Atendio: " + globalRenta.getUsuario().getNombre()+" "+globalRenta.getUsuario().getApellidos());
                
@@ -4074,10 +4146,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         cmb_chofer.setEnabled(true);
         cmb_fecha_devolucion.setEnabled(true);
         cmb_fecha_evento.setEnabled(true);
-        cmb_hora.setEnabled(true);
-        cmb_hora_devolucion.setEnabled(true);
-        cmb_hora_dos.setEnabled(true);
-        cmb_hora_devolucion_dos.setEnabled(true);
+        txtInitDeliveryHour.setEnabled(true);
+        txtEndDeliveryHour.setEnabled(true);
+        txtInitReturnHour.setEnabled(true);
+        txtEndReturnHour.setEnabled(true);
         txt_descripcion.setEnabled(true);
         cmb_estado1.setEnabled(true);
         cmb_tipo.setEnabled(true);
@@ -4141,10 +4213,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         cmb_chofer.setEnabled(false);
         cmb_fecha_devolucion.setEnabled(false);
         cmb_fecha_evento.setEnabled(false);
-        cmb_hora.setEnabled(false);
-        cmb_hora_devolucion.setEnabled(false);
-        cmb_hora_dos.setEnabled(false);
-        cmb_hora_devolucion_dos.setEnabled(false);
+        txtInitDeliveryHour.setEnabled(false);
+        txtEndDeliveryHour.setEnabled(false);
+        txtInitReturnHour.setEnabled(false);
+        txtEndReturnHour.setEnabled(false);
         txt_descripcion.setEnabled(false);
         cmb_estado1.setEnabled(false);
         cmb_tipo.setEnabled(false);
@@ -4762,7 +4834,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     systemService.getDataConfigurationByKey("icon_check_ok"),
                     systemService.getDataConfigurationByKey("sitio_empresa"),
                     lbl_folio.getText(),
-                    new SimpleDateFormat("EEEEE dd 'de' MMMM 'del' yyyy").format(cmb_fecha_devolucion.getDate())+" "+this.cmb_hora_devolucion.getSelectedItem()+" a "+this.cmb_hora_devolucion_dos.getSelectedItem()+" horas",
+                    new SimpleDateFormat("EEEEE dd 'de' MMMM 'del' yyyy").format(cmb_fecha_devolucion.getDate())+" "+this.txtInitReturnHour.getText()+" a "+this.txtEndReturnHour.getText()+" horas",
                     new SimpleDateFormat("EEEEE dd 'de' MMMM 'del' yyyy").format(cmb_fecha_evento.getDate()),
                     cmb_chofer.getSelectedItem()+"",
                     txt_descripcion.getText(),
@@ -4774,7 +4846,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     txt_total_iva.getText(),
                     txt_abonos.getText(),
                     txt_total.getText(),
-                    new SimpleDateFormat("EEEEE dd 'de' MMMM 'del' yyyy").format(cmb_fecha_entrega.getDate())+" "+cmb_hora.getSelectedItem().toString() +" a "+this.cmb_hora_dos.getSelectedItem()+" horas",
+                    new SimpleDateFormat("EEEEE dd 'de' MMMM 'del' yyyy").format(cmb_fecha_entrega.getDate())+" "+this.txtInitDeliveryHour.getText()+" a "+this.txtEndDeliveryHour.getText()+" horas",
                     txt_descuento.getText(),
                     new ArrayList<>()                
             );
@@ -5032,10 +5104,24 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         generateDetalleFoliosPDF();
     }//GEN-LAST:event_jButton7ActionPerformed
 
+    private void lblLastStatusProviderMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblLastStatusProviderMouseClicked
+        Frame frame = JOptionPane.getFrameForComponent(this);
+
+        ProviderStatusBitacoraDialog win =
+        new ProviderStatusBitacoraDialog(frame,true,Long.parseLong(globalRenta.getRentaId()+""), globalRenta.getFolio()+"");
+        win.setLocationRelativeTo(this);
+        win.setVisible(true);
+    }//GEN-LAST:event_lblLastStatusProviderMouseClicked
+
+    private void btnReloadGetLastStatusProviderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadGetLastStatusProviderActionPerformed
+        getLastStatusOrderProviders();
+    }//GEN-LAST:event_btnReloadGetLastStatusProviderActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGetItemsFromFolio;
     public static javax.swing.JButton btnInventoryMaterialReport;
+    private javax.swing.JButton btnReloadGetLastStatusProvider;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;
@@ -5051,10 +5137,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private com.toedter.calendar.JDateChooser cmb_fecha_entrega;
     private com.toedter.calendar.JDateChooser cmb_fecha_evento;
     private com.toedter.calendar.JDateChooser cmb_fecha_pago;
-    private javax.swing.JComboBox cmb_hora;
-    private javax.swing.JComboBox cmb_hora_devolucion;
-    private javax.swing.JComboBox cmb_hora_devolucion_dos;
-    private javax.swing.JComboBox cmb_hora_dos;
     private javax.swing.JComboBox<Tipo> cmb_tipo;
     private javax.swing.JButton jBtnAddOrderProvider;
     private javax.swing.JButton jButton1;
@@ -5157,6 +5239,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     public static javax.swing.JButton jtbtnGenerateExcel;
     public static javax.swing.JLabel lblInformation;
     public static javax.swing.JLabel lblInformationOrdersProvider;
+    private javax.swing.JLabel lblLastStatusProvider;
     private javax.swing.JLabel lbl_atiende;
     private javax.swing.JLabel lbl_aviso_resultados;
     private javax.swing.JLabel lbl_cliente;
@@ -5175,6 +5258,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     public static javax.swing.JTable tabla_prox_rentas;
     public static javax.swing.JTable tableOrdersProvider;
     private javax.swing.JTextField txtEmailToSend;
+    private javax.swing.JFormattedTextField txtEndDeliveryHour;
+    private javax.swing.JFormattedTextField txtEndReturnHour;
+    private javax.swing.JFormattedTextField txtInitDeliveryHour;
+    private javax.swing.JFormattedTextField txtInitReturnHour;
     private javax.swing.JFormattedTextField txtPorcentajeDescuento;
     private javax.swing.JTextField txt_abono;
     private javax.swing.JTextField txt_abonos;

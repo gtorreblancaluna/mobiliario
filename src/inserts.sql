@@ -47,3 +47,8 @@ INSERT INTO estado (descripcion) VALUES ('Finalizado');
 
 INSERT INTO tipo (tipo) VALUES ('Pedido');
 INSERT INTO tipo (tipo) VALUES ('Cotización');
+
+INSERT INTO catalog_status_provider (description) values ('Iniciado');
+INSERT INTO catalog_status_provider (description) values ('Finalizado');
+INSERT INTO catalog_status_provider (description) values ('Pendiente');
+INSERT INTO catalog_status_provider (description) values ('Cancelado');

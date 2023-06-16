@@ -23,6 +23,18 @@ public abstract class Utility {
     
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     
+    public static boolean validateHour(String hora) {
+        boolean b;
+        char[] a = hora.toCharArray();
+        String[] c = hora.split(":");
+        if ((a[0] == ' ') || (a[1] == ' ') || (a[2] == ' ') || (a[3] == ' ') || (a[4] == ' ') || (Integer.parseInt(c[0]) > 24) || (Integer.parseInt(c[1]) > 59)) {
+            b=false;
+        }else{
+            b=true;
+        }
+        return b;
+    }
+    
     public static void addJtableToPane (int sizeVertical, int sizeHorizontal, JPanel jPanel,JTable tableToAdd ) {
         
         JScrollPane jScrollPane = new JScrollPane();

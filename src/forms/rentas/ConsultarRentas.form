@@ -741,92 +741,6 @@
                     </Constraint>
                   </Constraints>
                 </Component>
-                <Component class="javax.swing.JComboBox" name="cmb_hora_devolucion">
-                  <Properties>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Arial" size="11" style="0"/>
-                    </Property>
-                    <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                      <StringArray count="24">
-                        <StringItem index="0" value="-sel-"/>
-                        <StringItem index="1" value="1:00"/>
-                        <StringItem index="2" value="2:00"/>
-                        <StringItem index="3" value="3:00"/>
-                        <StringItem index="4" value="4:00"/>
-                        <StringItem index="5" value="5:00"/>
-                        <StringItem index="6" value="6:00"/>
-                        <StringItem index="7" value="7:00"/>
-                        <StringItem index="8" value="8:00"/>
-                        <StringItem index="9" value="9:00"/>
-                        <StringItem index="10" value="10:00"/>
-                        <StringItem index="11" value="11:00"/>
-                        <StringItem index="12" value="12:00"/>
-                        <StringItem index="13" value="13:00"/>
-                        <StringItem index="14" value="14:00"/>
-                        <StringItem index="15" value="15:00"/>
-                        <StringItem index="16" value="16:00"/>
-                        <StringItem index="17" value="17:00"/>
-                        <StringItem index="18" value="18:00"/>
-                        <StringItem index="19" value="19:00"/>
-                        <StringItem index="20" value="20:00"/>
-                        <StringItem index="21" value="21:00"/>
-                        <StringItem index="22" value="22:00"/>
-                        <StringItem index="23" value="23:00"/>
-                      </StringArray>
-                    </Property>
-                    <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Default Cursor"/>
-                    </Property>
-                  </Properties>
-                  <Constraints>
-                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                      <AbsoluteConstraints x="130" y="170" width="60" height="-1"/>
-                    </Constraint>
-                  </Constraints>
-                </Component>
-                <Component class="javax.swing.JComboBox" name="cmb_hora">
-                  <Properties>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Arial" size="11" style="0"/>
-                    </Property>
-                    <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                      <StringArray count="24">
-                        <StringItem index="0" value="-sel-"/>
-                        <StringItem index="1" value="1:00"/>
-                        <StringItem index="2" value="2:00"/>
-                        <StringItem index="3" value="3:00"/>
-                        <StringItem index="4" value="4:00"/>
-                        <StringItem index="5" value="5:00"/>
-                        <StringItem index="6" value="6:00"/>
-                        <StringItem index="7" value="7:00"/>
-                        <StringItem index="8" value="8:00"/>
-                        <StringItem index="9" value="9:00"/>
-                        <StringItem index="10" value="10:00"/>
-                        <StringItem index="11" value="11:00"/>
-                        <StringItem index="12" value="12:00"/>
-                        <StringItem index="13" value="13:00"/>
-                        <StringItem index="14" value="14:00"/>
-                        <StringItem index="15" value="15:00"/>
-                        <StringItem index="16" value="16:00"/>
-                        <StringItem index="17" value="17:00"/>
-                        <StringItem index="18" value="18:00"/>
-                        <StringItem index="19" value="19:00"/>
-                        <StringItem index="20" value="20:00"/>
-                        <StringItem index="21" value="21:00"/>
-                        <StringItem index="22" value="22:00"/>
-                        <StringItem index="23" value="23:00"/>
-                      </StringArray>
-                    </Property>
-                    <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Default Cursor"/>
-                    </Property>
-                  </Properties>
-                  <Constraints>
-                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                      <AbsoluteConstraints x="130" y="140" width="60" height="-1"/>
-                    </Constraint>
-                  </Constraints>
-                </Component>
                 <Component class="javax.swing.JLabel" name="jLabel35">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="a"/>
@@ -844,92 +758,6 @@
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
                       <AbsoluteConstraints x="200" y="170" width="20" height="20"/>
-                    </Constraint>
-                  </Constraints>
-                </Component>
-                <Component class="javax.swing.JComboBox" name="cmb_hora_devolucion_dos">
-                  <Properties>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Arial" size="11" style="0"/>
-                    </Property>
-                    <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                      <StringArray count="24">
-                        <StringItem index="0" value="-sel-"/>
-                        <StringItem index="1" value="1:00"/>
-                        <StringItem index="2" value="2:00"/>
-                        <StringItem index="3" value="3:00"/>
-                        <StringItem index="4" value="4:00"/>
-                        <StringItem index="5" value="5:00"/>
-                        <StringItem index="6" value="6:00"/>
-                        <StringItem index="7" value="7:00"/>
-                        <StringItem index="8" value="8:00"/>
-                        <StringItem index="9" value="9:00"/>
-                        <StringItem index="10" value="10:00"/>
-                        <StringItem index="11" value="11:00"/>
-                        <StringItem index="12" value="12:00"/>
-                        <StringItem index="13" value="13:00"/>
-                        <StringItem index="14" value="14:00"/>
-                        <StringItem index="15" value="15:00"/>
-                        <StringItem index="16" value="16:00"/>
-                        <StringItem index="17" value="17:00"/>
-                        <StringItem index="18" value="18:00"/>
-                        <StringItem index="19" value="19:00"/>
-                        <StringItem index="20" value="20:00"/>
-                        <StringItem index="21" value="21:00"/>
-                        <StringItem index="22" value="22:00"/>
-                        <StringItem index="23" value="23:00"/>
-                      </StringArray>
-                    </Property>
-                    <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Default Cursor"/>
-                    </Property>
-                  </Properties>
-                  <Constraints>
-                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                      <AbsoluteConstraints x="220" y="170" width="-1" height="-1"/>
-                    </Constraint>
-                  </Constraints>
-                </Component>
-                <Component class="javax.swing.JComboBox" name="cmb_hora_dos">
-                  <Properties>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Arial" size="11" style="0"/>
-                    </Property>
-                    <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                      <StringArray count="24">
-                        <StringItem index="0" value="-sel-"/>
-                        <StringItem index="1" value="1:00"/>
-                        <StringItem index="2" value="2:00"/>
-                        <StringItem index="3" value="3:00"/>
-                        <StringItem index="4" value="4:00"/>
-                        <StringItem index="5" value="5:00"/>
-                        <StringItem index="6" value="6:00"/>
-                        <StringItem index="7" value="7:00"/>
-                        <StringItem index="8" value="8:00"/>
-                        <StringItem index="9" value="9:00"/>
-                        <StringItem index="10" value="10:00"/>
-                        <StringItem index="11" value="11:00"/>
-                        <StringItem index="12" value="12:00"/>
-                        <StringItem index="13" value="13:00"/>
-                        <StringItem index="14" value="14:00"/>
-                        <StringItem index="15" value="15:00"/>
-                        <StringItem index="16" value="16:00"/>
-                        <StringItem index="17" value="17:00"/>
-                        <StringItem index="18" value="18:00"/>
-                        <StringItem index="19" value="19:00"/>
-                        <StringItem index="20" value="20:00"/>
-                        <StringItem index="21" value="21:00"/>
-                        <StringItem index="22" value="22:00"/>
-                        <StringItem index="23" value="23:00"/>
-                      </StringArray>
-                    </Property>
-                    <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                      <Color id="Default Cursor"/>
-                    </Property>
-                  </Properties>
-                  <Constraints>
-                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                      <AbsoluteConstraints x="220" y="140" width="-1" height="-1"/>
                     </Constraint>
                   </Constraints>
                 </Component>
@@ -1297,6 +1125,54 @@
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
                       <AbsoluteConstraints x="980" y="180" width="120" height="20"/>
+                    </Constraint>
+                  </Constraints>
+                </Component>
+                <Component class="javax.swing.JFormattedTextField" name="txtEndDeliveryHour">
+                  <Properties>
+                    <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor" preCode="try {" postCode="} catch (java.text.ParseException ex) {&#xa;ex.printStackTrace();&#xa;}">
+                      <Format format="##:##" subtype="-1" type="5"/>
+                    </Property>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
+                      <AbsoluteConstraints x="220" y="140" width="60" height="-1"/>
+                    </Constraint>
+                  </Constraints>
+                </Component>
+                <Component class="javax.swing.JFormattedTextField" name="txtEndReturnHour">
+                  <Properties>
+                    <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor" preCode="try {" postCode="} catch (java.text.ParseException ex) {&#xa;ex.printStackTrace();&#xa;}">
+                      <Format format="##:##" subtype="-1" type="5"/>
+                    </Property>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
+                      <AbsoluteConstraints x="220" y="170" width="60" height="-1"/>
+                    </Constraint>
+                  </Constraints>
+                </Component>
+                <Component class="javax.swing.JFormattedTextField" name="txtInitDeliveryHour">
+                  <Properties>
+                    <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor" preCode="try {" postCode="} catch (java.text.ParseException ex) {&#xa;ex.printStackTrace();&#xa;}">
+                      <Format format="##:##" subtype="-1" type="5"/>
+                    </Property>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
+                      <AbsoluteConstraints x="130" y="140" width="60" height="-1"/>
+                    </Constraint>
+                  </Constraints>
+                </Component>
+                <Component class="javax.swing.JFormattedTextField" name="txtInitReturnHour">
+                  <Properties>
+                    <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor" preCode="try {" postCode="} catch (java.text.ParseException ex) {&#xa;ex.printStackTrace();&#xa;}">
+                      <Format format="##:##" subtype="-1" type="5"/>
+                    </Property>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
+                      <AbsoluteConstraints x="130" y="170" width="60" height="-1"/>
                     </Constraint>
                   </Constraints>
                 </Component>
@@ -2250,7 +2126,10 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
                                       <Component id="lblInformationOrdersProvider" min="-2" pref="590" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="561" max="32767" attributes="0"/>
+                                      <EmptySpace pref="28" max="32767" attributes="0"/>
+                                      <Component id="btnReloadGetLastStatusProvider" min="-2" pref="41" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="lblLastStatusProvider" min="-2" pref="487" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="jScrollPane8" max="32767" attributes="0"/>
                               </Group>
@@ -2262,9 +2141,13 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="lblInformationOrdersProvider" min="-2" pref="30" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jScrollPane8" pref="308" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="lblInformationOrdersProvider" max="32767" attributes="0"/>
+                                  <Component id="lblLastStatusProvider" max="32767" attributes="0"/>
+                                  <Component id="btnReloadGetLastStatusProvider" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                              <Component id="jScrollPane8" pref="302" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -2317,6 +2200,33 @@
                       <AuxValues>
                         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>
                       </AuxValues>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="lblLastStatusProvider">
+                      <Properties>
+                        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                          <Font name="Arial" size="12" style="3"/>
+                        </Property>
+                        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                          <Color id="Hand Cursor"/>
+                        </Property>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblLastStatusProviderMouseClicked"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="btnReloadGetLastStatusProvider">
+                      <Properties>
+                        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                          <Image iconType="3" name="/img/icons24/refresh-24.png"/>
+                        </Property>
+                        <Property name="toolTipText" type="java.lang.String" value=""/>
+                        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                          <Color id="Hand Cursor"/>
+                        </Property>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnReloadGetLastStatusProviderActionPerformed"/>
+                      </Events>
                     </Component>
                   </SubComponents>
                 </Container>

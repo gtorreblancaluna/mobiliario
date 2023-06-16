@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperStatusProvider">
+  
+    <resultMap id="resultCatalogStatusProvider" type="model.providers.CatalogStatusProvider">        
+        
+        <result property="id" column="id"/>
+        <result property="description" column="description"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="fgActive" column="fg_active"/>
+        
+             
+    </resultMap>
+    
+    <resultMap id="resulMapStatusProvicerByRenta" type="model.providers.StatusProviderByRenta">
+        
+        <result property="id" column="id"/>
+        
+        <!-- datos de la renta-->
+        <result property="renta.rentaId" column="renta_id"/>
+        <result property="renta.folio" column="renta_folio"/>
+        <result property="renta.descripcion" column="renta_descripcion"/>
+        <result property="renta.descripcion" column="renta_descripcion"/>
+        <result property="renta.fechaEvento" column="renta_fecha_evento"/>
+        <!-- datos usuario -->
+        <result property="user.nombre" column="usuario_nombre"/>
+        <result property="user.apellidos" column="usuario_apellidos"/>
+        
+        <result property="catalogStatusProvider.id" column="catalog_status_provider_id"/>
+        <result property="catalogStatusProvider.description" column="catalog_status_provider_description" />
+        
+        <result property="comment" column="comment"/>
+        
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="fgActive" column="fg_active"/>
+        
+             
+    </resultMap>
+    
+    <insert id="insertStatusProvicerByRenta" parameterType="model.providers.StatusProviderByRenta" 
+            useGeneratedKeys="true" keyProperty="id">
+        
+        INSERT INTO status_provider_by_renta
+        (
+            renta_id,
+            user_id,
+            catalog_status_provider_id,
+            comment,
+            created_at,
+            updated_at,
+            fg_active
+        )
+        VALUES
+        (
+            #{renta.rentaId},
+            #{user.usuarioId},
+            #{catalogStatusProvider.id},
+            #{comment},
+            #{createdAt},
+            #{updatedAt},
+            #{fgActive}
+        )
+        
+    </insert>
+    
+    <select id="getStatusProviderByRenta" resultMap="resulMapStatusProvicerByRenta" parameterType="java.lang.Long" >
+        SELECT 
+            status.id,
+            renta.id_renta AS renta_id,
+            renta.folio AS renta_folio,
+            usuario.nombre AS usuario_nombre,
+            usuario.apellidos AS usuario_apellidos,
+            catalog.id AS catalog_status_provider_id,
+            catalog.description AS catalog_status_provider_description,
+            status.comment,
+            status.created_at,
+            status.updated_at,
+            status.fg_active
+        FROM status_provider_by_renta status
+        INNER JOIN renta renta ON (renta.id_renta = status.renta_id)
+        INNER JOIN usuarios usuario ON (usuario.id_usuarios = status.user_id)
+        INNER JOIN catalog_status_provider catalog ON (catalog.id = status.catalog_status_provider_id)
+        WHERE status.fg_active = '1'
+        AND status.renta_id = #{rentaId}
+        ORDER BY status.id DESC     
+    </select> 
+    
+     <select id="getLastStatusProviderByRenta" resultMap="resulMapStatusProvicerByRenta" parameterType="java.lang.Long" >
+        SELECT 
+            status.id,
+            renta.id_renta AS renta_id,
+            renta.folio AS renta_folio,
+            usuario.nombre AS usuario_nombre,
+            usuario.apellidos AS usuario_apellidos,
+            catalog.id AS catalog_status_provider_id,
+            catalog.description AS catalog_status_provider_description,
+            status.comment,
+            status.created_at,
+            status.updated_at,
+            status.fg_active
+        FROM status_provider_by_renta status
+        INNER JOIN renta renta ON (renta.id_renta = status.renta_id)
+        INNER JOIN usuarios usuario ON (usuario.id_usuarios = status.user_id)
+        INNER JOIN catalog_status_provider catalog ON (catalog.id = status.catalog_status_provider_id)
+        WHERE status.fg_active = '1'
+        AND status.renta_id = #{rentaId}
+        ORDER BY status.id DESC 
+        LIMIT 1    
+    </select>  
+  
+    <select id="getCatalogStatusProvider" resultMap="resultCatalogStatusProvider" >
+        SELECT 
+            c.id,
+            c.description,
+            c.created_at,
+            c.updated_at,
+            c.fg_active
+        FROM catalog_status_provider c
+        WHERE c.fg_active = '1'        
+    </select>  
+    
+
+  
+</mapper>

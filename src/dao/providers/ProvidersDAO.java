@@ -17,8 +17,12 @@ public class ProvidersDAO {
     private ProvidersDAO() {
         sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();
     }
-    private static final ProvidersDAO SINGLE_INSTANCE = new ProvidersDAO();
-    public static ProvidersDAO getInstance(){
+    private static ProvidersDAO SINGLE_INSTANCE;
+    
+    public static synchronized ProvidersDAO getInstance(){
+        if (SINGLE_INSTANCE == null) {
+            SINGLE_INSTANCE = new ProvidersDAO();
+        }
         return SINGLE_INSTANCE;
     }
     
