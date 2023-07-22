@@ -1368,6 +1368,7 @@
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                               <Image iconType="3" name="/img/customer-service-icon-32.png"/>
                             </Property>
+                            <Property name="toolTipText" type="java.lang.String" value="Agregar orden al proveedor"/>
                             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
                               <Color id="Default Cursor"/>
                             </Property>
@@ -2126,10 +2127,12 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
                                       <Component id="lblInformationOrdersProvider" min="-2" pref="590" max="-2" attributes="0"/>
-                                      <EmptySpace pref="28" max="32767" attributes="0"/>
-                                      <Component id="btnReloadGetLastStatusProvider" min="-2" pref="41" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="lblLastStatusProvider" min="-2" pref="487" max="-2" attributes="0"/>
+                                      <Component id="lblLastStatusProvider" min="-2" pref="453" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="jBtnAddOrderProvider1" min="-2" pref="36" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="32767" attributes="0"/>
+                                      <Component id="btnReloadGetLastStatusProvider" min="-2" pref="41" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="jScrollPane8" max="32767" attributes="0"/>
                               </Group>
@@ -2140,11 +2143,12 @@
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
+                              <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                   <Component id="lblInformationOrdersProvider" max="32767" attributes="0"/>
                                   <Component id="lblLastStatusProvider" max="32767" attributes="0"/>
                                   <Component id="btnReloadGetLastStatusProvider" max="32767" attributes="0"/>
+                                  <Component id="jBtnAddOrderProvider1" pref="0" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                               <Component id="jScrollPane8" pref="302" max="32767" attributes="0"/>
@@ -2226,6 +2230,23 @@
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnReloadGetLastStatusProviderActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="jBtnAddOrderProvider1">
+                      <Properties>
+                        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                          <Image iconType="3" name="/img/customer-service-icon-32.png"/>
+                        </Property>
+                        <Property name="toolTipText" type="java.lang.String" value="Agregar orden al proveedor"/>
+                        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                          <Color id="Hand Cursor"/>
+                        </Property>
+                        <Property name="focusable" type="boolean" value="false"/>
+                        <Property name="horizontalTextPosition" type="int" value="0"/>
+                        <Property name="verticalTextPosition" type="int" value="3"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnAddOrderProvider1ActionPerformed"/>
                       </Events>
                     </Component>
                   </SubComponents>

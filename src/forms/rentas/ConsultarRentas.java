@@ -107,8 +107,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     public static String g_idTipoEvento;
     public static String g_idRenta = null;
     public static String messageSucessfullyResults = "";
-    // bandera para seleccionar si quiere generar el reporte pdf desde la tabla consulta
-    private static boolean fgConsultaTabla=false;
     String fecha_sistema, sql, id_articulo, id_abonos, id_cliente, cant_abono = "0", subTotal = "0", chofer, id_tipo = "1", descuento, desc_rep, iva_rep, id_estado;
     public static String fecha_inicial, fecha_final, validar_consultar = "0", id_renta;
     private final static sqlclass funcion = new sqlclass();    
@@ -133,13 +131,30 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private List<Articulo> articulos = new ArrayList<>();
     private final String NEW_ITEM = "1";
     private final String ITEM_ALREADY = "0";
-    private Renta globalRenta = null;
-    
+    private Renta globalRenta = null;    
     // variables gloables para reutilizar en los filtros y combos
     private List<Tipo> typesGlobal = new ArrayList<>();
     private List<EstadoEvento> statusListGlobal = new ArrayList<>();
     private List<Usuario> choferes = new ArrayList<>();
     private final UtilityService utilityService = UtilityService.getInstance();
+    private final int DELAY_SECONDS = 7_000;    
+    
+    private enum TabDetail {
+        ITEMS(0),
+        PAYMENTS(1),
+        COMMENTS(2),
+        PROVIDER_ORDERS(3);
+        
+        TabDetail(int number) {
+            this.number = number;
+        }
+        
+        private final int number;
+        
+        public int getNumber () {
+            return this.number;
+        }
+    }
 
     
     private enum ColumnTableDetail {
@@ -480,7 +495,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         JasperPrint jasperPrint;
         try {
-            fgConsultaTabla= false;
             String pathLocation = Utility.getPathLocation();
             String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_CONSULTA;
             System.out.println("Cargando desde: " + archivo);
@@ -808,6 +822,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
         txt_subtotal.setText(decimalFormat.format(total));
         jTabbedPaneItems.setTitleAt(1, "Articulos("+tabla_detalle.getRowCount()+")");
+        jTabbedPane2.setTitleAt(TabDetail.ITEMS.getNumber(), "Detalle conceptos ("+tabla_detalle.getRowCount()+")");
     }
     
     public void agregar_articulos() {
@@ -1433,15 +1448,16 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         float abonos = 0;
         txt_abonos.setText(decimalFormat.format(abonos));
         System.err.println(tabla_abonos.getRowCount());
-        if (tabla_abonos.getRowCount() <= 0) {
-            return;
-        }
+        int count = 0;
+        
         for (int i = 0; i < tabla_abonos.getRowCount(); i++) {
             aux = EliminaCaracteres(((String) tabla_abonos.getValueAt(i, 3).toString()), "$,");
             abonos = Float.parseFloat(aux) + abonos;
             System.out.println("Abono es: " + abonos);
+            count++;
         }
         txt_abonos.setText(decimalFormat.format(abonos));
+        jTabbedPane2.setTitleAt(TabDetail.PAYMENTS.getNumber(), "Pagos ("+count+")");
         
     }
     
@@ -2266,6 +2282,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         lblInformationOrdersProvider = new javax.swing.JLabel();
         lblLastStatusProvider = new javax.swing.JLabel();
         btnReloadGetLastStatusProvider = new javax.swing.JButton();
+        jBtnAddOrderProvider1 = new javax.swing.JButton();
         jToolBar5 = new javax.swing.JToolBar();
         jbtn_editar = new javax.swing.JButton();
         jbtn_guardar = new javax.swing.JButton();
@@ -2901,6 +2918,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jToolBar3.add(jButton5);
 
         jBtnAddOrderProvider.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/customer-service-icon-32.png"))); // NOI18N
+        jBtnAddOrderProvider.setToolTipText("Agregar orden al proveedor");
         jBtnAddOrderProvider.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jBtnAddOrderProvider.setFocusable(false);
         jBtnAddOrderProvider.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -3416,6 +3434,18 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
         });
 
+        jBtnAddOrderProvider1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/customer-service-icon-32.png"))); // NOI18N
+        jBtnAddOrderProvider1.setToolTipText("Agregar orden al proveedor");
+        jBtnAddOrderProvider1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jBtnAddOrderProvider1.setFocusable(false);
+        jBtnAddOrderProvider1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jBtnAddOrderProvider1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jBtnAddOrderProvider1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnAddOrderProvider1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -3425,10 +3455,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-                        .addComponent(btnReloadGetLastStatusProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 487, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 453, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jBtnAddOrderProvider1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnReloadGetLastStatusProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane8))
                 .addContainerGap())
         );
@@ -3439,7 +3471,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnReloadGetLastStatusProvider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnReloadGetLastStatusProvider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jBtnAddOrderProvider1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addGap(10, 10, 10)
                 .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
                 .addContainerGap())
@@ -3874,6 +3907,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         }
         
+        fillOrdersProvider(globalRenta.getFolio());
+        
+    }
+    
+    private void countOrdersProviderAndSetTitleTabPane () {
+        jTabbedPane2.setTitleAt(TabDetail.PROVIDER_ORDERS.getNumber(), "Ordenes al proveedor ("+tableOrdersProvider.getRowCount()+")");
     }
     
     private void fillOrdersProvider (Integer folioRenta) {
@@ -3903,12 +3942,15 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
               };
               tableModel.addRow(fila);
             }
+            
         } catch (NoDataFoundException e) {
             log.error(e.getMessage(),e);
             lblInformationOrdersProvider.setText("No se obtuvieron ordenes al proveedor.");
         } catch (Exception e) {
             log.error(e.getMessage(),e);
             JOptionPane.showMessageDialog(this, "Ocurrio un inesperado al obtener las ordenes del proveedor\n "+e, "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            countOrdersProviderAndSetTitleTabPane();
         }
     }
     private void tabla_prox_rentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_prox_rentasMouseClicked
@@ -4396,14 +4438,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jbtn_agregar_articulosActionPerformed
 
     private void jbtn_generar_reporte1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_generar_reporte1ActionPerformed
-        // TODO add your handling code here:
-
-            fgConsultaTabla= true;
-            try{
-                reporte();
-            }catch(Exception e){
-                log.error(e);
-            }
+      
+        try{
+            reporte();
+        }catch(Exception e){
+            log.error(e);
+        }
             
 
     }//GEN-LAST:event_jbtn_generar_reporte1ActionPerformed
@@ -4940,12 +4980,15 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_check_enviar_emailActionPerformed
 
-    private void jBtnAddOrderProviderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddOrderProviderActionPerformed
+    private void showProviderForm () {
         if(id_renta == null || id_renta.equals("")){
-             JOptionPane.showMessageDialog(null, "Ocurrio un error, vuelve a cerrar todo y consultar de nuevo porfavor ...", "ERROR", JOptionPane.INFORMATION_MESSAGE);
-             return;
+            JOptionPane.showMessageDialog(null, "Ocurrio un error, vuelve a cerrar todo y consultar de nuevo porfavor ...", "ERROR", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
-        mostrar_agregar_orden_proveedor(lbl_folio.getText(),"",id_renta);
+        mostrar_agregar_orden_proveedor(globalRenta.getFolio()+"","",id_renta);
+    }
+    private void jBtnAddOrderProviderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddOrderProviderActionPerformed
+        showProviderForm();
     }//GEN-LAST:event_jBtnAddOrderProviderActionPerformed
 
     private void jbtn_generar_reporte1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jbtn_generar_reporte1MouseClicked
@@ -5008,11 +5051,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private void tableOrdersProviderMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableOrdersProviderMouseClicked
         // TODO add your handling code here:
         if (evt.getClickCount() == 2) {
-            String rentaId = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 7).toString();
+            //String rentaId = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 7).toString();
             String orderId = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 0).toString();
-            String folio = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 1).toString();
+            //String folio = tableOrdersProvider.getValueAt(tableOrdersProvider.getSelectedRow(), 1).toString();
         
-            mostrar_agregar_orden_proveedor(folio, orderId, rentaId);
+            mostrar_agregar_orden_proveedor(globalRenta.getFolio()+"", orderId, globalRenta.getRentaId()+"");
         }
     }//GEN-LAST:event_tableOrdersProviderMouseClicked
 
@@ -5115,7 +5158,14 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
     private void btnReloadGetLastStatusProviderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadGetLastStatusProviderActionPerformed
         getLastStatusOrderProviders();
+        btnReloadGetLastStatusProvider.setEnabled(false);
+        UtilityCommon.setTimeout(() -> btnReloadGetLastStatusProvider.setEnabled(true), DELAY_SECONDS);
+        
     }//GEN-LAST:event_btnReloadGetLastStatusProviderActionPerformed
+
+    private void jBtnAddOrderProvider1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddOrderProvider1ActionPerformed
+        showProviderForm();
+    }//GEN-LAST:event_jBtnAddOrderProvider1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -5139,6 +5189,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private com.toedter.calendar.JDateChooser cmb_fecha_pago;
     private javax.swing.JComboBox<Tipo> cmb_tipo;
     private javax.swing.JButton jBtnAddOrderProvider;
+    private javax.swing.JButton jBtnAddOrderProvider1;
     private javax.swing.JButton jButton1;
     public static javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;

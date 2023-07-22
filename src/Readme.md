@@ -2,7 +2,7 @@ Para poder modificar los reportes jasper, se utiliza el programa iReport 5.6.0, 
 
 Projecto common, es importante incluir en las librerias de este projecto
 
-#### PASOS PARA INSTALAR EN WINDOWS
+#### PASOS PARA INSTALAR EN WINDOWS.
 1. Instalar MySQL Server 5.7 
     *** Link de descarga (https://dev.mysql.com/downloads/installer/)
     *** NOTA: antes de editar el archivo, debe de activar la opcion de "mostrar archivos ocultos"
@@ -19,7 +19,16 @@ Projecto common, es importante incluir en las librerias de este projecto
     b) mysql> USE mobiliario;
     c) Ejecutar el script ubicado dentro de este proyecto (en la raiz) mobiliario.sql
         *** mysql> source file_path_with_file_name.sql
-        *** Ejemplo para ejecutar el archivo: mysql> C:/Users/GT01894/Desktop/mobiliario.sql
+        *** Ejemplo para ejecutar el archivo: mysql>source C:/Users/GT01894/Desktop/mobiliario.sql
     d) Ejecutar el script inserts.sql
-3. Instalar ORACLE jre 8
+3. Instalar ORACLE JAVA jre 8
+    *** Link de descarga (https://www.java.com/es/download/ie_manual.jsp)
+
+#### PASOS PARA INSTALAR EN MAC.
+1. Instalar MySQL Server 5.7
+   1.1 Una vez instalado debera modificar o crear el archivo my.cnf ubicado en: /etc/mysql/my.cnf y agregar las siguientes dos lineas:
+        [mysqld]
+        sql_mode=IGNORE_SPACE,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+   1.2 Reiniciar el servidor MySQL.
+2. Instalar ORACLE JAVA jre 8
     *** Link de descarga (https://www.java.com/es/download/ie_manual.jsp)

@@ -209,11 +209,12 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
             Logger.getLogger(VerDisponibilidadArticulos.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
             return;
-        }
+        }        
         
         
         if(availabilityItemResults == null || availabilityItemResults.isEmpty()){
             lblEncontrados.setText("No se obtuvieron ordenes en las fechas indicadas, fecha de entrega: "+initialDate+", fecha devolución: "+endDate);
+            calculateAvailableInTable();
             return;
         }
         
@@ -247,12 +248,8 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
           
         }// en for renta  
 
-        // calculando la disponibilidad para la tabla unicos
-        for(int j=0 ; j < tablaArticulosUnicos.getRowCount() ; j++){
-          float pedidos = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ORDER_AMOUNT.getColumn()).toString());
-          float utiles = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ITEM_UTILES.getColumn()).toString());
-          tablaArticulosUnicos.setValueAt( ( utiles - pedidos ), j, HeaderTableUnicos.ITEM_DISPONIBLE.getColumn());
-        }
+        calculateAvailableInTable();
+
 
         if(showOnlyNegatives) {
           mensaje.append("Mostrando solo los negativos - ");
@@ -263,6 +260,15 @@ public final class VerDisponibilidadArticulos extends java.awt.Dialog {
         this.lblEncontrados.setText(mensaje.toString());
           
     }// en funcion mostrarDisponibilidad
+    
+    private void calculateAvailableInTable () {
+                // calculando la disponibilidad para la tabla unicos
+        for(int j=0 ; j < tablaArticulosUnicos.getRowCount() ; j++){
+          float pedidos = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ORDER_AMOUNT.getColumn()).toString());
+          float utiles = Float.parseFloat(tablaArticulosUnicos.getValueAt(j, HeaderTableUnicos.ITEM_UTILES.getColumn()).toString());
+          tablaArticulosUnicos.setValueAt( ( utiles - pedidos ), j, HeaderTableUnicos.ITEM_DISPONIBLE.getColumn());
+        }
+    }
     
     private int getDistictByFolioFromTable () {
         Set<String> distinctFolios = new HashSet<>();
