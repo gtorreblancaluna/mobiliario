@@ -33,7 +33,7 @@ public class ProviderStatusBitacoraDialog extends javax.swing.JDialog {
         this.setLocationRelativeTo(null);
         this.setTitle("Bitacora status proveedor");
         tableStatusProveedorBitacora = new TableStatusProveedorBitacora();
-        Utility.addJtableToPane(719, 451, this.panelTable, tableStatusProveedorBitacora);
+        Utility.addJtableToPane(400, 400, this.panelTable, tableStatusProveedorBitacora);
         providerStatusBitacoraService = ProviderStatusBitacoraService.getInstance();
         fillCombo();
         this.rentaId = rentaId;
@@ -259,7 +259,7 @@ public class ProviderStatusBitacoraDialog extends javax.swing.JDialog {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(panelTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -275,7 +275,8 @@ public class ProviderStatusBitacoraDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();

@@ -11,6 +11,7 @@ import common.constants.ApplicationConstants;
 import common.constants.PropertyConstant;
 import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
+import common.exceptions.DataFoundException;
 import common.exceptions.DataOriginException;
 import common.exceptions.NoDataFoundException;
 import forms.material.inventory.GenerateReportMaterialSaleItemsView;
@@ -99,8 +100,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private TaskDeliveryChoferUpdateService taskDeliveryChoferUpdateService;
     private OrderProviderForm orderProviderForm;
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ConsultarRentas.class.getName());
-    private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
-    private static final SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy");
+    private static final DecimalFormat decimalFormat = new DecimalFormat(ApplicationConstants.DECIMAL_FORMAT_SHORT);
+    private static final SimpleDateFormat formatDate = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT);
     // variable global para almacenar el id detalle de renta
     public static String g_idDetalleRenta;
     // variable global para almacenar el tipo de estado de la renta
@@ -137,7 +138,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private List<EstadoEvento> statusListGlobal = new ArrayList<>();
     private List<Usuario> choferes = new ArrayList<>();
     private final UtilityService utilityService = UtilityService.getInstance();
-    private final int DELAY_SECONDS = 7_000;    
+    private final int DELAY_SECONDS = 7_000;   
+    private final static String FORMAT_HOUR = "%s%s";
+    private final static String FILL_HOUR_ZERO = "0";
     
     private enum TabDetail {
         ITEMS(0),
@@ -365,17 +368,17 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             resultDataShowByDeliveryOrReturnDate = 
                     optionPaneService.getOptionPaneShowByDeliveryOrReturnDateItemsAvailivity(this);   
         } catch (BusinessException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, e.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
             return;            
         }
         
-        String initDate = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
-        String endDate = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
+        String initDate = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(cmb_fecha_entrega.getDate());
+        String endDate = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(cmb_fecha_devolucion.getDate());
 
         List<Long> itemsId = new ArrayList<>();
         
         for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
-            itemsId.add(Long.parseLong(tabla_detalle.getValueAt(i, 2).toString()));
+            itemsId.add(Long.parseLong(tabla_detalle.getValueAt(i, ColumnTableDetail.ITEM_ID.getNumber()).toString()));
         }
         
         VerDisponibilidadArticulos ventanaVerDisponibilidad = 
@@ -468,7 +471,54 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         return ids.get(0);
     }
     
+    private void generateReporteFromRenta (final Renta renta) {
+        JasperPrint jasperPrint;
+        try {
+            String pathLocation = Utility.getPathLocation();
+            String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_CONSULTA;
+            System.out.println("Cargando desde: " + archivo);
+            if (archivo == null) {
+                JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
+                return;
+            }
+            JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(archivo);  
+           
+            DatosGenerales datosGenerales = systemService.getGeneralData();
+            
+            Map parametro = new HashMap<>();
+            parametro.put("NOMBRE_EMPRESA",datosGenerales.getCompanyName());
+            parametro.put("DIRECCION_1",datosGenerales.getAddress1() != null ? datosGenerales.getAddress1() : "");
+            parametro.put("DIRECCION_2",datosGenerales.getAddress2() != null ? datosGenerales.getAddress2() : "");
+            parametro.put("DIRECCION_3",datosGenerales.getAddress3() != null ? datosGenerales.getAddress3() : "");
+            //guardamos el parámetro
+            parametro.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
+            parametro.put("id_renta", renta.getRentaId()+"");
+            parametro.put("abonos", renta.getTotalAbonos()+"");
+            parametro.put("subTotal", renta.getSubTotal()+"");
+            parametro.put("chofer", renta.getChofer().getNombre()+" "+renta.getChofer().getApellidos());
+            parametro.put("descuento", renta.getCalculoDescuento()+"");
+            parametro.put("iva", renta.getCalculoIVA()+"");
+            parametro.put("total_faltantes", renta.getTotalFaltantes()+"");
+            parametro.put("mensaje_faltantes", renta.getMensajeFaltantes());  
+            parametro.put("URL_SUB_REPORT_CONSULTA", pathLocation+ApplicationConstants.URL_SUB_REPORT_CONSULTA);
+            parametro.put("INFO_SUMMARY_FOLIO",datosGenerales.getInfoSummaryFolio());
+         
+            jasperPrint = JasperFillManager.fillReport(masterReport, parametro, funcion.getConnection());
+            JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_CONSULTA);
+            File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_CONSULTA);
+                
+            Desktop.getDesktop().open(file2);
+            
+        } catch (Exception e) {
+            log.error(e);
+            System.out.println("Mensaje de Error:" + e.toString());
+            JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());
+        }
+    
+    }
+    
     public void reporte() throws RuntimeException {
+        
         String rentaId;
         
         try {
@@ -493,48 +543,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             return;
         }
         
-        JasperPrint jasperPrint;
-        try {
-            String pathLocation = Utility.getPathLocation();
-            String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_CONSULTA;
-            System.out.println("Cargando desde: " + archivo);
-            if (archivo == null) {
-                JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
-                return;
-            }
-            JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(archivo);  
-           
-            DatosGenerales datosGenerales = systemService.getGeneralData();
-            
-            Map parametro = new HashMap<>();
-            parametro.put("NOMBRE_EMPRESA",datosGenerales.getCompanyName());
-            parametro.put("DIRECCION_1",datosGenerales.getAddress1() != null ? datosGenerales.getAddress1() : "");
-            parametro.put("DIRECCION_2",datosGenerales.getAddress2() != null ? datosGenerales.getAddress2() : "");
-            parametro.put("DIRECCION_3",datosGenerales.getAddress3() != null ? datosGenerales.getAddress3() : "");
-            //guardamos el parámetro
-            parametro.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
-            parametro.put("id_renta", rentaId);
-            parametro.put("abonos", renta.getTotalAbonos()+"");
-            parametro.put("subTotal", renta.getSubTotal()+"");
-            parametro.put("chofer", renta.getChofer().getNombre()+" "+renta.getChofer().getApellidos());
-            parametro.put("descuento", renta.getCalculoDescuento()+"");
-            parametro.put("iva", renta.getCalculoIVA()+"");
-            parametro.put("total_faltantes", renta.getTotalFaltantes()+"");
-            parametro.put("mensaje_faltantes", renta.getMensajeFaltantes());  
-            parametro.put("URL_SUB_REPORT_CONSULTA", pathLocation+ApplicationConstants.URL_SUB_REPORT_CONSULTA);
-            parametro.put("INFO_SUMMARY_FOLIO",datosGenerales.getInfoSummaryFolio());
-         
-            jasperPrint = JasperFillManager.fillReport(masterReport, parametro, funcion.getConnection());
-            JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_CONSULTA);
-            File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_CONSULTA);
-                
-            Desktop.getDesktop().open(file2);
-            
-        } catch (Exception e) {
-            log.error(e);
-            System.out.println("Mensaje de Error:" + e.toString());
-            JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());
-        }
+        generateReporteFromRenta(renta);
+        
+        
         
     }
     
@@ -815,7 +826,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         float subTotal = 0, total = 0;
         int count = 0;
         for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
-            aux = EliminaCaracteres(((String) tabla_detalle.getValueAt(i, 7).toString()), "$,");
+            aux = EliminaCaracteres(((String) tabla_detalle.getValueAt(i, ColumnTableDetail.AMOUNT_TOTAL.getNumber()).toString()), "$,");
             subTotal = Float.parseFloat(aux);
             total = subTotal + total;
             count++;
@@ -825,20 +836,37 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jTabbedPane2.setTitleAt(TabDetail.ITEMS.getNumber(), "Detalle conceptos ("+tabla_detalle.getRowCount()+")");
     }
     
+    private void itemExist (String itemIdToFind) throws DataFoundException{
+        for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
+            if (itemIdToFind.equals(
+                    String.valueOf(tabla_detalle.getValueAt(i, ColumnTableDetail.ITEM_ID.getNumber())))){
+                throw new DataFoundException("Found Exception.");
+            }
+        }
+    }
+    
     public void agregar_articulos() {
+        
+        try {
+            itemExist(String.valueOf(id_articulo));
+        } catch (DataFoundException e) {
+            JOptionPane.showMessageDialog(this, "No se permiten duplicados. :(", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
+            Toolkit.getDefaultToolkit().beep();
+            return;
+        }
+        
         existe = false;
         if (txt_cantidad.getText().equals("") || txt_precio_unitario.getText().equals("")) {
             
-            JOptionPane.showMessageDialog(null, "Favor de completar los parametros para agregar articulos...", "Error", JOptionPane.INFORMATION_MESSAGE);
-            
+            JOptionPane.showMessageDialog(this, "Favor de completar los parametros para agregar articulos...", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
             Toolkit.getDefaultToolkit().beep();
         } else {
-             float porcentajeDescuento = 0f;
+            float porcentajeDescuento = 0f;
             if(!this.txt_porcentaje_descuento.getText().equals("") ){
                 try {
                     porcentajeDescuento = Float.parseFloat(this.txt_porcentaje_descuento.getText()+"");
                 } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(null, "Ingresa un número valido para porcentaje descuento "+e, "Error", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Ingresa un número valido para porcentaje descuento "+e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
                     Toolkit.getDefaultToolkit().beep();
                     return;
                 }
@@ -849,61 +877,45 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(null, "Ingresa un rango de 0 al 100 para el porcentaje de descuento ", "Error", JOptionPane.INFORMATION_MESSAGE);
                 Toolkit.getDefaultToolkit().beep();
                 return;
-            }
-            
-            
-            existe = false;
-                for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
-                    System.out.println("lbl: " + lbl_eleccion.getText() + "  tabla: " + tabla_detalle.getValueAt(i, 3).toString());
-                    if (lbl_eleccion.getText().equals(tabla_detalle.getValueAt(i, 3).toString())) {
-                        existe = true;
-                        break;
-                    }
-                }
-                if (existe == true) {
-                    JOptionPane.showMessageDialog(null, "No se permiten duplicados...", "Error", JOptionPane.INFORMATION_MESSAGE);
-                    
-                    Toolkit.getDefaultToolkit().beep();
-                    
-                } else {
+            }  
                     
  
-                   Articulo articulo = itemService.obtenerArticuloPorId(Integer.parseInt(id_articulo)); 
-                                     
-                    String datos[] = {id_renta, txt_cantidad.getText().toString(), id_articulo, txt_precio_unitario.getText().toString(),porcentajeDescuento+""};
+            Articulo articulo = itemService.obtenerArticuloPorId(Integer.parseInt(id_articulo)); 
 
-                   int lastId = saleService.insertarDetalleRenta(datos, funcion);
-                   updateItemsInFolio = true;
+             String datos[] = {id_renta, txt_cantidad.getText().toString(), id_articulo, txt_precio_unitario.getText().toString(),porcentajeDescuento+""};
 
-                    DefaultTableModel temp = (DefaultTableModel) tabla_detalle.getModel();              
-                     float cantidad = Float.parseFloat(txt_cantidad.getText().toString());
-                    float precio = Float.parseFloat(txt_precio_unitario.getText().toString());
-                    float importe = (cantidad * precio);
-                    float totalDescuento = 0f;
-                    if(porcentajeDescuento > 0){
-                        totalDescuento = importe * (porcentajeDescuento / 100);
-                        importe = importe - totalDescuento;
-                    }
-                    Object nuevo[] = {
-                                  lastId+"", 
-                                  txt_cantidad.getText().toString(),
-                                  articulo.getArticuloId()+"",
-                                  articulo.getDescripcion()+" "+articulo.getColor().getColor(),
-                                  decimalFormat.format(Float.parseFloat(txt_precio_unitario.getText())),
-                                  porcentajeDescuento+"",
-                                  totalDescuento+"",
-                                  decimalFormat.format(importe),
-                                  ITEM_ALREADY
-                    };
-                    temp.addRow(nuevo);
-                    subTotal();
-                    total();
-                    jbtn_mostrar_articulos.setEnabled(true);
-                    panel = true;
-                    lbl_eleccion.setText("Articulo se agrego al evento.");
-                    Toolkit.getDefaultToolkit().beep();
+            int lastId = saleService.insertarDetalleRenta(datos, funcion);
+            updateItemsInFolio = true;
+
+             DefaultTableModel temp = (DefaultTableModel) tabla_detalle.getModel();              
+              float cantidad = Float.parseFloat(txt_cantidad.getText().toString());
+             float precio = Float.parseFloat(txt_precio_unitario.getText().toString());
+             float importe = (cantidad * precio);
+             float totalDescuento = 0f;
+             if(porcentajeDescuento > 0){
+                 totalDescuento = importe * (porcentajeDescuento / 100);
+                 importe = importe - totalDescuento;
+             }
+             Object nuevo[] = {
+                           lastId+"", 
+                           txt_cantidad.getText().toString(),
+                           articulo.getArticuloId()+"",
+                           articulo.getDescripcion()+" "+articulo.getColor().getColor(),
+                           decimalFormat.format(Float.parseFloat(txt_precio_unitario.getText())),
+                           porcentajeDescuento+"",
+                           totalDescuento+"",
+                           decimalFormat.format(importe),
+                           ITEM_ALREADY
+             };
+             temp.addRow(nuevo);
+             subTotal();
+             total();
+             jbtn_mostrar_articulos.setEnabled(true);
+             panel = true;
+             lbl_eleccion.setText("Articulo se agrego al evento.");
+             Toolkit.getDefaultToolkit().beep();
                     
-                }
+               
         }
         
     }
@@ -924,7 +936,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 float cantidadAbono = 0f;
                 
                 if (cmb_fecha_pago.getDate() != null )
-                    fechaPago = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_pago.getDate());              
+                    fechaPago = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(cmb_fecha_pago.getDate());              
                 
                 TipoAbono tipoAbono = (TipoAbono) this.cmbTipoPago.getModel().getSelectedItem();
           
@@ -987,7 +999,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 txt_comentario.setText((String) tabla_abonos.getValueAt(tabla_abonos.getSelectedRow(), 4).toString());
                 
                 
-                SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat formatDate = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT);
                 String fechaPago = (String) (tabla_abonos.getValueAt(tabla_abonos.getSelectedRow(), 7));
                 if(fechaPago != null && !fechaPago.equals(""))
                     cmb_fecha_pago.setDate((Date) formatDate.parse(tabla_abonos.getValueAt(tabla_abonos.getSelectedRow(), 7).toString()));
@@ -1034,7 +1046,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
         String fechaPago = "";
         if (cmb_fecha_pago.getDate() != null )
-            fechaPago = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_pago.getDate());            
+            fechaPago = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(cmb_fecha_pago.getDate());            
         fecha_sistema();
         // funcion.conectate();
         String tipoAbonoId = funcion.GetData("id_tipo_abono", "SELECT id_tipo_abono FROM tipo_abono "
@@ -1064,7 +1076,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     
     public void quitar_articulo() {
 
-        int seleccion = JOptionPane.showOptionDialog(this, "¿Eliminar registro?  " + tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 3).toString(), "Confirme eliminacion", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si");
+        int seleccion = JOptionPane.showOptionDialog(this, "¿Eliminar registro?  " + tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 
+                ColumnTableDetail.ITEM_DESCRIPTION.getNumber()).toString(), "Confirme eliminacion", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si");
         
         if (seleccion != -1) {
             if ((seleccion + 1) == 1) {
@@ -1074,11 +1087,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                  if( (ApplicationConstants.ESTADO_EN_RENTA.equals(estadoActualPedido )
                   ) ){
 
-                    float cantidadDetalleVenta = Float.parseFloat((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 1).toString());
-                    String en_renta = funcion.GetData("en_renta", "SELECT en_renta FROM articulo WHERE id_articulo ='" + ((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 2).toString()) + "'");
+                    float cantidadDetalleVenta = Float.parseFloat((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.AMOUNT.getNumber()).toString());
+                    String en_renta = funcion.GetData("en_renta", "SELECT en_renta FROM articulo WHERE id_articulo ='" + ((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.ITEM_ID.getNumber()).toString()) + "'");
                     float resta = Float.parseFloat(en_renta.toString()) - cantidadDetalleVenta;// restamos la cantidad restada
 
-                    String id = ((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 2).toString());
+                    String id = ((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.ITEM_ID.getNumber()).toString());
                     String[] datos3 = {String.valueOf(resta), id};
                      try {
                          funcion.UpdateRegistro(datos3, "UPDATE articulo SET en_renta=? WHERE id_articulo=?");
@@ -1088,10 +1101,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     
                 }
                     try {
-                        funcion.DeleteRegistro("detalle_renta", "id_detalle_renta", tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 0).toString());
+                        funcion.DeleteRegistro("detalle_renta", "id_detalle_renta", tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.ID.getNumber()).toString());
                         updateItemsInFolio = true;
                         log.info("el usuario: "+iniciar_sesion.usuarioGlobal.getNombre()+" "
-                            +iniciar_sesion.usuarioGlobal.getApellidos()+" a eliminado el articulo id: "+tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 0).toString() + 
+                            +iniciar_sesion.usuarioGlobal.getApellidos()+" a eliminado el articulo id: "+tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.ID.getNumber()).toString() + 
                                 ", renta_id: "+id_renta);
                      } catch (Exception e) {
                          JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
@@ -1123,7 +1136,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     
     public void quitar_abono() {
         if (iniciar_sesion.administrador_global.equals("1")) {
-            int seleccion = JOptionPane.showOptionDialog(this, "¿Eliminar registro?  " + tabla_abonos.getValueAt(tabla_abonos.getSelectedRow(), 3).toString(), "Confirme eliminacion", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si");
+            int seleccion = JOptionPane.showOptionDialog(this, "¿Eliminar registro?  " + tabla_abonos.getValueAt(tabla_abonos.getSelectedRow(), ColumnTableDetail.ITEM_DESCRIPTION.getNumber()).toString(), "Confirme eliminacion", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si");
             
             if (seleccion == 0) {
                 try {
@@ -1207,9 +1220,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         boolean updated = false;
         
-        String fechaEntrega = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
-        String fechaDevolucion = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
-        String fechaEvento = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_evento.getDate());
+        String fechaEntrega = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(cmb_fecha_entrega.getDate());
+        String fechaDevolucion = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(cmb_fecha_devolucion.getDate());
+        String fechaEvento = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(cmb_fecha_evento.getDate());
         
         String[] deliveryHourArray = globalRenta.getHoraEntrega().split("a");
         if (!deliveryHourArray[0].trim().equals(txtInitDeliveryHour.getText())) {
@@ -1258,9 +1271,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
         
         String hora_entrega = txtInitDeliveryHour.getText()+" a "+txtEndDeliveryHour.getText();
-        String fecha_entrega = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
-        String fecha_devolucion = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
-        String fecha_evento = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_evento.getDate());
+        String fecha_entrega = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(cmb_fecha_entrega.getDate());
+        String fecha_devolucion = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(cmb_fecha_devolucion.getDate());
+        String fecha_evento = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(cmb_fecha_evento.getDate());
        
         final EstadoEvento estadoEventoSelected = (EstadoEvento) cmb_estado1.getModel().getSelectedItem();
         final Tipo tipoSelected = (Tipo) cmb_tipo.getModel().getSelectedItem();
@@ -1464,8 +1477,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     
     
     public void modificar_detalle() {
-        cant = ((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 1).toString());
-        precio = EliminaCaracteres(((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 3).toString()), "$,");
+        cant = ((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.AMOUNT.getNumber()).toString());
+        precio = EliminaCaracteres(((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.ITEM_DESCRIPTION.getNumber()).toString()), "$,");
         
     }
     
@@ -2381,9 +2394,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(4, 4, 4)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 1160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblInformation, javax.swing.GroupLayout.PREFERRED_SIZE, 514, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1160, Short.MAX_VALUE)
+                    .addComponent(lblInformation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3417,7 +3430,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         lblInformationOrdersProvider.setFont(new java.awt.Font("Arial", 3, 14)); // NOI18N
         lblInformationOrdersProvider.setForeground(new java.awt.Color(204, 0, 51));
 
-        lblLastStatusProvider.setFont(new java.awt.Font("Arial", 3, 12)); // NOI18N
+        lblLastStatusProvider.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         lblLastStatusProvider.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         lblLastStatusProvider.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -3454,9 +3467,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 453, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 499, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 539, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jBtnAddOrderProvider1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -3901,7 +3914,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                         " - " + formatDate.format(statusProviderByRenta.getCreatedAt())
                         );
             } else {
-                lblLastStatusProvider.setText("Aún no se obtuvo un registro. Da clic aqui para registrar uno.");
+                lblLastStatusProvider.setText("No se obtuvieron comentarios en la bitacora de status proveedor. Clic aqui para agregar uno.");
             }
         } catch (DataOriginException e) {
         
@@ -3953,6 +3966,44 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             countOrdersProviderAndSetTitleTabPane();
         }
     }
+    
+    private void setupHourInitialForm (final Renta renta) {
+        
+        final String SPLIT_HOUR = "a";
+        final String SPACE = " ";
+        final String NONE_SPACE = "";
+        final int LENGHT_MAX_HOUR = 4;
+        
+        try {
+        
+            String[] horaEntregaSplit = renta.getHoraEntrega().split(SPLIT_HOUR);
+            String[] horaDevolucionSplit = renta.getHoraDevolucion().split(SPLIT_HOUR);
+
+            String initDeliveryHour = horaEntregaSplit[0].replaceAll(SPACE, NONE_SPACE);
+            String endDeliveryHour = horaEntregaSplit[1].replaceAll(SPACE, NONE_SPACE);
+
+            String initReturnHour = horaDevolucionSplit[0].replaceAll(SPACE, NONE_SPACE);
+            String endReturnHour = horaDevolucionSplit[1].replaceAll(SPACE, NONE_SPACE);
+
+            // Fill with zero in left string. example original value 9:00. Value result is: 09:00
+            txtInitDeliveryHour.setText(
+                    initDeliveryHour.length() > LENGHT_MAX_HOUR ? initDeliveryHour : String.format(FORMAT_HOUR,FILL_HOUR_ZERO,initDeliveryHour));
+            txtEndDeliveryHour.setText(
+                    endDeliveryHour.length() > LENGHT_MAX_HOUR ? endDeliveryHour : String.format(FORMAT_HOUR,FILL_HOUR_ZERO,endDeliveryHour));
+            txtInitReturnHour.setText(
+                    initReturnHour.length() > LENGHT_MAX_HOUR ? initReturnHour : String.format(FORMAT_HOUR,FILL_HOUR_ZERO,initReturnHour));
+            txtEndReturnHour.setText(
+                    endReturnHour.length() > LENGHT_MAX_HOUR ? endReturnHour : String.format(FORMAT_HOUR,FILL_HOUR_ZERO,endReturnHour));
+            // end fill zero.
+        
+        } catch (final Exception exception) {
+            log.error(exception.getMessage(),exception);
+            JOptionPane.showMessageDialog(this, "Error al formatear la hora del evento.\nDetalle del error: "+exception.getMessage(), 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+        }
+        
+    }
+    
     private void tabla_prox_rentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_prox_rentasMouseClicked
         // TODO add your handling code here:
         if (evt.getClickCount() == 2) {
@@ -4004,7 +4055,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }).start();
 
                       
-            SimpleDateFormat formatoDelTexto = new SimpleDateFormat("dd/MM/yyyy");
+            SimpleDateFormat formatoDelTexto = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT);
             jTabbedPane1.setEnabledAt(1, true);
             jTabbedPane1.setSelectedIndex(1);
             jTabbedPane1.setEnabledAt(2, true);
@@ -4027,14 +4078,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
             cmb_tipo.getModel().setSelectedItem(globalRenta.getTipo());
                   
-            String[] horaEntregaSplit = globalRenta.getHoraEntrega().split("a");
-            String[] horaDevolucionSplit = globalRenta.getHoraDevolucion().split("a");
-
-            txtInitDeliveryHour.setText(horaEntregaSplit[0].replaceAll(" ", ""));
-            txtEndDeliveryHour.setText(horaEntregaSplit[1].replaceAll(" ", ""));
-            
-            txtInitReturnHour.setText(horaDevolucionSplit[0].replaceAll(" ", ""));
-            txtEndReturnHour.setText(horaDevolucionSplit[1].replaceAll(" ", ""));
+            setupHourInitialForm(globalRenta);
             
             lbl_atiende.setText("Atendio: " + globalRenta.getUsuario().getNombre()+" "+globalRenta.getUsuario().getApellidos());
                
@@ -4080,7 +4124,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
     private void txt_cantidadKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_cantidadKeyPressed
         // TODO add your handling code here:
-        if (evt.getKeyCode() == 10) {
+        
+        if (evt.getKeyCode() == 10) {            
             agregar_articulos();
         }
 
@@ -4109,7 +4154,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         
         if (evt.getClickCount() == 2) {
-            lbl_sel.setText((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 3));
+            lbl_sel.setText((String) tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.ITEM_DESCRIPTION.getNumber()));
             this.editarDetalleRenta();
         }
     }//GEN-LAST:event_tabla_detalleMouseClicked
@@ -4450,26 +4495,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
     private void jbtn_generar_reporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_generar_reporteActionPerformed
         // TODO add your handling code here:
-        float a = 0, b = 0;
-        String aux = "";
-        
-        for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
-            aux = EliminaCaracteres((String) tabla_detalle.getValueAt(i, 7).toString(), "$,");
-            a = a + Float.parseFloat(aux);
-        }
-        subTotal = String.valueOf(a);
-        
-        for (int i = 0; i < tabla_abonos.getRowCount(); i++) {
-            aux = EliminaCaracteres((String) tabla_abonos.getValueAt(i, 3).toString(), "$,");
-            b = b + Float.parseFloat(aux);
-        }
-        cant_abono = String.valueOf(b);
-        chofer = cmb_chofer.getSelectedItem().toString();
-        desc_rep = EliminaCaracteres(txt_descuento.getText().toString(), "$");
-        desc_rep = desc_rep.replaceAll(",", "");
-        iva_rep = EliminaCaracteres(txt_total_iva.getText().toString(), "$");
-        iva_rep=iva_rep.replaceAll(",", "");
-        reporte();
+        generateReporteFromRenta(globalRenta);
 
     }//GEN-LAST:event_jbtn_generar_reporteActionPerformed
 
@@ -4490,9 +4516,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
     private void txt_precio_unitarioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_precio_unitarioKeyPressed
         // TODO add your handling code here:
-        if (evt.getKeyCode() == 10) {
-            agregar_articulos();
-            
+        if (evt.getKeyCode() == 10) {            
+            agregar_articulos();            
         }
     }//GEN-LAST:event_txt_precio_unitarioKeyPressed
 
@@ -4725,8 +4750,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
     private void txt_porcentaje_descuentoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_porcentaje_descuentoKeyPressed
         if (evt.getKeyCode() == 10) {
-            agregar_articulos();
-            
+          agregar_articulos();            
         }
     }//GEN-LAST:event_txt_porcentaje_descuentoKeyPressed
 
@@ -4837,10 +4861,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     
     public void editarDetalleRenta(){
                     
-         this.g_idDetalleRenta = tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 0).toString();
-         String porcentajeDescuento = EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 5).toString(), "$,");
-         String cantidad = EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 1).toString(), "$,");
-         String precioUnitario = EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 4).toString(), "$,");
+         this.g_idDetalleRenta = tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.ID.getNumber()).toString();
+         String porcentajeDescuento = EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.ITEM_PERCENT_DISCOUNT.getNumber()).toString(), "$,");
+         String cantidad = EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.AMOUNT.getNumber()).toString(), "$,");
+         String precioUnitario = EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.ITEM_UNIT_PRICE.getNumber()).toString(), "$,");
          
          this.txt_editar_cantidad.setText(cantidad);
          this.txt_editar_porcentaje_descuento.setText(porcentajeDescuento);
@@ -4894,11 +4918,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
          
             for (int i = 0; i < tabla_detalle.getRowCount() ; i++) {
                 emailTemplate.getItems().add(new ModelTableItem(
-                        tabla_detalle.getValueAt(i, 1).toString(),
-                        tabla_detalle.getValueAt(i, 3).toString(),
-                        tabla_detalle.getValueAt(i, 4).toString(),
-                        tabla_detalle.getValueAt(i, 6).toString(),
-                        tabla_detalle.getValueAt(i, 7).toString()
+                        tabla_detalle.getValueAt(i, ColumnTableDetail.AMOUNT.getNumber()).toString(),
+                        tabla_detalle.getValueAt(i, ColumnTableDetail.ITEM_DESCRIPTION.getNumber()).toString(),
+                        tabla_detalle.getValueAt(i, ColumnTableDetail.ITEM_UNIT_PRICE.getNumber()).toString(),
+                        tabla_detalle.getValueAt(i, ColumnTableDetail.ITEM_TOTAL_DISCOUNT.getNumber()).toString(),
+                        tabla_detalle.getValueAt(i, ColumnTableDetail.AMOUNT_TOTAL.getNumber()).toString()
                 ));
             }
             

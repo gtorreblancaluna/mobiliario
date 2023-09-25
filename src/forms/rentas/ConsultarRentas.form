@@ -100,9 +100,9 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace min="4" pref="4" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane2" min="-2" pref="1160" max="-2" attributes="0"/>
-                              <Component id="lblInformation" min="-2" pref="514" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="jScrollPane2" pref="1160" max="32767" attributes="0"/>
+                              <Component id="lblInformation" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -2126,9 +2126,9 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
-                                      <Component id="lblInformationOrdersProvider" min="-2" pref="590" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="lblLastStatusProvider" min="-2" pref="453" max="-2" attributes="0"/>
+                                      <Component id="lblInformationOrdersProvider" min="-2" pref="499" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="lblLastStatusProvider" min="-2" pref="539" max="-2" attributes="0"/>
                                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                       <Component id="jBtnAddOrderProvider1" min="-2" pref="36" max="-2" attributes="0"/>
                                       <EmptySpace type="unrelated" max="32767" attributes="0"/>
@@ -2208,7 +2208,7 @@
                     <Component class="javax.swing.JLabel" name="lblLastStatusProvider">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                          <Font name="Arial" size="12" style="3"/>
+                          <Font name="Arial" size="12" style="0"/>
                         </Property>
                         <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
                           <Color id="Hand Cursor"/>
