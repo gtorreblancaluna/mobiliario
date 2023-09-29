@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import static mobiliario.iniciar_sesion.usuarioGlobal;
-import model.DatosGenerales;
+import common.model.DatosGenerales;
 import services.SystemService;
 import utilities.Utility;
 

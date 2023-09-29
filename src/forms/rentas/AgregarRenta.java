@@ -38,7 +38,7 @@ import javax.swing.table.TableRowSorter;
 import mobiliario.iniciar_sesion;
 import common.model.Articulo;
 import common.model.Cliente;
-import model.DatosGenerales;
+import common.model.DatosGenerales;
 import common.model.Renta;
 import common.model.TipoAbono;
 import common.model.Usuario;

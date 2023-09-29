@@ -1,7 +1,5 @@
 package services;
 
-import common.services.ItemService;
-import common.services.UserService;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
 import dao.SalesDAO;
@@ -23,10 +21,13 @@ import common.model.Renta;
 import common.model.Tipo;
 import common.model.TipoAbono;
 import common.model.Usuario;
+import common.services.ItemService;
+import common.services.UserService;
 import common.utilities.UtilityCommon;
 import model.querys.AvailabilityItemResult;
 import model.querys.rentas.ItemByFolioResultQuery;
 import model.querys.rentas.SearchItemByFolioParams;
+
 
 public class SaleService {
     private static final Logger log = Logger.getLogger(SaleService.class.getName());

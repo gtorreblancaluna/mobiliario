@@ -25,17 +25,17 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import mobiliario.IndexForm;
-import model.DatosGenerales;
-import model.providers.OrdenProveedor;
-import model.providers.queryresult.DetailOrderSupplierQueryResult;
+import common.model.DatosGenerales;
+import common.model.providers.OrdenProveedor;
+import common.model.providers.queryresult.DetailOrderSupplierQueryResult;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
-import parametersVO.ParameterOrderProvider;
+import common.model.providers.ParameterOrderProvider;
 import services.SystemService;
-import services.providers.OrderProviderService;
+import common.services.providers.OrderProviderService;
 import utilities.Utility;
 
 public class ViewOrdersProviders extends javax.swing.JInternalFrame {
@@ -792,7 +792,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         );
         tabPanelGeneralLayout.setVerticalGroup(
             tabPanelGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 318, Short.MAX_VALUE)
+            .addGap(0, 408, Short.MAX_VALUE)
         );
 
         tabGeneral.addTab("General", tabPanelGeneral);
@@ -805,7 +805,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         );
         tabPanelDetailLayout.setVerticalGroup(
             tabPanelDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 318, Short.MAX_VALUE)
+            .addGap(0, 408, Short.MAX_VALUE)
         );
 
         tabGeneral.addTab("Detalle", tabPanelDetail);
@@ -831,7 +831,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, 990, 400));
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, 990, 490));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

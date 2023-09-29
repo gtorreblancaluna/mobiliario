@@ -13,8 +13,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import model.providers.Proveedor;
-import services.providers.ProvidersService;
+import common.model.providers.Proveedor;
+import common.services.providers.ProvidersService;
 
 public class ViewProviderForm extends javax.swing.JDialog {
 

@@ -15,9 +15,9 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import mobiliario.iniciar_sesion;
-import model.providers.CatalogStatusProvider;
-import model.providers.StatusProviderByRenta;
-import services.providers.ProviderStatusBitacoraService;
+import common.model.providers.CatalogStatusProvider;
+import common.model.providers.StatusProviderByRenta;
+import common.services.providers.ProviderStatusBitacoraService;
 import utilities.Utility;
 
 public class ProviderStatusBitacoraDialog extends javax.swing.JDialog {

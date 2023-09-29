@@ -28,14 +28,16 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         <mapper resource="data/MapperAccounts.xml"/>
         <mapper resource="data/MapperTipoAbonos.xml"/>
         <mapper resource="data/MapperAbonos.xml"/>
-        <mapper resource="data/MapperDatosGenerales.xml"/>
+        <mapper resource="common/mappers/MapperDatosGenerales.xml"/>
         <mapper resource="data/MapperCompras.xml"/>
-        <mapper resource="data/providers/MapperProveedores.xml"/>
-        <mapper resource="data/providers/MapperOrdenProveedor.xml"/>
-        <mapper resource="data/providers/MapperDetalleOrdenProveedor.xml"/>
-        <mapper resource="data/providers/MapperPagosProveedor.xml"/>
+        
+        <mapper resource="common/mappers/providers/MapperProveedores.xml"/>
+        <mapper resource="common/mappers/providers/MapperOrdenProveedor.xml"/>
+        <mapper resource="common/mappers/providers/MapperDetalleOrdenProveedor.xml"/>
+        <mapper resource="common/mappers/providers/MapperPagosProveedor.xml"/>
+        <mapper resource="common/mappers/providers/MapperStatusProvider.xml"/>
+        
         <mapper resource="data/material/inventory/MapperMaterialInventory.xml"/>
-        <mapper resource="data/providers/MapperStatusProvider.xml"/>
         <mapper resource="common/mappers/MapperEstadoEvento.xml"/>
         <mapper resource="common/mappers/MapperTipoEvento.xml"/>
         <mapper resource="data/MapperCustomer.xml"/>

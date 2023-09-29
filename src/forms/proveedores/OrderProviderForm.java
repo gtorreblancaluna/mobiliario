@@ -24,14 +24,14 @@ import javax.swing.table.TableRowSorter;
 import mobiliario.iniciar_sesion;
 import mobiliario.IndexForm;
 import common.model.Articulo;
-import model.DatosGenerales;
+import common.model.DatosGenerales;
 import common.model.DetalleRenta;
 import common.model.Renta;
-import model.providers.DetalleOrdenProveedor;
-import model.providers.OrdenProveedor;
-import model.providers.PagosProveedor;
-import model.providers.Proveedor;
-import model.providers.DetailOrderProviderType;
+import common.model.providers.DetalleOrdenProveedor;
+import common.model.providers.OrdenProveedor;
+import common.model.providers.PagosProveedor;
+import common.model.providers.Proveedor;
+import common.model.providers.DetailOrderProviderType;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -39,7 +39,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
 import services.SaleService;
 import services.SystemService;
-import services.providers.OrderProviderService;
+import common.services.providers.OrderProviderService;
 import utilities.Utility;
 
 public class OrderProviderForm extends javax.swing.JInternalFrame {
@@ -1145,7 +1145,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             // update detail order
           
             try {
-                orderProviderService.updateDetailOrderProvider(Long.parseLong(idDetailOrderProviderToEdit), cantidad, precio, comentario, type.getId());
+                orderProviderService.updateDetailOrderProvider(Long.parseLong(idDetailOrderProviderToEdit), cantidad, precio, comentario, type.getId(),"1");
                 OrdenProveedor orderProvider = orderProviderService.getOrderById(Long.parseLong(orderId));
                 formato_tabla_orden();
                 fillTableDetailOrderProvider(orderProvider.getDetalleOrdenProveedorList());
@@ -1301,7 +1301,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
     private javax.swing.JComboBox cmbStatusOrder;
-    private javax.swing.JComboBox<model.providers.DetailOrderProviderType> comboOrderType;
+    private javax.swing.JComboBox<common.model.providers.DetailOrderProviderType> comboOrderType;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;

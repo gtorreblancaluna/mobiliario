@@ -9,7 +9,7 @@ import javax.swing.table.DefaultTableModel;
 import common.model.Articulo;
 import model.material.inventory.MaterialInventory;
 import model.material.inventory.MaterialSaleItem;
-import model.providers.Proveedor;
+import common.model.providers.Proveedor;
 import org.apache.log4j.Priority;
 import common.services.ItemService;
 import services.material.inventory.MaterialInventoryService;

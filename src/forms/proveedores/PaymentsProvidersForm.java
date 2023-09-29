@@ -15,11 +15,11 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import mobiliario.iniciar_sesion;
 import common.model.TipoAbono;
-import model.providers.OrdenProveedor;
-import model.providers.PagosProveedor;
+import common.model.providers.OrdenProveedor;
+import common.model.providers.PagosProveedor;
 import services.SaleService;
-import services.providers.OrderProviderService;
-import services.providers.ProvidersPaymentsService;
+import common.services.providers.OrderProviderService;
+import common.services.providers.ProvidersPaymentsService;
 
 public class PaymentsProvidersForm extends javax.swing.JInternalFrame {
     
