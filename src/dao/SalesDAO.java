@@ -9,7 +9,7 @@ import common.model.Abono;
 import common.model.DetalleRenta;
 import common.model.Renta;
 import common.model.TipoAbono;
-import model.querys.AvailabilityItemResult;
+import common.model.AvailabilityItemResult;
 import model.querys.rentas.ItemByFolioResultQuery;
 import model.querys.rentas.SearchItemByFolioParams;
 import org.apache.ibatis.session.SqlSession;
@@ -122,32 +122,6 @@ public class SalesDAO {
         SqlSession session = sqlSessionFactory.openSession();
         try {
            return (List<Renta>) session.selectList("MapperPedidos.obtenerRentaPorParametros",parameters);       
-        } finally {
-            session.close();
-        }
-    }
-    
-    public List<AvailabilityItemResult> obtenerDisponibilidadRentaPorConsulta (Map<String,Object> parameters) throws DataOriginException{
-        SqlSession session = sqlSessionFactory.openSession();
-        try {
-            
-            List<AvailabilityItemResult> availabilityItemResults;
-            
-            parameters.put("statusOrderFinish", ApplicationConstants.STATUS_ORDER_PROVIDER_FINISH);
-            parameters.put("statusOrder", ApplicationConstants.STATUS_ORDER_PROVIDER_ORDER);
-            parameters.put("typeOrderDetail", ApplicationConstants.TYPE_DETAIL_ORDER_SHOPPING);
-            
-            if (parameters.get("showByDeliveryDate") != null && Boolean.parseBoolean(parameters.get("showByDeliveryDate").toString())) {
-                availabilityItemResults = session.selectList("MapperPedidos.obtenerRentaPorDisponibilidadPorFechaDeEntrega",parameters);
-            } else if (parameters.get("showByReturnDate") != null && Boolean.parseBoolean(parameters.get("showByReturnDate").toString())) {
-                availabilityItemResults = session.selectList("MapperPedidos.obtenerRentaPorDisponibilidadPorFechaDeDevolucion",parameters);
-            } else {
-                availabilityItemResults = session.selectList("MapperPedidos.obtenerRentaPorDisponibilidad",parameters);
-            }
-                       
-            return availabilityItemResults;
-        } catch (Exception e){
-            throw new DataOriginException(e.getMessage(),e);
         } finally {
             session.close();
         }

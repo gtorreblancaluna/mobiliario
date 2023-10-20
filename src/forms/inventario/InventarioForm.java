@@ -1,5 +1,7 @@
 package forms.inventario;
 
+import common.form.items.AgregarArticuloDisponibilidadDialog;
+import common.form.items.VerDisponibilidadArticulos;
 import common.constants.ApplicationConstants;
 import common.exceptions.BusinessException;
 import common.exceptions.DataOriginException;
@@ -44,6 +46,7 @@ import common.services.EstadoEventoService;
 import services.CategoryService;
 import common.services.ItemService;
 import common.services.TipoEventoService;
+import common.tables.TableDisponibilidadArticulosShow;
 import forms.inventario.tables.TableItemsByFolio;
 import java.awt.Component;
 import java.awt.Point;
@@ -80,6 +83,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private final TipoEventoService tipoEventoService = TipoEventoService.getInstance();
     private final TableItemsByFolio tableItemsByFolio;
     private final SaleService saleService = SaleService.getInstance();
+    private static TableDisponibilidadArticulosShow tablaDisponibilidadArticulos;
     
 
     public InventarioForm() {
@@ -99,8 +103,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         if (iniciar_sesion.administrador_global.equals("0")) {
             txt_precio_compra.setEditable(false);
             txt_precio_renta.setEditable(false);
-        }        
-        formato_tabla();
+        }
+
         this.setTitle(TITLE);
         lblInfoConsultarDisponibilidad.setText("");
         
@@ -117,6 +121,10 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         
         tableItemsByFolio = new TableItemsByFolio();
         Utility.addJtableToPane(937, 305, panelTableItemsByFolio, tableItemsByFolio);
+        
+        tablaDisponibilidadArticulos = new TableDisponibilidadArticulosShow();
+        Utility.addJtableToPane(937, 305, jPanel6, tablaDisponibilidadArticulos);
+        
         eventListener();
         setCmbLimit();
     }
@@ -244,127 +252,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         lblInfoConsultarDisponibilidad.setText(message);
         
     }
-    private enum Column{
-        
-        BOOLEAN(0,"",Boolean.class, true),
-        ID(1,"id",String.class, false),
-        CODE(2,"Codigo",String.class,false),
-        CATEGORY(3,"Categoria",String.class, false),
-        DESCRIPTION(4,"Descripcion",String.class, false),
-        COLOR(5,"Color",String.class, false),
-        PRICE(6,"P.Unitario",String.class, false),
-        STOCK(7,"Stock",String.class, false)
-        ;
-        
-        Column (Integer number, String description, Class clazz, Boolean isEditable) {
-            this.number = number;
-            this.description = description;
-            this.clazz = clazz;
-            this.isEditable = isEditable;
-        }
-        private final Integer number;
-        private final String description;
-        private final Class clazz;
-        private final Boolean isEditable;
-        
-        public Boolean getIsEditable() {
-            return isEditable;
-        }
-        
-        public Class getClazz () {
-            return clazz;
-        }
-
-        public Integer getNumber() {
-            return number;
-        }
-        
-        public String getDescription () {
-            return description;
-        }
-        
-    }
-    
-    public void formato_tabla() {
-        
-        String[] columnNames = {
-            
-            Column.BOOLEAN.getDescription(),
-            Column.ID.getDescription(),
-            Column.CODE.getDescription(), 
-            Column.CATEGORY.getDescription(),
-            Column.DESCRIPTION.getDescription(), 
-            Column.COLOR.getDescription(),                        
-            Column.PRICE.getDescription(),
-            Column.STOCK.getDescription()
-            
-        };
-        Class[] types = {
-            Column.BOOLEAN.getClazz(),
-            Column.ID.getClazz(),
-            Column.CODE.getClazz(), 
-            Column.CATEGORY.getClazz(),
-            Column.DESCRIPTION.getClazz(), 
-            Column.COLOR.getClazz(),                        
-            Column.PRICE.getClazz(),
-            Column.STOCK.getClazz()            
-        };
-        
-        boolean[] editable = {
-            
-            Column.BOOLEAN.getIsEditable(),
-            Column.ID.getIsEditable(),
-            Column.CODE.getIsEditable(), 
-            Column.CATEGORY.getIsEditable(),
-            Column.DESCRIPTION.getIsEditable(),
-            Column.COLOR.getIsEditable(),                        
-            Column.PRICE.getIsEditable(),
-            Column.STOCK.getIsEditable()
-        };
-        
-  
-        // customize column types
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0){
-            @Override
-            public Class getColumnClass(int column) {
-                return types[column];
-            }
-            
-            @Override
-            public boolean isCellEditable (int row, int column) {
-                return editable[column];
-            }
-        };
-        tablaDisponibilidadArticulos.setModel(tableModel);
-        int[] anchos = {10,20, 120, 250, 100, 40, 40,40};
-
-        for (int inn = 0; inn < tablaDisponibilidadArticulos.getColumnCount(); inn++) {
-            tablaDisponibilidadArticulos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
-        }
-
-        try {
-            DefaultTableModel temp = (DefaultTableModel) tablaDisponibilidadArticulos.getModel();
-            temp.removeRow(temp.getRowCount() - 1);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            ;
-        }
-        tablaDisponibilidadArticulos.getColumnModel().getColumn(Column.ID.getNumber()).setMaxWidth(0);
-        tablaDisponibilidadArticulos.getColumnModel().getColumn(Column.ID.getNumber()).setMinWidth(0);
-        tablaDisponibilidadArticulos.getColumnModel().getColumn(Column.ID.getNumber()).setPreferredWidth(0);
-        
-        tablaDisponibilidadArticulos.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                // int row = table.rowAtPoint(evt.getPoint());
-                int col = tablaDisponibilidadArticulos.columnAtPoint(evt.getPoint());
-                String name = tablaDisponibilidadArticulos.getColumnName(col);
-                System.out.println("Column index selected " + col + " " + name);
-                if (col == Column.BOOLEAN.getNumber()) {
-                    System.out.println("BOOLEAN");
-                }
-            }
-        });
-    }
     
     public static boolean agregarArticulo (String id) {
         
@@ -377,7 +264,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
          
          // verificamos que el elemento no se encuentre en la lista
         for (int i = 0; i < tablaDisponibilidadArticulos.getRowCount(); i++) {
-            dato = tablaDisponibilidadArticulos.getValueAt(i, Column.ID.getNumber()).toString();
+            dato = tablaDisponibilidadArticulos.getValueAt(i, TableDisponibilidadArticulosShow.Column.ID.getNumber()).toString();
             System.out.println("dato seleccionado" + " " + " - " + dato + " - ");
             if (dato.equals(String.valueOf(articulo.getArticuloId()))) {
                  JOptionPane.showMessageDialog(null, "Ya se encuentra el elemento en la lista  ", "Error", JOptionPane.INFORMATION_MESSAGE);
@@ -556,9 +443,9 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         if (articulos.isEmpty()) {
             articulos = itemService.obtenerArticulosActivos();
         }
-        AgregarArticuloDisponibilidad ventanaAgregarArticuloDisponibilidad = new AgregarArticuloDisponibilidad(null, true, articulos);
-        ventanaAgregarArticuloDisponibilidad.setVisible(true);
-        ventanaAgregarArticuloDisponibilidad.setLocationRelativeTo(null);
+        AgregarArticuloDisponibilidadDialog dialog = new AgregarArticuloDisponibilidadDialog(null, true, articulos);
+        String itemId = dialog.showDialog();
+        agregarArticulo(itemId);
     }
     
      public void mostrar_ver_disponibilidad_articulos() {
@@ -567,7 +454,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         String endDate = new SimpleDateFormat("dd/MM/yyyy").format(txtDisponibilidadFechaFinal.getDate());
         List<Long> itemsId = new ArrayList<>();
         for (int i = 0; i < InventarioForm.tablaDisponibilidadArticulos.getRowCount(); i++) {
-            itemsId.add(Long.parseLong(tablaDisponibilidadArticulos.getValueAt(i, Column.ID.getNumber()).toString()));
+            itemsId.add(Long.parseLong(tablaDisponibilidadArticulos.getValueAt(i, TableDisponibilidadArticulosShow.Column.ID.getNumber()).toString()));
         }
         VerDisponibilidadArticulos ventanaVerDisponibilidad = new VerDisponibilidadArticulos(
                 null,
@@ -872,8 +759,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         btnShowAvailivity = new javax.swing.JButton();
         lblInfoConsultarDisponibilidad = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        tablaDisponibilidadArticulos = new javax.swing.JTable();
         jPanel7 = new javax.swing.JPanel();
         txtDisponibilidadFechaInicial = new com.toedter.calendar.JDateChooser();
         txtDisponibilidadFechaFinal = new com.toedter.calendar.JDateChooser();
@@ -1336,40 +1221,15 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        tablaDisponibilidadArticulos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        tablaDisponibilidadArticulos.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tablaDisponibilidadArticulos.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                tablaDisponibilidadArticulosKeyPressed(evt);
-            }
-        });
-        jScrollPane3.setViewportView(tablaDisponibilidadArticulos);
-
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane3)
-                .addContainerGap())
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
-                .addContainerGap())
+            .addGap(0, 504, Short.MAX_VALUE)
         );
 
         txtDisponibilidadFechaInicial.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
@@ -2001,10 +1861,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         win.show();
     }//GEN-LAST:event_jButton5ActionPerformed
 
-    private void tablaDisponibilidadArticulosKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tablaDisponibilidadArticulosKeyPressed
-        UtilityCommon.selectCheckBoxWhenKeyPressedIsSpace(evt,tablaDisponibilidadArticulos,Column.BOOLEAN.getNumber());
-    }//GEN-LAST:event_tablaDisponibilidadArticulosKeyPressed
-
     private void searchItemsByFolio () {
         try {
             SearchItemByFolioParams searchItemByFolioParams
@@ -2044,7 +1900,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
        DefaultTableModel temp = (DefaultTableModel) tablaDisponibilidadArticulos.getModel();
         for( int i = temp.getRowCount() - 1; i >= 0; i-- ){
-            if (Boolean.parseBoolean(tablaDisponibilidadArticulos.getValueAt(i, Column.BOOLEAN.getNumber()).toString())) {
+            if (Boolean.parseBoolean(tablaDisponibilidadArticulos.getValueAt(i, TableDisponibilidadArticulosShow.Column.BOOLEAN.getNumber()).toString())) {
                 temp.removeRow(i);
             }
         }
@@ -2210,7 +2066,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JButton jbtnSearch;
     private javax.swing.JButton jbtn_agregar;
@@ -2228,7 +2083,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     public static javax.swing.JRadioButton radioBtnFechaEntrega;
     public static javax.swing.JRadioButton radioBtnTodos;
     private javax.swing.JTabbedPane tabGeneral;
-    public static javax.swing.JTable tablaDisponibilidadArticulos;
     private javax.swing.JTable tabla_articulos;
     private javax.swing.JTextField txtCodigo;
     private static com.toedter.calendar.JDateChooser txtDisponibilidadFechaFinal;

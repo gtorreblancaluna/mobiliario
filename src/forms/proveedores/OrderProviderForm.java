@@ -235,7 +235,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
                 return;
           }
           confirmationMessage = ApplicationConstants.MESSAGE_UPDATE_SUCCESSFUL;
-          Utility.pushNotification("Se a actualizado orden al proveedor, orden número: "+orderId);
+          Utility.pushNotification("Se a actualizado orden al proveedor, orden número: "+orderId+", usuario: "+iniciar_sesion.usuarioGlobal.getNombre()+" "+iniciar_sesion.usuarioGlobal.getApellidos());
       }else{
         try{
           orderProviderService.saveOrder(orden);
@@ -244,7 +244,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             return;
         }
         confirmationMessage = ApplicationConstants.MESSAGE_SAVE_SUCCESSFUL;
-        Utility.pushNotification("Se a agregado orden al proveedor con éxito");
+        Utility.pushNotification("Se a agregado orden al proveedor con éxito, usuario: "+iniciar_sesion.usuarioGlobal.getNombre()+" "+iniciar_sesion.usuarioGlobal.getApellidos());
       } 
       
       JOptionPane.showMessageDialog(this, confirmationMessage, "EXITO", JOptionPane.INFORMATION_MESSAGE);
@@ -1142,13 +1142,15 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         String comentario = this.txtComentario.getText();
         
         if (idDetailOrderProviderToEdit != null) {
-            // update detail order
-          
+            // update detail order          
             try {
                 orderProviderService.updateDetailOrderProvider(Long.parseLong(idDetailOrderProviderToEdit), cantidad, precio, comentario, type.getId(),"1");
                 OrdenProveedor orderProvider = orderProviderService.getOrderById(Long.parseLong(orderId));
                 formato_tabla_orden();
                 fillTableDetailOrderProvider(orderProvider.getDetalleOrdenProveedorList());
+                
+                Utility.pushNotification("El usuario "+iniciar_sesion.usuarioGlobal.getNombre()+" "+iniciar_sesion.usuarioGlobal.getApellidos()
+                +" modifico la orden al proveedor: '"+this.orderId+"', folio: '"+this.folio+"'.");
             } catch (BusinessException e) {
                 JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.INFORMATION_MESSAGE);
                 return;

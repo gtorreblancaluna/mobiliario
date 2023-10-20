@@ -21,10 +21,8 @@ import common.model.Renta;
 import common.model.Tipo;
 import common.model.TipoAbono;
 import common.model.Usuario;
-import common.services.ItemService;
 import common.services.UserService;
 import common.utilities.UtilityCommon;
-import model.querys.AvailabilityItemResult;
 import model.querys.rentas.ItemByFolioResultQuery;
 import model.querys.rentas.SearchItemByFolioParams;
 
@@ -33,7 +31,6 @@ public class SaleService {
     private static final Logger log = Logger.getLogger(SaleService.class.getName());
     private final SalesDAO salesDao;
     private final UserService userService = UserService.getInstance();
-    private final ItemService itemService = ItemService.getInstance();
     
     
     private SaleService () {
@@ -234,23 +231,7 @@ public class SaleService {
         
         return rentas;
                 
-    } // fin disponibilidad renta por 
-    
-    
-     public List<AvailabilityItemResult> obtenerDisponibilidadRentaPorConsulta(Map<String, Object> parameters)throws BusinessException {
-         
-        try {
-            List<AvailabilityItemResult> availabilityItemResults = salesDao.obtenerDisponibilidadRentaPorConsulta(parameters);
-            for (AvailabilityItemResult availabilityItemResult : availabilityItemResults) {        
-              availabilityItemResult.getItem().setUtiles(itemService.utilesCalculate(availabilityItemResult.getItem()));  
-            }
-            return availabilityItemResults;
-        } catch (DataOriginException e) {
-            throw new BusinessException(e.getMessage(),e);
-        }
-                
-    } // fin disponibilidad renta por fechas
-    
+    } // fin disponibilidad renta por     
     
     // obtenemos los pedidos por una consulta armada desde la vista
     public List<Renta> obtenerPedidosPorConsultaSql(String querySql,sqlclass sql)throws Exception {

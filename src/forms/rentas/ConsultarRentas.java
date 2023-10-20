@@ -74,7 +74,7 @@ import common.model.providers.ParameterOrderProvider;
 import common.services.OrderStatusChangeService;
 import services.OrderTypeChangeService;
 import common.services.TipoEventoService;
-import forms.inventario.VerDisponibilidadArticulos;
+import common.form.items.VerDisponibilidadArticulos;
 import common.services.providers.OrderProviderService;
 import common.services.TaskAlmacenUpdateService;
 import common.services.TaskDeliveryChoferUpdateService;
@@ -89,6 +89,9 @@ import javax.swing.table.TableColumn;
 import lombok.Getter;
 import common.model.providers.StatusProviderByRenta;
 import common.services.providers.ProviderStatusBitacoraService;
+import java.awt.Color;
+import java.awt.Component;
+import java.util.Locale;
 import utilities.OptionPaneService;
 import utilities.PropertySystemUtil;
 import utilities.dtos.ResultDataShowByDeliveryOrReturnDate;
@@ -1894,7 +1897,31 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
     }
     
-    public static void tabla_consultar_renta(Map<String,Object> parameters) {   // funcion para llenar al abrir la ventana   
+    public static void tabla_consultar_renta(Map<String,Object> parameters) {   // funcion para llenar al abrir la ventana
+        
+            tabla_prox_rentas.setDefaultRenderer(Object.class, new DefaultTableCellRenderer(){
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column){
+                    final Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    String status = table.getValueAt(row, ColumConsultarRentaTable.STATUS.getNumber()).toString();
+                    
+                    switch (status.trim()) {
+                        case ApplicationConstants.DS_ESTADO_APARTADO:
+                            component.setBackground(Color.YELLOW);
+                            break;
+                        case ApplicationConstants.DS_ESTADO_EN_RENTA:
+                            component.setBackground(Color.RED);
+                            break;
+                        case ApplicationConstants.DS_ESTADO_FINALIZADO:
+                            component.setBackground(Color.GREEN);
+                            break;
+                        default:
+                            component.setBackground(row % 2 == 0 ? new Color(240,240,240) : Color.WHITE);
+                    }                    
+                    
+                    return component;
+                }
+            });
         
             // customize column types
             DefaultTableModel tableModel = new DefaultTableModel(ColumConsultarRentaTable.getColumnNames(), 0){
@@ -1933,7 +1960,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.ID.getNumber()).setMinWidth(0);
             tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.ID.getNumber()).setPreferredWidth(0);
             
-            tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.FOLIO.getNumber()).setCellRenderer(centrar);
             tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.SUBTOTAL.getNumber()).setCellRenderer(right);
             tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.GUARANTEE_DEPOSIT.getNumber()).setCellRenderer(right);
             tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.RECOLECTION_SENT.getNumber()).setCellRenderer(right);
@@ -1944,14 +1970,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.SALDO.getNumber()).setCellRenderer(right);
             tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.SUBTOTAL_DESCUENTOS.getNumber()).setCellRenderer(right);
             
-             //FormatoTabla ft = new FormatoTabla(3);
-            //tabla_prox_rentas.setDefaultRenderer(Object.class, ft);
             
             // adding checkbox in header table
             TableColumn tc = tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.BOOLEAN.getNumber());
             tc.setCellEditor(tabla_prox_rentas.getDefaultEditor(Boolean.class)); 
             tc.setHeaderRenderer(new CheckBoxHeader(new ItemListenerHeaderCheckbox(ColumConsultarRentaTable.BOOLEAN.getNumber(),tabla_prox_rentas)));
-
+            
             jPanel2.setVisible(true);
 
 

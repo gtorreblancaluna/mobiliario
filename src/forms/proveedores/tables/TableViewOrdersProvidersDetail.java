@@ -1,5 +1,6 @@
 package forms.proveedores.tables;
 
+import common.constants.ApplicationConstants;
 import java.awt.Font;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -10,7 +11,7 @@ public class TableViewOrdersProvidersDetail extends JTable {
 
     public TableViewOrdersProvidersDetail() {
         
-        this.setFont(new Font( "Arial" , Font.PLAIN, 11 ));
+        this.setFont(new Font( ApplicationConstants.ARIAL , Font.PLAIN, 11 ));
         format();
         
     }
