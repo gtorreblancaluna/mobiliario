@@ -6,8 +6,6 @@ import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
 import common.exceptions.NoDataFoundException;
 import common.services.UtilityService;
-import forms.proveedores.tables.TableViewOrdersProviders;
-import forms.proveedores.tables.TableViewOrdersProvidersDetail;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Point;
@@ -36,6 +34,8 @@ import net.sf.jasperreports.engine.util.JRLoader;
 import common.model.providers.ParameterOrderProvider;
 import services.SystemService;
 import common.services.providers.OrderProviderService;
+import common.tables.TableViewOrdersProviders;
+import common.tables.TableViewOrdersProvidersDetail;
 import utilities.Utility;
 
 public class ViewOrdersProviders extends javax.swing.JInternalFrame {

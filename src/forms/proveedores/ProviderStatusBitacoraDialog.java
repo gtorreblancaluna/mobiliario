@@ -4,7 +4,6 @@ import common.constants.ApplicationConstants;
 import common.exceptions.BusinessException;
 import common.exceptions.DataOriginException;
 import common.model.Renta;
-import forms.proveedores.tables.TableStatusProveedorBitacora;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +17,7 @@ import mobiliario.iniciar_sesion;
 import common.model.providers.CatalogStatusProvider;
 import common.model.providers.StatusProviderByRenta;
 import common.services.providers.ProviderStatusBitacoraService;
+import common.tables.TableStatusProveedorBitacora;
 import utilities.Utility;
 
 public class ProviderStatusBitacoraDialog extends javax.swing.JDialog {

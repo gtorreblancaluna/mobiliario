@@ -696,7 +696,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         for (i = 0; i <= datos_combo.length - 1; i++) {
             cmb_estado.addItem(datos_combo[i].toString());
         }
-        cmb_estado.addItem("-sel-");
+        cmb_estado.addItem(ApplicationConstants.CMB_SELECCIONE);
         cmb_estado.setSelectedItem("Apartado");
 
     }
@@ -711,7 +711,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             System.out.println("COMBO TIPO: " + datos_combo[i].toString());
             cmb_tipo.addItem(datos_combo[i].toString());
         }
-        cmb_tipo.addItem("-sel-");
+        cmb_tipo.addItem(ApplicationConstants.CMB_SELECCIONE);
         cmb_tipo.setSelectedItem("Pedido");
 
     }
@@ -739,14 +739,14 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         List<TipoAbono> tiposAbonos =  saleService.obtenerTiposAbono(funcion);
         this.cmbTipoPago.removeAllItems();
-         cmbTipoPago.addItem("-sel-");
+         cmbTipoPago.addItem(ApplicationConstants.CMB_SELECCIONE);
         if(tiposAbonos != null && tiposAbonos.size()>0){
             for(TipoAbono tipo : tiposAbonos){               
                    cmbTipoPago.addItem(tipo.getDescripcion());
             }
         }        
        
-        cmbTipoPago.setSelectedItem("-sel-");
+        cmbTipoPago.setSelectedItem(ApplicationConstants.CMB_SELECCIONE);
     }
 
     public String EliminaCaracteres(String s_cadena, String s_caracteres) {
@@ -779,19 +779,19 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "Falta fecha de devolucion ", "Error", JOptionPane.INFORMATION_MESSAGE);
        } else if (cmb_fecha_evento.getDate() == null) {
             JOptionPane.showMessageDialog(null, "Falta fecha del evento ", "Error", JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_hora.getSelectedIndex() == 0) {
+        } else if (!Utility.validateHour(txtInitDeliveryHour.getText())) {
             JOptionPane.showMessageDialog(null, "Falta seleccionar hora ", "Error", JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_hora_dos.getSelectedIndex() == 0) {
+        } else if (!Utility.validateHour(txtEndDeliveryHour.getText())) {
             JOptionPane.showMessageDialog(null, "Falta seleccionar segunda hora ", "Error", JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_hora_devolucion.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Falta seleccionar hora devolucion ", "Error", JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_hora_devolucion_dos.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Falta seleccionar segunda hora devolucion", "Error", JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_estado.getSelectedItem().equals("-sel-")) {
+        } else if (!Utility.validateHour(txtInitReturnHour.getText())) {
+            JOptionPane.showMessageDialog(null, "Falta seleccionar hora devolución ", "Error", JOptionPane.INFORMATION_MESSAGE);
+        } else if (!Utility.validateHour(txtEndReturnHour.getText())) {
+            JOptionPane.showMessageDialog(null, "Falta seleccionar segunda hora devolución", "Error", JOptionPane.INFORMATION_MESSAGE);
+        } else if (cmb_estado.getSelectedItem().equals(ApplicationConstants.CMB_SELECCIONE)) {
             JOptionPane.showMessageDialog(null, "Favor de ingresar un estado ", "Error", JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_chofer.getSelectedItem().equals("-sel-")) {
+        } else if (cmb_chofer.getSelectedItem().equals(ApplicationConstants.CMB_SELECCIONE)) {
             JOptionPane.showMessageDialog(null, "Favor de seleccionar un chofer ", "Error", JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_tipo.getSelectedItem().equals("-sel-")) {
+        } else if (cmb_tipo.getSelectedItem().equals(ApplicationConstants.CMB_SELECCIONE)) {
             JOptionPane.showMessageDialog(null, "Favor de seleccionar tipo ", "Error", JOptionPane.INFORMATION_MESSAGE);
         } else if (!txt_descripcion.getText().equals("") && txt_descripcion.getText().length() >= 400) {
             JOptionPane.showMessageDialog(null, "Descripcion a rebasado los caracteres permitidos [400 caracteres] ", "Error", JOptionPane.INFORMATION_MESSAGE);
@@ -851,15 +851,12 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         String stock = "0";
         
         int aux = 1;
-        hora_entrega = cmb_hora.getSelectedItem().toString() +" a "+this.cmb_hora_dos.getSelectedItem()+"";
-        hora_devolucion = this.cmb_hora_devolucion.getSelectedItem()+" a "+this.cmb_hora_devolucion_dos.getSelectedItem()+"";
+        hora_entrega = txtInitDeliveryHour.getText() +" a "+this.txtEndDeliveryHour.getText();
+        hora_devolucion = this.txtInitReturnHour.getText()+" a "+txtEndReturnHour.getText();
         
-//        hora_entrega = cmb_hora.getSelectedItem().toString() + ":" + cmb_minutos.getSelectedItem().toString() + " " + cmb_meridiano.getSelectedItem().toString();
         fecha_entrega = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
         fecha_devolucion = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
         fecha_evento = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_evento.getDate());
-
-        // funcion.conectate();
 
         String id_estado = funcion.GetData("id_estado", "Select id_estado from estado where descripcion='" + cmb_estado.getSelectedItem().toString() + "'");
         String id_chofer = funcion.GetData("id_usuarios", "Select id_usuarios from usuarios where CONCAT(nombre,\" \",apellidos)='" + cmb_chofer.getSelectedItem().toString() + "'");
@@ -1075,11 +1072,13 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     }
 
     public void nuevo_evento() {
-        cmb_chofer.setSelectedItem("-sel-");
+        cmb_chofer.setSelectedItem(ApplicationConstants.CMB_SELECCIONE);
         cmb_estado.setSelectedItem("Apartado");
         cmb_tipo.setSelectedItem("Pedido");
-        cmb_hora.setSelectedItem("-sel-");
-        cmb_hora_devolucion.setSelectedItem("-sel-");
+        txtInitDeliveryHour.setText("");
+        txtEndDeliveryHour.setText("");
+        txtInitReturnHour.setText("");
+        txtEndReturnHour.setText("");
         cmb_fecha_entrega.setDate(null);
         cmb_fecha_devolucion.setDate(null);
         txt_descripcion.setText("");
@@ -1566,11 +1565,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         cmb_tipo = new javax.swing.JComboBox();
         jLabel27 = new javax.swing.JLabel();
         jLabel28 = new javax.swing.JLabel();
-        cmb_hora_devolucion = new javax.swing.JComboBox();
-        cmb_hora_dos = new javax.swing.JComboBox();
-        cmb_hora = new javax.swing.JComboBox();
         jLabel29 = new javax.swing.JLabel();
-        cmb_hora_devolucion_dos = new javax.swing.JComboBox();
         jLabel30 = new javax.swing.JLabel();
         jLabel31 = new javax.swing.JLabel();
         cmb_fecha_evento = new com.toedter.calendar.JDateChooser();
@@ -1587,6 +1582,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         check_enviar_email = new javax.swing.JCheckBox();
         check_mostrar_precios = new javax.swing.JCheckBox();
         txtEmailToSend = new javax.swing.JTextField();
+        txtInitReturnHour = new javax.swing.JFormattedTextField();
+        txtInitDeliveryHour = new javax.swing.JFormattedTextField();
+        txtEndDeliveryHour = new javax.swing.JFormattedTextField();
+        txtEndReturnHour = new javax.swing.JFormattedTextField();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel6 = new javax.swing.JPanel();
         jToolBar3 = new javax.swing.JToolBar();
@@ -2016,29 +2015,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jLabel28.setText("Hora devolución:");
         panel_datos_generales.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 100, 20));
 
-        cmb_hora_devolucion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_hora_devolucion.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_devolucion.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_hora_devolucion, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 60, -1));
-
-        cmb_hora_dos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_hora_dos.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_hora_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 140, -1, -1));
-
-        cmb_hora.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_hora.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_hora, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 140, 60, -1));
-
         jLabel29.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel29.setText("a");
         panel_datos_generales.add(jLabel29, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 170, 20, 30));
-
-        cmb_hora_devolucion_dos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_hora_devolucion_dos.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-sel-", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00" }));
-        cmb_hora_devolucion_dos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_hora_devolucion_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 170, -1, -1));
 
         jLabel30.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel30.setText("a");
@@ -2159,6 +2138,34 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             }
         });
         panel_datos_generales.add(txtEmailToSend, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 170, 220, -1));
+
+        try {
+            txtInitReturnHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+        panel_datos_generales.add(txtInitReturnHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 60, -1));
+
+        try {
+            txtInitDeliveryHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+        panel_datos_generales.add(txtInitDeliveryHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 140, 60, -1));
+
+        try {
+            txtEndDeliveryHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+        panel_datos_generales.add(txtEndDeliveryHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 140, 60, -1));
+
+        try {
+            txtEndReturnHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+        panel_datos_generales.add(txtEndReturnHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 170, 60, -1));
 
         jTabbedPane2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jTabbedPane2.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
@@ -3346,10 +3353,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private com.toedter.calendar.JDateChooser cmb_fecha_entrega;
     private com.toedter.calendar.JDateChooser cmb_fecha_evento;
     private com.toedter.calendar.JDateChooser cmb_fecha_pago;
-    private javax.swing.JComboBox cmb_hora;
-    private javax.swing.JComboBox cmb_hora_devolucion;
-    private javax.swing.JComboBox cmb_hora_devolucion_dos;
-    private javax.swing.JComboBox cmb_hora_dos;
     private javax.swing.JComboBox cmb_tipo;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -3439,6 +3442,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtAmountEdit;
     private javax.swing.JTextField txtDiscountRateEdit;
     private javax.swing.JTextField txtEmailToSend;
+    private javax.swing.JFormattedTextField txtEndDeliveryHour;
+    private javax.swing.JFormattedTextField txtEndReturnHour;
+    private javax.swing.JFormattedTextField txtInitDeliveryHour;
+    private javax.swing.JFormattedTextField txtInitReturnHour;
     private javax.swing.JFormattedTextField txtPorcentajeDescuento;
     private javax.swing.JTextField txtUnitPriceEdit;
     private javax.swing.JTextField txt_abono;
