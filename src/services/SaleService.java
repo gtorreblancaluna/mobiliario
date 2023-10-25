@@ -23,14 +23,12 @@ import common.model.TipoAbono;
 import common.model.Usuario;
 import common.services.UserService;
 import common.utilities.UtilityCommon;
-import model.querys.rentas.ItemByFolioResultQuery;
-import model.querys.rentas.SearchItemByFolioParams;
-
 
 public class SaleService {
     private static final Logger log = Logger.getLogger(SaleService.class.getName());
     private final SalesDAO salesDao;
     private final UserService userService = UserService.getInstance();
+    
     
     
     private SaleService () {
@@ -44,27 +42,6 @@ public class SaleService {
             return new SaleService();
         }
         return SINGLE_INSTANCE;
-    }
-    public List<ItemByFolioResultQuery> getItemsByFolio(SearchItemByFolioParams searchItemByFolioParams) throws DataOriginException{
-        
-        List<ItemByFolioResultQuery> itemByFolioResultQuerys
-                = salesDao.getItemsByFolio(searchItemByFolioParams);
-        
-        itemByFolioResultQuerys
-                .stream()
-                .forEach(item -> {
-                    float unitPrice = item.getItemUnitPrice() != null ? item.getItemUnitPrice() : 0;
-                    float itemAmount = item.getItemAmount() != null ? item.getItemAmount() : 0;
-                    float total = itemAmount * unitPrice;
-                    if (item.getItemDiscountRate() != null && item.getItemDiscountRate() > 0) {
-                        float percentaje = item.getItemDiscountRate() / 100;
-                        float discount = total * percentaje;
-                        total = total - discount;
-                    }
-                    item.setItemSubTotal(total);
-                });
-        
-        return itemByFolioResultQuerys;
     }
     
     // inserta un detalle de renta y devuelve el ultimo id insertado

@@ -3,21 +3,7 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
-<mapper namespace="MapperPedidos">
-    
-    <resultMap id="resultMapItemByFolioResultQuery" type="model.querys.rentas.ItemByFolioResultQuery">
-        <result property="eventId" column="event_id"/>
-        <result property="eventFolio" column="event_folio"/>
-        <result property="itemId" column="item_id"/>
-        <result property="itemAmount" column="item_amount"/>
-        <result property="itemDescription" column="item_description"/>
-        <result property="itemUnitPrice" column="item_unit_price"/>
-        <result property="itemDiscountRate" column="item_discount_rate"/>
-        <result property="eventDeliveryDate" column="event_delivery_date"/>
-        <result property="eventCreatedAtDate" column="event_created_at_date"/>
-        <result property="eventType" column="event_type"/>
-        <result property="eventStatus" column="event_status"/>
-    </resultMap>
+<mapper namespace="MapperPedidos">    
     
     <resultMap id="resultMapRenta" type="common.model.Renta">
         <result property="rentaId" column="id_renta"/>
@@ -96,48 +82,7 @@
         <result property="articulo.totalCompras" column="total_compras" />
         <result property="articulo.totalShopProvider" column="total_shop_provider" />
       
-    </resultMap> 
-    
-    <select id="getItemsByFolio" resultMap="resultMapItemByFolioResultQuery" parameterType="model.querys.rentas.SearchItemByFolioParams">
-        SELECT
-            renta.id_renta AS event_id,
-            renta.folio AS event_folio,
-            d.cantidad AS item_amount,
-            articulo.id_articulo AS item_id,
-            CONCAT(articulo.descripcion," ",c.color) AS item_description,
-            d.p_unitario AS item_unit_price,
-            d.porcentaje_descuento AS item_discount_rate,
-            renta.fecha_pedido AS event_created_at_date,
-            renta.fecha_evento AS event_delivery_date,
-            tipo.tipo AS event_type,
-            estado.descripcion AS event_status
-        FROM detalle_renta d
-        INNER JOIN articulo articulo ON (articulo.id_articulo = d.id_articulo)
-        INNER JOIN renta renta ON (renta.id_renta = d.id_renta)
-        INNER JOIN color c ON (c.id_color = articulo.id_color)
-        INNER JOIN estado estado ON (estado.id_estado = renta.id_estado)
-        INNER JOIN tipo tipo ON (tipo.id_tipo = renta.id_tipo)
-        <if test="likeItemDescription != null and likeItemDescription != '' ">
-            AND CONCAT(articulo.descripcion," ",c.color) LIKE CONCAT('%',#{likeItemDescription},'%')
-        </if>
-        <if test="folio != null and folio != '' ">
-            AND renta.folio = #{folio}
-        </if>   
-        <if test="eventTypeId != null and eventTypeId != '' and eventTypeId != 0 ">
-            AND tipo.id_tipo = #{eventTypeId}
-        </if>
-        <if test="initialEventDate != null and endEventDate != null ">
-            AND STR_TO_DATE(renta.fecha_evento,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initialEventDate},'%d/%m/%Y') AND STR_TO_DATE(#{endEventDate},'%d/%m/%Y')
-        </if>
-        <if test="initCreatedAtEvent != null and endCreatedAtEvent != null ">
-            AND STR_TO_DATE(renta.fecha_pedido,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initCreatedAtEvent},'%d/%m/%Y') AND STR_TO_DATE(#{endCreatedAtEvent},'%d/%m/%Y')
-        </if>
-        <if test="eventStatusId != null and eventStatusId != '' and eventStatusId != 0 ">
-            AND renta.id_estado = #{eventStatusId}
-        </if>
-        ORDER BY d.id_detalle_renta DESC
-        LIMIT #{limit}
-    </select>
+    </resultMap>
     
     <select id="getDetailByRentId" resultMap="resultMapDetalleRenta" parameterType="java.lang.String">
         SELECT d.*,

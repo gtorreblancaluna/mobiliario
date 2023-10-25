@@ -47,16 +47,15 @@ import services.CategoryService;
 import common.services.ItemService;
 import common.services.TipoEventoService;
 import common.tables.TableDisponibilidadArticulosShow;
-import forms.inventario.tables.TableItemsByFolio;
+import common.tables.TableItemsByFolio;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import static mobiliario.IndexForm.jDesktopPane1;
-import model.querys.rentas.ItemByFolioResultQuery;
-import model.querys.rentas.SearchItemByFolioParams;
-import services.SaleService;
+import common.model.ItemByFolioResultQuery;
+import common.model.SearchItemByFolioParams;
 import utilities.Utility;
 
 public class InventarioForm extends javax.swing.JInternalFrame {
@@ -76,13 +75,16 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     // variable para mandar a la ventana de agregar articulo
     private List<Articulo> articulos = new ArrayList<>();
     private final UtilityService utilityService = UtilityService.getInstance();
-    private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0" );
+    private static final DecimalFormat decimalFormat = 
+            new DecimalFormat( ApplicationConstants.DECIMAL_FORMAT_SHORT );
+    private static final DecimalFormat integerFormat = 
+            new DecimalFormat( ApplicationConstants.INTEGER_FORMAT );
     private List<Tipo> eventTypes = new ArrayList<>();
     private List<EstadoEvento> eventStatus = new ArrayList<>();
     private final EstadoEventoService estadoEventoService = EstadoEventoService.getInstance();
     private final TipoEventoService tipoEventoService = TipoEventoService.getInstance();
     private final TableItemsByFolio tableItemsByFolio;
-    private final SaleService saleService = SaleService.getInstance();
+    //private final SaleService saleService = SaleService.getInstance();
     private static TableDisponibilidadArticulosShow tablaDisponibilidadArticulos;
     
 
@@ -106,7 +108,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         }
 
         this.setTitle(TITLE);
-        lblInfoConsultarDisponibilidad.setText("");
+        lblInfoConsultarDisponibilidad.setText(ApplicationConstants.EMPTY_STRING);
         
         txtDisponibilidadFechaInicial.getDateEditor().addPropertyChangeListener((PropertyChangeEvent e) -> {
             if ("date".equals(e.getPropertyName())) {
@@ -144,7 +146,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                         });
                     } catch (DataOriginException e) {
                         log.error(e.getMessage(),e);
-                        JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);  
+                        JOptionPane.showMessageDialog(this, e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);  
                     }
                 }).start();
             }
@@ -162,12 +164,10 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                         });
                     } catch (DataOriginException e) {
                         log.error(e.getMessage(),e);
-                        JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);  
+                        JOptionPane.showMessageDialog(this, e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);  
                     }
                 }).start();
-            }
-        
-        
+            }        
         
     }
     
@@ -197,7 +197,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         
         SearchItemByFolioParams searchItemByFolioParams = new SearchItemByFolioParams();
          
-        final String FORMAT_DATE = "dd/MM/yyyy"; 
+        final String FORMAT_DATE = ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT; 
          
          searchItemByFolioParams.setInitCreatedAtEvent(
                  txtSearchInitialDate.getDate() != null ? new SimpleDateFormat(FORMAT_DATE).format(txtSearchInitialDate.getDate()) : null
@@ -217,7 +217,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
          
          searchItemByFolioParams.setEventStatusId(estadoEvento.getEstadoId());
          searchItemByFolioParams.setEventTypeId(eventType.getTipoId());
-         searchItemByFolioParams.setLikeItemDescription(txtSearchLikeItemDescription.getText());
+         searchItemByFolioParams.setLikeItemDescription(
+                 UtilityCommon.removeAccents(txtSearchLikeItemDescription.getText().toLowerCase().trim()));
          
          searchItemByFolioParams.setLimit(Integer.parseInt(cmbLimit.getSelectedItem().toString()));
          try {
@@ -239,7 +240,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         String initDate = txtDisponibilidadFechaInicial.getDate() != null ? new SimpleDateFormat(FORMAT_DATE).format(txtDisponibilidadFechaInicial.getDate()) : null;
         String endDate = txtDisponibilidadFechaFinal.getDate() != null ? new SimpleDateFormat(FORMAT_DATE).format(txtDisponibilidadFechaFinal.getDate()) : null;
         
-        String message = "";
+        String message = ApplicationConstants.EMPTY_STRING;
         
         if (initDate != null && endDate != null) {
             if (rowCount > 0) {
@@ -267,7 +268,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             dato = tablaDisponibilidadArticulos.getValueAt(i, TableDisponibilidadArticulosShow.Column.ID.getNumber()).toString();
             System.out.println("dato seleccionado" + " " + " - " + dato + " - ");
             if (dato.equals(String.valueOf(articulo.getArticuloId()))) {
-                 JOptionPane.showMessageDialog(null, "Ya se encuentra el elemento en la lista  ", "Error", JOptionPane.INFORMATION_MESSAGE);
+                 JOptionPane.showMessageDialog(null, "Ya se encuentra el elemento en la lista  ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
                  return false;
             }
         }
@@ -352,7 +353,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             articulos = itemService.obtenerArticulosBusquedaInventario(map);
         } catch (Exception e) {
             Logger.getLogger(InventarioForm.class.getName()).log(Level.SEVERE, null, e);
-            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
         } finally {
             Toolkit.getDefaultToolkit().beep();
             dialog.dispose();
@@ -368,25 +369,24 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             
             DefaultTableModel temp = (DefaultTableModel) tabla_articulos.getModel();
             Object fila[] = {
-                  articulo.getArticuloId()+"",
+                  articulo.getArticuloId()+ApplicationConstants.EMPTY_STRING,
                   articulo.getCodigo(),
-                  articulo.getCantidad() != 0 ? decimalFormat.format(articulo.getCantidad()) : "",
-                  articulo.getRentados() != 0 ? decimalFormat.format(articulo.getRentados()) : "",
+                  articulo.getCantidad() != 0 ? integerFormat.format(articulo.getCantidad()) : ApplicationConstants.EMPTY_STRING,
+                  articulo.getRentados() != 0 ? integerFormat.format(articulo.getRentados()) : ApplicationConstants.EMPTY_STRING,
                   
-                  articulo.getFaltantes() != 0 ? decimalFormat.format(articulo.getFaltantes()) : "",
-                  articulo.getReparacion() != 0 ? decimalFormat.format(articulo.getReparacion()) : "",
-                  articulo.getAccidenteTrabajo() != 0 ? decimalFormat.format(articulo.getAccidenteTrabajo()) : "",
-                  articulo.getDevolucion() != 0 ? decimalFormat.format(articulo.getDevolucion()) : "",
-                  articulo.getTotalCompras() != 0 ? decimalFormat.format(articulo.getTotalCompras()) : "",
-                  articulo.getUtiles() != 0 ? decimalFormat.format(articulo.getUtiles()) : "",
+                  articulo.getFaltantes() != 0 ? integerFormat.format(articulo.getFaltantes()) : ApplicationConstants.EMPTY_STRING,
+                  articulo.getReparacion() != 0 ? integerFormat.format(articulo.getReparacion()) : ApplicationConstants.EMPTY_STRING,
+                  articulo.getAccidenteTrabajo() != 0 ? integerFormat.format(articulo.getAccidenteTrabajo()) : ApplicationConstants.EMPTY_STRING,
+                  articulo.getDevolucion() != 0 ? integerFormat.format(articulo.getDevolucion()) : ApplicationConstants.EMPTY_STRING,
+                  articulo.getTotalCompras() != 0 ? integerFormat.format(articulo.getTotalCompras()) : ApplicationConstants.EMPTY_STRING,
+                  articulo.getUtiles() != 0 ? integerFormat.format(articulo.getUtiles()) : ApplicationConstants.EMPTY_STRING,
                   
-                 
                   articulo.getCategoria().getDescripcion(),
                   articulo.getDescripcion(),
                   articulo.getColor().getColor(),
                   articulo.getFechaIngreso(),
-                  articulo.getPrecioCompra()+"",
-                  articulo.getPrecioRenta()+"",
+                  decimalFormat.format(articulo.getPrecioCompra()),
+                  decimalFormat.format(articulo.getPrecioRenta()),
                   articulo.getFechaUltimaModificacion()
                };
                temp.addRow(fila);
@@ -436,7 +436,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         ventana.setLocation(x, y);
         
         ventana.setVisible(true);
-//        ventana.setLocationRelativeTo(null);
     }
     
     public void mostrar_agregar_articulo() {
@@ -450,8 +449,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     
      public void mostrar_ver_disponibilidad_articulos() {
          // mostrara la ventana de disponibilidad de articulos
-        String initDate = new SimpleDateFormat("dd/MM/yyyy").format(txtDisponibilidadFechaInicial.getDate());
-        String endDate = new SimpleDateFormat("dd/MM/yyyy").format(txtDisponibilidadFechaFinal.getDate());
+        String initDate = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(txtDisponibilidadFechaInicial.getDate());
+        String endDate = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(txtDisponibilidadFechaFinal.getDate());
         List<Long> itemsId = new ArrayList<>();
         for (int i = 0; i < InventarioForm.tablaDisponibilidadArticulos.getRowCount(); i++) {
             itemsId.add(Long.parseLong(tablaDisponibilidadArticulos.getValueAt(i, TableDisponibilidadArticulosShow.Column.ID.getNumber()).toString()));
@@ -486,11 +485,11 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     }
 
     public void limpiar() {
-        txt_cantidad.setText("");
-        txt_descripcion.setText("");
-        txt_precio_compra.setText("");
-        txt_precio_renta.setText("");
-        this.txtCodigo.setText("");
+        txt_cantidad.setText(ApplicationConstants.EMPTY_STRING);
+        txt_descripcion.setText(ApplicationConstants.EMPTY_STRING);
+        txt_precio_compra.setText(ApplicationConstants.EMPTY_STRING);
+        txt_precio_renta.setText(ApplicationConstants.EMPTY_STRING);
+        this.txtCodigo.setText(ApplicationConstants.EMPTY_STRING);
         txt_cantidad.requestFocus();
         cmb_categoria.setSelectedIndex(0);
         cmb_color.setSelectedIndex(0);
@@ -501,14 +500,14 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         int cont = 0;
         StringBuilder message = new StringBuilder();       
         
-        if (txt_cantidad.getText().equals("") 
-                || txt_descripcion.getText().equals("") 
-                || txt_precio_renta.getText().equals("") 
-                || txtCodigo.getText().equals("")
+        if (txt_cantidad.getText().equals(ApplicationConstants.EMPTY_STRING) 
+                || txt_descripcion.getText().equals(ApplicationConstants.EMPTY_STRING) 
+                || txt_precio_renta.getText().equals(ApplicationConstants.EMPTY_STRING) 
+                || txtCodigo.getText().equals(ApplicationConstants.EMPTY_STRING)
                 || cmb_categoria.getSelectedIndex() == 0 
                 || cmb_color.getSelectedIndex() == 0) {
             
-            JOptionPane.showMessageDialog(null, "Faltan parametros", "Error", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Faltan parametros", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
         } else {            
             
             float cant = 0f;
@@ -524,11 +523,11 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 message.append(++cont + "Cantidad no puede ser menor a cero\n");
             if(precioRenta < 0)
                 message.append(++cont + "Precio de renta no puede ser menor a cero\n");
-            if(!txt_descripcion.getText().equals("") && txt_descripcion.getText().length()>250)
+            if(!txt_descripcion.getText().equals(ApplicationConstants.EMPTY_STRING) && txt_descripcion.getText().length()>250)
                  message.append(++cont + "La descripcion sobrepasa la longitud permitida, 250 caracteres\n");
             
-            if(!message.toString().equals("")){
-                JOptionPane.showMessageDialog(null, message.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+            if(!message.toString().equals(ApplicationConstants.EMPTY_STRING)){
+                JOptionPane.showMessageDialog(null, message.toString(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
                 return;
             }
             log.debug("validaci\u00F3n exitosa para agregar articulo ");
@@ -549,7 +548,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             articulo.setActivo("1");
             itemService.insertarArticulo(articulo);
             log.debug("se a insertado con \u00E9xito el articulo: "+articulo.getDescripcion());
-            JOptionPane.showMessageDialog(null, "se a insertado con \u00E9xito el articulo: "+articulo.getDescripcion(), "Error", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "se a insertado con \u00E9xito el articulo: "+articulo.getDescripcion(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
 
             this.formato_tabla_articulos();
             limpiar();
@@ -558,8 +557,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     }
 
     public void guardar() {
-        if (txt_cantidad.getText().equals("") || txt_descripcion.getText().equals("") || txt_precio_compra.getText().equals("") || txt_precio_renta.getText().equals("") || cmb_categoria.getSelectedIndex() == 0 || cmb_color.getSelectedIndex() == 0 ) {
-            JOptionPane.showMessageDialog(null, "Faltan parametros", "Error", JOptionPane.INFORMATION_MESSAGE);
+        if (txt_cantidad.getText().equals(ApplicationConstants.EMPTY_STRING) || txt_descripcion.getText().equals(ApplicationConstants.EMPTY_STRING) || txt_precio_compra.getText().equals(ApplicationConstants.EMPTY_STRING) || txt_precio_renta.getText().equals(ApplicationConstants.EMPTY_STRING) || cmb_categoria.getSelectedIndex() == 0 || cmb_color.getSelectedIndex() == 0 ) {
+            JOptionPane.showMessageDialog(null, "Faltan parametros", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
         } else {
             Articulo articuloAnterior = itemService.obtenerArticuloPorId(Integer.parseInt(id_articulo));
             log.debug("articulo antes de editar es: "+articuloAnterior.toString());
@@ -578,7 +577,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             articulo.setFechaUltimaModificacion(new Timestamp(System.currentTimeMillis()));
             itemService.actualizarArticulo(articulo);
             log.debug("articulo despues de actualizar: "+articulo.toString());
-            JOptionPane.showMessageDialog(null, "se a actualizado con \u00E9xito el articulo: "+articulo.getDescripcion(), "Error", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "se a actualizado con \u00E9xito el articulo: "+articulo.getDescripcion(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
             log.debug("el usuario: "+iniciar_sesion.usuarioGlobal.getNombre()+" "+iniciar_sesion.usuarioGlobal.getApellidos()+" a modificado el articulo: "+articulo.getDescripcion()+" con id: "+articulo.getArticuloId());
 
             this.formato_tabla_articulos();
@@ -608,7 +607,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     }
 
     public String EliminaCaracteres(String s_cadena, String s_caracteres) {
-        String nueva_cadena = "";
+        String nueva_cadena = ApplicationConstants.EMPTY_STRING;
         Character caracter = null;
         boolean valido = true;
 
@@ -633,7 +632,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     }
 
     private void formato_tabla_articulos(){
-        Object[][] data = {{"","","","", "","","", "", "", "", "", "","","",""}};
+        Object[][] data = {{ApplicationConstants.EMPTY_STRING,ApplicationConstants.EMPTY_STRING,ApplicationConstants.EMPTY_STRING,ApplicationConstants.EMPTY_STRING, ApplicationConstants.EMPTY_STRING,ApplicationConstants.EMPTY_STRING,ApplicationConstants.EMPTY_STRING, ApplicationConstants.EMPTY_STRING, ApplicationConstants.EMPTY_STRING, ApplicationConstants.EMPTY_STRING, ApplicationConstants.EMPTY_STRING, ApplicationConstants.EMPTY_STRING,ApplicationConstants.EMPTY_STRING,ApplicationConstants.EMPTY_STRING,ApplicationConstants.EMPTY_STRING}};
         String[] columNames = {"Id","Codigo", "Stock","En renta","faltantes","reparacion","accidente trabajo","devolucion","compras","utiles", "Categoria", "Descripcion", "Color", "Fecha", "P Compra", "P Renta","ult. modifiacion"};
         DefaultTableModel tableModel = new DefaultTableModel(data, columNames);
         tabla_articulos.setModel(tableModel);
@@ -672,7 +671,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         tabla_articulos.getColumnModel().getColumn(0).setPreferredWidth(0);
     }
     public void formato_tabla_disponibilidad() {
-        Object[][] data = {{"", "", "", "", "", "", ""}};
+        Object[][] data = {{ApplicationConstants.EMPTY_STRING, ApplicationConstants.EMPTY_STRING, ApplicationConstants.EMPTY_STRING, ApplicationConstants.EMPTY_STRING, ApplicationConstants.EMPTY_STRING, ApplicationConstants.EMPTY_STRING, ApplicationConstants.EMPTY_STRING}};
         String[] columnNames = {"id_articulo", "cantidad_pedido", "cantidad_inventario", "articulo", "fecha_entrega", "fecha_devolucion", "cliente"};
         DefaultTableModel TableModel = new DefaultTableModel(data, columnNames);
         tablaDisponibilidadArticulos.setModel(TableModel);
@@ -1614,7 +1613,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        tabGeneral.addTab("Articulos por folio", panelItemsByFolio);
+        tabGeneral.addTab("Artículos por folio", panelItemsByFolio);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -1681,7 +1680,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         if (tabla_articulos.getSelectedRow() != - 1) {
              if(iniciar_sesion.usuarioGlobal.getAdministrador().equals("0")){
-                JOptionPane.showMessageDialog(null, "Solo el administrador puede editar articulos :( ", "Error", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Solo el administrador puede editar articulos :( ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
                 return;
              }
              
@@ -1691,26 +1690,26 @@ public class InventarioForm extends javax.swing.JInternalFrame {
              
             if (articulo == null)
             {
-             JOptionPane.showMessageDialog(null, "Ocurrio un error al obtener datos del articulo, intenta de nuevo o reinicia la aplicaci\u00F3n", "Error", JOptionPane.INFORMATION_MESSAGE);
+             JOptionPane.showMessageDialog(null, "Ocurrio un error al obtener datos del articulo, intenta de nuevo o reinicia la aplicaci\u00F3n", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
              return;
             }
-            id_articulo = articulo.getArticuloId()+"";
+            id_articulo = articulo.getArticuloId()+ApplicationConstants.EMPTY_STRING;
             jbtn_guardar.setEnabled(true);
             jbtn_agregar.setEnabled(false);
             
-            this.txt_cantidad.setText(articulo.getCantidad()+"");
+            this.txt_cantidad.setText(articulo.getCantidad()+ApplicationConstants.EMPTY_STRING);
             
             
             this.txtCodigo.setText(articulo.getCodigo());
             this.txt_descripcion.setText(articulo.getDescripcion());
-            txt_precio_compra.setText(articulo.getPrecioCompra()+"");
-            this.txt_precio_renta.setText(articulo.getPrecioRenta()+"");
+            txt_precio_compra.setText(articulo.getPrecioCompra()+ApplicationConstants.EMPTY_STRING);
+            this.txt_precio_renta.setText(articulo.getPrecioRenta()+ApplicationConstants.EMPTY_STRING);
             
             cmb_categoria.getModel().setSelectedItem(articulo.getCategoria());
             cmb_color.getModel().setSelectedItem(articulo.getColor());
 
         } else {
-            JOptionPane.showMessageDialog(null, "Selecciona una fila para editar", "Error", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Selecciona una fila para editar", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_jbtn_editarActionPerformed
 
@@ -1751,7 +1750,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
          
          if (tabla_articulos.getSelectedRow() != -1) {
             if(iniciar_sesion.usuarioGlobal.getAdministrador().equals("0")){
-                JOptionPane.showMessageDialog(null, "Solo el administrador puede eliminar articulos :( ", "Error", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Solo el administrador puede eliminar articulos :( ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
             int seleccion = JOptionPane.showOptionDialog(this, "¿Eliminar registro: " + (String.valueOf(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 9))) + "?", "Confirme eliminacion", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "No");
@@ -1762,26 +1761,11 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 articulo.setArticuloId(Integer.parseInt(artId));
                 articulo.setActivo("0");
                 itemService.actualizarArticulo(articulo);
-//                String datos[] = {"0", tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString()};
-//                try {
-//                    funcion.UpdateRegistro(datos, "UPDATE articulo SET activo=? WHERE id_articulo=?");
-//                } catch (SQLNonTransientConnectionException e) {
-//                    funcion.conectate();
-//                    JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-//                } catch (SQLException e) {
-//                    JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-//                } catch (Exception e) {
-//                    JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-//                }
-               
-               
                 limpiar();
-//                tabla_articulos();
-//                    buscar();
                 this.formato_tabla_articulos();
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Selecciona una fila para eliminar ", "Error", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Selecciona una fila para eliminar ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
         }        
       
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -1796,7 +1780,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         if (tabla_articulos.getSelectedRow() == - 1) {
-            JOptionPane.showMessageDialog(null, "Seleciona un articulo para continuar", "Error", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Seleciona un articulo para continuar", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         this.mostrarVentanaFoliosPorArticulos();
@@ -1814,13 +1798,13 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
         if (tabla_articulos.getSelectedRow() == - 1) {
-            JOptionPane.showMessageDialog(null, "Seleciona un articulo para continuar", "Error", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Seleciona un articulo para continuar", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         this.g_articuloId = Integer.parseInt(tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString());
         Articulo articulo = itemService.obtenerArticuloPorId(g_articuloId);
         if(articulo == null ){
-            JOptionPane.showMessageDialog(null, "Ocurrio un error al obtener el articulo, intenta de nuevo porfavor ", "Error", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Ocurrio un error al obtener el articulo, intenta de nuevo porfavor ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         this.g_articuloId = articulo.getArticuloId();
@@ -1830,7 +1814,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
 
     private void btnMostrarAgregarCompraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarAgregarCompraActionPerformed
         if (tabla_articulos.getSelectedRow() == - 1) {
-            JOptionPane.showMessageDialog(null, "Seleciona un articulo para continuar", "Error", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Seleciona un articulo para continuar", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
             return;
         }
          
@@ -1849,7 +1833,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         
         if (tabla_articulos.getSelectedRow() == - 1) {
-            JOptionPane.showMessageDialog(null, "Seleciona un articulo para continuar", "Error", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Seleciona un articulo para continuar", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
             return;
         }
          
@@ -1865,21 +1849,25 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         try {
             SearchItemByFolioParams searchItemByFolioParams
                     = getParametersToSearchItemsByFolio();
-            List<ItemByFolioResultQuery> itemByFolioResultQuerys = saleService.getItemsByFolio(searchItemByFolioParams);
+            List<ItemByFolioResultQuery> itemByFolioResultQuerys = itemService.getItemsByFolio(searchItemByFolioParams);
             tableItemsByFolio.format();
-            if (!itemByFolioResultQuerys.isEmpty()) {
-                lblInfoGeneral.setText("Total: "+itemByFolioResultQuerys.size()+", Limite de resultados: "+cmbLimit.getSelectedItem());
+            if (itemByFolioResultQuerys.isEmpty()) {
+                lblInfoGeneral.setText(ApplicationConstants.NO_DATA_FOUND_EXCEPTION);
+            } else {
+                lblInfoGeneral.setText("Total: "+itemByFolioResultQuerys.size()+", Límite de resultados: "+cmbLimit.getSelectedItem());
                 DefaultTableModel tableModel = (DefaultTableModel) tableItemsByFolio.getModel();
                 
                     for(ItemByFolioResultQuery item : itemByFolioResultQuerys){
                         Object fila[] = {
                             item.getEventId(),
                             item.getEventFolio(),
-                            item.getItemAmount(),
+                            integerFormat.format(item.getItemAmount()),
                             item.getItemDescription(),
                             decimalFormat.format(item.getItemUnitPrice()),
-                            item.getItemDiscountRate() > 0 ? decimalFormat.format(item.getItemDiscountRate()) : "",
-                            item.getItemSubTotal() > 0 ? decimalFormat.format(item.getItemSubTotal()) : "",
+                            item.getItemDiscountRate() > 0 ? 
+                                integerFormat.format(item.getItemDiscountRate()) : ApplicationConstants.EMPTY_STRING,
+                            item.getItemSubTotal() > 0 ? 
+                                decimalFormat.format(item.getItemSubTotal()) : ApplicationConstants.EMPTY_STRING,
                             item.getEventDeliveryDate(),
                             item.getEventCreatedAtDate(),
                             item.getEventType(),
@@ -1887,12 +1875,11 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                         };
                     tableModel.addRow(fila);
                 }
-            } else {
-                lblInfoGeneral.setText("No se obtuvieron resultados.");
             }
         } catch (BusinessException | DataOriginException e) {
             log.error(e.getMessage(),e);
-            JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, e.getMessage(), 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
         }finally{
            Toolkit.getDefaultToolkit().beep();
         }
@@ -1913,8 +1900,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
 
     private void btnShowAvailivityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowAvailivityActionPerformed
         StringBuilder mensaje = new StringBuilder();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT);
         int contador = 0;
         if ((txtDisponibilidadFechaInicial.getDate() == null 
                 || txtDisponibilidadFechaFinal.getDate() == null)) {
@@ -1929,7 +1916,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         }
         
         if(!mensaje.toString().isEmpty())
-              JOptionPane.showMessageDialog(null, mensaje.toString(), "Error", JOptionPane.INFORMATION_MESSAGE);
+              JOptionPane.showMessageDialog(this, mensaje.toString(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
         else
             this.mostrar_ver_disponibilidad_articulos();
     }//GEN-LAST:event_btnShowAvailivityActionPerformed

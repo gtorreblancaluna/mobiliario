@@ -9,9 +9,6 @@ import common.model.Abono;
 import common.model.DetalleRenta;
 import common.model.Renta;
 import common.model.TipoAbono;
-import common.model.AvailabilityItemResult;
-import model.querys.rentas.ItemByFolioResultQuery;
-import model.querys.rentas.SearchItemByFolioParams;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
@@ -32,21 +29,8 @@ public class SalesDAO {
             return new SalesDAO();
         }
         return SINGLE_INSTANCE;
-    }
-    
-    @SuppressWarnings("unchecked")
-    public List<ItemByFolioResultQuery> getItemsByFolio(SearchItemByFolioParams searchItemByFolioParams) throws DataOriginException{
-        SqlSession session = sqlSessionFactory.openSession();
-        try {
-           return (List<ItemByFolioResultQuery>) 
-                   session.selectList("MapperPedidos.getItemsByFolio",searchItemByFolioParams);
-        }catch(Exception ex){
-            log.error(ex);
-            throw new DataOriginException(ex.getMessage(),ex);
-        } finally {
-            session.close();
-        }
-    }
+    }    
+
     
     @SuppressWarnings("unchecked")
     public List<DetalleRenta> getDetailByRentId(String rentId) throws DataOriginException{

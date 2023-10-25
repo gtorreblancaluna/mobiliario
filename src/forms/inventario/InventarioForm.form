@@ -1035,8 +1035,8 @@
         <Container class="javax.swing.JPanel" name="panelItemsByFolio">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Articulos por folio">
-                <Property name="tabTitle" type="java.lang.String" value="Articulos por folio"/>
+              <JTabbedPaneConstraints tabName="Art&#xed;culos por folio">
+                <Property name="tabTitle" type="java.lang.String" value="Art&#xed;culos por folio"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
