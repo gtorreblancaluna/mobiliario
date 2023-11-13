@@ -46,6 +46,8 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         <mapper resource="common/mappers/MapperTaskAlmacenUpdate.xml"/>
         <mapper resource="common/mappers/MapperTaskDeliveryChoferUpdate.xml"/>
         
+        <mapper resource="common/mappers/MapperCatalogSocialMediaContact.xml"/>
+        
     </mappers>
     
     

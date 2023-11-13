@@ -6,14 +6,10 @@ import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
 import common.exceptions.DataOriginException;
 import common.services.UtilityService;
-import java.awt.Desktop;
 import java.awt.Toolkit;
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -32,11 +28,6 @@ import common.model.providers.OrdenProveedor;
 import common.model.providers.PagosProveedor;
 import common.model.providers.Proveedor;
 import common.model.providers.DetailOrderProviderType;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.util.JRLoader;
 import services.SaleService;
 import services.SystemService;
 import common.services.providers.OrderProviderService;
@@ -118,33 +109,18 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(this, "No se obtuvo la orden del proveedor");
             return;
         }
-        JasperPrint jasperPrint;
        
-           
-        String pathLocation = Utility.getPathLocation();
-        String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_ORDEN_PROVEEDOR;
-        System.out.println("Cargando desde: " + archivo);
-        if (archivo == null) {
-            JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
-            return;
-        }
-        JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(archivo);  
-
-        DatosGenerales datosGenerales = systemService.getGeneralData();
-
-        Map parametros = new HashMap<>();
-        parametros.put("ID_ORDEN",orderProviderId);
-        parametros.put("NOMBRE_EMPRESA",datosGenerales.getCompanyName());
-        parametros.put("DIRECCION_EMPRESA",datosGenerales.getAddress1());
-        parametros.put("TELEFONOS_EMPRESA",datosGenerales.getAddress2());
-        parametros.put("EMAIL_EMPRESA",datosGenerales.getAddress3() != null ? datosGenerales.getAddress3() : "");
-        //guardamos el parámetro
-        parametros.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
-
-        jasperPrint = JasperFillManager.fillReport(masterReport, parametros, funcion.getConnection());
-        JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
-        File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
-        Desktop.getDesktop().open(file2);
+        try {
+            
+            String pathLocation = Utility.getPathLocation();
+            DatosGenerales datosGenerales = systemService.getGeneralData();
+            UtilityCommon.generatePDFOrderProvider(
+               orderId,funcion.getConnection(),datosGenerales, pathLocation);
+            
+       } catch (Exception e) {
+           LOGGER.error(e);
+           JOptionPane.showMessageDialog(this, e.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+       }
      
      }
     
@@ -231,7 +207,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
             orden.setStatus(orden.getStatusFromDescription(cmbStatusOrder.getSelectedItem().toString()));
             orderProviderService.updateOrder(orden);
           }catch(BusinessException e){
-                JOptionPane.showMessageDialog(this, e.getMessage()+"\n"+e.getCause(), "ERROR", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, e.getMessage()+"\n"+e.getCause(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
                 return;
           }
           confirmationMessage = ApplicationConstants.MESSAGE_UPDATE_SUCCESSFUL;
@@ -240,7 +216,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
         try{
           orderProviderService.saveOrder(orden);
         }catch(BusinessException e){
-            JOptionPane.showMessageDialog(this, e.getMessage()+"\n"+e.getCause(), "ERROR", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, e.getMessage()+"\n"+e.getCause(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
             return;
         }
         confirmationMessage = ApplicationConstants.MESSAGE_SAVE_SUCCESSFUL;
@@ -306,7 +282,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
                 comboOrderType.addItem(t);
               });
             } catch(DataOriginException e){
-              JOptionPane.showMessageDialog(this, e.getMessage()+"\n"+e, "ERROR", JOptionPane.ERROR_MESSAGE);
+              JOptionPane.showMessageDialog(this, e.getMessage()+"\n"+e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
             }
         }).start();
     }
@@ -318,7 +294,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
           try{
             ordenProveedor = orderProviderService.getOrderById(Long.parseLong(orderId));
           } catch(BusinessException e){
-            JOptionPane.showMessageDialog(this, e.getMessage()+"\n"+e.getCause(), "ERROR", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, e.getMessage()+"\n"+e.getCause(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
             return;
           }
           

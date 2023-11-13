@@ -301,3 +301,17 @@ ADD FOREIGN KEY fk_tasks_almacen_user2_id(user_id) REFERENCES usuarios(id_usuari
 -- agregar columna 
 ALTER TABLE tasks_chofer_delivery ADD COLUMN user_id INT(11) NOT NULL DEFAULT 12 AFTER fg_active,
 ADD FOREIGN KEY fk_tasks_chofer_delivery_user_id(user_id) REFERENCES usuarios(id_usuarios) ON DELETE CASCADE;
+
+-- agregar columna 
+ALTER TABLE clientes ADD COLUMN birthday TIMESTAMP NULL DEFAULT NULL AFTER activo;
+
+-- agregar columna 
+ALTER TABLE catalog_social_media_contact ADD COLUMN updated_at TIMESTAMP NULL DEFAULT NULL AFTER fg_active;
+
+ALTER TABLE clientes ADD COLUMN catalog_social_media_contact_id INT(11) NOT NULL DEFAULT 1 AFTER activo,
+ADD FOREIGN KEY fk_catalog_social_media_contact(catalog_social_media_contact_id) 
+REFERENCES catalog_social_media_contact(id) ON DELETE CASCADE;
+
+-- agregar columna 
+ALTER TABLE clientes ADD COLUMN created_at TIMESTAMP NULL DEFAULT NULL AFTER activo;
+ALTER TABLE clientes ADD COLUMN updated_at TIMESTAMP NULL DEFAULT NULL AFTER activo;

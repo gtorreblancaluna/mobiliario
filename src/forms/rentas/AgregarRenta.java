@@ -1,5 +1,6 @@
 package forms.rentas;
 
+import forms.socialMediaContact.AddCatalogSocialMediaFormDialog;
 import forms.tipo.abonos.cuentas.TiposAbonosForm;
 import common.services.UserService;
 import clases.Mail;
@@ -33,8 +34,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import mobiliario.iniciar_sesion;
 import common.model.Articulo;
 import common.model.Cliente;
@@ -47,6 +46,8 @@ import common.model.Color;
 import common.model.EstadoEvento;
 import common.model.Tipo;
 import common.model.AvailabilityItemResult;
+import common.model.CatalogSocialMediaContactModel;
+import common.services.CatalogSocialMediaContactService;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -58,7 +59,16 @@ import services.SaleService;
 import services.SystemService;
 import common.services.TaskAlmacenUpdateService;
 import common.services.TaskDeliveryChoferUpdateService;
+import common.tables.TableCustomer;
+import java.awt.Point;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.sql.Timestamp;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import utilities.OptionPaneService;
 import utilities.PropertySystemUtil;
 import utilities.Utility;
@@ -84,6 +94,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     public static boolean utiliza_conexion_TLS = false, utiliza_autenticacion = false, status,validad_tipo_abonos;
     private final UserService userService = UserService.getInstance();
     private final SaleService saleService;
+    private final CatalogSocialMediaContactService catalogSocialMediaContactService 
+            = CatalogSocialMediaContactService.getInstance();
     private final SystemService systemService = SystemService.getInstance();
     // listado de articulos que se llenaran de manera asincrona, y se utilizara para realizar busquedas por descripcion
     private List<Articulo> articulos = new ArrayList<>();
@@ -95,11 +107,14 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private Integer rowSelectedToEdit = null;
     private TaskAlmacenUpdateService taskAlmacenUpdateService;
     private TaskDeliveryChoferUpdateService taskDeliveryChoferUpdateService;
+    private final TableCustomer tableCustomer;
 
     public AgregarRenta() {
         
         funcion.conectate();
         initComponents();
+        tableCustomer = new TableCustomer();
+        Utility.addJtableToPane(937, 305, panelCustomer, tableCustomer);
         saleService = SaleService.getInstance();
         customerService = CustomerService.getInstance();
         
@@ -119,15 +134,78 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         panel_articulos.setVisible(true);
         panel_conceptos.setVisible(false);
         jTabbedPane1.setEnabledAt(1, false);
-        lbl_atiende.setText("Atiende: " + iniciar_sesion.nombre_usuario_global.toString() + " " + iniciar_sesion.apellidos_usuario_global.toString());
+        lbl_atiende.setText("Atiende: " + iniciar_sesion.nombre_usuario_global+ " " + iniciar_sesion.apellidos_usuario_global);
         jTabbedPane1.setSelectedIndex(0);
         itemService = ItemService.getInstance();
         disableInputsEditItem();
         initData();
+        eventListenerTextHourFields();
+        addEventListenerTableCustomers();
+    }
+    
+    private void addEventListenerTableCustomers(){
+        
+        tableCustomer.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent mouseEvent) {
+                JTable table =(JTable) mouseEvent.getSource();
+                Point point = mouseEvent.getPoint();
+                int row = table.rowAtPoint(point);
+                if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                    id_cliente = tableCustomer.getValueAt(
+                    tableCustomer.getSelectedRow(), TableCustomer.Column.ID.getNumber()).toString();
+                    jTabbedPane1.setSelectedIndex(1);
+                    jTabbedPane1.setEnabledAt(1, true);
+                    
+                    String customerName = tableCustomer.getValueAt(tableCustomer.getSelectedRow(), 
+                            TableCustomer.Column.NAME.getNumber()).toString();
+                    String customerLastName = tableCustomer.getValueAt(tableCustomer.getSelectedRow(), 
+                            TableCustomer.Column.LAST_NAME.getNumber()).toString();
+                    lbl_cliente.setText("Cliente: "+customerName+" "+customerLastName);
+                }
+            }
+        });
+    
+    }
+    
+    private void eventListenerTextHourFields () {
+        
+        txtInitDeliveryHour.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                JTextField textField = (JTextField) e.getSource();                
+                if (Utility.validateHour(textField.getText()) 
+                        && !Utility.validateHour(txtEndDeliveryHour.getText())) {
+                    txtEndDeliveryHour.requestFocus();
+                }
+            }
+        });
+        
+        txtInitReturnHour.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                JTextField textField = (JTextField) e.getSource();                
+                if (Utility.validateHour(textField.getText()) 
+                        && !Utility.validateHour(txtEndReturnHour.getText())) {
+                    txtEndReturnHour.requestFocus();
+                }
+            }
+        });
+        
+        txtEndDeliveryHour.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                JTextField textField = (JTextField) e.getSource();                
+                if (Utility.validateHour(textField.getText())
+                        && !Utility.validateHour(txtInitReturnHour.getText())) {
+                    txtInitReturnHour.requestFocus();
+                }
+            }
+        });
+        
     }
     
     private void initData () {
-        customerTableFormat();
+        
         getCustomers();
         llenar_combo_estado();
         llenar_combo_tipo();
@@ -135,34 +213,59 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         llenar_abonos();
         formato_tabla_detalles();
         formato_tabla_abonos();
-        nombre_focus();
+        fillCmbCatalogSocialMediaContact();
+        UtilityCommon.setTimeout(() -> txt_nombre.requestFocus(), 1000);      
         
     }
     
+    private void fillCmbCatalogSocialMediaContact () {
+        
+        cmbSocialMedialContact.removeAllItems();
+        cmbSocialMedialContact.addItem(
+                new CatalogSocialMediaContactModel(0L, ApplicationConstants.CMB_SELECCIONE)
+        );
+        new Thread(() -> {
+            try {
+            List<CatalogSocialMediaContactModel> catalogs = 
+                    catalogSocialMediaContactService.getAll();
+
+            catalogs.stream().forEach(t -> 
+                    cmbSocialMedialContact.addItem(t));
+
+            } catch (DataOriginException e) {
+               JOptionPane.showMessageDialog(this, e, 
+                       ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
+            }
+        }).start();
+    }
+    
     private void fillTableCustomers (List<Cliente> list) {
-        customerTableFormat();
-        DefaultTableModel tableModel = (DefaultTableModel) tabla_clientes.getModel();
+        tableCustomer.format();
+        DefaultTableModel tableModel = (DefaultTableModel) tableCustomer.getModel();
             
             list.forEach(customer -> {
                 Object row[] = {
+                    false,
                     customer.getId(),
-                    customer.getNombre() + " " + customer.getApellidos(),
+                    customer.getNombre(),
+                    customer.getApellidos(),
                     customer.getApodo(),
                     customer.getTelMovil(),
                     customer.getTelFijo(),
                     customer.getEmail(),
                     customer.getDireccion(),
                     customer.getLocalidad(),
-                    customer.getRfc().toUpperCase()
-                };
-                
+                    customer.getRfc(),
+                    customer.getBirthday(),
+                    customer.getSocialMedia().getDescription()
+                };                
                 tableModel.addRow(row);
             });
     }
     
     private void getCustomers() {
         try {
-            customers = customerService.obtenerClientesActivos();
+            customers = customerService.getAll();
             fillTableCustomers(customers);
         } catch (BusinessException e) {
             JOptionPane.showMessageDialog(this, "Error al obtener los clientes de la base de datos " + e,"ERROR", JOptionPane.ERROR_MESSAGE);
@@ -561,50 +664,46 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     }
 
     public boolean agregar_cliente() {
-        boolean res = false, email = false;
-        if (txt_nombre.getText().equals("") || txt_apellidos.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "Faltan parametros... ", "Error", JOptionPane.INFORMATION_MESSAGE);
-
-            Toolkit.getDefaultToolkit().beep();
-            res = false;
-        } else {
-            if (!txt_email.getText().equals("") && funcion.isEmail(txt_email.getText().toString())) {
-                email = true;
-                email_cliente = txt_email.getText().toString();
-            } else {
-                email_cliente = "";
-                email = false;
-            }
-            if (email == true || txt_email.getText().equals("")) {
-                try {
-                    String datos[] = {txt_nombre.getText().toString(), txt_apellidos.getText().toString(), txt_apodo.getText().toString(), txt_tel_movil.getText().toString(), txt_tel_casa.getText().toString(), txt_email.getText().toString(), txt_direccion.getText().toString(), txt_localidad.getText().toString(), txt_rfc.getText().toString(), "1"};
-                    // funcion.conectate();
-                    
-                    funcion.InsertarRegistro(datos, "insert into clientes (nombre,apellidos,apodo,tel_movil,tel_fijo,email,direccion,localidad,rfc,activo) values(?,?,?,?,?,?,?,?,?,?)");
-                    id_cliente = funcion.ultimoid();
-                    // funcion.desconecta();
-                    
-                    customerTableFormat();
-                    res = true;
-                } catch (SQLException ex) {
-                    Logger.getLogger(AgregarRenta.class.getName()).log(Level.SEVERE, null, ex);
-                    JOptionPane.showMessageDialog(null, "Error al insertar registro ", "Error", JOptionPane.INFORMATION_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Email no valido... ", "Error", JOptionPane.INFORMATION_MESSAGE);
-                txt_email.requestFocus();
-                Toolkit.getDefaultToolkit().beep();
-
-            }
-
+        
+        boolean res = true;
+        
+        Cliente cliente = new Cliente();
+        
+        CatalogSocialMediaContactModel catalog = 
+                (CatalogSocialMediaContactModel) cmbSocialMedialContact.getModel().getSelectedItem();
+        
+        cliente.setSocialMedia(catalog);
+        
+        if (cmbBirthday.getDate() != null) {        
+            cliente.setBirthday(
+                    new Timestamp(cmbBirthday.getDate().getTime())
+            );
         }
+        
+        cliente.setNombre(txt_nombre.getText());
+        cliente.setApellidos(txt_apellidos.getText());
+        cliente.setApodo(txt_apodo.getText());
+        cliente.setEmail(txt_email.getText());
+        cliente.setTelMovil(txt_tel_movil.getText());
+        cliente.setTelFijo(txt_tel_casa.getText());
+        cliente.setDireccion(txt_direccion.getText());
+        cliente.setLocalidad(txt_localidad.getText());
+        cliente.setRfc(txt_rfc.getText());
+        cliente.setActivo("1");
+        
+        try {
+            customerService.saveOrUpdate(cliente); 
+        } catch (BusinessException businessException) {
+            JOptionPane.showMessageDialog(this, businessException.getMessage(), 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+            res = false;
+        }
+
+        
         return res;
 
     }
 
-    public void nombre_focus() {
-        txt_nombre.requestFocus();
-    }
 
     public void total() {
         
@@ -879,8 +978,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         fecha_sistema();
         String porcentajeDescuentoRenta;
-        if (!txt_descuento.getText().equals("") && !txtPorcentajeDescuento.getText().toString().equals("")) {
-            descuento = EliminaCaracteres(txt_descuento.getText().toString(), "$");
+        if (!txt_descuento.getText().equals("") && !txtPorcentajeDescuento.getText().equals("")) {
+            descuento = EliminaCaracteres(txt_descuento.getText(), "$");
             descuento = descuento.replace(",", ".");
             porcentajeDescuentoRenta = this.txtPorcentajeDescuento.getText()+"";
         } else {
@@ -888,7 +987,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             descuento = "0";
         }
         if (!txt_iva.getText().equals("")) {
-            iva = EliminaCaracteres(txt_iva.getText().toString(), "$");
+            iva = EliminaCaracteres(txt_iva.getText(), "$");
             iva = iva.replace(",", ".");
         } else {
             iva = "0";
@@ -1182,34 +1281,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         }
     }
 
-    private void customerTableFormat() {
-        Object[][] data = {{"","","","","","","", "", ""}};
-        String[] columNames = {"Id", "Cliente ", "Apodo", "Tel Cel", "Tel Fijo", "Email ", "Dirección", "Localidad", "RFC"};       
-
-        
-        DefaultTableModel tableModel = new DefaultTableModel(data, columNames);
-        tabla_clientes.setModel(tableModel);
-        TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
-        tabla_clientes.setRowSorter(ordenarTabla);
-
-        int[] anchos = {10, 190, 100, 80, 80, 200, 100, 80, 80};
-
-        for (int inn = 0; inn < tabla_clientes.getColumnCount(); inn++) {
-            tabla_clientes.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
-        }
-
-        tabla_clientes.getColumnModel().getColumn(0).setMaxWidth(0);
-        tabla_clientes.getColumnModel().getColumn(0).setMinWidth(0);
-        tabla_clientes.getColumnModel().getColumn(0).setPreferredWidth(0);
-        
-        try {
-            tableModel.removeRow(tableModel.getRowCount() - 1);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            ;
-        }
-
-    }
-
     
     private void searchAndFillTableCustomers () {
         try {
@@ -1223,7 +1294,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                             .collect(Collectors.toList());
             fillTableCustomers(filterCustomers);
         } catch (Exception e){
-            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(this, e, 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
             log.error(e.getMessage(),e);
         }
         
@@ -1336,8 +1408,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
                 } else {
                     DefaultTableModel temp = (DefaultTableModel) tabla_detalle.getModel();
-                    float cantidad = Float.parseFloat(txt_cantidad.getText().toString());
-                    float precio = Float.parseFloat(txt_precio_unitario.getText().toString());
+                    float cantidad = Float.parseFloat(txt_cantidad.getText());
+                    float precio = Float.parseFloat(txt_precio_unitario.getText());
                     float importe = (cantidad * precio);
                     float totalDescuento = 0f;
                     if(porcentajeDescuento > 0){
@@ -1348,7 +1420,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                     String xprecio = conviertemoneda(Float.toString(precio));
                     String ximporte = conviertemoneda(Float.toString(importe));
 
-                    Object nuevo1[] = {txt_cantidad.getText().toString(), id_articulo, lbl_eleccion.getText(), xprecio,porcentajeDescuento+"", conviertemoneda(totalDescuento+"") , ximporte, itemUtilesGlobal};
+                    Object nuevo1[] = {txt_cantidad.getText(), id_articulo, lbl_eleccion.getText(), xprecio,porcentajeDescuento+"", conviertemoneda(totalDescuento+"") , ximporte, itemUtilesGlobal};
                     temp.addRow(nuevo1);
                     subTotal();
                     total();
@@ -1359,6 +1431,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                     lbl_eleccion.setText("Articulo se agrego al evento.");
                     Toolkit.getDefaultToolkit().beep();
                     txt_buscar.requestFocus();
+                    txt_buscar.selectAll();
                 }
 
         }
@@ -1386,7 +1459,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             DefaultTableModel temp = (DefaultTableModel) tabla_abonos.getModel();
             float abono = 0f;
             try {         
-                abono = Float.parseFloat(txt_abono.getText().toString());                          
+                abono = Float.parseFloat(txt_abono.getText());                          
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Ingresa solo numeros ", "Error", JOptionPane.INFORMATION_MESSAGE);
                 return;
@@ -1397,7 +1470,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             
             String xabono = conviertemoneda(Float.toString(abono));
             fecha_sistema();
-            Object nuevo1[] = {fecha_sistema, xabono, txt_comentario.getText().toString(),tipoAbonoId,cmbTipoPago.getSelectedItem().toString(),fechaPago};
+            Object nuevo1[] = {fecha_sistema, xabono, txt_comentario.getText(),tipoAbonoId,cmbTipoPago.getSelectedItem().toString(),fechaPago};
             temp.addRow(nuevo1);
             abonos();
             subTotal();
@@ -1482,7 +1555,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     public void tabla_articulos_like() {
         
-        String textToSearch = txt_buscar.getText().toLowerCase().trim();
+        String textToSearch = UtilityCommon.removeAccents(txt_buscar.getText().toLowerCase().trim());
         
         List<Articulo> filterItems =
                 articulos.stream()
@@ -1532,9 +1605,13 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         txt_rfc = new javax.swing.JTextField();
+        cmbBirthday = new com.toedter.calendar.JDateChooser();
+        jLabel23 = new javax.swing.JLabel();
+        cmbSocialMedialContact = new javax.swing.JComboBox<>();
+        jLabel42 = new javax.swing.JLabel();
+        lblAddSocialMediaContact = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tabla_clientes = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
+        panelCustomer = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         panel_datos_generales = new javax.swing.JPanel();
         lbl_cliente = new javax.swing.JLabel();
@@ -1668,7 +1745,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ingresa nuevo cliente", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
-        txt_nombre.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_nombre.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_nombre.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_nombreKeyPressed(evt);
@@ -1681,7 +1758,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jLabel1.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jLabel1.setText("Nombre:");
 
-        txt_apellidos.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_apellidos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_apellidos.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txt_apellidosKeyReleased(evt);
@@ -1691,32 +1768,32 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jLabel2.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jLabel2.setText("Apellidos:");
 
-        txt_apodo.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_apodo.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
         jLabel3.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jLabel3.setText("Apodo:");
 
-        txt_tel_movil.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_tel_movil.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
         jLabel4.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jLabel4.setText("Tel Movil:");
 
-        txt_tel_casa.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_tel_casa.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
         jLabel5.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jLabel5.setText("Tel Casa:");
 
-        txt_email.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_email.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
         jLabel6.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jLabel6.setText("Email:");
 
-        txt_direccion.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_direccion.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
         jLabel7.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jLabel7.setText("Direccion:");
 
-        txt_localidad.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_localidad.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
         jLabel8.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jLabel8.setText("Localidad:");
@@ -1724,7 +1801,31 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jLabel9.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         jLabel9.setText("RFC:");
 
-        txt_rfc.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_rfc.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        cmbBirthday.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        jLabel23.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        jLabel23.setText("Fecha de cumpleaños:");
+
+        cmbSocialMedialContact.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        cmbSocialMedialContact.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        jLabel42.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        jLabel42.setText("Medio de contacto:");
+
+        lblAddSocialMediaContact.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Add-icon.png"))); // NOI18N
+        lblAddSocialMediaContact.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblAddSocialMediaContact.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblAddSocialMediaContactMouseClicked(evt);
+            }
+        });
+        lblAddSocialMediaContact.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                lblAddSocialMediaContactKeyPressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -1746,6 +1847,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                         .addComponent(txt_tel_casa))
                     .addComponent(txt_direccion)
                     .addComponent(txt_localidad)
+                    .addComponent(cmbBirthday, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cmbSocialMedialContact, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
@@ -1762,8 +1865,13 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                                 .addGap(18, 18, 18)
                                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txt_rfc, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 12, Short.MAX_VALUE)))
+                            .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel42)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblAddSocialMediaContact)))
+                        .addGap(0, 12, Short.MAX_VALUE))
+                    .addComponent(txt_rfc))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -1803,45 +1911,47 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txt_rfc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(2, 2, 2)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel23)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbBirthday, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel42))
+                    .addComponent(lblAddSocialMediaContact))
+                .addGap(4, 4, 4)
+                .addComponent(cmbSocialMedialContact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(187, Short.MAX_VALUE))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Clientes en la base de datos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
-        tabla_clientes.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        tabla_clientes.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tabla_clientes.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        tabla_clientes.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tabla_clientesMouseClicked(evt);
-            }
-        });
-        jScrollPane1.setViewportView(tabla_clientes);
+        javax.swing.GroupLayout panelCustomerLayout = new javax.swing.GroupLayout(panelCustomer);
+        panelCustomer.setLayout(panelCustomerLayout);
+        panelCustomerLayout.setHorizontalGroup(
+            panelCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        panelCustomerLayout.setVerticalGroup(
+            panelCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
+                .addComponent(panelCustomer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE)
+                .addComponent(panelCustomer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -2570,7 +2680,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         });
 
         lblTipoAbono.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Add-icon.png"))); // NOI18N
-        lblTipoAbono.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        lblTipoAbono.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         lblTipoAbono.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblTipoAbonoMouseClicked(evt);
@@ -2812,35 +2922,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void tabla_clientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_clientesMouseClicked
-        // TODO add your handling code here:
-        if (evt.getClickCount() == 2) {
-            email_cliente = tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 5).toString();
-            System.out.println("Email es: " + email_cliente.toString());
-            this.txtEmailToSend.setText(email_cliente);
-            if (email_cliente.equals("")) {
-                check_enviar_email.setSelected(false);
-//                check_adjuntarPDF.setSelected(false);
-            } else if (xemail != null && xemail > 0) {
-                this.txtEmailToSend.setText(email_cliente);
-                check_enviar_email.setSelected(true);
-//                check_adjuntarPDF.setSelected(true);
-            }
-            jTabbedPane1.setSelectedIndex(1);
-            jTabbedPane1.setEnabledAt(1, true);
-            jbtn_agregar_evento.setEnabled(true);
-            panel_articulos.setVisible(true);
-            panel_conceptos.setVisible(false);
-
-            id_cliente = tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 0).toString();
-            //lbl_aviso.setText("Has elegido al cliente con exito.. Continua con los datos del evento...");
-            this.lbl_cliente.setText("Cliente: "+ tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 1) + " " + (String) tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 2));
-
-            tabla_articulos();
-            txt_buscar.requestFocus();
-        }
-    }//GEN-LAST:event_tabla_clientesMouseClicked
-
     private void tabla_detalleMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_detalleMouseClicked
         // TODO add your handling code here:
         
@@ -2868,18 +2949,21 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        if (iniciar_sesion.administrador_global.equals("1")) {
-            txt_precio_unitario.setEditable(true);
-            txt_precio_unitario.requestFocus();
-            JOptionPane.showMessageDialog(null, "Puedes modificar el precio...", "Precio", JOptionPane.INFORMATION_MESSAGE);
+        
+        if(!iniciar_sesion.usuarioGlobal.getAdministrador().equals("1")){
+            JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_NOT_PERMISIONS_ADMIN, 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+            Toolkit.getDefaultToolkit().beep();            
+            return;
+        }        
 
-            Toolkit.getDefaultToolkit().beep();
+        txt_precio_unitario.setEditable(true);
+        txt_precio_unitario.requestFocus();
+        JOptionPane.showMessageDialog(this, "Puedes modificar el precio...", "Precio", JOptionPane.INFORMATION_MESSAGE);
 
-        } else {
-            JOptionPane.showMessageDialog(null, "No cuenta con permisos... ", "Error", JOptionPane.INFORMATION_MESSAGE);
+        
 
-            Toolkit.getDefaultToolkit().beep();
-        }
+        
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -2903,7 +2987,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private void txt_descuentoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_descuentoKeyPressed
         // TODO add your handling code here:
         if (evt.getKeyCode() == 10) {
-            if (txt_subtotal.getText().toString().equals("")) {
+            if (txt_subtotal.getText().equals("")) {
                 JOptionPane.showMessageDialog(null, "No hay cantidad en subtotal para agregar el descuento", "Descuento", JOptionPane.INFORMATION_MESSAGE);
                 Toolkit.getDefaultToolkit().beep();
 
@@ -2918,7 +3002,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     private void txtPorcentajeDescuentoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPorcentajeDescuentoKeyPressed
          if (evt.getKeyCode() == 10) {
-            if (txt_subtotal.getText().toString().equals("")) {
+            if (txt_subtotal.getText().equals("")) {
                 JOptionPane.showMessageDialog(null, "Es necesario incluir subtotal para realizar el calculo", "ERROR", JOptionPane.INFORMATION_MESSAGE);
                 Toolkit.getDefaultToolkit().beep();
 
@@ -3044,7 +3128,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     private void txt_envioRecoleccionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_envioRecoleccionKeyPressed
          if (evt.getKeyCode() == 10) {
-            if (txt_subtotal.getText().toString().equals("")) {
+            if (txt_subtotal.getText().equals("")) {
                 JOptionPane.showMessageDialog(null, "No hay cantidad en subtotal para agregar el descuento", "Envio y recoleccion", JOptionPane.INFORMATION_MESSAGE);
                 Toolkit.getDefaultToolkit().beep();
 
@@ -3057,7 +3141,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     private void txt_depositoGarantiaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_depositoGarantiaKeyPressed
          if (evt.getKeyCode() == 10) {
-            if (txt_subtotal.getText().toString().equals("")) {
+            if (txt_subtotal.getText().equals("")) {
                 JOptionPane.showMessageDialog(null, "No hay cantidad en subtotal para agregar el descuento", "Deposito en garantia", JOptionPane.INFORMATION_MESSAGE);
                 Toolkit.getDefaultToolkit().beep();
 
@@ -3078,7 +3162,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     private void txt_ivaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_ivaKeyPressed
         if (evt.getKeyCode() == 10) {
-            if (txt_subtotal.getText().toString().equals("")) {
+            if (txt_subtotal.getText().equals("")) {
                 JOptionPane.showMessageDialog(null, "Es necesario incluir subtotal para realizar el calculo", "ERROR", JOptionPane.INFORMATION_MESSAGE);
                 Toolkit.getDefaultToolkit().beep();
 
@@ -3099,8 +3183,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     private void lblTipoAbonoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblTipoAbonoMouseClicked
         // TODO add your handling code here:
-        if(iniciar_sesion.usuarioGlobal.getAdministrador().equals("0")){
-            JOptionPane.showMessageDialog(null, "No cuentas con suficientes permisos para esta accion ", "Error", JOptionPane.INFORMATION_MESSAGE);
+        if(!iniciar_sesion.usuarioGlobal.getAdministrador().equals("1")){
+            JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_NOT_PERMISIONS_ADMIN, 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+            Toolkit.getDefaultToolkit().beep();   
             return;
         }
         mostrar_tipos_abonos();
@@ -3133,29 +3219,35 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_porcentaje_descuentoActionPerformed
 
+    private void addItemToEventFromInventory (int selectedRow) {
+        lbl_eleccion.setText((String) tabla_articulos.getValueAt(selectedRow, 3).toString() + " " + (String) tabla_articulos.getValueAt(selectedRow, 4).toString());
+        txt_precio_unitario.setText(EliminaCaracteres((String) tabla_articulos.getValueAt(selectedRow, 5).toString(), "$,"));
+        txt_cantidad.setText("");
+        txt_cantidad.requestFocus();
+        txt_cantidad.selectAll();
+        this.txt_porcentaje_descuento.setText("");
+        id_articulo = (String) tabla_articulos.getValueAt(selectedRow, 0).toString();
+        itemUtilesGlobal = tabla_articulos.getValueAt(selectedRow, 6).toString();
+        txt_precio_unitario.setEditable(false);
+    }
+    
     private void tabla_articulosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_articulosMouseClicked
         // TODO add your handling code here:
         if (evt.getClickCount() == 2) {
-
-            lbl_eleccion.setText((String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 3).toString() + " " + (String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 4).toString());
-            txt_precio_unitario.setText(EliminaCaracteres((String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 5).toString(), "$,"));
-            txt_cantidad.setText("");
-            txt_cantidad.requestFocus();
-            this.txt_porcentaje_descuento.setText("");
-            id_articulo = (String) tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString();
-            itemUtilesGlobal = tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 6).toString();
-            txt_precio_unitario.setEditable(false);
-
+            addItemToEventFromInventory(tabla_articulos.getSelectedRow());
         }
     }//GEN-LAST:event_tabla_articulosMouseClicked
 
     private void txt_buscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_buscarKeyReleased
-        // TODO add your handling code here:
-        tabla_articulos_like();
+        
     }//GEN-LAST:event_txt_buscarKeyReleased
 
     private void txt_buscarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_buscarKeyPressed
-        // TODO add your handling code here:
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER && tabla_articulos.getRowCount() > 0) {
+            addItemToEventFromInventory(0);
+        } else {
+           tabla_articulos_like();
+        }
     }//GEN-LAST:event_txt_buscarKeyPressed
 
     private void txt_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_buscarActionPerformed
@@ -3299,6 +3391,32 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         
     }//GEN-LAST:event_txt_nombreKeyPressed
 
+    private void lblAddSocialMediaContactMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblAddSocialMediaContactMouseClicked
+        
+        if(!iniciar_sesion.usuarioGlobal.getAdministrador().equals("1")){
+            JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_NOT_PERMISIONS_ADMIN, 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+            Toolkit.getDefaultToolkit().beep();   
+            return;
+        }
+        
+        AddCatalogSocialMediaFormDialog dialog = 
+                new AddCatalogSocialMediaFormDialog(null, true);
+        
+        Boolean successfulChangesDetected = dialog.showDialog();
+        
+        if (successfulChangesDetected) {
+            fillCmbCatalogSocialMediaContact();
+        }
+        
+    }//GEN-LAST:event_lblAddSocialMediaContactMouseClicked
+
+    private void lblAddSocialMediaContactKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lblAddSocialMediaContactKeyPressed
+        
+
+        
+    }//GEN-LAST:event_lblAddSocialMediaContactKeyPressed
+
     private void fillTableFromItemsFolio (Renta renta) {
         DefaultTableModel tableModel = (DefaultTableModel) tabla_detalle.getModel();
         
@@ -3346,6 +3464,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private javax.swing.JCheckBox check_enviar_email;
     private javax.swing.JCheckBox check_generar_reporte;
     private javax.swing.JCheckBox check_mostrar_precios;
+    private com.toedter.calendar.JDateChooser cmbBirthday;
+    private javax.swing.JComboBox<CatalogSocialMediaContactModel> cmbSocialMedialContact;
     private javax.swing.JComboBox cmbTipoPago;
     private javax.swing.JComboBox cmb_chofer;
     private javax.swing.JComboBox cmb_estado;
@@ -3372,6 +3492,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
@@ -3392,6 +3513,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel40;
     private javax.swing.JLabel jLabel41;
+    private javax.swing.JLabel jLabel42;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -3406,7 +3528,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -3427,17 +3548,18 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private javax.swing.JButton jbtn_nuevo_evento;
     private javax.swing.JButton jbtn_quitar_abono;
     private javax.swing.JButton jbtn_reporte;
+    private javax.swing.JLabel lblAddSocialMediaContact;
     private javax.swing.JLabel lblTipoAbono;
     private javax.swing.JLabel lbl_atiende;
     private javax.swing.JLabel lbl_cliente;
     private javax.swing.JLabel lbl_eleccion;
     private javax.swing.JLabel lbl_sel;
+    private javax.swing.JPanel panelCustomer;
     private javax.swing.JPanel panel_articulos;
     private javax.swing.JPanel panel_conceptos;
     private javax.swing.JPanel panel_datos_generales;
     private javax.swing.JTable tabla_abonos;
     public static javax.swing.JTable tabla_articulos;
-    private javax.swing.JTable tabla_clientes;
     public static javax.swing.JTable tabla_detalle;
     private javax.swing.JTextField txtAmountEdit;
     private javax.swing.JTextField txtDiscountRateEdit;

@@ -1,4 +1,9 @@
 -- inserts iniciales
+INSERT INTO catalog_social_media_contact (description,created_at,fg_active) VALUES ('Carga inicial','2023-11-08','0');
+INSERT INTO catalog_social_media_contact (description,created_at,fg_active) VALUES ('Facebook','2023-11-08','1');
+INSERT INTO catalog_social_media_contact (description,created_at,fg_active) VALUES ('Google','2023-11-08','1');
+INSERT INTO catalog_social_media_contact (description,created_at,fg_active) VALUES ('Twitter','2023-11-08','1');
+
 INSERT INTO datos_generales (nombre_empresa,direccion1,folio,folio_cambio) VALUES ('generico','generico','1','0');
 
 INSERT INTO puesto (descripcion) values ('Chofer');

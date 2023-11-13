@@ -7,18 +7,14 @@ import common.exceptions.BusinessException;
 import common.exceptions.NoDataFoundException;
 import common.services.UtilityService;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -26,11 +22,6 @@ import mobiliario.IndexForm;
 import common.model.DatosGenerales;
 import common.model.providers.OrdenProveedor;
 import common.model.providers.queryresult.DetailOrderSupplierQueryResult;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.util.JRLoader;
 import common.model.providers.ParameterOrderProvider;
 import services.SystemService;
 import common.services.providers.OrderProviderService;
@@ -144,7 +135,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
             folio = getValueIdBySelectedRow(ColumnToGetValue.FOLIO);
        } catch (BusinessException e) {
            LOGGER.error(e);
-           JOptionPane.showMessageDialog(this, e, "ERROR", JOptionPane.ERROR_MESSAGE);
+           JOptionPane.showMessageDialog(this, e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
            return;
        }
         
@@ -162,47 +153,18 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
      public void reportPDF(){
          
        String orderId;
+       String pathLocation;
        try {
-            orderId = getValueIdBySelectedRow(ColumnToGetValue.ORDER_ID);
-       } catch (BusinessException e) {
+            orderId = getValueIdBySelectedRow(ColumnToGetValue.ORDER_ID);            
+            pathLocation = Utility.getPathLocation();
+       } catch (Exception e) {
            LOGGER.error(e);
-           JOptionPane.showMessageDialog(this, e, "ERROR", JOptionPane.ERROR_MESSAGE);
+           JOptionPane.showMessageDialog(this, e.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
            return;
-       }
-         
-        JasperPrint jasperPrint;
-        try {
-           
-            String pathLocation = Utility.getPathLocation();
-            String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_ORDEN_PROVEEDOR;
-            System.out.println("Cargando desde: " + archivo);
-            if (archivo == null) {
-                JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
-                return;
-            }
-            JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(archivo);  
-           
-            DatosGenerales datosGenerales = systemService.getGeneralData();
-            
-            Map parametros = new HashMap<>();
-            parametros.put("ID_ORDEN",orderId);
-            parametros.put("NOMBRE_EMPRESA",datosGenerales.getCompanyName());
-            parametros.put("DIRECCION_EMPRESA",datosGenerales.getAddress1());
-            parametros.put("TELEFONOS_EMPRESA",datosGenerales.getAddress2());
-            parametros.put("EMAIL_EMPRESA",datosGenerales.getAddress3() != null ? datosGenerales.getAddress3() : "");
-            //guardamos el parámetro
-            parametros.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
-           
-            jasperPrint = JasperFillManager.fillReport(masterReport, parametros, funcion.getConnection());
-            JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
-            File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_ORDEN_PROVEEDOR);
-            Desktop.getDesktop().open(file2);
-            
-        } catch (Exception e) {
-            LOGGER.error(e);
-            System.out.println("Mensaje de Error:" + e.toString());
-            JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage() + "\n" + e);
-        }
+       }       
+       DatosGenerales datosGenerales = systemService.getGeneralData();       
+       UtilityCommon.generatePDFOrderProvider(
+               orderId,funcion.getConnection(),datosGenerales, pathLocation);
      
      }
    public void initComboBox(){
@@ -227,7 +189,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
             orderId = getValueIdBySelectedRow(ColumnToGetValue.ORDER_ID);
        } catch (BusinessException e) {
            LOGGER.error(e);
-           JOptionPane.showMessageDialog(this, e, "ERROR", JOptionPane.ERROR_MESSAGE);
+           JOptionPane.showMessageDialog(this, e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
            return;
        }
        
@@ -276,7 +238,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                 parameter.setEndEventDate(UtilityCommon.getStringFromDate(txtSearchEndEventDate.getDate(),formatDate));
             } catch (ParseException e) {
                 LOGGER.error(e);
-                JOptionPane.showMessageDialog(this, e, "ERROR", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
             }
         }
         if(!this.cmbStatus.getModel().getSelectedItem().equals(ApplicationConstants.CMB_SELECCIONE)){
@@ -299,7 +261,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
             return;
         }catch(BusinessException e){
             LOGGER.error(e);
-            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, e.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
         return;
         }finally{
            Toolkit.getDefaultToolkit().beep();
@@ -348,7 +310,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
          return;
      }catch(BusinessException e){
         LOGGER.error(e);
-        JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, e.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
         return;
      }finally {
         Toolkit.getDefaultToolkit().beep();

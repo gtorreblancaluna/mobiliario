@@ -27,10 +27,14 @@ public abstract class Utility {
         boolean b;
         char[] a = hora.toCharArray();
         String[] c = hora.split(":");
-        if ((a[0] == ' ') || (a[1] == ' ') || (a[2] == ' ') || (a[3] == ' ') || (a[4] == ' ') || (Integer.parseInt(c[0]) > 24) || (Integer.parseInt(c[1]) > 59)) {
+        try {
+            if ((a[0] == ' ') || (a[1] == ' ') || (a[2] == ' ') || (a[3] == ' ') || (a[4] == ' ') || (Integer.parseInt(c[0]) > 24) || (Integer.parseInt(c[1]) > 59)) {
+                b=false;
+            }else{
+                b=true;
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
             b=false;
-        }else{
-            b=true;
         }
         return b;
     }

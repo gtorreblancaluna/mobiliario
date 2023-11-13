@@ -18,21 +18,97 @@
         <result property="localidad" column="localidad"/>
         <result property="rfc" column="rfc"/>
         <result property="activo" column="activo"/>
+        <result property="birthday" column="birthday"/>
+        <result property="activo" column="activo"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/> 
+        
+        <!--Catalog Social Media-->
+        <result property="socialMedia.id" column="social_media_id"/>
+        <result property="socialMedia.description" column="social_media_description"/>
         
     </resultMap>
   
     <select id="getAllCustomers" resultMap="resultMapCustomer" >
-        SELECT *      
+        SELECT 
+            c.*,
+            catalog.id AS social_media_id,
+            catalog.description AS social_media_description
         FROM clientes c
+        INNER JOIN catalog_social_media_contact catalog ON (catalog.id = c.catalog_social_media_contact_id)
         WHERE c.activo = 1
         ORDER BY CONCAT(c.nombre,' ',c.apellidos)
     </select> 
     
     <select id="getByIdCustomer" resultMap="resultMapCustomer" parameterType="java.lang.Long" >
-        SELECT * 
+        SELECT 
+            c.*,
+            catalog.id AS social_media_id,
+            catalog.description AS social_media_description 
         FROM clientes c
+        INNER JOIN catalog_social_media_contact catalog ON (catalog.id = c.catalog_social_media_contact_id)
         WHERE c.id_clientes = #{id} 
         AND c.activo = 1
-    </select>  
+    </select>
+    
+    <insert id="insertCustomer" parameterType="common.model.Cliente">
+        INSERT INTO clientes
+        (
+            nombre,
+            apellidos,
+            apodo,
+            tel_movil,
+            tel_fijo,
+            email,
+            direccion,
+            localidad,
+            rfc,
+            activo,
+            updated_at,
+            created_at,
+            catalog_social_media_contact_id,
+            birthday
+        )
+        VALUES
+        (
+            #{nombre},
+            #{apellidos},
+            #{apodo},
+            #{telMovil},
+            #{telFijo},
+            #{email},
+            #{direccion},
+            #{localidad},
+            #{rfc},
+            #{activo},
+            #{updatedAt},
+            #{createdAt},
+            #{socialMedia.id},
+            #{birthday}
+        )
+        
+    </insert>
+    
+    <update id="updateCustomer" parameterType="common.model.Cliente">
+        UPDATE clientes cliente       
+        <set>
+            <if test="nombre != null">cliente.nombre=#{nombre},</if>
+            <if test="apellidos != null">cliente.apellidos=#{apellidos},</if>
+            <if test="apodo != null">cliente.apodo=#{apodo},</if>
+            <if test="telMovil != null">cliente.tel_movil=#{telMovil},</if>
+            <if test="telFijo != null">cliente.tel_fijo=#{telFijo},</if>
+            <if test="email != null">cliente.email=#{email},</if>
+            <if test="direccion != null">cliente.direccion=#{direccion},</if>
+            <if test="localidad != null">cliente.localidad=#{localidad},</if>
+            <if test="rfc != null">cliente.rfc=#{rfc},</if>
+            <if test="activo != null">cliente.activo=#{activo},</if>
+            <if test="updatedAt != null">cliente.updated_at=#{updatedAt},</if>
+            <if test="createdAt != null">cliente.created_at=#{createdAt},</if>
+            <if test="socialMedia != null">cliente.catalog_social_media_contact_id=#{socialMedia.id},</if>
+            <if test="birthday != null">cliente.birthday=#{birthday}</if>
+        </set>
+        WHERE cliente.id_clientes = #{id}
+
+    </update>
   
 </mapper>

@@ -125,7 +125,7 @@ public class SaleService {
                 renta.setEstadoId(Integer.parseInt(dtconduc[i][1].toString()));
              
              if(dtconduc[i][2] != null)
-                renta.setCliente(customerService.obtenerClientePorId(Long.parseLong(dtconduc[i][2].toString()))); 
+                renta.setCliente(customerService.getById(Long.parseLong(dtconduc[i][2].toString()))); 
              
              if(dtconduc[i][3] != null)
                 renta.setUsuario(userService.getById(Integer.parseInt(dtconduc[i][3].toString())));  
@@ -240,7 +240,7 @@ public class SaleService {
                 renta.setEstadoId(Integer.parseInt(dtconduc[i][1].toString()));
              
              if(dtconduc[i][2] != null)
-                renta.setCliente(customerService.obtenerClientePorId(Long.parseLong(dtconduc[i][2].toString()))); 
+                renta.setCliente(customerService.getById(Long.parseLong(dtconduc[i][2].toString()))); 
              
              if(dtconduc[i][3] != null)
                 renta.setUsuario(userService.getById( Integer.parseInt(dtconduc[i][3].toString())));  

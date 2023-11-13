@@ -1,5 +1,6 @@
 package mobiliario;
 
+import forms.customer.CustomerForm;
 import common.utilities.UtilityCommon;
 import forms.abonos.PaymentsForm;
 import forms.inventario.InventarioForm;
@@ -24,7 +25,7 @@ public class IndexForm extends javax.swing.JFrame {
 
     private ViewOrdersProviders viewOrdersProviders;
     private MaterialInventoryView materialInventoryView;
-    private clientes ventana_clientes;
+    private CustomerForm ventana_clientes;
     private iniciar_sesion v_iniciar_sesion;
     private usuarios ventana_usuarios;
     private ContabilidadForm ventana_contabilidad;
@@ -68,7 +69,7 @@ public class IndexForm extends javax.swing.JFrame {
 
     public void abrir_clientes() {
         if (UtilityCommon.verifyIfInternalFormIsOpen(ventana_clientes,IndexForm.jDesktopPane1)) {
-            ventana_clientes = new clientes();
+            ventana_clientes = new CustomerForm();
             ventana_clientes.setLocation(this.getWidth() / 2 - ventana_clientes.getWidth() / 2, this.getHeight() / 2 - ventana_clientes.getHeight() / 2 - 20);
             jDesktopPane1.add(ventana_clientes);
             ventana_clientes.show();
@@ -296,7 +297,7 @@ public class IndexForm extends javax.swing.JFrame {
         jPanel1.add(jSeparator9, new org.netbeans.lib.awtextra.AbsoluteConstraints(1150, 0, 10, 60));
 
         jLabel5.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
-        jLabel5.setText("Versión 1.4.5");
+        jLabel5.setText("Versión 1.4.7");
         jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 24, 150, 20));
 
         jLabel6.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N

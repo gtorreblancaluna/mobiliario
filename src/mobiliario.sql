@@ -1,3 +1,12 @@
+CREATE TABLE catalog_social_media_contact (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  description VARCHAR(145) NOT NULL,
+  created_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NULL DEFAULT NULL,
+  fg_active ENUM('1','0') NOT NULL DEFAULT '1',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE tipo_detalle_orden_proveedor (
   id INT(10) NOT NULL AUTO_INCREMENT,
   description VARCHAR(145) NOT NULL,
@@ -137,7 +146,13 @@ CREATE TABLE clientes (
   localidad varchar(45) DEFAULT NULL,
   rfc varchar(45) DEFAULT NULL,
   activo varchar(5) DEFAULT NULL,
-  PRIMARY KEY (id_clientes)
+  birthday TIMESTAMP NULL DEFAULT NULL,
+  catalog_social_media_contact_id INT(11) DEFAULT NULL,
+  PRIMARY KEY (id_clientes),
+  CONSTRAINT fk_catalog_social_media_contact 
+    FOREIGN KEY (catalog_social_media_contact_id) 
+    REFERENCES catalog_social_media_contact (id)
+    ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -204,10 +219,13 @@ CREATE TABLE usuarios (
   nivel2 varchar(5) DEFAULT NULL,
   contrasenia varchar(45) DEFAULT NULL,
   activo varchar(5) DEFAULT NULL,
-  id_puesto int(11) DEFAULT NULL,
+  id_puesto int(11) DEFAULT NULL,  
   PRIMARY KEY (id_usuarios),
   KEY fk_usuarios_puesto1_idx (id_puesto),
-  CONSTRAINT fk_usuarios_puesto1 FOREIGN KEY (id_puesto) REFERENCES puesto (id_puesto) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT fk_usuarios_puesto1 
+    FOREIGN KEY (id_puesto) 
+    REFERENCES puesto (id_puesto) 
+    ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
