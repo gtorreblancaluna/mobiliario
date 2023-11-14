@@ -48,6 +48,7 @@ import common.model.Tipo;
 import common.model.AvailabilityItemResult;
 import common.model.CatalogSocialMediaContactModel;
 import common.services.CatalogSocialMediaContactService;
+import common.services.EstadoEventoService;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -59,14 +60,18 @@ import services.SaleService;
 import services.SystemService;
 import common.services.TaskAlmacenUpdateService;
 import common.services.TaskDeliveryChoferUpdateService;
+import common.services.TipoEventoService;
 import common.tables.TableCustomer;
+import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Date;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import utilities.OptionPaneService;
@@ -102,12 +107,19 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private final ItemService itemService;
     private final CustomerService customerService;
     private List<Cliente> customers = new ArrayList<>();
-    private static final DecimalFormat decimalFormat = new DecimalFormat( "$#,###,###,##0.00" );
+    private static final DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.00" );
     // valor de la fila a editar
     private Integer rowSelectedToEdit = null;
     private TaskAlmacenUpdateService taskAlmacenUpdateService;
     private TaskDeliveryChoferUpdateService taskDeliveryChoferUpdateService;
     private final TableCustomer tableCustomer;
+    // variables gloables para reutilizar en los filtros y combos
+    private List<Usuario> choferes = new ArrayList<>();
+    private List<Tipo> typesGlobal = new ArrayList<>();
+    private List<EstadoEvento> statusListGlobal = new ArrayList<>();
+    private List<TipoAbono> tiposAbonosGlobal = new ArrayList<>();
+    private final EstadoEventoService estadoEventoService = EstadoEventoService.getInstance();
+    private final TipoEventoService tipoEventoService = TipoEventoService.getInstance();
 
     public AgregarRenta() {
         
@@ -120,11 +132,17 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         
         txt_precio_unitario.setEditable(false);
         txt_subtotal.setEditable(false);
-        txt_abonos.setEditable(false);
+        txt_subtotal.setHorizontalAlignment(SwingConstants.RIGHT);
         txt_calculo.setEditable(false);
+        txt_calculo.setHorizontalAlignment(SwingConstants.RIGHT);
+        txt_abonos.setEditable(false);
+        txt_abonos.setHorizontalAlignment(SwingConstants.RIGHT);
         txt_total.setEditable(false);
+        txt_total.setHorizontalAlignment(SwingConstants.RIGHT);
         txt_total_iva.setEditable(false);
+        txt_total_iva.setHorizontalAlignment(SwingConstants.RIGHT);
         txt_descuento.setEditable(false);
+        txt_descuento.setHorizontalAlignment(SwingConstants.RIGHT);
         jbtn_reporte.setEnabled(false);
         jbtn_disponible.setEnabled(false);
         check_mostrar_precios.setSelected(true);
@@ -141,6 +159,16 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         initData();
         eventListenerTextHourFields();
         addEventListenerTableCustomers();
+        addEventListenerCmbDate();
+    }
+    
+    private void addEventListenerCmbDate () {
+    
+        cmb_fecha_evento.getDateEditor().addPropertyChangeListener((PropertyChangeEvent e) -> {
+            if ("date".equals(e.getPropertyName()) && cmb_fecha_evento.getDate() != null) {
+                txtInitDeliveryHour.requestFocus();
+            }
+        });
     }
     
     private void addEventListenerTableCustomers(){
@@ -161,6 +189,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                     String customerLastName = tableCustomer.getValueAt(tableCustomer.getSelectedRow(), 
                             TableCustomer.Column.LAST_NAME.getNumber()).toString();
                     lbl_cliente.setText("Cliente: "+customerName+" "+customerLastName);
+                    
+                    fillDataCmbs();
                 }
             }
         });
@@ -206,35 +236,41 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     
     private void initData () {
         
-        getCustomers();
-        llenar_combo_estado();
-        llenar_combo_tipo();
-        llenar_chofer();
-        llenar_abonos();
+        new Thread(() -> {
+            disableFormCustomer();
+            getCustomers();
+            enableFormCustomer();
+            UtilityCommon.setTimeout(() -> txt_nombre.requestFocus(), 1000);
+        }).start();        
         formato_tabla_detalles();
         formato_tabla_abonos();
         fillCmbCatalogSocialMediaContact();
-        UtilityCommon.setTimeout(() -> txt_nombre.requestFocus(), 1000);      
+        cmb_fecha_pago.setDate(new Date());
+          
         
     }
     
     private void fillCmbCatalogSocialMediaContact () {
         
+        cmbSocialMedialContact.setEnabled(false);
         cmbSocialMedialContact.removeAllItems();
         cmbSocialMedialContact.addItem(
                 new CatalogSocialMediaContactModel(0L, ApplicationConstants.CMB_SELECCIONE)
         );
         new Thread(() -> {
             try {
-            List<CatalogSocialMediaContactModel> catalogs = 
-                    catalogSocialMediaContactService.getAll();
+                List<CatalogSocialMediaContactModel> catalogs = 
+                        catalogSocialMediaContactService.getAll();
 
-            catalogs.stream().forEach(t -> 
-                    cmbSocialMedialContact.addItem(t));
+                catalogs.stream().forEach(t -> 
+                        cmbSocialMedialContact.addItem(t));
 
+            
             } catch (DataOriginException e) {
                JOptionPane.showMessageDialog(this, e, 
                        ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
+            } finally {
+                cmbSocialMedialContact.setEnabled(true);
             }
         }).start();
     }
@@ -533,7 +569,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 mensaje.append("Total");
             mensaje.append("</td>");
             mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_total.getText());
+                mensaje.append(txt_abonos.getText());
             mensaje.append("</td>");
         mensaje.append("</tr>");
         
@@ -662,8 +698,41 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(rootPane, "No se pudo generar el PDF, muestra este mensaje de error al administrador del sistema:" + j.toString() + "\nO bien, revisa que no exista un PDF abierto, cierralo e intenta generar el PDF nuevamente");
         }
     }
+    
+    private void fillDataCmbs () {
+        new Thread(() -> {
+            txt_buscar.setEnabled(false);
+            tabla_articulos();
+            txt_buscar.setEnabled(true);            
+        }).start();
+        
+        new Thread(() -> {
+            cmb_estado.setEnabled(false);
+            llenar_combo_estado();
+            cmb_estado.setEnabled(true);                     
+        }).start();
+        
+        new Thread(() -> {
+            cmb_tipo.setEnabled(false);
+            llenar_combo_tipo();
+            cmb_tipo.setEnabled(true);           
+        }).start();
+        
+        new Thread(() -> {
+            cmb_chofer.setEnabled(false);
+            llenar_chofer();
+            cmb_chofer.setEnabled(true);         
+        }).start();
+        
+        new Thread(() -> {
+            cmbTipoPago.setEnabled(false);
+            llenar_abonos();
+            cmbTipoPago.setEnabled(true);
+        }).start();
+    
+    }
 
-    public boolean agregar_cliente() {
+    private boolean agregar_cliente() {
         
         boolean res = true;
         
@@ -692,7 +761,25 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         cliente.setActivo("1");
         
         try {
-            customerService.saveOrUpdate(cliente); 
+            customerService.saveOrUpdate(cliente);
+            
+            id_cliente = cliente.getId().toString();
+            lbl_cliente.setText("Cliente: "+cliente.getNombre()+" "+cliente.getApellidos());
+            
+            jTabbedPane1.setSelectedIndex(1);
+            jTabbedPane1.setEnabledAt(1, true);            
+            limpiar();
+            fillDataCmbs();
+            jbtn_disponible.setEnabled(false);
+            jbtn_reporte.setEnabled(false);
+            jbtn_nuevo_evento.setEnabled(false);
+
+            if (txt_email.getText().equals("")) {
+                check_enviar_email.setSelected(false);
+            } else if (xemail != null && xemail > 0) {
+                check_enviar_email.setSelected(true);
+            }
+            
         } catch (BusinessException businessException) {
             JOptionPane.showMessageDialog(this, businessException.getMessage(), 
                     ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
@@ -721,25 +808,25 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         try {
             
             if(!this.txtPorcentajeDescuento.getText().equals(""))
-                fPorcentaejeDescuento = Float.parseFloat(this.txtPorcentajeDescuento.getText()+"".replace(",", "."));
+                fPorcentaejeDescuento = Float.parseFloat(this.txtPorcentajeDescuento.getText().replace(",", ""));
             
-            if(!this.txt_subtotal.getText().equals("") )
-                fSubtotal = Float.parseFloat(this.txt_subtotal.getText()+"".replace(",", "."));
+            if(!this.txt_subtotal.getText().isEmpty() )
+                fSubtotal = Float.parseFloat(this.txt_subtotal.getText().replace(",", ""));
             
-            if(!this.txt_descuento.getText().equals(""))
-                fDescuento = Float.parseFloat(this.txt_descuento.getText()+"".replace(",", "."));
+            if(!this.txt_descuento.getText().isEmpty())
+                fDescuento = Float.parseFloat(this.txt_descuento.getText().replace(",", ""));
             
-            if(!this.txt_envioRecoleccion.getText().equals(""))
-                fEnvioRecoleccion = Float.parseFloat(this.txt_envioRecoleccion.getText()+"".replace(",", "."));
+            if(!this.txt_envioRecoleccion.getText().isEmpty())
+                fEnvioRecoleccion = Float.parseFloat(this.txt_envioRecoleccion.getText().replace(",", ""));
             
-            if(!this.txt_depositoGarantia.getText().equals(""))
-                fDepositoGarantia = Float.parseFloat(this.txt_depositoGarantia.getText()+"".replace(",", "."));
+            if(!this.txt_depositoGarantia.getText().isEmpty())
+                fDepositoGarantia = Float.parseFloat(this.txt_depositoGarantia.getText().replace(",", ""));
             
-            if(!this.txt_abonos.getText().equals(""))
-                fAbonos = Float.parseFloat(this.txt_abonos.getText()+"".replace(",", "."));        
+            if(!this.txt_abonos.getText().isEmpty())
+                fAbonos = Float.parseFloat(this.txt_abonos.getText().replace(",", ""));        
             
             if(fPorcentaejeDescuento == 0)
-                this.txt_descuento.setValue(0);
+                this.txt_descuento.setText("0");
             
           
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento;
@@ -747,26 +834,26 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             
             if(fPorcentaejeDescuento > 0){
                 fDescuento = (fSubtotal * (fPorcentaejeDescuento / 100));
-                this.txt_descuento.setValue(fDescuento);
+                this.txt_descuento.setText(decimalFormat.format(fDescuento));
             
             }
               
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento; 
             if(!this.txt_iva.getText().equals(""))
             {              
-                fIVA = Float.parseFloat(this.txt_iva.getText()+"".replace(",", "."));
+                fIVA = Float.parseFloat(this.txt_iva.getText().replace(",", ""));
                 fTotalIVA = (fCalculo * (fIVA / 100));              
-                this.txt_total_iva.setValue(fTotalIVA);
+                this.txt_total_iva.setText(decimalFormat.format(fTotalIVA));
             }            
             
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento; 
-            this.txt_calculo.setValue(fCalculo);            
+            this.txt_calculo.setText(decimalFormat.format(fCalculo));        
             
-             if(!this.txt_total_iva.getText().equals(""))
-                fTotalIVA = Float.parseFloat(this.txt_total_iva.getText()+"".replace(",", "."));
+             if(!this.txt_total_iva.getText().isEmpty())
+                fTotalIVA = Float.parseFloat(this.txt_total_iva.getText().replace(",", ""));
             
             fCalculo = (fSubtotal+fEnvioRecoleccion+fDepositoGarantia+fTotalIVA) - fDescuento;
-            this.txt_calculo.setValue(fCalculo);
+            this.txt_calculo.setText(decimalFormat.format(fCalculo));
             
             
             // TOTALES            
@@ -775,10 +862,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             if(fTotal < 0)
                 fTotal = 0f;
             
-            txt_total.setValue(fTotal);
+         txt_total.setText(decimalFormat.format(fTotal));
             
         } catch (NumberFormatException e) {
-             JOptionPane.showMessageDialog(null, "Error al calcular el total "+e, "SOLO NUMEROS", JOptionPane.INFORMATION_MESSAGE);
+             JOptionPane.showMessageDialog(null, "Error al calcular el total. "+e, "SOLO NUMEROS", JOptionPane.INFORMATION_MESSAGE);
              return;
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error inesperado al calcular el total "+e, "Error", JOptionPane.INFORMATION_MESSAGE);
@@ -788,64 +875,79 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     }
 
     public void llenar_combo_estado() {
-        int i = 0;
-        datos_combo = funcion.GetColumna("estado", "descripcion", "Select descripcion from estado");
-        cmb_estado.removeAllItems();
-
-        for (i = 0; i <= datos_combo.length - 1; i++) {
-            cmb_estado.addItem(datos_combo[i].toString());
+        
+        if (!statusListGlobal.isEmpty()) {
+            return;
         }
-        cmb_estado.addItem(ApplicationConstants.CMB_SELECCIONE);
-        cmb_estado.setSelectedItem("Apartado");
+        
+        try {
+            statusListGlobal = estadoEventoService.get();
+            cmb_estado.removeAllItems();
+            statusListGlobal.stream().forEach(t -> cmb_estado.addItem(t));
+        } catch (DataOriginException dataOriginException) {
+            JOptionPane.showMessageDialog(this, dataOriginException, 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+        }
+
 
     }
 
     public void llenar_combo_tipo() {
-        int i = 0;
-        // funcion.conectate();
-        datos_combo = funcion.GetColumna("tipo", "tipo", "Select tipo from tipo");
-        cmb_tipo.removeAllItems();
-
-        for (i = 0; i <= datos_combo.length - 1; i++) {
-            System.out.println("COMBO TIPO: " + datos_combo[i].toString());
-            cmb_tipo.addItem(datos_combo[i].toString());
+        
+        if (!typesGlobal.isEmpty()) {
+            return;
         }
-        cmb_tipo.addItem(ApplicationConstants.CMB_SELECCIONE);
-        cmb_tipo.setSelectedItem("Pedido");
+        
+        try {
+            cmb_tipo.removeAllItems();
+            typesGlobal = tipoEventoService.get();
+            typesGlobal.stream().forEach(t -> cmb_tipo.addItem(t));
+        } catch (DataOriginException dataOriginException) {
+            JOptionPane.showMessageDialog(this, dataOriginException, 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+        }
 
     }
 
     public void llenar_chofer() {
+        
+        if (!choferes.isEmpty()) {
+            return;
+        }
 
         try {
-            List<Usuario> choferes =  userService.getChoferes();
+            choferes =  userService.getChoferes();
             cmb_chofer.removeAllItems();
-            cmb_chofer.addItem(ApplicationConstants.CMB_SELECCIONE);
-            
+            cmb_chofer.addItem(
+                    new Usuario(0,ApplicationConstants.CMB_SELECCIONE));
+
             for(Usuario usuario : choferes){
-              cmb_chofer.addItem(usuario.getNombre()+" "+usuario.getApellidos());
+              cmb_chofer.addItem(usuario);
             }
+
+            cmb_chofer.setSelectedIndex(0);
             
-            cmb_chofer.setSelectedItem(ApplicationConstants.CMB_SELECCIONE);
-        } catch (DataOriginException e) {
-            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (DataOriginException dataOriginException) {
+            JOptionPane.showMessageDialog(this, dataOriginException, 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
         }
         
 
     }
     
     public void llenar_abonos() {
+        
+        if (!tiposAbonosGlobal.isEmpty()) {
+            return;
+        }
 
-        List<TipoAbono> tiposAbonos =  saleService.obtenerTiposAbono(funcion);
+        tiposAbonosGlobal =  saleService.obtenerTiposAbono(funcion);
         this.cmbTipoPago.removeAllItems();
-         cmbTipoPago.addItem(ApplicationConstants.CMB_SELECCIONE);
-        if(tiposAbonos != null && tiposAbonos.size()>0){
-            for(TipoAbono tipo : tiposAbonos){               
-                   cmbTipoPago.addItem(tipo.getDescripcion());
-            }
-        }        
-       
-        cmbTipoPago.setSelectedItem(ApplicationConstants.CMB_SELECCIONE);
+        
+        cmbTipoPago.addItem(new TipoAbono(0,ApplicationConstants.CMB_SELECCIONE));
+        
+        tiposAbonosGlobal.stream().forEach(t -> cmbTipoPago.addItem(t));
+        
     }
 
     public String EliminaCaracteres(String s_cadena, String s_caracteres) {
@@ -886,12 +988,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "Falta seleccionar hora devolución ", "Error", JOptionPane.INFORMATION_MESSAGE);
         } else if (!Utility.validateHour(txtEndReturnHour.getText())) {
             JOptionPane.showMessageDialog(null, "Falta seleccionar segunda hora devolución", "Error", JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_estado.getSelectedItem().equals(ApplicationConstants.CMB_SELECCIONE)) {
-            JOptionPane.showMessageDialog(null, "Favor de ingresar un estado ", "Error", JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_chofer.getSelectedItem().equals(ApplicationConstants.CMB_SELECCIONE)) {
+        } else if (cmb_chofer.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(null, "Favor de seleccionar un chofer ", "Error", JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_tipo.getSelectedItem().equals(ApplicationConstants.CMB_SELECCIONE)) {
-            JOptionPane.showMessageDialog(null, "Favor de seleccionar tipo ", "Error", JOptionPane.INFORMATION_MESSAGE);
         } else if (!txt_descripcion.getText().equals("") && txt_descripcion.getText().length() >= 400) {
             JOptionPane.showMessageDialog(null, "Descripcion a rebasado los caracteres permitidos [400 caracteres] ", "Error", JOptionPane.INFORMATION_MESSAGE);
             txt_descripcion.requestFocus();
@@ -956,16 +1054,19 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         fecha_entrega = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
         fecha_devolucion = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
         fecha_evento = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_evento.getDate());
+        
+        EstadoEvento estadoEventoSelected =(EstadoEvento) cmb_estado.getModel().getSelectedItem();
+        Usuario choferSelected = (Usuario) cmb_chofer.getModel().getSelectedItem();
+        Tipo tipoSelected = (Tipo) cmb_tipo.getModel().getSelectedItem();
 
-        String id_estado = funcion.GetData("id_estado", "Select id_estado from estado where descripcion='" + cmb_estado.getSelectedItem().toString() + "'");
-        String id_chofer = funcion.GetData("id_usuarios", "Select id_usuarios from usuarios where CONCAT(nombre,\" \",apellidos)='" + cmb_chofer.getSelectedItem().toString() + "'");
-        String id_tipo = funcion.GetData("id_tipo", "Select id_tipo from tipo where tipo='" + cmb_tipo.getSelectedItem().toString() + "'");
+        String id_estado = estadoEventoSelected.getEstadoId().toString();
+        String id_chofer = choferSelected.getUsuarioId().toString();
+        String id_tipo = tipoSelected.getTipoId().toString();
         System.out.println("ID TIPO: " + id_tipo);
         
-        final EstadoEvento estadoEvento = new EstadoEvento(Integer.parseInt(id_estado));
-        final Tipo tipoEvento = new Tipo(Integer.parseInt(id_tipo));
+
         try {
-            Utility.validateStatusAndTypeEvent(estadoEvento,tipoEvento);
+            Utility.validateStatusAndTypeEvent(estadoEventoSelected,tipoSelected);
         } catch (BusinessException e) {
             log.error(e);
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -1155,6 +1256,34 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         }
 
     }
+    
+    private void disableFormCustomer() {
+        txt_nombre.setEnabled(false);
+        txt_apellidos.setEnabled(false);
+        txt_direccion.setEnabled(false);
+        txt_apodo.setEnabled(false);
+        txt_tel_movil.setEnabled(false);
+        txt_tel_casa.setEnabled(false);
+        txt_direccion.setEnabled(false);
+        txt_localidad.setEnabled(false);
+        txt_rfc.setEnabled(false);
+        txt_email.setEnabled(false);
+
+    }
+    
+    private void enableFormCustomer() {
+        txt_nombre.setEnabled(true);
+        txt_apellidos.setEnabled(true);
+        txt_direccion.setEnabled(true);
+        txt_apodo.setEnabled(true);
+        txt_tel_movil.setEnabled(true);
+        txt_tel_casa.setEnabled(true);
+        txt_direccion.setEnabled(true);
+        txt_localidad.setEnabled(true);
+        txt_rfc.setEnabled(true);
+        txt_email.setEnabled(true);
+
+    }
 
     public void limpiar() {
         this.txt_nombre.setText("");
@@ -1168,6 +1297,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         txt_rfc.setText("");
         txt_email.setText("");
 
+
     }
 
     public void nuevo_evento() {
@@ -1180,6 +1310,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         txtEndReturnHour.setText("");
         cmb_fecha_entrega.setDate(null);
         cmb_fecha_devolucion.setDate(null);
+        cmb_fecha_pago.setDate(new Date());
         txt_descripcion.setText("");
         txt_descuento.setText("0.0");
         txtPorcentajeDescuento.setText("");
@@ -1222,8 +1353,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             tabla_detalle.setValueAt(decimalFormat.format(importe), i, 6);
             total = total + importe;
         }
-        txt_subtotal.setValue(total);
-        jTabbedPaneItems.setTitleAt(1, "Articulos("+tabla_detalle.getRowCount()+")");
+        txt_subtotal.setText(decimalFormat.format(total));
+        jTabbedPaneItems.setTitleAt(1, "Artículos("+tabla_detalle.getRowCount()+")");
 
     }
 
@@ -1235,7 +1366,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             abonos = Float.parseFloat(aux) + abonos;
 
         }
-        txt_abonos.setValue(abonos);
+        txt_abonos.setText(decimalFormat.format(abonos));
 
     }
 
@@ -1428,7 +1559,11 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                     jbtn_mostrar_articulos.setEnabled(true);
                     panel = true;
                     disableInputsEditItem();
-                    lbl_eleccion.setText("Articulo se agrego al evento.");
+                    
+                    String itemSelected = lbl_eleccion.getText();
+                    lbl_eleccion.setText("Artículo se agregó al evento.");
+                    UtilityCommon.setTimeout(() -> lbl_eleccion.setText(itemSelected), 2000);
+                    
                     Toolkit.getDefaultToolkit().beep();
                     txt_buscar.requestFocus();
                     txt_buscar.selectAll();
@@ -1452,32 +1587,31 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             Toolkit.getDefaultToolkit().beep();
             return;
         }
-           
-        String tipoAbonoId = funcion.GetData("id_tipo_abono", "SELECT id_tipo_abono FROM tipo_abono "
-                + "WHERE descripcion='" + cmbTipoPago.getSelectedItem().toString() + "'");
-            //{"cantidad","id_articulo", "P.Unitario", "Importe"};
-            DefaultTableModel temp = (DefaultTableModel) tabla_abonos.getModel();
-            float abono = 0f;
-            try {         
-                abono = Float.parseFloat(txt_abono.getText());                          
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Ingresa solo numeros ", "Error", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-            String fechaPago = "";
-            if(cmb_fecha_pago.getDate() != null && !cmb_fecha_pago.getDate().toString().equals(""))
-                fechaPago = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_pago.getDate());
-            
-            String xabono = conviertemoneda(Float.toString(abono));
-            fecha_sistema();
-            Object nuevo1[] = {fecha_sistema, xabono, txt_comentario.getText(),tipoAbonoId,cmbTipoPago.getSelectedItem().toString(),fechaPago};
-            temp.addRow(nuevo1);
-            abonos();
-            subTotal();
-            total();
+        
+        TipoAbono tipoAbonoSelected = (TipoAbono) cmbTipoPago.getModel().getSelectedItem();           
 
-            txt_abono.setText("0");
-            txt_abono.requestFocus();
+        DefaultTableModel temp = (DefaultTableModel) tabla_abonos.getModel();
+        float abono = 0f;
+        try {         
+            abono = Float.parseFloat(txt_abono.getText());                          
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Ingresa solo numeros ", "Error", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        String fechaPago = "";
+        if(cmb_fecha_pago.getDate() != null && !cmb_fecha_pago.getDate().toString().equals(""))
+            fechaPago = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_pago.getDate());
+
+        String xabono = conviertemoneda(Float.toString(abono));
+        fecha_sistema();
+        Object nuevo1[] = {fecha_sistema, xabono, txt_comentario.getText(),tipoAbonoSelected.getTipoAbonoId(),cmbTipoPago.getSelectedItem().toString(),fechaPago};
+        temp.addRow(nuevo1);
+        abonos();
+        subTotal();
+        total();
+
+        txt_abono.setText("0");
+        txt_abono.requestFocus();
 
         
 
@@ -1623,23 +1757,18 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
-        cmb_estado = new javax.swing.JComboBox();
-        txt_subtotal = new javax.swing.JFormattedTextField();
+        cmb_estado = new javax.swing.JComboBox<>();
         jLabel15 = new javax.swing.JLabel();
-        txt_descuento = new javax.swing.JFormattedTextField();
         jLabel16 = new javax.swing.JLabel();
         txtPorcentajeDescuento = new javax.swing.JFormattedTextField();
         jLabel17 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
-        txt_abonos = new javax.swing.JFormattedTextField();
         jLabel19 = new javax.swing.JLabel();
-        txt_total = new javax.swing.JFormattedTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
         txt_descripcion = new javax.swing.JTextPane();
-        txt_total_iva = new javax.swing.JFormattedTextField();
-        cmb_chofer = new javax.swing.JComboBox();
+        cmb_chofer = new javax.swing.JComboBox<>();
         jLabel26 = new javax.swing.JLabel();
-        cmb_tipo = new javax.swing.JComboBox();
+        cmb_tipo = new javax.swing.JComboBox<>();
         jLabel27 = new javax.swing.JLabel();
         jLabel28 = new javax.swing.JLabel();
         jLabel29 = new javax.swing.JLabel();
@@ -1653,7 +1782,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jLabel35 = new javax.swing.JLabel();
         txt_depositoGarantia = new javax.swing.JFormattedTextField();
         jLabel36 = new javax.swing.JLabel();
-        txt_calculo = new javax.swing.JFormattedTextField();
         txt_iva = new javax.swing.JFormattedTextField();
         check_generar_reporte = new javax.swing.JCheckBox();
         check_enviar_email = new javax.swing.JCheckBox();
@@ -1663,6 +1791,12 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         txtInitDeliveryHour = new javax.swing.JFormattedTextField();
         txtEndDeliveryHour = new javax.swing.JFormattedTextField();
         txtEndReturnHour = new javax.swing.JFormattedTextField();
+        txt_abonos = new javax.swing.JTextField();
+        txt_subtotal = new javax.swing.JTextField();
+        txt_calculo = new javax.swing.JTextField();
+        txt_descuento = new javax.swing.JTextField();
+        txt_total_iva = new javax.swing.JTextField();
+        txt_total = new javax.swing.JTextField();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel6 = new javax.swing.JPanel();
         jToolBar3 = new javax.swing.JToolBar();
@@ -1707,7 +1841,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jLabel25 = new javax.swing.JLabel();
         txt_abono = new javax.swing.JTextField();
         lblTipoAbono = new javax.swing.JLabel();
-        cmbTipoPago = new javax.swing.JComboBox();
+        cmbTipoPago = new javax.swing.JComboBox<>();
         jLabel39 = new javax.swing.JLabel();
         cmb_fecha_pago = new com.toedter.calendar.JDateChooser();
         jLabel40 = new javax.swing.JLabel();
@@ -1723,7 +1857,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         setResizable(true);
         setTitle("AGREGAR UNA RENTA O PEDIDO....");
 
-        jTabbedPane1.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        jTabbedPane1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
         jToolBar1.setFloatable(false);
         jToolBar1.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -1922,7 +2056,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                     .addComponent(lblAddSocialMediaContact))
                 .addGap(4, 4, 4)
                 .addComponent(cmbSocialMedialContact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(187, Short.MAX_VALUE))
+                .addContainerGap(188, Short.MAX_VALUE))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Clientes en la base de datos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
@@ -1982,78 +2116,57 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Elige el cliente", jPanel1);
 
-        panel_datos_generales.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos generales", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
+        panel_datos_generales.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 153, 153)));
         panel_datos_generales.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lbl_cliente.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(lbl_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 20, 220, 20));
+        panel_datos_generales.add(lbl_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 20, 200, 20));
 
         lbl_atiende.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         lbl_atiende.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        panel_datos_generales.add(lbl_atiende, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 40, 220, 20));
+        panel_datos_generales.add(lbl_atiende, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 40, 200, 20));
 
-        cmb_fecha_entrega.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmb_fecha_entrega.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         panel_datos_generales.add(cmb_fecha_entrega, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 50, 210, 21));
 
-        jLabel10.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel10.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel10.setText("Fecha de entrega:");
-        panel_datos_generales.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 100, 21));
+        panel_datos_generales.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 110, 21));
 
-        jLabel11.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel11.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel11.setText("Hora entrega:");
-        panel_datos_generales.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 80, 20));
+        panel_datos_generales.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 110, 20));
 
-        cmb_fecha_devolucion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmb_fecha_devolucion.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         panel_datos_generales.add(cmb_fecha_devolucion, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 80, 210, 21));
 
-        jLabel12.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel12.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel12.setText("Fecha del evento:");
-        panel_datos_generales.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 100, 20));
+        panel_datos_generales.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 110, 20));
 
         jLabel13.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel13.setText("Direccion del evento:");
+        jLabel13.setText("Dirección del evento:");
         panel_datos_generales.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 20, 230, -1));
 
-        jLabel14.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel14.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel14.setText("Estado:");
-        panel_datos_generales.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 140, -1, 23));
+        panel_datos_generales.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 140, 70, 23));
 
-        cmb_estado.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_estado.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmb_estado.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmb_estado.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_estado, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 140, 190, -1));
+        panel_datos_generales.add(cmb_estado, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 140, 170, -1));
 
-        txt_subtotal.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_subtotal.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_subtotal.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        panel_datos_generales.add(txt_subtotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 20, 120, -1));
-
-        jLabel15.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel15.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel15.setText("Subtotal:");
-        panel_datos_generales.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 20, 69, 20));
+        panel_datos_generales.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(809, 20, 90, 20));
 
-        txt_descuento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_descuento.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_descuento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_descuento.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txt_descuentoFocusLost(evt);
-            }
-        });
-        txt_descuento.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_descuentoKeyPressed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_descuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 40, 70, -1));
-
-        jLabel16.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel16.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel16.setText("Descuento % :");
-        panel_datos_generales.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 40, 110, 20));
+        panel_datos_generales.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 40, 130, 20));
 
         txtPorcentajeDescuento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
         txtPorcentajeDescuento.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtPorcentajeDescuento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtPorcentajeDescuento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txtPorcentajeDescuento.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtPorcentajeDescuentoFocusLost(evt);
@@ -2066,95 +2179,73 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         });
         panel_datos_generales.add(txtPorcentajeDescuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 40, 40, -1));
 
-        jLabel17.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel17.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel17.setText("IVA % :");
-        panel_datos_generales.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 100, 69, 20));
+        panel_datos_generales.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 100, 120, 20));
 
-        jLabel18.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel18.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel18.setText("Pagos:");
-        panel_datos_generales.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 140, 69, 20));
+        panel_datos_generales.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 140, 120, 20));
 
-        txt_abonos.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_abonos.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_abonos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        panel_datos_generales.add(txt_abonos, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 140, 120, -1));
-
-        jLabel19.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel19.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel19.setText("Total:");
-        panel_datos_generales.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 160, 69, 20));
+        panel_datos_generales.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 160, 120, 20));
 
-        txt_total.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_total.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_total.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_total.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_totalActionPerformed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_total, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 160, 120, -1));
-
-        txt_descripcion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_descripcion.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jScrollPane3.setViewportView(txt_descripcion);
 
         panel_datos_generales.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 40, 230, 90));
 
-        txt_total_iva.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_total_iva.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_total_iva.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        panel_datos_generales.add(txt_total_iva, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 100, 70, -1));
-
-        cmb_chofer.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_chofer.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmb_chofer.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmb_chofer.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         panel_datos_generales.add(cmb_chofer, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 20, 210, -1));
 
-        jLabel26.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel26.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel26.setText("Chofer:");
         panel_datos_generales.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 110, 20));
 
-        cmb_tipo.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmb_tipo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmb_tipo.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmb_tipo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(cmb_tipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 170, 190, -1));
+        panel_datos_generales.add(cmb_tipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 170, 170, -1));
 
-        jLabel27.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel27.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel27.setText("Tipo:");
-        panel_datos_generales.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 170, 40, 20));
+        panel_datos_generales.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 170, 70, 20));
 
-        jLabel28.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel28.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel28.setText("Hora devolución:");
-        panel_datos_generales.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 100, 20));
+        panel_datos_generales.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 110, 20));
 
-        jLabel29.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel29.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel29.setText("a");
-        panel_datos_generales.add(jLabel29, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 170, 20, 30));
+        panel_datos_generales.add(jLabel29, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 170, 20, 20));
 
-        jLabel30.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel30.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel30.setText("a");
-        panel_datos_generales.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 140, 20, 30));
+        panel_datos_generales.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 140, 20, 20));
 
-        jLabel31.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel31.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel31.setText("Fecha de devolución:");
         panel_datos_generales.add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 120, 20));
 
-        cmb_fecha_evento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmb_fecha_evento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         panel_datos_generales.add(cmb_fecha_evento, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 110, 210, 21));
 
-        jLabel32.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel32.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel32.setText("Hrs.");
-        panel_datos_generales.add(jLabel32, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 170, -1, -1));
+        panel_datos_generales.add(jLabel32, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 170, 40, 20));
 
-        jLabel33.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel33.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel33.setText("Hrs.");
-        panel_datos_generales.add(jLabel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 140, -1, -1));
+        panel_datos_generales.add(jLabel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 140, 50, 20));
 
-        jLabel34.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel34.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel34.setText("Envío y recolección");
-        panel_datos_generales.add(jLabel34, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 60, 110, 20));
+        panel_datos_generales.add(jLabel34, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 60, 130, 20));
 
         txt_envioRecoleccion.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
         txt_envioRecoleccion.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_envioRecoleccion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_envioRecoleccion.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_envioRecoleccion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_envioRecoleccionActionPerformed(evt);
@@ -2167,13 +2258,13 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         });
         panel_datos_generales.add(txt_envioRecoleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 60, 120, -1));
 
-        jLabel35.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel35.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel35.setText("Depósito en garantía");
-        panel_datos_generales.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(829, 80, 110, 20));
+        panel_datos_generales.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(809, 80, 130, 20));
 
         txt_depositoGarantia.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
         txt_depositoGarantia.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_depositoGarantia.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_depositoGarantia.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_depositoGarantia.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_depositoGarantiaActionPerformed(evt);
@@ -2186,23 +2277,13 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         });
         panel_datos_generales.add(txt_depositoGarantia, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 80, 120, -1));
 
-        jLabel36.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel36.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel36.setText("Calculo:");
-        panel_datos_generales.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 120, 69, 20));
-
-        txt_calculo.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_calculo.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_calculo.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        txt_calculo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_calculoActionPerformed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_calculo, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 120, 120, -1));
+        panel_datos_generales.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 120, 120, 20));
 
         txt_iva.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
         txt_iva.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_iva.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_iva.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_iva.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txt_ivaFocusLost(evt);
@@ -2215,7 +2296,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         });
         panel_datos_generales.add(txt_iva, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 100, 40, -1));
 
-        check_generar_reporte.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        check_generar_reporte.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         check_generar_reporte.setText("Generar reporte al guardar");
         check_generar_reporte.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         check_generar_reporte.addActionListener(new java.awt.event.ActionListener() {
@@ -2223,9 +2304,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 check_generar_reporteActionPerformed(evt);
             }
         });
-        panel_datos_generales.add(check_generar_reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 150, 220, 20));
+        panel_datos_generales.add(check_generar_reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 150, 190, 20));
 
-        check_enviar_email.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        check_enviar_email.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         check_enviar_email.setText("Enviar email confirmación");
         check_enviar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         check_enviar_email.addActionListener(new java.awt.event.ActionListener() {
@@ -2233,12 +2314,12 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 check_enviar_emailActionPerformed(evt);
             }
         });
-        panel_datos_generales.add(check_enviar_email, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 110, 220, -1));
+        panel_datos_generales.add(check_enviar_email, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 110, 180, -1));
 
-        check_mostrar_precios.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        check_mostrar_precios.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         check_mostrar_precios.setText("Mostrar precios en PDF");
         check_mostrar_precios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(check_mostrar_precios, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 130, 220, 20));
+        panel_datos_generales.add(check_mostrar_precios, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 130, 180, 20));
 
         txtEmailToSend.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
         txtEmailToSend.setToolTipText("Para enviar multiples correos deberas separarlos por punto y coma [;]");
@@ -2247,13 +2328,14 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 txtEmailToSendActionPerformed(evt);
             }
         });
-        panel_datos_generales.add(txtEmailToSend, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 170, 220, -1));
+        panel_datos_generales.add(txtEmailToSend, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 170, 180, -1));
 
         try {
             txtInitReturnHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
+        txtInitReturnHour.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         panel_datos_generales.add(txtInitReturnHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 60, -1));
 
         try {
@@ -2261,6 +2343,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
+        txtInitDeliveryHour.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         panel_datos_generales.add(txtInitDeliveryHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 140, 60, -1));
 
         try {
@@ -2268,6 +2351,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
+        txtEndDeliveryHour.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         panel_datos_generales.add(txtEndDeliveryHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 140, 60, -1));
 
         try {
@@ -2275,10 +2359,29 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
+        txtEndReturnHour.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         panel_datos_generales.add(txtEndReturnHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 170, 60, -1));
 
+        txt_abonos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        panel_datos_generales.add(txt_abonos, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 140, 120, -1));
+
+        txt_subtotal.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        panel_datos_generales.add(txt_subtotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 20, 120, 20));
+
+        txt_calculo.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        panel_datos_generales.add(txt_calculo, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 120, 120, 20));
+
+        txt_descuento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        panel_datos_generales.add(txt_descuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 40, 80, 20));
+
+        txt_total_iva.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        panel_datos_generales.add(txt_total_iva, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 100, 80, 20));
+
+        txt_total.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        panel_datos_generales.add(txt_total, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 160, 120, -1));
+
         jTabbedPane2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jTabbedPane2.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        jTabbedPane2.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
         jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -2353,27 +2456,29 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         jPanel6.add(jToolBar3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 39, 370));
 
-        txt_cantidad.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jTabbedPaneItems.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        txt_cantidad.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_cantidad.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_cantidadKeyPressed(evt);
             }
         });
 
-        jLabel20.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel20.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel20.setText("Cantidad:");
 
-        txt_precio_unitario.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_precio_unitario.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_precio_unitario.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_precio_unitarioKeyPressed(evt);
             }
         });
 
-        jLabel21.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel21.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel21.setText("Precio:");
 
-        txt_buscar.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_buscar.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_buscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_buscarActionPerformed(evt);
@@ -2388,7 +2493,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             }
         });
 
-        tabla_articulos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        tabla_articulos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         tabla_articulos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2408,7 +2513,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         });
         jScrollPane4.setViewportView(tabla_articulos);
 
-        txt_porcentaje_descuento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_porcentaje_descuento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_porcentaje_descuento.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_porcentaje_descuentoActionPerformed(evt);
@@ -2420,11 +2525,11 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             }
         });
 
-        jLabel37.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel37.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel37.setText("Descuento %");
 
-        btnGetItemsFromFolio.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        btnGetItemsFromFolio.setText("Obtener articulos de un folio");
+        btnGetItemsFromFolio.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        btnGetItemsFromFolio.setText("Obtener artículos de un folio");
         btnGetItemsFromFolio.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGetItemsFromFolio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2441,52 +2546,52 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             .addGroup(panel_articulosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 1055, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panel_articulosLayout.createSequentialGroup()
-                        .addComponent(txt_buscar, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txt_buscar, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnGetItemsFromFolio)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(lbl_eleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(lbl_eleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel20)
+                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txt_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel21)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(7, 7, 7)
+                        .addComponent(txt_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel37)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txt_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panel_articulosLayout.setVerticalGroup(
             panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_articulosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_articulosLayout.createSequentialGroup()
-                            .addGap(0, 1, Short.MAX_VALUE)
-                            .addComponent(txt_buscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnGetItemsFromFolio)
-                            .addComponent(jLabel37, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txt_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txt_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txt_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(lbl_eleccion, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE))
+                    .addComponent(jLabel20, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel37, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txt_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txt_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txt_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_articulosLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txt_buscar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnGetItemsFromFolio, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(lbl_eleccion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE))
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE))
         );
 
         jTabbedPaneItems.addTab("Inventario", panel_articulos);
 
-        tabla_detalle.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        tabla_detalle.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         tabla_detalle.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2506,12 +2611,12 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         });
         jScrollPane2.setViewportView(tabla_detalle);
 
-        lbl_sel.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        lbl_sel.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
-        jLabel22.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel22.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel22.setText("Cantidad:");
 
-        txtAmountEdit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtAmountEdit.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txtAmountEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtAmountEditActionPerformed(evt);
@@ -2523,20 +2628,20 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             }
         });
 
-        txtUnitPriceEdit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtUnitPriceEdit.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txtUnitPriceEdit.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtUnitPriceEditKeyPressed(evt);
             }
         });
 
-        jLabel38.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel38.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel38.setText("Precio:");
 
-        jLabel41.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel41.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel41.setText("Descuento %:");
 
-        txtDiscountRateEdit.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtDiscountRateEdit.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txtDiscountRateEdit.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtDiscountRateEditKeyPressed(evt);
@@ -2550,17 +2655,19 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_conceptosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2)
+                    .addGroup(panel_conceptosLayout.createSequentialGroup()
+                        .addGap(2, 2, 2)
+                        .addComponent(jScrollPane2))
                     .addGroup(panel_conceptosLayout.createSequentialGroup()
                         .addComponent(lbl_sel, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 415, Short.MAX_VALUE)
-                        .addComponent(jLabel22)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 362, Short.MAX_VALUE)
+                        .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtAmountEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel38)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtUnitPriceEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtUnitPriceEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(7, 7, 7)
                         .addComponent(jLabel41)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -2581,13 +2688,13 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                         .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(lbl_sel, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        jTabbedPaneItems.addTab("Articulos (0)", panel_conceptos);
+        jTabbedPaneItems.addTab("Artículos (0)", panel_conceptos);
 
-        jPanel6.add(jTabbedPaneItems, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 10, 1080, 370));
+        jPanel6.add(jTabbedPaneItems, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 10, 1070, 370));
 
         jTabbedPane2.addTab("Detalle conceptos", jPanel6);
 
@@ -2665,14 +2772,15 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         });
         jToolBar4.add(jbtn_quitar_abono);
 
-        jLabel24.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        jLabel24.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel24.setText("Pago:");
 
-        txt_comentario.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_comentario.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
-        jLabel25.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        jLabel25.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel25.setText("Comentario:");
 
+        txt_abono.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_abono.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_abonoKeyPressed(evt);
@@ -2692,16 +2800,15 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             }
         });
 
-        cmbTipoPago.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        cmbTipoPago.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbTipoPago.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmbTipoPago.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-        jLabel39.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel39.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel39.setText("Tipo de pago:");
 
-        cmb_fecha_pago.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmb_fecha_pago.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
-        jLabel40.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel40.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel40.setText("Fecha del pago:");
 
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
@@ -2710,21 +2817,20 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(txt_abono, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel25)
-                            .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(jPanel10Layout.createSequentialGroup()
-                                    .addComponent(jLabel39)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 129, Short.MAX_VALUE)
-                                    .addComponent(lblTipoAbono))
-                                .addComponent(txt_comentario, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(cmbTipoPago, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                    .addComponent(cmb_fecha_pago, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txt_abono)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(jPanel10Layout.createSequentialGroup()
+                                .addComponent(jLabel39, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblTipoAbono))
+                            .addComponent(txt_comentario, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cmbTipoPago, javax.swing.GroupLayout.Alignment.LEADING, 0, 220, Short.MAX_VALUE))
+                        .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmb_fecha_pago, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addComponent(jToolBar4, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -2747,10 +2853,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                         .addGap(10, 10, 10)
                         .addComponent(cmbTipoPago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel40)
-                        .addGap(7, 7, 7)
-                        .addComponent(cmb_fecha_pago, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel40))
                     .addComponent(lblTipoAbono))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmb_fecha_pago, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -2763,7 +2869,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(69, Short.MAX_VALUE))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2777,7 +2883,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         jTabbedPane2.addTab("Pagos", jPanel8);
 
-        txt_comentarios.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_comentarios.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jScrollPane6.setViewportView(txt_comentarios);
 
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
@@ -2884,8 +2990,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane1)
-                .addContainerGap())
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2898,27 +3004,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
 
-        // boolean res = agregar_cliente();
-        if (agregar_cliente() == true) {
-            jTabbedPane1.setSelectedIndex(1);
-            jTabbedPane1.setEnabledAt(1, true);
-            this.lbl_cliente.setText("Cliente: "+this.txt_nombre.getText() + " " + this.txt_apellidos.getText());
-            limpiar();
-            tabla_articulos();
-            jbtn_disponible.setEnabled(false);
-            jbtn_reporte.setEnabled(false);
-            jbtn_nuevo_evento.setEnabled(false);
+        agregar_cliente();
 
-            if (txt_email.getText().equals("")) {
-                check_enviar_email.setSelected(false);
-            } else if (xemail != null && xemail > 0) {
-                check_enviar_email.setSelected(true);
-
-            }
-
-        }
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -2984,22 +3072,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_jButton3ActionPerformed
 
-    private void txt_descuentoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_descuentoKeyPressed
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == 10) {
-            if (txt_subtotal.getText().equals("")) {
-                JOptionPane.showMessageDialog(null, "No hay cantidad en subtotal para agregar el descuento", "Descuento", JOptionPane.INFORMATION_MESSAGE);
-                Toolkit.getDefaultToolkit().beep();
-
-            } else {
-
-                total();
-                //lbl_aviso.setText("Se aplico con exito el descuento...");
-                Toolkit.getDefaultToolkit().beep();
-            }
-        }
-    }//GEN-LAST:event_txt_descuentoKeyPressed
-
     private void txtPorcentajeDescuentoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPorcentajeDescuentoKeyPressed
          if (evt.getKeyCode() == 10) {
             if (txt_subtotal.getText().equals("")) {
@@ -3012,13 +3084,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             }
         }
     }//GEN-LAST:event_txtPorcentajeDescuentoKeyPressed
-
-    private void txt_descuentoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_descuentoFocusLost
-        // TODO add your handling code here:
-        if (txt_descuento.getText().equals("")) {
-            txt_descuento.setText("0");
-        }
-    }//GEN-LAST:event_txt_descuentoFocusLost
 
     private void txtPorcentajeDescuentoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPorcentajeDescuentoFocusLost
         // TODO add your handling code here:
@@ -3104,10 +3169,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         //jbtn_mostrar_articulos.setEnabled(false);
     }//GEN-LAST:event_jbtn_mostrar_articulosActionPerformed
 
-    private void txt_totalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_totalActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_totalActionPerformed
-
     private void txt_abonoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_abonoKeyPressed
         if (evt.getKeyCode() == 10)
          agregar_abonos();
@@ -3151,10 +3212,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             }
         }
     }//GEN-LAST:event_txt_depositoGarantiaKeyPressed
-
-    private void txt_calculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_calculoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_calculoActionPerformed
 
     private void txt_ivaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_ivaFocusLost
         // TODO add your handling code here:
@@ -3400,8 +3457,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             return;
         }
         
+        Frame frame = JOptionPane.getFrameForComponent(this);
+        
         AddCatalogSocialMediaFormDialog dialog = 
-                new AddCatalogSocialMediaFormDialog(null, true);
+                new AddCatalogSocialMediaFormDialog(frame, true);
         
         Boolean successfulChangesDetected = dialog.showDialog();
         
@@ -3466,14 +3525,14 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private javax.swing.JCheckBox check_mostrar_precios;
     private com.toedter.calendar.JDateChooser cmbBirthday;
     private javax.swing.JComboBox<CatalogSocialMediaContactModel> cmbSocialMedialContact;
-    private javax.swing.JComboBox cmbTipoPago;
-    private javax.swing.JComboBox cmb_chofer;
-    private javax.swing.JComboBox cmb_estado;
+    private javax.swing.JComboBox<TipoAbono> cmbTipoPago;
+    private javax.swing.JComboBox<Usuario> cmb_chofer;
+    private javax.swing.JComboBox<EstadoEvento> cmb_estado;
     private com.toedter.calendar.JDateChooser cmb_fecha_devolucion;
     private com.toedter.calendar.JDateChooser cmb_fecha_entrega;
     private com.toedter.calendar.JDateChooser cmb_fecha_evento;
     private com.toedter.calendar.JDateChooser cmb_fecha_pago;
-    private javax.swing.JComboBox cmb_tipo;
+    private javax.swing.JComboBox<Tipo> cmb_tipo;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -3571,17 +3630,17 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private javax.swing.JFormattedTextField txtPorcentajeDescuento;
     private javax.swing.JTextField txtUnitPriceEdit;
     private javax.swing.JTextField txt_abono;
-    private javax.swing.JFormattedTextField txt_abonos;
+    private javax.swing.JTextField txt_abonos;
     private javax.swing.JTextField txt_apellidos;
     private javax.swing.JTextField txt_apodo;
     private javax.swing.JTextField txt_buscar;
-    private javax.swing.JFormattedTextField txt_calculo;
+    private javax.swing.JTextField txt_calculo;
     private javax.swing.JTextField txt_cantidad;
     private javax.swing.JTextField txt_comentario;
     private javax.swing.JTextPane txt_comentarios;
     private javax.swing.JFormattedTextField txt_depositoGarantia;
     public static javax.swing.JTextPane txt_descripcion;
-    private javax.swing.JFormattedTextField txt_descuento;
+    private javax.swing.JTextField txt_descuento;
     private javax.swing.JTextField txt_direccion;
     private javax.swing.JTextField txt_email;
     private javax.swing.JFormattedTextField txt_envioRecoleccion;
@@ -3591,10 +3650,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txt_porcentaje_descuento;
     private javax.swing.JTextField txt_precio_unitario;
     private javax.swing.JTextField txt_rfc;
-    private javax.swing.JFormattedTextField txt_subtotal;
+    private javax.swing.JTextField txt_subtotal;
     private javax.swing.JTextField txt_tel_casa;
     private javax.swing.JTextField txt_tel_movil;
-    private javax.swing.JFormattedTextField txt_total;
-    private javax.swing.JFormattedTextField txt_total_iva;
+    private javax.swing.JTextField txt_total;
+    private javax.swing.JTextField txt_total_iva;
     // End of variables declaration//GEN-END:variables
 }

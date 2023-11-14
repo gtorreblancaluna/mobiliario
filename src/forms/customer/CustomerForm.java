@@ -10,6 +10,7 @@ import common.services.UtilityService;
 import common.tables.TableCustomer;
 import common.utilities.UtilityCommon;
 import forms.socialMediaContact.AddCatalogSocialMediaFormDialog;
+import java.awt.Frame;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
@@ -163,8 +164,10 @@ public class CustomerForm extends javax.swing.JInternalFrame {
             return;
         }
         
+        Frame frame = JOptionPane.getFrameForComponent(this);
+        
         AddCatalogSocialMediaFormDialog dialog = 
-                new AddCatalogSocialMediaFormDialog(null, true);
+                new AddCatalogSocialMediaFormDialog(frame, true);
         
         Boolean successfulChangesDetected = dialog.showDialog();
         

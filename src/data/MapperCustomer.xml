@@ -51,7 +51,8 @@
         AND c.activo = 1
     </select>
     
-    <insert id="insertCustomer" parameterType="common.model.Cliente">
+    <insert id="insertCustomer" parameterType="common.model.Cliente" useGeneratedKeys="true" 
+            keyProperty="id" >
         INSERT INTO clientes
         (
             nombre,

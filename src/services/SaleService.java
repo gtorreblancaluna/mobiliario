@@ -51,7 +51,6 @@ public class SaleService {
             String id = sql.GetData("id_detalle_renta", "SELECT id_detalle_renta FROM detalle_renta ORDER BY id_detalle_renta DESC LIMIT 1 ");
             return Integer.parseInt(id);
         } catch (SQLException ex) {
-//            Logger.getLogger(SaleService.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(null, "Error al insertar registro ", "Error", JOptionPane.ERROR);
             return 0;
         }

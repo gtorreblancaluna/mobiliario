@@ -10,11 +10,16 @@ import common.tables.TableCatalogSocialMediaContact;
 import common.utilities.UtilityCommon;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 
 
@@ -30,16 +35,31 @@ public class AddCatalogSocialMediaFormDialog extends javax.swing.JDialog {
     
     public AddCatalogSocialMediaFormDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        this.setLocation((Toolkit.getDefaultToolkit().getScreenSize().width)/2 - getWidth()/2, (Toolkit.getDefaultToolkit().getScreenSize().height)/2 - getHeight()/2);
+
         initComponents();
         init();
         tableCatalogSocialMediaContact = new TableCatalogSocialMediaContact();
         UtilityCommon.addJtableToPane(950, 400, panelTable, tableCatalogSocialMediaContact);
         fillTable();
-        this.setTitle("Catalogo Social Media Contact");
         addEventListenerTable();
         this.setTitle("Catalogo Medio de contacto.");
+        addEscapeListener();
         
-    }   
+    }
+    
+    // close dialog when esc is pressed.
+    private void addEscapeListener() {
+        ActionListener escListener = (ActionEvent e) -> {
+            setVisible(false);
+            dispose();
+        };
+
+        this.getRootPane().registerKeyboardAction(escListener,
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+    }
     
     private void addEventListenerTable () {
     
@@ -62,6 +82,7 @@ public class AddCatalogSocialMediaFormDialog extends javax.swing.JDialog {
                     idToUpdate = Integer.parseInt(id);
 
                     txtDescription.setText(description);
+                    txtDescription.selectAll();
 
                     btnSave.setEnabled(true);
                     txtDescription.requestFocus();
