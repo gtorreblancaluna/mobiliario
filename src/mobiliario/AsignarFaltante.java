@@ -3,6 +3,7 @@ package mobiliario;
 import forms.inventario.InventarioForm;
 import services.SaleService;
 import clases.sqlclass;
+import common.constants.ApplicationConstants;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import javax.swing.JOptionPane;
 import common.model.DetalleRenta;
 import common.model.Renta;
 import common.services.ItemService;
+import common.utilities.UtilityCommon;
 
 public class AsignarFaltante extends java.awt.Dialog {
 

@@ -23,6 +23,7 @@ public abstract class Utility {
     
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     
+    
     public static boolean validateHour(String hora) {
         boolean b;
         char[] a = hora.toCharArray();

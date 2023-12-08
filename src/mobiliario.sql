@@ -145,9 +145,9 @@ CREATE TABLE clientes (
   direccion varchar(500) DEFAULT NULL,
   localidad varchar(45) DEFAULT NULL,
   rfc varchar(45) DEFAULT NULL,
-  activo varchar(5) DEFAULT NULL,
+  activo ENUM('1','0') NOT NULL DEFAULT '1',
   birthday TIMESTAMP NULL DEFAULT NULL,
-  catalog_social_media_contact_id INT(11) DEFAULT NULL,
+  catalog_social_media_contact_id INT(11) DEFAULT NOT NULL,
   PRIMARY KEY (id_clientes),
   CONSTRAINT fk_catalog_social_media_contact 
     FOREIGN KEY (catalog_social_media_contact_id) 
@@ -171,7 +171,7 @@ CREATE TABLE proveedores (
   direccion varchar(250) DEFAULT NULL,
   telefonos varchar(250) DEFAULT NULL,
   email varchar(250) DEFAULT NULL,
-  fg_activo enum('1','0') NOT NULL DEFAULT '1',
+  fg_activo ENUM('1','0') NOT NULL DEFAULT '1',
   creado timestamp NULL DEFAULT NULL,
   actualizado timestamp NULL DEFAULT NULL,
   PRIMARY KEY (id)

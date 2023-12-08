@@ -199,6 +199,20 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     
     private void eventListenerTextHourFields () {
         
+        txtEndReturnHour.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                JTextField textField = (JTextField) e.getSource();                
+                if (Utility.validateHour(textField.getText()) 
+                        && Utility.validateHour(txtInitDeliveryHour.getText())
+                        && Utility.validateHour(txtEndDeliveryHour.getText())
+                        && Utility.validateHour(txtInitReturnHour.getText())
+                        ) {
+                    txt_descripcion.requestFocus();
+                }
+            }
+        });
+        
         txtInitDeliveryHour.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -2511,6 +2525,11 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 tabla_articulosMouseClicked(evt);
             }
         });
+        tabla_articulos.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tabla_articulosKeyPressed(evt);
+            }
+        });
         jScrollPane4.setViewportView(tabla_articulos);
 
         txt_porcentaje_descuento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
@@ -3302,6 +3321,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private void txt_buscarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_buscarKeyPressed
         if(evt.getKeyCode() == KeyEvent.VK_ENTER && tabla_articulos.getRowCount() > 0) {
             addItemToEventFromInventory(0);
+        } else if (evt.getKeyCode() == KeyEvent.VK_DOWN && tabla_articulos.getRowCount() > 0) {
+            tabla_articulos.requestFocus();
+            tabla_articulos.changeSelection(0,0,false, false);
         } else {
            tabla_articulos_like();
         }
@@ -3475,6 +3497,16 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
         
     }//GEN-LAST:event_lblAddSocialMediaContactKeyPressed
+
+    private void tabla_articulosKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tabla_articulosKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER && tabla_articulos.getRowCount() > 0) {
+            addItemToEventFromInventory(tabla_articulos.getSelectedRow());
+        } else if (evt.getKeyCode() == KeyEvent.VK_UP 
+                && tabla_articulos.getSelectedRow() == 0) {
+            txt_buscar.requestFocus();
+            txt_buscar.selectAll();
+        } 
+    }//GEN-LAST:event_tabla_articulosKeyPressed
 
     private void fillTableFromItemsFolio (Renta renta) {
         DefaultTableModel tableModel = (DefaultTableModel) tabla_detalle.getModel();

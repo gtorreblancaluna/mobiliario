@@ -235,10 +235,24 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     
     private void eventListenerTextHourFields () {
         
-        txtInitDeliveryHour.addKeyListener(new KeyAdapter() {
+        txtEndReturnHour.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
                 JTextField textField = (JTextField) e.getSource();                
+                if (Utility.validateHour(textField.getText()) 
+                        && Utility.validateHour(txtInitDeliveryHour.getText())
+                        && Utility.validateHour(txtEndDeliveryHour.getText())
+                        && Utility.validateHour(txtInitReturnHour.getText())
+                        ) {
+                    txt_descripcion.requestFocus();
+                }
+            }
+        });
+        
+        txtInitDeliveryHour.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                JTextField textField = (JTextField) e.getSource();
                 if (Utility.validateHour(textField.getText()) 
                         && !Utility.validateHour(txtEndDeliveryHour.getText())) {
                     txtEndDeliveryHour.requestFocus();
@@ -955,7 +969,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
              total();
              jbtn_mostrar_articulos.setEnabled(true);
              panel = true;
-             lbl_eleccion.setText("Articulo se agrego al evento.");
+             
+            String itemSelected = lbl_eleccion.getText();
+            lbl_eleccion.setText("Artículo se agregó al evento.");
+            UtilityCommon.setTimeout(() -> lbl_eleccion.setText(itemSelected), 2000);
+             
              Toolkit.getDefaultToolkit().beep();
              txt_buscar.requestFocus();
              txt_buscar.selectAll();
@@ -1736,11 +1754,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             this.txt_total.setText(decimalFormat.format(fTotal));
             
         } catch (NumberFormatException e) {
-             JOptionPane.showMessageDialog(null, "Error al calcular el total "+e, "SOLO NUMEROS", JOptionPane.INFORMATION_MESSAGE);
-             return;
+             log.error(e.getMessage(),e);
+             JOptionPane.showMessageDialog(null, "Error al calcular el total "+e, "SOLO NÚMEROS", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
+            log.error(e.getMessage(),e);
             JOptionPane.showMessageDialog(null, "Error inesperado al calcular el total "+e, "Error", JOptionPane.INFORMATION_MESSAGE);
-            return;
         }
         
     }
@@ -2669,18 +2687,18 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 cmb_fecha_entregaKeyPressed(evt);
             }
         });
-        panel_datos_generales.add(cmb_fecha_entrega, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 50, 210, 21));
+        panel_datos_generales.add(cmb_fecha_entrega, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 50, 200, 21));
 
         jLabel10.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel10.setText("Fecha de entrega:");
-        panel_datos_generales.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 110, 20));
+        panel_datos_generales.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 130, 20));
 
         cmb_fecha_devolucion.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(cmb_fecha_devolucion, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 80, 210, 21));
+        panel_datos_generales.add(cmb_fecha_devolucion, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 80, 200, 21));
 
         jLabel12.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel12.setText("Fecha de devolución:");
-        panel_datos_generales.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 110, 20));
+        panel_datos_generales.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 130, 20));
 
         jLabel13.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel13.setText("Dirección del evento:");
@@ -2701,7 +2719,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         cmb_chofer.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmb_chofer.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        panel_datos_generales.add(cmb_chofer, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 20, 210, -1));
+        panel_datos_generales.add(cmb_chofer, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 20, 200, -1));
 
         jLabel31.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel31.setText("Chofer:");
@@ -2725,26 +2743,26 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         jLabel35.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel35.setText("a");
-        panel_datos_generales.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 140, 20, 20));
+        panel_datos_generales.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 140, 20, 20));
 
         jLabel36.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel36.setText("a");
-        panel_datos_generales.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 170, 20, 20));
+        panel_datos_generales.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 170, 20, 20));
 
         jLabel33.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel33.setText("Hrs.");
-        panel_datos_generales.add(jLabel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 140, -1, 20));
+        panel_datos_generales.add(jLabel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 140, -1, 20));
 
         jLabel37.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel37.setText("Hrs.");
-        panel_datos_generales.add(jLabel37, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 170, -1, 20));
+        panel_datos_generales.add(jLabel37, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 170, -1, 20));
 
         jLabel38.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel38.setText("Fecha del evento:");
-        panel_datos_generales.add(jLabel38, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 110, 20));
+        panel_datos_generales.add(jLabel38, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 130, 20));
 
         cmb_fecha_evento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(cmb_fecha_evento, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 110, 210, 21));
+        panel_datos_generales.add(cmb_fecha_evento, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 110, 200, 21));
 
         jLabel15.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel15.setText("Subtotal:");
@@ -2879,7 +2897,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             ex.printStackTrace();
         }
         txtEndDeliveryHour.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txtEndDeliveryHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 140, 60, -1));
+        panel_datos_generales.add(txtEndDeliveryHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 140, 60, -1));
 
         try {
             txtEndReturnHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
@@ -2887,7 +2905,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             ex.printStackTrace();
         }
         txtEndReturnHour.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txtEndReturnHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 170, 60, -1));
+        panel_datos_generales.add(txtEndReturnHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 170, 60, -1));
 
         try {
             txtInitDeliveryHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
@@ -2895,7 +2913,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             ex.printStackTrace();
         }
         txtInitDeliveryHour.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txtInitDeliveryHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 140, 60, -1));
+        panel_datos_generales.add(txtInitDeliveryHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 140, 60, -1));
 
         try {
             txtInitReturnHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
@@ -2903,7 +2921,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             ex.printStackTrace();
         }
         txtInitReturnHour.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txtInitReturnHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 60, -1));
+        panel_datos_generales.add(txtInitReturnHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 170, 60, -1));
 
         jPanel4.add(panel_datos_generales, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 1120, 210));
 
@@ -3087,6 +3105,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         tabla_articulos.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tabla_articulosMouseClicked(evt);
+            }
+        });
+        tabla_articulos.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tabla_articulosKeyPressed(evt);
             }
         });
         jScrollPane4.setViewportView(tabla_articulos);
@@ -4171,7 +4194,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
            
             // TOTALES
             txt_subtotal.setText(decimalFormat.format(globalRenta.getSubTotal()));
-            txtPorcentajeDescuento.setText(decimalFormat.format(globalRenta.getDescuento()));
+            
+            txtPorcentajeDescuento.setText(
+                    decimalFormat.format(globalRenta.getDescuento() != null ? globalRenta.getDescuento() : 0F));
+            
             txt_descuento.setText(decimalFormat.format(globalRenta.getCalculoDescuento()));
             txt_envioRecoleccion.setText(decimalFormat.format(globalRenta.getEnvioRecoleccion()));
             txt_depositoGarantia.setText(decimalFormat.format(globalRenta.getDepositoGarantia()));
@@ -5146,12 +5172,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             return;
         }
         try {
-            Integer number = Integer.parseInt(folio);
+            String onlyNumber = UtilityCommon.onlyNumbers(folio);
+            Integer number = Integer.parseInt(onlyNumber);
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("folio", number);
             parameters.put("limit", 1250);
             tabla_consultar_renta(parameters);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Folio no válido, ingresa un número válido para continuar ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -5278,10 +5305,23 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private void txt_buscarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_buscarKeyPressed
         if(evt.getKeyCode() == KeyEvent.VK_ENTER && tabla_articulos.getRowCount() > 0) {
             addItemToEventFromInventory(0);
+        } else if (evt.getKeyCode() == KeyEvent.VK_DOWN && tabla_articulos.getRowCount() > 0) {
+            tabla_articulos.requestFocus();
+            tabla_articulos.changeSelection(0,0,false, false);
         } else {
            tabla_articulos_like();
         }
     }//GEN-LAST:event_txt_buscarKeyPressed
+
+    private void tabla_articulosKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tabla_articulosKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER && tabla_articulos.getRowCount() > 0) {
+            addItemToEventFromInventory(tabla_articulos.getSelectedRow());
+        } else if (evt.getKeyCode() == KeyEvent.VK_UP 
+                && tabla_articulos.getSelectedRow() == 0) {
+            txt_buscar.requestFocus();
+            txt_buscar.selectAll();
+        }
+    }//GEN-LAST:event_tabla_articulosKeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
