@@ -124,11 +124,12 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
 
     }
     
-     public void mostrar_agregar_orden_proveedor() {
+     public void mostrar_agregar_orden_proveedor(){
          
         String rentaId;
         String orderId;
         String folio;
+        
        try {
             rentaId = getValueIdBySelectedRow(ColumnToGetValue.RENTA_ID);
             orderId = getValueIdBySelectedRow(ColumnToGetValue.ORDER_ID);
@@ -324,7 +325,8 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
 
        for(OrdenProveedor orden : list){      
 
-            Object fila[] = {                                          
+            Object fila[] = {
+                false,
                 orden.getId(),
                 orden.getRenta().getFolio(),
                 orden.getUsuario().getNombre()+" "+orden.getUsuario().getApellidos(),
