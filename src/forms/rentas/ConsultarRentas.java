@@ -4389,6 +4389,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jbtn_editar_abonos.setEnabled(true);        
         jbtn_guardar_abonos.setEnabled(true); 
         tabla_detalle.setEnabled(true);
+        btnCopyOrders.setEnabled(true);
+        jBtnAddOrderProvider1.setEnabled(true);
+        btnReloadGetLastStatusProvider.setEnabled(true);
     }
     
     private void disableEvent () {
@@ -4456,6 +4459,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jbtn_editar_abonos.setEnabled(false);        
         jbtn_guardar_abonos.setEnabled(false);   
         tabla_detalle.setEnabled(false);
+        btnCopyOrders.setEnabled(false);
+        jBtnAddOrderProvider1.setEnabled(false);
+        btnReloadGetLastStatusProvider.setEnabled(false);
                 
     }
     private void jbtn_editarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_editarActionPerformed
@@ -5301,16 +5307,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private void btnCopyOrdersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCopyOrdersActionPerformed
         
         List<String> orders = new ArrayList<>();
-        String folio=null;
         for (int i = 0; i < tableViewOrdersProviders.getRowCount(); i++) {
              if (Boolean.parseBoolean(tableViewOrdersProviders.
                      getValueAt(i, TableViewOrdersProviders.Column.BOOLEAN.getNumber()).toString())) {
                  orders.add(
                          tableViewOrdersProviders.getValueAt(i, TableViewOrdersProviders.Column.ORDER_NUM.getNumber()).toString()
                  );
-                 folio = tableViewOrdersProviders.
-                            getValueAt(tableViewOrdersProviders.getSelectedRow(), 
-                                    TableViewOrdersProviders.Column.FOLIO_RENTA.getNumber()).toString();
              }
         }
         
@@ -5322,8 +5324,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         OrderProviderCopyParameter orderProviderCopyParameter
                 = new OrderProviderCopyParameter();
         
+        orderProviderCopyParameter.setUsuarioId(iniciar_sesion.usuarioGlobal.getUsuarioId());
         orderProviderCopyParameter.setOrders(orders);
-        orderProviderCopyParameter.setCurrentFolio(folio);
         
         OrderProviderCopyFormDialog orderProviderCopyFormDialog =
                 new OrderProviderCopyFormDialog(null, true, orderProviderCopyParameter);

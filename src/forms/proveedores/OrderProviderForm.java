@@ -290,7 +290,7 @@ public class OrderProviderForm extends javax.swing.JInternalFrame {
     public void llenar_tabla_articulos(){
         
                         
-        if (!orderId.equals("")){
+        if (orderId != null && !orderId.isEmpty()){
           try{
             ordenProveedor = orderProviderService.getOrderById(Long.parseLong(orderId));
           } catch(BusinessException e){

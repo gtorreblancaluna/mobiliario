@@ -4,7 +4,9 @@ import clases.sqlclass;
 import common.constants.ApplicationConstants;
 import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
+import common.exceptions.DataOriginException;
 import common.exceptions.NoDataFoundException;
+import common.form.provider.OrderProviderCopyFormDialog;
 import common.services.UtilityService;
 import java.awt.Component;
 import java.awt.Point;
@@ -20,13 +22,19 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import mobiliario.IndexForm;
 import common.model.DatosGenerales;
+import common.model.Renta;
 import common.model.providers.OrdenProveedor;
+import common.model.providers.OrderProviderCopyParameter;
 import common.model.providers.queryresult.DetailOrderSupplierQueryResult;
 import common.model.providers.ParameterOrderProvider;
+import common.services.RentaService;
 import services.SystemService;
 import common.services.providers.OrderProviderService;
 import common.tables.TableViewOrdersProviders;
 import common.tables.TableViewOrdersProvidersDetail;
+import java.awt.Frame;
+import java.util.ArrayList;
+import mobiliario.iniciar_sesion;
 import utilities.Utility;
 
 public class ViewOrdersProviders extends javax.swing.JInternalFrame {
@@ -43,6 +51,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
     private int indexTabPanelActive = 0;
     private final TableViewOrdersProviders tableViewOrdersProviders;
     private final TableViewOrdersProvidersDetail tableViewOrdersProvidersDetail;
+    private final RentaService rentaService = RentaService.getInstance();
 
     public ViewOrdersProviders() {
         initComponents();
@@ -123,6 +132,29 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         win.setLocationRelativeTo(null);
 
     }
+     
+    private void addNewOrderProvider () {
+        String folioID = JOptionPane.showInputDialog(this, "Folio de la renta para generar nueva orden.", "Nueva orden.", JOptionPane.INFORMATION_MESSAGE);
+        if(folioID == null || folioID.isEmpty()){
+             return;
+        }
+        System.out.println(folioID);
+
+        try {
+            Integer folioInt = Integer.parseInt(folioID);
+            Renta renta = rentaService.getByFolio(folioInt);
+            if (renta == null) {
+                throw new BusinessException(String.format("Folio '%s' no encontrado en la base de datos.",folioInt));
+            }
+            OrderProviderForm form = new OrderProviderForm(renta.getFolio()+"", null, renta.getRentaId()+"");
+            IndexForm.jDesktopPane1.add(form);
+            form.show();
+        } catch (NumberFormatException numberFormatException) {
+            JOptionPane.showMessageDialog(this, "Introduce un numero valido", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+        } catch (BusinessException | DataOriginException dataOriginException) {
+            JOptionPane.showMessageDialog(this, dataOriginException.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+        }
+   }
     
      public void mostrar_agregar_orden_proveedor(){
          
@@ -462,6 +494,9 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         jLabel7 = new javax.swing.JLabel();
         txtSearchInitialEventDate = new com.toedter.calendar.JDateChooser();
         txtSearchEndEventDate = new com.toedter.calendar.JDateChooser();
+        btnCopyOrders = new javax.swing.JButton();
+        jbtnBitacoraProveedor = new javax.swing.JButton();
+        jbtnAddOrder = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         lblInfoGeneral = new javax.swing.JLabel();
         tabGeneral = new javax.swing.JTabbedPane();
@@ -633,6 +668,35 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
             }
         });
 
+        btnCopyOrders.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/copy.png"))); // NOI18N
+        btnCopyOrders.setToolTipText("Copiar ordenes a un nuevo folio");
+        btnCopyOrders.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCopyOrders.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCopyOrdersActionPerformed(evt);
+            }
+        });
+
+        jbtnBitacoraProveedor.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jbtnBitacoraProveedor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/inventario-24.png"))); // NOI18N
+        jbtnBitacoraProveedor.setToolTipText("Bitacora seguimiento proveedor");
+        jbtnBitacoraProveedor.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtnBitacoraProveedor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbtnBitacoraProveedorActionPerformed(evt);
+            }
+        });
+
+        jbtnAddOrder.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jbtnAddOrder.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/agregar-24.png"))); // NOI18N
+        jbtnAddOrder.setToolTipText("Agregar nueva orden");
+        jbtnAddOrder.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtnAddOrder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbtnAddOrderActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -645,7 +709,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                         .addGap(28, 28, 28)
                         .addComponent(jLabel5))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(txtSearchByNameProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(7, 7, 7)
@@ -653,11 +717,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                                 .addGap(11, 11, 11)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtSearchOrderNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel3)))
+                                    .addComponent(txtSearchOrderNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -670,10 +730,20 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jbtnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jbtnAddOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jbtnBitacoraProveedor, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(11, 11, 11)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(cmbLimit, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING))))
+                                    .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel3)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnCopyOrders, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -682,11 +752,17 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                                 .addComponent(txtSearchEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jLabel2)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtSearchInitialEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cmbLimit, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtSearchEndEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel7))))
-                .addContainerGap(157, Short.MAX_VALUE))
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(txtSearchInitialEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtSearchEndEventDate, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jLabel7))))))
+                .addContainerGap(31, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -719,20 +795,22 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                             .addComponent(cmbLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(46, 46, 46))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jbtnSearch, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jButton5)
-                                .addComponent(jButton4)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jButton3, javax.swing.GroupLayout.Alignment.TRAILING))
-                                .addComponent(jButton2)))
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jbtnAddOrder, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jbtnSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jbtnBitacoraProveedor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(btnCopyOrders))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 980, 130));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 980, 120));
 
         lblInfoGeneral.setFont(new java.awt.Font("Arial", 1, 11)); // NOI18N
 
@@ -885,8 +963,72 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
         } 
     }//GEN-LAST:event_txtSearchByNameProviderKeyPressed
 
+    private void btnCopyOrdersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCopyOrdersActionPerformed
+
+        List<String> orders = new ArrayList<>();
+        for (int i = 0; i < tableViewOrdersProviders.getRowCount(); i++) {
+            if (Boolean.parseBoolean(tableViewOrdersProviders.
+                getValueAt(i, TableViewOrdersProviders.Column.BOOLEAN.getNumber()).toString())) {
+            orders.add(
+                tableViewOrdersProviders.getValueAt(i, TableViewOrdersProviders.Column.ORDER_NUM.getNumber()).toString()
+            );
+        }
+        }
+
+        if (orders.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Selecciona una o mas ordenes al proveedor.");
+            return;
+        }
+
+        OrderProviderCopyParameter orderProviderCopyParameter
+        = new OrderProviderCopyParameter();
+
+        orderProviderCopyParameter.setUsuarioId(iniciar_sesion.usuarioGlobal.getUsuarioId());
+        orderProviderCopyParameter.setOrders(orders);
+
+        OrderProviderCopyFormDialog orderProviderCopyFormDialog =
+        new OrderProviderCopyFormDialog(null, true, orderProviderCopyParameter);
+
+        Boolean success = orderProviderCopyFormDialog.showDialog();
+
+        if (success) {
+            this.search();
+        }
+
+    }//GEN-LAST:event_btnCopyOrdersActionPerformed
+
+    private void showBitacoraProveedores () {
+        
+        Frame frame = JOptionPane.getFrameForComponent(this);
+
+        String rentaId;
+        String folio;
+       try {
+            rentaId = getValueIdBySelectedRow(ColumnToGetValue.RENTA_ID);
+            folio = getValueIdBySelectedRow(ColumnToGetValue.FOLIO);
+       } catch (BusinessException e) {
+           LOGGER.error(e);
+           JOptionPane.showMessageDialog(this, e.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+           return;
+       }
+
+        ProviderStatusBitacoraDialog win =
+        new ProviderStatusBitacoraDialog(frame,true,Long.parseLong(rentaId), folio);
+        win.setLocationRelativeTo(this);
+        win.setVisible(true);
+   }
+    
+    private void jbtnBitacoraProveedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnBitacoraProveedorActionPerformed
+        showBitacoraProveedores();
+    }//GEN-LAST:event_jbtnBitacoraProveedorActionPerformed
+
+    private void jbtnAddOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnAddOrderActionPerformed
+        addNewOrderProvider();
+    }//GEN-LAST:event_jbtnAddOrderActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCopyOrders;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox cmbLimit;
     private javax.swing.JComboBox cmbStatus;
@@ -906,6 +1048,8 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JButton jbtnAddOrder;
+    private javax.swing.JButton jbtnBitacoraProveedor;
     private javax.swing.JButton jbtnSearch;
     private javax.swing.JLabel lblInfoGeneral;
     private javax.swing.JTabbedPane tabGeneral;
