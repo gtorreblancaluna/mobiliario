@@ -48,6 +48,8 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         
         <mapper resource="common/mappers/MapperCatalogSocialMediaContact.xml"/>
         <mapper resource="common/mappers/MapperRentas.xml"/>
+        <mapper resource="common/mappers/MapperDesgloseAlmacen.xml"/>        
+        
         
     </mappers>
     

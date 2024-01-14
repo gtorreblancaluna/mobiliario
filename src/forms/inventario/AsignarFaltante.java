@@ -1,9 +1,7 @@
-package mobiliario;
+package forms.inventario;
 
-import forms.inventario.InventarioForm;
 import services.SaleService;
 import clases.sqlclass;
-import common.constants.ApplicationConstants;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
@@ -13,7 +11,7 @@ import javax.swing.JOptionPane;
 import common.model.DetalleRenta;
 import common.model.Renta;
 import common.services.ItemService;
-import common.utilities.UtilityCommon;
+import mobiliario.VerFaltantes;
 
 public class AsignarFaltante extends java.awt.Dialog {
 
@@ -108,7 +106,7 @@ public class AsignarFaltante extends java.awt.Dialog {
 
         jButton1.setFont(new java.awt.Font("Arial", 1, 11)); // NOI18N
         jButton1.setText("Asignar");
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -117,7 +115,7 @@ public class AsignarFaltante extends java.awt.Dialog {
 
         checkAccidenteLaboral.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         checkAccidenteLaboral.setText("Por accidente de trabajo");
-        checkAccidenteLaboral.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        checkAccidenteLaboral.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         checkAccidenteLaboral.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 checkAccidenteLaboralMouseClicked(evt);

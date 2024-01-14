@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporte_por_categorias" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d16cf63b-3404-463d-935c-2e064e5dbd9b">
-	<property name="ireport.zoom" value="2.143588810000003"/>
+	<property name="ireport.zoom" value="2.1435888100000056"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="ID_USUARIO" class="java.lang.String"/>
 	<parameter name="ID_RENTA" class="java.lang.String"/>
 	<parameter name="URL_IMAGEN" class="java.lang.String"/>
 	<parameter name="NOMBRE_ENCARGADO_AREA" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\107209781\\Developer\\mobiliario-project\\mobiliario\\src\\jasper\\reports\\gaby\\"]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[SELECT renta.descripcion AS descripcion_evento,renta.fecha_entrega,renta.fecha_evento,renta.fecha_devolucion,cliente.nombre AS nombre_cliente,
 cliente.apellidos AS apellidos_cliente,cliente.tel_movil,cliente.tel_fijo, renta.id_renta, renta.folio, articulo.id_categoria, categoria.descripcion AS descripcion_categoria, articulo.id_articulo, articulo.descripcion AS descripcion_articulo,
@@ -152,7 +155,7 @@ WHERE renta.id_renta = $P{ID_RENTA} AND articulo.id_categoria IN (SELECT asigna.
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="18" splitType="Stretch">
+		<band height="23" splitType="Stretch">
 			<textField>
 				<reportElement x="0" y="0" width="49" height="13" forecolor="#333333" uuid="5b85f887-ff8f-48fc-9ddc-43d94ab5cfa0"/>
 				<textElement verticalAlignment="Top">
@@ -188,9 +191,14 @@ WHERE renta.id_renta = $P{ID_RENTA} AND articulo.id_categoria IN (SELECT asigna.
 				</textElement>
 				<textFieldExpression><![CDATA[$F{descripcion_categoria}]]></textFieldExpression>
 			</textField>
-			<line>
-				<reportElement x="0" y="15" width="787" height="1" forecolor="#999999" uuid="bb0eb9f4-0af6-44f4-acb6-2ae398af3ffb"/>
-			</line>
+			<subreport>
+				<reportElement x="5" y="13" width="797" height="10" uuid="a68a6a6b-4653-4bad-af6b-37ceaf9a4e69"/>
+				<subreportParameter name="ITEM_INIT_ID">
+					<subreportParameterExpression><![CDATA[$F{id_articulo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "reporte_por_categorias_sub_report.jasper"]]></subreportExpression>
+			</subreport>
 		</band>
 	</detail>
 	<columnFooter>

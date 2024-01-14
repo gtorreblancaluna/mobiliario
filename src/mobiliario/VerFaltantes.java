@@ -1,5 +1,6 @@
 package mobiliario;
 
+import forms.inventario.AsignarFaltante;
 import services.SaleService;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;

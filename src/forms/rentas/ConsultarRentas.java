@@ -33,10 +33,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.mail.MessagingException;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -2123,23 +2121,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     
     public void tabla_articulos_like() {
         
-        tabla_articulos();
-        String textToSearch = txt_buscar.getText().toLowerCase().trim();
-        List<Articulo> filterArticulos = articulos.stream()
-                    .filter(articulo -> Objects.nonNull(articulo))
-                    .filter(articulo -> Objects.nonNull(articulo.getDescripcion()))
-                    .filter(articulo -> Objects.nonNull(articulo.getColor()))
-                    .filter(articulo -> (
-                            UtilityCommon.removeAccents(
-                                    articulo.getDescripcion().trim().toLowerCase() + " " + 
-                                            articulo.getColor().getColor().trim().toLowerCase()
-                            )).contains(textToSearch)
-                            || articulo.getCodigo().trim().toLowerCase().contains(textToSearch))
-                    .collect(Collectors.toList());
-        
-        DefaultTableModel tableModel = (DefaultTableModel) tabla_articulos.getModel();
-        
-        filterArticulos.forEach(articulo -> {
+        tabla_articulos();        
+        List<Articulo> itemsFiltered = 
+                UtilityCommon.applyFilterToItems(articulos,txt_buscar.getText());        
+        DefaultTableModel tableModel = (DefaultTableModel) tabla_articulos.getModel();        
+        itemsFiltered.forEach(articulo -> {
             Object fila[] = {                                          
                 articulo.getArticuloId(),
                 articulo.getCodigo().toUpperCase(),
@@ -2303,6 +2289,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         txtEndReturnHour = new javax.swing.JFormattedTextField();
         txtInitDeliveryHour = new javax.swing.JFormattedTextField();
         txtInitReturnHour = new javax.swing.JFormattedTextField();
+        lblCreationDate = new javax.swing.JLabel();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel6 = new javax.swing.JPanel();
         jToolBar3 = new javax.swing.JToolBar();
@@ -2648,13 +2635,16 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         panel_datos_generales.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lbl_folio.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(lbl_folio, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 40, 170, 20));
+        lbl_folio.setText("lbl_folio");
+        panel_datos_generales.add(lbl_folio, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 40, 190, 20));
 
         lbl_cliente.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(lbl_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 60, 170, 20));
+        lbl_cliente.setText("lbl_cliente");
+        panel_datos_generales.add(lbl_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 60, 190, 20));
 
         lbl_atiende.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(lbl_atiende, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 80, 180, 20));
+        lbl_atiende.setText("lbl_atiende");
+        panel_datos_generales.add(lbl_atiende, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 80, 190, 20));
 
         cmb_fecha_entrega.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmb_fecha_entrega.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -2902,6 +2892,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
         txtInitReturnHour.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         panel_datos_generales.add(txtInitReturnHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 170, 60, -1));
+
+        lblCreationDate.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        lblCreationDate.setText("lblCreationDate");
+        panel_datos_generales.add(lblCreationDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 20, 190, -1));
 
         jPanel4.add(panel_datos_generales, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 1120, 210));
 
@@ -4150,7 +4144,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jTabbedPane1.setEnabledAt(2, true);
             
             lbl_cliente.setText("Cliente: "+globalRenta.getCliente().getNombre()+" "+globalRenta.getCliente().getApellidos());
-            lbl_folio.setText("Folio: "+globalRenta.getFolio()+"");            
+            lbl_folio.setText("Folio: "+globalRenta.getFolio()+"");
+            lblCreationDate.setText("Creación: "+globalRenta.getFechaPedido());
           
             try {
                 cmb_fecha_entrega.setDate((Date) formatoDelTexto.parse((String) globalRenta.getFechaEntrega()));
@@ -4208,7 +4203,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         cmbTipoPago.setSelectedIndex(0);
         txt_abono.setText("");
         txt_comentario.setText("");
-        cmb_fecha_pago.setDate(null);
+        cmb_fecha_pago.setDate(new Date());
     }
     private void jbtn_refrescarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_refrescarActionPerformed
        initalData();
@@ -5459,6 +5454,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JButton jbtn_quitar_abono;
     public static javax.swing.JButton jbtn_refrescar;
     public static javax.swing.JButton jtbtnGenerateExcel;
+    private javax.swing.JLabel lblCreationDate;
     public static javax.swing.JLabel lblInformation;
     public static javax.swing.JLabel lblInformationOrdersProvider;
     private javax.swing.JLabel lblLastStatusProvider;

@@ -169,6 +169,17 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 txtInitDeliveryHour.requestFocus();
             }
         });
+        
+        cmb_fecha_entrega.getDateEditor().addPropertyChangeListener((PropertyChangeEvent e) -> {
+            if ("date".equals(e.getPropertyName()) && cmb_fecha_devolucion.getDate() == null 
+                    && cmb_fecha_entrega.getDate() != null) {
+                cmb_fecha_devolucion.setDate(cmb_fecha_entrega.getDate());
+            }
+            if ("date".equals(e.getPropertyName()) && cmb_fecha_evento.getDate() == null 
+                    && cmb_fecha_entrega.getDate() != null) {
+                cmb_fecha_evento.setDate(cmb_fecha_entrega.getDate());
+            }
+        });
     }
     
     private void addEventListenerTableCustomers(){
@@ -1703,22 +1714,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     public void tabla_articulos_like() {
         
-        String textToSearch = UtilityCommon.removeAccents(txt_buscar.getText().toLowerCase().trim());
+        List<Articulo> itemsFiltered = 
+                UtilityCommon.applyFilterToItems(articulos,txt_buscar.getText());
         
-        List<Articulo> filterItems =
-                articulos.stream()
-                    .filter(item -> Objects.nonNull(item))
-                    .filter(item -> Objects.nonNull(item.getDescripcion()))
-                    .filter(item -> Objects.nonNull(item.getColor()))
-                    .filter(item -> (
-                            UtilityCommon.removeAccents(
-                                item.getDescripcion().trim().toLowerCase() + " " + item.getColor().getColor().trim().toLowerCase())
-                            ).contains(textToSearch) 
-                            || item.getCodigo().trim().toLowerCase().contains(textToSearch)
-                    )
-                .collect(Collectors.toList());
-        
-        fillTableItems(filterItems);
+        fillTableItems(itemsFiltered);
     }
 
     /**

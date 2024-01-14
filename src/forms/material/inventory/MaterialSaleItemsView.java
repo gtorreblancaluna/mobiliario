@@ -24,9 +24,6 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
     public static String gMaterialId = "";
     public static String gProviderId = "";
     
-    /**
-     * @param itemId .> item id, to add material inventory
-     */
     public MaterialSaleItemsView(String itemId) {
         initComponents();
         this.setTitle("Material para construcción de articulo");

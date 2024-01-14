@@ -706,3 +706,25 @@ CREATE TABLE status_provider_by_renta (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE desglose_almacen (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  item_init_id INT(11) NOT NULL,
+  item_relation_id INT(11) NOT NULL,
+  comment VARCHAR(700) DEFAULT NULL,
+  amount INT(11) NOT NULL,
+  fg_active enum('1','0') NOT NULL DEFAULT '1',
+  created_at TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_desglose_almacen_item_init_id
+    FOREIGN KEY (item_init_id)
+    REFERENCES articulo (id_articulo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_desglose_almacen_item_relation_id
+    FOREIGN KEY (item_relation_id)
+    REFERENCES articulo (id_articulo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

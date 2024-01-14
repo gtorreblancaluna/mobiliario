@@ -20,19 +20,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.AsignarFaltante;
 import mobiliario.Categoria;
 import mobiliario.Colores;
 import mobiliario.VerFoliosPorArticulo;
@@ -56,6 +50,8 @@ import java.beans.PropertyChangeEvent;
 import static mobiliario.IndexForm.jDesktopPane1;
 import common.model.ItemByFolioResultQuery;
 import common.model.SearchItemByFolioParams;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import utilities.Utility;
 
 public class InventarioForm extends javax.swing.JInternalFrame {
@@ -73,7 +69,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private static final ItemService itemService = ItemService.getInstance();
     private static final CategoryService categoryService = new CategoryService();
     // variable para mandar a la ventana de agregar articulo
-    private List<Articulo> articulos = new ArrayList<>();
+    private List<Articulo> items = new ArrayList<>();
     private final UtilityService utilityService = UtilityService.getInstance();
     private static final DecimalFormat decimalFormat = 
             new DecimalFormat( ApplicationConstants.DECIMAL_FORMAT_SHORT );
@@ -129,6 +125,9 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         
         eventListener();
         setCmbLimit();
+        
+        getInitialItems();
+        UtilityCommon.setTimeout( () -> txtSearch.requestFocus(), 1000);
     }
     
     private void fillParametersSearchByItemsByFolio () {
@@ -292,21 +291,13 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     public void llenar_combo_categorias() {
 
         List<CategoriaDTO> categorias = categoryService.obtenerCategorias();
-        cmb_categoria.removeAllItems();
-        cmb_categoria2.removeAllItems();
-        
+        cmb_categoria.removeAllItems();        
         
         cmb_categoria.addItem(
                 new CategoriaDTO(0, ApplicationConstants.CMB_SELECCIONE)
         );
-        
-        cmb_categoria2.addItem(
-                new CategoriaDTO(0, ApplicationConstants.CMB_SELECCIONE)
-        );
-        
         for (CategoriaDTO categoria : categorias){
             cmb_categoria.addItem(categoria);
-            cmb_categoria2.addItem(categoria);
         }
 
     }
@@ -331,86 +322,55 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         return entero2;
 
     }
-
-    public void buscar() {
-              
-       JDialog dialog = UtilityCommon.showDialog("Espere porfavor...","Espere porfavor...", this);
-         
-        this.formato_tabla_articulos();
-        Map<String,Object> map = new HashMap<>();
-        
-        
-               
-        CategoriaDTO categoria = (CategoriaDTO) cmb_categoria2.getModel().getSelectedItem();
-        Color color = (Color) cmb_color2.getModel().getSelectedItem();
+    
+    private void getInitialItems () {
        
-        map.put("categoria", categoria);
-        map.put("color", color);
-        map.put("descripcion", txt_descripcion2.getText());
-        
-        List<Articulo> articulos = null;
-        try {
-            articulos = itemService.obtenerArticulosBusquedaInventario(map);
-        } catch (Exception e) {
-            Logger.getLogger(InventarioForm.class.getName()).log(Level.SEVERE, null, e);
-            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
-        } finally {
-            Toolkit.getDefaultToolkit().beep();
-            dialog.dispose();
-        }
+        items = itemService.obtenerArticulosActivos();
+        fillItemTable(items);
 
-        if(articulos == null || articulos.size()<=0){
-            JOptionPane.showMessageDialog(null, "Sin resultados obtenidos ", "Sin resultados", JOptionPane.INFORMATION_MESSAGE);
-            return ;
-        }
-       
+    }
+    
+    private void fillItemTable (List<Articulo> items) {
         
-        for(Articulo articulo : articulos){
+        for(Articulo item : items){
             
             DefaultTableModel temp = (DefaultTableModel) tabla_articulos.getModel();
             Object fila[] = {
-                  articulo.getArticuloId()+ApplicationConstants.EMPTY_STRING,
-                  articulo.getCodigo(),
-                  articulo.getCantidad() != 0 ? integerFormat.format(articulo.getCantidad()) : ApplicationConstants.EMPTY_STRING,
-                  articulo.getRentados() != 0 ? integerFormat.format(articulo.getRentados()) : ApplicationConstants.EMPTY_STRING,
+                  item.getArticuloId()+ApplicationConstants.EMPTY_STRING,
+                  item.getCodigo(),
+                  item.getCantidad() != 0 ? integerFormat.format(item.getCantidad()) : ApplicationConstants.EMPTY_STRING,
                   
-                  articulo.getFaltantes() != 0 ? integerFormat.format(articulo.getFaltantes()) : ApplicationConstants.EMPTY_STRING,
-                  articulo.getReparacion() != 0 ? integerFormat.format(articulo.getReparacion()) : ApplicationConstants.EMPTY_STRING,
-                  articulo.getAccidenteTrabajo() != 0 ? integerFormat.format(articulo.getAccidenteTrabajo()) : ApplicationConstants.EMPTY_STRING,
-                  articulo.getDevolucion() != 0 ? integerFormat.format(articulo.getDevolucion()) : ApplicationConstants.EMPTY_STRING,
-                  articulo.getTotalCompras() != 0 ? integerFormat.format(articulo.getTotalCompras()) : ApplicationConstants.EMPTY_STRING,
-                  articulo.getUtiles() != 0 ? integerFormat.format(articulo.getUtiles()) : ApplicationConstants.EMPTY_STRING,
+                  item.getRentados().equals(0F) ? ApplicationConstants.EMPTY_STRING : integerFormat.format(item.getRentados()),
                   
-                  articulo.getCategoria().getDescripcion(),
-                  articulo.getDescripcion(),
-                  articulo.getColor().getColor(),
-                  articulo.getFechaIngreso(),
-                  decimalFormat.format(articulo.getPrecioCompra()),
-                  decimalFormat.format(articulo.getPrecioRenta()),
-                  articulo.getFechaUltimaModificacion()
+                  item.getFaltantes() != 0 ? integerFormat.format(item.getFaltantes()) : ApplicationConstants.EMPTY_STRING,
+                  item.getReparacion() != 0 ? integerFormat.format(item.getReparacion()) : ApplicationConstants.EMPTY_STRING,
+                  item.getAccidenteTrabajo() != 0 ? integerFormat.format(item.getAccidenteTrabajo()) : ApplicationConstants.EMPTY_STRING,
+                  item.getDevolucion() != 0 ? integerFormat.format(item.getDevolucion()) : ApplicationConstants.EMPTY_STRING,
+                  item.getTotalCompras() != 0 ? integerFormat.format(item.getTotalCompras()) : ApplicationConstants.EMPTY_STRING,
+                  item.getUtiles() != 0 ? integerFormat.format(item.getUtiles()) : ApplicationConstants.EMPTY_STRING,
+                  
+                  item.getCategoria().getDescripcion(),
+                  item.getDescripcion(),
+                  item.getColor().getColor(),
+                  item.getFechaIngreso(),
+                  decimalFormat.format(item.getPrecioCompra()),
+                  decimalFormat.format(item.getPrecioRenta()),
+                  item.getFechaUltimaModificacion()
                };
                temp.addRow(fila);
         }
-
+    
     }
 
-    public void llenar_combo_colores() {
- 
+    public void llenar_combo_colores() { 
         List<Color> colores = itemService.obtenerColores();
         cmb_color.removeAllItems();
-        cmb_color2.removeAllItems();
-        
-        cmb_color2.addItem(
-                new Color(0, ApplicationConstants.CMB_SELECCIONE)
-        );
         cmb_color.addItem(
                 new Color(0, ApplicationConstants.CMB_SELECCIONE)
         );
         for(Color color : colores){
             cmb_color.addItem(color);
-            cmb_color2.addItem(color);
         }
-
     }
 
     public void mostrar_colores() {
@@ -439,16 +399,16 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     }
     
     public void mostrar_agregar_articulo() {
-        if (articulos.isEmpty()) {
-            articulos = itemService.obtenerArticulosActivos();
+        if (items.isEmpty()) {
+            items = itemService.obtenerArticulosActivos();
         }
-        AgregarArticuloDisponibilidadDialog dialog = new AgregarArticuloDisponibilidadDialog(null, true, articulos);
+        AgregarArticuloDisponibilidadDialog dialog = new AgregarArticuloDisponibilidadDialog(null, true, items);
         String itemId = dialog.showDialog();
         agregarArticulo(itemId);
     }
     
      public void mostrar_ver_disponibilidad_articulos() {
-         // mostrara la ventana de disponibilidad de articulos
+         // mostrara la ventana de disponibilidad de items
         String initDate = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(txtDisponibilidadFechaInicial.getDate());
         String endDate = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(txtDisponibilidadFechaFinal.getDate());
         List<Long> itemsId = new ArrayList<>();
@@ -732,13 +692,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabla_articulos = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
-        cmb_categoria2 = new javax.swing.JComboBox<>();
-        txt_descripcion2 = new javax.swing.JTextField();
-        cmb_color2 = new javax.swing.JComboBox<>();
-        lbl_buscar = new javax.swing.JLabel();
+        txtSearch = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
         jToolBar1 = new javax.swing.JToolBar();
         jbtn_nuevo = new javax.swing.JButton();
         jbtn_agregar = new javax.swing.JButton();
@@ -750,6 +705,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         jButton4 = new javax.swing.JButton();
         btnMostrarAgregarCompra = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         btnAddItem = new javax.swing.JButton();
@@ -887,9 +843,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         });
         jPanel1.add(txtCodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 200, 160, -1));
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Panel de busqueda"));
-
-        tabla_articulos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        tabla_articulos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         tabla_articulos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -909,38 +863,15 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         });
         jScrollPane1.setViewportView(tabla_articulos);
 
-        cmb_categoria2.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
-
-        txt_descripcion2.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
-        txt_descripcion2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_descripcion2ActionPerformed(evt);
-            }
-        });
-        txt_descripcion2.addKeyListener(new java.awt.event.KeyAdapter() {
+        txtSearch.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_descripcion2KeyPressed(evt);
+                txtSearchKeyPressed(evt);
             }
         });
 
-        cmb_color2.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
-
-        lbl_buscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/search-icon.png"))); // NOI18N
-        lbl_buscar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        lbl_buscar.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lbl_buscarMouseClicked(evt);
-            }
-        });
-
-        jLabel8.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel8.setText("Categoría:");
-
-        jLabel9.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel9.setText("Descripción:");
-
-        jLabel12.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jLabel12.setText("Color:");
+        jLabel8.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel8.setText("Buscar por descripción, color, código o categoría:");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -949,40 +880,23 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 928, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmb_categoria2, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel8))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txt_descripcion2, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel9))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(cmb_color2, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lbl_buscar))
-                            .addComponent(jLabel12))
-                        .addGap(0, 385, Short.MAX_VALUE)))
+                            .addComponent(jLabel8)
+                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 465, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel12))
-                .addGap(8, 8, 8)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cmb_categoria2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txt_descripcion2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmb_color2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl_buscar))
+                .addContainerGap()
+                .addComponent(jLabel8)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(16, 16, 16)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE))
         );
 
         jToolBar1.setBorder(null);
@@ -1120,6 +1034,20 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         });
         jToolBar1.add(jButton5);
 
+        jButton8.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jButton8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/archive-icon.png"))); // NOI18N
+        jButton8.setToolTipText("Desglose de almacen por artículo");
+        jButton8.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton8.setFocusable(false);
+        jButton8.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton8.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton8);
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -1143,7 +1071,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 .addContainerGap())
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 420, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1650,17 +1578,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_txt_precio_rentaKeyPressed
 
-    private void txt_descripcion2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_descripcion2KeyPressed
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == 10) {
-            buscar();
-        }
-    }//GEN-LAST:event_txt_descripcion2KeyPressed
-
-    private void txt_descripcion2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_descripcion2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_descripcion2ActionPerformed
-
     private void lbl_colorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_colorMouseClicked
         // TODO add your handling code here:
         mostrar_colores();
@@ -1670,11 +1587,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
 //            buscar();
         }
     }//GEN-LAST:event_lbl_colorMouseClicked
-
-    private void lbl_buscarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_buscarMouseClicked
-        // TODO add your handling code here:
-        buscar();
-    }//GEN-LAST:event_lbl_buscarMouseClicked
 
     private void jbtn_editarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_editarActionPerformed
         // TODO add your handling code here:
@@ -2003,6 +1915,29 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_txtSearchLikeItemDescriptionKeyPressed
 
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        
+        if (tabla_articulos.getSelectedRow() == - 1) {
+            JOptionPane.showMessageDialog(this, ApplicationConstants.SELECT_A_ROW_NECCESSARY, 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+         
+        String id = (tabla_articulos.getValueAt(tabla_articulos.getSelectedRow(), 0).toString());
+        Articulo item = itemService.obtenerArticuloPorId(Integer.parseInt(id));
+        
+        DesgloseAlmacenForm form = new DesgloseAlmacenForm(item, items);
+        jDesktopPane1.add(form);
+        form.show();
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    private void txtSearchKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyPressed
+        formato_tabla_articulos();        
+        List<Articulo> itemsFiltered = 
+                UtilityCommon.applyFilterToItems(items,txtSearch.getText());      
+        fillItemTable(itemsFiltered);
+    }//GEN-LAST:event_txtSearchKeyPressed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddItem;
@@ -2014,9 +1949,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox cmbLimit;
     private javax.swing.JComboBox<EstadoEvento> cmbStatus;
     private javax.swing.JComboBox<CategoriaDTO> cmb_categoria;
-    private javax.swing.JComboBox<CategoriaDTO> cmb_categoria2;
     public static javax.swing.JComboBox<Color> cmb_color;
-    private javax.swing.JComboBox<Color> cmb_color2;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -2024,10 +1957,10 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel16;
@@ -2042,7 +1975,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
@@ -2061,7 +1993,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JButton jbtn_nuevo;
     private static javax.swing.JLabel lblInfoConsultarDisponibilidad;
     private javax.swing.JLabel lblInfoGeneral;
-    private javax.swing.JLabel lbl_buscar;
     private javax.swing.JLabel lbl_categoria;
     private javax.swing.JLabel lbl_color;
     private javax.swing.JPanel panelItemsByFolio;
@@ -2074,6 +2005,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtCodigo;
     private static com.toedter.calendar.JDateChooser txtDisponibilidadFechaFinal;
     private static com.toedter.calendar.JDateChooser txtDisponibilidadFechaInicial;
+    private javax.swing.JTextField txtSearch;
     private com.toedter.calendar.JDateChooser txtSearchEndDate;
     private com.toedter.calendar.JDateChooser txtSearchEndEventDate;
     private javax.swing.JTextField txtSearchFolioRenta;
@@ -2082,7 +2014,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtSearchLikeItemDescription;
     private javax.swing.JTextField txt_cantidad;
     private javax.swing.JTextField txt_descripcion;
-    private javax.swing.JTextField txt_descripcion2;
     private javax.swing.JTextField txt_precio_compra;
     private javax.swing.JTextField txt_precio_renta;
     // End of variables declaration//GEN-END:variables
