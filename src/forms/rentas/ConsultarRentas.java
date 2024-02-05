@@ -8,7 +8,6 @@ import clases.Mail;
 import clases.sqlclass;
 import com.mysql.jdbc.MysqlDataTruncation;
 import common.constants.ApplicationConstants;
-import common.constants.PropertyConstant;
 import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
 import common.exceptions.DataFoundException;
@@ -90,6 +89,8 @@ import lombok.Getter;
 import common.model.providers.StatusProviderByRenta;
 import common.services.providers.ProviderStatusBitacoraService;
 import common.tables.TableViewOrdersProviders;
+import common.utilities.ConnectionDB;
+import common.utilities.JasperPrintUtility;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyAdapter;
@@ -98,11 +99,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JTextField;
 import utilities.OptionPaneService;
-import utilities.PropertySystemUtil;
 import utilities.dtos.ResultDataShowByDeliveryOrReturnDate;
 
 public class ConsultarRentas extends javax.swing.JInternalFrame {
     
+    private static ConnectionDB connectionDB;
     private Boolean updateItemsInFolio = false;
     private TaskAlmacenUpdateService taskAlmacenUpdateService;
     private TaskDeliveryChoferUpdateService taskDeliveryChoferUpdateService;
@@ -141,7 +142,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private List<Articulo> articulos = new ArrayList<>();
     private final String NEW_ITEM = "1";
     private final String ITEM_ALREADY = "0";
-    private Renta globalRenta = null;    
+    private static Renta globalRenta = null;    
     // variables gloables para reutilizar en los filtros y combos
     private List<Tipo> typesGlobal = new ArrayList<>();
     private List<EstadoEvento> statusListGlobal = new ArrayList<>();
@@ -1403,14 +1404,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
          new Thread(() -> {
             String messageSaveWhenEventIsUpdated;
-            Boolean generateTaskAlmacen=false;
-                
-            try {
-                generateTaskAlmacen = 
-                    Boolean.parseBoolean(PropertySystemUtil.get(PropertyConstant.GENERATE_TASK_ALMACEN));
-            } catch (IOException e) {
-                log.error(e);
-            }
+            
             try {
                 messageSaveWhenEventIsUpdated = taskAlmacenUpdateService
                     .saveWhenEventIsUpdated(estadoEventoSelected,
@@ -1418,8 +1412,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                             globalRenta, 
                             updateItemsInFolio, 
                             generalDataUpdated, 
-                            iniciar_sesion.usuarioGlobal.getUsuarioId().toString(),
-                            generateTaskAlmacen
+                            iniciar_sesion.usuarioGlobal.getUsuarioId().toString()
+                            
                     );
             } catch (NoDataFoundException e) {
                 messageSaveWhenEventIsUpdated = e.getMessage();
@@ -1434,20 +1428,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
          
         new Thread(() -> {
             String message;
-            Boolean generateTaskChofer=false;
-                
-            try {
-                generateTaskChofer = 
-                    Boolean.parseBoolean(PropertySystemUtil.get(PropertyConstant.GENERATE_TASK_CHOFER));
-            } catch (IOException e) {
-                log.error(e);
-            }
+
             try {
                 taskDeliveryChoferUpdateService = TaskDeliveryChoferUpdateService.getInstance();
                 taskDeliveryChoferUpdateService.saveWhenEventIsUpdated(
                         estadoEventoSelected, tipoSelected, globalRenta, updateItemsInFolio, id_chofer ,generalDataUpdated,
-                        iniciar_sesion.usuarioGlobal.getUsuarioId().toString(),
-                        generateTaskChofer
+                        iniciar_sesion.usuarioGlobal.getUsuarioId().toString()
                 );
                 message = String.format("Tarea 'entrega chofer' generada. Folio: %s, chofer: %s",globalRenta.getFolio(),cmb_chofer.getSelectedItem());
             } catch (DataOriginException | NoDataFoundException e) {
@@ -4690,56 +4676,21 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
     }
     private void jbtnGenerarReporteEntregasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnGenerarReporteEntregasActionPerformed
-        
-        String rentaId;
-        
+         
         try {
-            rentaId = getRentaIdFromConsultarRentaTableOnlyOneRowSelected();
-        } catch (BusinessException e) {
+            String rentaId = getRentaIdFromConsultarRentaTableOnlyOneRowSelected();
+            Renta renta = saleService.obtenerRentaPorIdSinDetalle(Integer.parseInt(rentaId));
+            if(renta == null ){
+               JOptionPane.showMessageDialog(this, "No se obtuvo los datos de manera correcta, intentalo de nuevo o reinicia el sistema ");
+               return;
+            }                   
+            JasperPrintUtility.openPDFReportDeliveryChofer(renta.getRentaId()+"", 
+                    renta.getChofer().getNombre()+" "+renta.getChofer().getApellidos(),
+                    renta.getFolio()+"", connectionDB, Utility.getPathLocation());
+        } catch (Exception e) {
+            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(
-                    this,e.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }         
-
-        Renta renta;
-        
-        try {
-            renta = saleService.obtenerRentaPorIdSinDetalle(Integer.parseInt(rentaId));
-        } catch (Exception e) {
-            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
-            JOptionPane.showMessageDialog(this, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
-            return;
-        }
-
-        if(renta == null ){
-           JOptionPane.showMessageDialog(this, "No se obtuvo los datos de manuera correcta, intentalo de nuevo o reinicia el sistema ");
-           return;
-        }
-
-        
-        // mandamos a generar el reporte PDF
-        
-        
-        try {      
-            JasperPrint jasperPrint;
-            String pathLocation = Utility.getPathLocation();
-           
-            JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(pathLocation+ApplicationConstants.RUTA_REPORTE_ENTREGAS);  
-            // enviamos los parametros
-            Map map = new HashMap<>();
-            map.put("id_renta", renta.getRentaId());
-            map.put("chofer", renta.getChofer().getNombre()+" "+renta.getChofer().getApellidos());
-            map.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
-
-            jasperPrint = JasperFillManager.fillReport(masterReport, map, funcion.getConnection());
-            JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_ENTREGAS);
-            File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_ENTREGAS);
-            
-            Desktop.getDesktop().open(file2);
-
-        } catch (Exception e) {
-            Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
-            JOptionPane.showMessageDialog(this, e);
+                    this,e.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
         }
             
          
@@ -4750,7 +4701,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jtbtnGenerateExcelActionPerformed
 
     
-    public static void generateReportByCategories (Usuario user) {
+    public static void generateReportByCategories (final Usuario user) {
     
         if (tabla_prox_rentas.getSelectedRow() == - 1){
             JOptionPane.showMessageDialog(null, "Selecciona una fila para generar el reporte...", "Reporte", JOptionPane.INFORMATION_MESSAGE);
@@ -4758,33 +4709,14 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
         
         String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), ColumConsultarRentaTable.ID.getNumber()).toString();
+        //String folio = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), ColumConsultarRentaTable.FOLIO.getNumber()).toString();
         
         try {
-            
-            JasperPrint jasperPrint;
-            String archivo = ApplicationConstants.RUTA_REPORTE_CATEGORIAS;
-            String pathLocation = Utility.getPathLocation();
-            System.out.println("Cargando desde: " + archivo);
-            if (archivo == null) {
-                JOptionPane.showMessageDialog(null, "No se encuentra el Archivo jasper");
-            }
-            JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(pathLocation+archivo);
-            
-            Map<String,Object> parametro = new HashMap<>();
-            //guardamos el parametro
-
-            parametro.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
-            parametro.put("ID_RENTA",rentaId);
-            parametro.put("ID_USUARIO",user.getUsuarioId());
-            parametro.put("NOMBRE_ENCARGADO_AREA",user.getNombre() + " " + user.getApellidos());
-            
-            jasperPrint = JasperFillManager.fillReport(masterReport, parametro, funcion.getConnection());
-            JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_CATEGORIAS);
-            File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_CATEGORIAS);
-            
-            Desktop.getDesktop().open(file2);
-            
-            
+            Renta renta = saleService.obtenerRentaPorIdSinDetalle(Integer.parseInt(rentaId));
+            JasperPrintUtility.openPDFReportByCategories(
+                      user.getUsuarioId().toString(), 
+                      user.getNombre()+" "+user.getApellidos(),
+                      renta,connectionDB, Utility.getPathLocation());            
 
         } catch (Exception e) {
             System.out.println("Mensaje de Error:" + e.toString());
@@ -5212,22 +5144,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             return;
         }
         String message;
-        Boolean generateTaskAlmacen=false;
-                
-        try {
-            generateTaskAlmacen = 
-                Boolean.parseBoolean(PropertySystemUtil.get(PropertyConstant.GENERATE_TASK_ALMACEN));
-        } catch (IOException e) {
-            log.error(e);
-        }
         
         try {
             taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
             message = taskAlmacenUpdateService.saveWhenIsNewEvent(
                     Long.parseLong(String.valueOf(globalRenta.getRentaId())), 
                     String.valueOf(globalRenta.getFolio()), 
-                    iniciar_sesion.usuarioGlobal.getUsuarioId().toString(),
-                    generateTaskAlmacen
+                    iniciar_sesion.usuarioGlobal.getUsuarioId().toString()
             );
         } catch (NoDataFoundException e) {
             message = e.getMessage();

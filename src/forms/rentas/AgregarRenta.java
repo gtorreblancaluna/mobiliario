@@ -7,7 +7,6 @@ import clases.Mail;
 import clases.conectate;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
-import common.constants.PropertyConstant;
 import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
 import common.exceptions.DataOriginException;
@@ -69,13 +68,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import utilities.OptionPaneService;
-import utilities.PropertySystemUtil;
 import utilities.Utility;
 import utilities.dtos.ResultDataShowByDeliveryOrReturnDate;
 
@@ -279,9 +276,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         
         cmbSocialMedialContact.setEnabled(false);
         cmbSocialMedialContact.removeAllItems();
-        cmbSocialMedialContact.addItem(
-                new CatalogSocialMediaContactModel(0L, ApplicationConstants.CMB_SELECCIONE)
-        );
         new Thread(() -> {
             try {
                 List<CatalogSocialMediaContactModel> catalogs = 
@@ -1105,9 +1099,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         fecha_sistema();
         String porcentajeDescuentoRenta;
         if (!txt_descuento.getText().equals("") && !txtPorcentajeDescuento.getText().equals("")) {
-            descuento = EliminaCaracteres(txt_descuento.getText(), "$");
-            descuento = descuento.replace(",", ".");
-            porcentajeDescuentoRenta = this.txtPorcentajeDescuento.getText()+"";
+            descuento = UtilityCommon.onlyNumbers(txt_descuento.getText());            
+            porcentajeDescuentoRenta = UtilityCommon.onlyNumbers(this.txtPorcentajeDescuento.getText());
         } else {
             porcentajeDescuentoRenta = "0";
             descuento = "0";
@@ -1205,22 +1198,14 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             new Thread(() -> {
                 
                 String message;
-                Boolean generateTaskAlmacen=false;
                 
-                try {
-                    generateTaskAlmacen = 
-                        Boolean.parseBoolean(PropertySystemUtil.get(PropertyConstant.GENERATE_TASK_ALMACEN));
-                } catch (IOException e) {
-                    log.error(e);
-                }
                
                 try {
                     taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
                     message = taskAlmacenUpdateService.saveWhenIsNewEvent(
                             Long.parseLong(id_ultima_renta), 
                             folio, 
-                            iniciar_sesion.usuarioGlobal.getUsuarioId().toString(),
-                            generateTaskAlmacen
+                            iniciar_sesion.usuarioGlobal.getUsuarioId().toString()
                     );
                     log.info(message);
                 } catch (NoDataFoundException e) {
@@ -1236,23 +1221,14 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             
             new Thread(() -> {       
                 
-                String message;
-                Boolean generateTaskChofer=false;
-                
-                try {
-                generateTaskChofer = 
-                        Boolean.parseBoolean(PropertySystemUtil.get(PropertyConstant.GENERATE_TASK_CHOFER));
-                } catch (IOException e) {
-                    log.error(e);
-                }
+                String message;                
 
                 try {
                     taskDeliveryChoferUpdateService = TaskDeliveryChoferUpdateService.getInstance();
                     taskDeliveryChoferUpdateService.saveWhenIsNewEvent(
                             Long.parseLong(id_ultima_renta), 
                             folio,id_chofer, 
-                            iniciar_sesion.usuarioGlobal.getUsuarioId().toString(),
-                            generateTaskChofer
+                            iniciar_sesion.usuarioGlobal.getUsuarioId().toString()
                     );
                     message = String.format("Tarea 'entrega chofer' generada. Folio: %s, chofer: %s",folio,cmb_chofer.getSelectedItem());
                 } catch (DataOriginException | NoDataFoundException e) {

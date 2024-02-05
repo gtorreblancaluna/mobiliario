@@ -50,7 +50,7 @@ public class CustomerService {
             throw new BusinessException("Nombre y apellidos son requeridos.");
         }
         
-        if (cliente.getSocialMedia() == null || cliente.getSocialMedia().getId().equals(0)) {
+        if (cliente.getSocialMedia() == null || cliente.getSocialMedia().getId().equals(0L)) {
             throw new BusinessException("Medio de contacto es requerido.");
         }
         

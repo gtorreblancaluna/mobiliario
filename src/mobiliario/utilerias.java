@@ -29,7 +29,7 @@ import common.model.DatosGenerales;
 import org.jvnet.substance.SubstanceLookAndFeel;
 import org.jvnet.substance.skin.SkinInfo;
 import services.SystemService;
-import utilities.PropertySystemUtil;
+import common.utilities.PropertySystemUtil;
 
 public class utilerias extends java.awt.Dialog {
 

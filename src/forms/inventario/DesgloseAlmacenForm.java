@@ -605,7 +605,7 @@ public class DesgloseAlmacenForm extends javax.swing.JInternalFrame {
         }
         
         int seleccion = JOptionPane.showOptionDialog(this, ""
-                + "Total de elmentos a eliminar: "+ ids.size() + ". Confirma para continuar.", 
+                + "Total de elementos a eliminar: ["+ ids.size() + "]. Confirma para continuar.", 
                 ApplicationConstants.MESSAGE_TITLE_CONFIRM_DELETE, 
                 JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si");
         if (seleccion != 0) {//presiono que no

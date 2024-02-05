@@ -269,21 +269,20 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         setClosable(true);
         setTitle("Contabilidad");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Registra ingreso o egreso", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 11))); // NOI18N
         jPanel1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel1.setText("Categoria:");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 24, -1, -1));
 
-        jLabel2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel2.setText("Sub categoria:");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(184, 24, -1, -1));
 
-        cmbSubCategoria.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmbSubCategoria.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmbSubCategoria.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmbSubCategoria.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmbSubCategoria.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         cmbSubCategoria.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 cmbSubCategoriaMouseClicked(evt);
@@ -291,9 +290,9 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         });
         jPanel1.add(cmbSubCategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 40, 166, 20));
 
-        cmbCategoria.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmbCategoria.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmbCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmbCategoria.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmbCategoria.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         cmbCategoria.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cmbCategoriaItemStateChanged(evt);
@@ -306,7 +305,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         });
         jPanel1.add(cmbCategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 166, 20));
 
-        txtComentario.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtComentario.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txtComentario.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtComentarioActionPerformed(evt);
@@ -314,13 +313,13 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         });
         jPanel1.add(txtComentario, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 40, 260, 20));
 
-        jLabel3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel3.setText("Fecha movimiento:");
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 20, 160, -1));
 
         btnRegistrar.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         btnRegistrar.setText("Registrar");
-        btnRegistrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnRegistrar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnRegistrar.setDefaultCapable(false);
         btnRegistrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -329,8 +328,9 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         });
         jPanel1.add(btnRegistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 40, -1, 20));
 
+        lblAgregarCategoria.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         lblAgregarCategoria.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Add-icon.png"))); // NOI18N
-        lblAgregarCategoria.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblAgregarCategoria.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         lblAgregarCategoria.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblAgregarCategoriaMouseClicked(evt);
@@ -343,8 +343,9 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         });
         jPanel1.add(lblAgregarCategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 20, -1, -1));
 
+        lblAgregarSubCategoria.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         lblAgregarSubCategoria.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Add-icon.png"))); // NOI18N
-        lblAgregarSubCategoria.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblAgregarSubCategoria.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         lblAgregarSubCategoria.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblAgregarSubCategoriaMouseClicked(evt);
@@ -357,11 +358,11 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         });
         jPanel1.add(lblAgregarSubCategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 20, -1, -1));
 
-        jLabel4.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel4.setText("Cantidad:");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 20, -1, -1));
 
-        txtCantidad.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txtCantidad.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txtCantidad.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtCantidadActionPerformed(evt);
@@ -369,9 +370,9 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         });
         jPanel1.add(txtCantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 40, 70, 20));
 
-        cmbCuenta.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmbCuenta.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmbCuenta.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cmbCuenta.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmbCuenta.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         cmbCuenta.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cmbCuentaItemStateChanged(evt);
@@ -384,12 +385,13 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         });
         jPanel1.add(cmbCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 40, 170, 20));
 
-        lblDescripcion.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        lblDescripcion.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         lblDescripcion.setText("Cuenta:");
         jPanel1.add(lblDescripcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 20, 70, -1));
 
+        lblAgregarCuenta.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         lblAgregarCuenta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Add-icon.png"))); // NOI18N
-        lblAgregarCuenta.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblAgregarCuenta.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         lblAgregarCuenta.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblAgregarCuentaMouseClicked(evt);
@@ -402,7 +404,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         });
         jPanel1.add(lblAgregarCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 20, -1, -1));
 
-        txt_fecha_movimiento.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_fecha_movimiento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_fecha_movimiento.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 txt_fecha_movimientoMouseClicked(evt);
@@ -413,16 +415,13 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
                 txt_fecha_movimientoKeyPressed(evt);
             }
         });
-        jPanel1.add(txt_fecha_movimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 40, 160, 21));
+        jPanel1.add(txt_fecha_movimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 40, 170, 21));
 
-        jLabel6.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel6.setText("Comentario:");
         jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 20, -1, -1));
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Busqueda", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 11))); // NOI18N
-        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        txt_fecha_inicial.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_fecha_inicial.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_fecha_inicial.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 txt_fecha_inicialMouseClicked(evt);
@@ -433,9 +432,8 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
                 txt_fecha_inicialKeyPressed(evt);
             }
         });
-        jPanel2.add(txt_fecha_inicial, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 37, 169, 21));
 
-        txt_fecha_final.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_fecha_final.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_fecha_final.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 txt_fecha_finalMouseClicked(evt);
@@ -446,13 +444,11 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
                 txt_fecha_finalKeyPressed(evt);
             }
         });
-        jPanel2.add(txt_fecha_final, new org.netbeans.lib.awtextra.AbsoluteConstraints(193, 37, 160, 21));
 
-        jLabel5.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel5.setText("Fecha inicial y final:");
-        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 18, 111, -1));
 
-        btnBusqueda.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnBusqueda.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         btnBusqueda.setText("Realizar busqueda");
         btnBusqueda.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnBusqueda.setDefaultCapable(false);
@@ -461,12 +457,10 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
                 btnBusquedaActionPerformed(evt);
             }
         });
-        jPanel2.add(btnBusqueda, new org.netbeans.lib.awtextra.AbsoluteConstraints(365, 38, -1, 20));
 
-        lblSummaryIngresos.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jPanel2.add(lblSummaryIngresos, new org.netbeans.lib.awtextra.AbsoluteConstraints(462, 15, 605, 16));
+        lblSummaryIngresos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
-        btnExportExcel.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnExportExcel.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         btnExportExcel.setText("Exportar a Excel");
         btnExportExcel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnExportExcel.setDefaultCapable(false);
@@ -475,9 +469,8 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
                 btnExportExcelActionPerformed(evt);
             }
         });
-        jPanel2.add(btnExportExcel, new org.netbeans.lib.awtextra.AbsoluteConstraints(506, 38, -1, 20));
 
-        btnEliminar.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnEliminar.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         btnEliminar.setText("Eliminar registro");
         btnEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnEliminar.setDefaultCapable(false);
@@ -486,11 +479,8 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
                 btnEliminarActionPerformed(evt);
             }
         });
-        jPanel2.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(637, 38, -1, 20));
 
-        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        tabla_pagos.setFont(new java.awt.Font("Arial", 0, 9)); // NOI18N
+        tabla_pagos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         tabla_pagos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -505,11 +495,26 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         tabla_pagos.setToolTipText("");
         jScrollPane2.setViewportView(tabla_pagos);
 
-        jPanel4.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(2, 5, 1130, 330));
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1131, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
         jTabbedPane1.addTab("Pagos", jPanel4);
 
-        tabla_contabilidad.setFont(new java.awt.Font("Arial", 0, 9)); // NOI18N
+        tabla_contabilidad.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         tabla_contabilidad.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -529,13 +534,14 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1131, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -543,7 +549,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
 
         jPanel3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
 
-        tabla_resumen.setFont(new java.awt.Font("Arial", 0, 9)); // NOI18N
+        tabla_resumen.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         tabla_resumen.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -563,19 +569,70 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 1112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 1131, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jTabbedPane1.addTab("Resumen", jPanel3);
 
-        jPanel2.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 1160, 400));
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(339, 339, 339)
+                        .addComponent(lblSummaryIngresos, javax.swing.GroupLayout.PREFERRED_SIZE, 605, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(txt_fecha_inicial, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12)
+                        .addComponent(txt_fecha_final, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12)
+                        .addComponent(btnBusqueda)
+                        .addGap(9, 9, 9)
+                        .addComponent(btnExportExcel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(4, 4, 4)
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(2, 2, 2))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(3, 3, 3)
+                        .addComponent(jLabel5))
+                    .addComponent(lblSummaryIngresos, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(5, 5, 5)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txt_fecha_inicial, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txt_fecha_final, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(3, 3, 3)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnExportExcel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnBusqueda)
+                            .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(12, 12, 12)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
         jTabbedPane1.getAccessibleContext().setAccessibleName("Cuentas");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -586,7 +643,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1178, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -595,7 +652,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -732,7 +789,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         String[] columnNames = {"Id", "id sub categoria", "Categoria", "Sub Categoria","Ingreso/Egreso", "Usuario", "Fecha registro","Fecha movimiento","Comentario","Cantidad","Cuenta"};       
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
         tabla_contabilidad.setModel(tableModel);
-        tabla_contabilidad.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 10));
+        tabla_contabilidad.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 12));
         TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<TableModel>(tableModel); 
         tabla_contabilidad.setRowSorter(ordenarTabla);
         int[] anchos = {10, 10, 100, 100,100, 100, 120,120,140,100,400};
@@ -777,7 +834,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         tabla_pagos.setRowSorter(ordenarTabla);
         int[] anchos = {10, 10, 50, 100, 300, 150,150,400,400};
 
-            tabla_pagos.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 10));
+            tabla_pagos.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 12));
         for (int inn = 0; inn < tabla_pagos.getColumnCount(); inn++) {
             tabla_pagos.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
         }        
@@ -821,7 +878,7 @@ public final class ContabilidadForm extends javax.swing.JInternalFrame {
         
         int[] anchos = {400, 100, 100, 100, 100,100};
 
-            tabla_resumen.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 10));
+            tabla_resumen.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 12));
         for (int inn = 0; inn < tabla_resumen.getColumnCount(); inn++) {
             tabla_resumen.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
         }        

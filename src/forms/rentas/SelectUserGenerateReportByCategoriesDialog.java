@@ -83,7 +83,7 @@ public class SelectUserGenerateReportByCategoriesDialog extends javax.swing.JDia
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         if (cmbUsersInCategories.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Selecciona un usuario para generar el reporte ", "Reporte", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Selecciona un usuario para generar el reporte ", "Reporte", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         Usuario user = ((Usuario) cmbUsersInCategories.getModel().getSelectedItem());

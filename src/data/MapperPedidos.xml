@@ -12,6 +12,8 @@
         <result property="cliente.id" column="cliente_id"/>
         <result property="cliente.nombre" column="cliente_nombre"/>
         <result property="cliente.apellidos" column="cliente_apellidos"/>
+        <result property="cliente.telMovil" column="cliente_tel_movil"/>
+        <result property="cliente.telFijo" column="cliente_tel_fijo"/>
         <!--user info-->
         <result property="usuario.usuarioId" column="usuario_id"/>
         <result property="usuario.nombre" column="usuario_nombre"/>
@@ -124,6 +126,8 @@
             c.id_clientes AS cliente_id,
             c.nombre AS cliente_nombre,
             c.apellidos AS cliente_apellidos,
+            c.tel_movil AS cliente_tel_movil,
+            c.tel_fijo AS cliente_tel_fijo,
             u.id_usuarios AS usuario_id,
             u.nombre AS usuario_nombre,
             u.apellidos AS usuario_apellidos,

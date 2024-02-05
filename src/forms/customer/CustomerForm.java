@@ -8,7 +8,7 @@ import common.model.Cliente;
 import common.services.CatalogSocialMediaContactService;
 import common.services.UtilityService;
 import common.tables.TableCustomer;
-import common.utilities.UtilityCommon;
+import static common.utilities.UtilityCommon.removeAccents;
 import forms.socialMediaContact.AddCatalogSocialMediaFormDialog;
 import java.awt.Frame;
 import java.awt.Point;
@@ -54,6 +54,7 @@ public class CustomerForm extends javax.swing.JInternalFrame {
     private void addEventListenerTableCustomer () {
     
         tableCustomer.addMouseListener(new MouseAdapter() {
+            @Override
             public void mousePressed(MouseEvent mouseEvent) {
                 JTable table =(JTable) mouseEvent.getSource();
                 Point point = mouseEvent.getPoint();
@@ -63,25 +64,6 @@ public class CustomerForm extends javax.swing.JInternalFrame {
                 }
             }
         });
-        
-    }
-    
-    private void searchAndFillTableCustomers () {
-        try {
-            List<Cliente> filterCustomers =
-                    customers.stream()
-                            .filter(customer -> Objects.nonNull(customer))
-                            .filter(customer -> Objects.nonNull(customer.getNombre()))
-                            .filter(customer -> Objects.nonNull(customer.getApellidos()))
-                            .filter(customer -> UtilityCommon.removeAccents(customer.getNombre().toLowerCase().trim()).contains(txt_nombre.getText().toLowerCase().trim()))
-                            .filter(customer -> UtilityCommon.removeAccents(customer.getApellidos().toLowerCase().trim()).contains(txt_apellidos.getText().toLowerCase().trim()))
-                            .collect(Collectors.toList());
-            fillTableCustomers(filterCustomers);
-        } catch (Exception e){
-            JOptionPane.showMessageDialog(this, e, 
-                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
-        }
-        
         
     }
     
@@ -155,6 +137,9 @@ public class CustomerForm extends javax.swing.JInternalFrame {
         cmbSocialMedialContact.setSelectedIndex(0);
 
     }
+    private void lblAddSocialMediaContactKeyPressed(java.awt.event.KeyEvent evt) {    
+        
+    }
     
     private void lblAddSocialMediaContactMouseClicked(java.awt.event.MouseEvent evt) {    
         if(!iniciar_sesion.usuarioGlobal.getAdministrador().equals("1")){
@@ -176,15 +161,6 @@ public class CustomerForm extends javax.swing.JInternalFrame {
         }
     }
 
-    private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {                                          
-        searchAndFillTableCustomers();
-    }
-    
-    private void lblAddSocialMediaContactKeyPressed(java.awt.event.KeyEvent evt) {                                     
-       
-    } 
-
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -199,7 +175,6 @@ public class CustomerForm extends javax.swing.JInternalFrame {
         buttonGroup1 = new javax.swing.ButtonGroup();
         panel_botones = new javax.swing.JPanel();
         txtSearch = new javax.swing.JTextField();
-        jLabel10 = new javax.swing.JLabel();
         panelCustomer = new javax.swing.JPanel();
         panel_datos = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -242,12 +217,13 @@ public class CustomerForm extends javax.swing.JInternalFrame {
 
         txtSearch.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchKeyPressed(evt);
+            }
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txtSearchKeyReleased(evt);
             }
         });
-
-        jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/search-icon.png"))); // NOI18N
 
         javax.swing.GroupLayout panelCustomerLayout = new javax.swing.GroupLayout(panelCustomer);
         panelCustomer.setLayout(panelCustomerLayout);
@@ -257,7 +233,7 @@ public class CustomerForm extends javax.swing.JInternalFrame {
         );
         panelCustomerLayout.setVerticalGroup(
             panelCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 306, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout panel_botonesLayout = new javax.swing.GroupLayout(panel_botones);
@@ -268,9 +244,7 @@ public class CustomerForm extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(panel_botonesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_botonesLayout.createSequentialGroup()
-                        .addGap(0, 423, Short.MAX_VALUE)
-                        .addComponent(jLabel10)
-                        .addGap(18, 18, 18)
+                        .addGap(0, 465, Short.MAX_VALUE)
                         .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 469, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(panelCustomer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -278,9 +252,7 @@ public class CustomerForm extends javax.swing.JInternalFrame {
         panel_botonesLayout.setVerticalGroup(
             panel_botonesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_botonesLayout.createSequentialGroup()
-                .addGroup(panel_botonesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel10))
+                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelCustomer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -617,10 +589,15 @@ public class CustomerForm extends javax.swing.JInternalFrame {
         
         try {
             customerService.saveOrUpdate(cliente); 
+            limpiar();
+            JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_SAVE_SUCCESSFUL, 
+                    ApplicationConstants.MESSAGE_SAVE_SUCCESSFUL, JOptionPane.INFORMATION_MESSAGE);
             getCustomers();
-        } catch (BusinessException businessException) {
-            JOptionPane.showMessageDialog(this, businessException.getMessage(), 
+        } catch (Exception exception) {
+            JOptionPane.showMessageDialog(this, exception.getMessage(), 
                     ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+        } finally {
+            Toolkit.getDefaultToolkit().beep();
         }
 
 
@@ -732,13 +709,31 @@ public class CustomerForm extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jbtn_eliminarActionPerformed
 
     private void txt_buscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_buscarKeyReleased
-        // TODO add your handling code here:
-        searchAndFillTableCustomers();
+       
+        
     }//GEN-LAST:event_txt_buscarKeyReleased
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         utilityService.exportarExcel(tableCustomer);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchKeyReleased
+
+    private void txtSearchKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyPressed
+        String textToSearch = "(.*)"+removeAccents(txtSearch.getText()).toLowerCase().trim()+"(.*)";
+        List<Cliente> customerFiltered = customers.stream()
+        .filter(customer -> Objects.nonNull(customer))
+        .filter(customer -> Objects.nonNull(customer.getNombre()))
+        .filter(customer -> Objects.nonNull(customer.getApellidos()))
+        .filter(customer -> (
+            removeAccents(
+                customer.getNombre().trim().toLowerCase() + " " +
+                customer.getApellidos().trim().toLowerCase()
+            )).matches(textToSearch)).collect(Collectors.toList());
+            fillTableCustomers(customerFiltered);
+    }//GEN-LAST:event_txtSearchKeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -747,7 +742,6 @@ public class CustomerForm extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox<CatalogSocialMediaContactModel> cmbSocialMedialContact;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel23;
