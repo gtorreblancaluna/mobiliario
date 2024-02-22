@@ -9,7 +9,7 @@ import common.services.CatalogSocialMediaContactService;
 import common.services.UtilityService;
 import common.tables.TableCustomer;
 import static common.utilities.UtilityCommon.removeAccents;
-import forms.socialMediaContact.AddCatalogSocialMediaFormDialog;
+import forms.social_media_contact.AddCatalogSocialMediaFormDialog;
 import java.awt.Frame;
 import java.awt.Point;
 import java.awt.Toolkit;

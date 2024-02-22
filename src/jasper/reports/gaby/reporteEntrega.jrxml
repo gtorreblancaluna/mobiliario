@@ -1,254 +1,275 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="renta" pageWidth="695" pageHeight="900" columnWidth="655" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="af0ab36d-faf5-45a3-a784-d9f82f7a9acc">
-	<property name="ireport.zoom" value="0.9313819845887352"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
-	<parameter name="id_renta" class="java.lang.String"/>
-	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+	<property name="ireport.zoom" value="16.252058915082742"/>
+	<property name="ireport.x" value="419"/>
+	<property name="ireport.y" value="2275"/>
+	<parameter name="RENTA_ID" class="java.lang.String"/>
+	<parameter name="NOMBRE_CLIENTE" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["C:\\Users\\Carlos Alberto\\Documents\\NetBeansProjects\\mobiliario\\reportes\\"]]></defaultValueExpression>
 	</parameter>
-	<parameter name="abonos" class="java.lang.String"/>
-	<parameter name="subTotal" class="java.lang.String"/>
-	<parameter name="chofer" class="java.lang.String"/>
-	<parameter name="descuento" class="java.lang.String"/>
-	<parameter name="iva" class="java.lang.String"/>
-	<parameter name="QR" class="java.awt.Image" isForPrompting="false"/>
+	<parameter name="FECHA_EVENTO" class="java.lang.String"/>
+	<parameter name="FECHA_ENTREGA" class="java.lang.String"/>
+	<parameter name="FECHA_RECOLECCION" class="java.lang.String"/>
+	<parameter name="DESCRIPCION_EVENTO" class="java.lang.String"/>
+	<parameter name="FOLIO" class="java.lang.String"/>
+	<parameter name="COMENTARIO_EVENTO" class="java.lang.String"/>
 	<parameter name="URL_IMAGEN" class="java.lang.String"/>
+	<parameter name="HORA_ENTREGA" class="java.lang.String"/>
+	<parameter name="HORA_RECOLECCION" class="java.lang.String"/>
+	<parameter name="TIPO_EVENTO" class="java.lang.String"/>
+	<parameter name="NOMBRE_USUARIO" class="java.lang.String"/>
+	<parameter name="NOMBRE_CHOFER" class="java.lang.String"/>
+	<parameter name="TELEFONOS_CLIENTE" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[SELECT
-     CONCAT(u.`nombre`," ",u.`apellidos`) AS Usuario,
-     (d.`cantidad`*d.`p_unitario`) AS Importe,
-     CONCAT(a.`descripcion`," ",co.`color`) AS Articulo,
-     CONCAT(c.`nombre`," ",c.`apellidos`) AS Cliente,
-     r.`fecha_pedido`,
-     r.`fecha_entrega`,
-     r.`hora_entrega`,
-     r.`fecha_devolucion`,
-     r.`descripcion`,
-     d.`cantidad` ,
-     d.`p_unitario`,
-     c.`direccion`,
-     c.tel_movil,
-     c.tel_fijo,
-     r.`comentario`,
-     r.`folio`,
-    ti.`tipo`,
-    r.hora_devolucion,
-    r.fecha_evento
-
-FROM
-     `renta` r INNER JOIN `usuarios` u ON r.`id_usuarios` = u.`id_usuarios`
-     INNER JOIN `detalle_renta` d ON r.`id_renta` = d.`id_renta`
-     INNER JOIN `clientes` c ON r.`id_clientes` = c.`id_clientes`
-     INNER JOIN `articulo` a ON d.`id_articulo` = a.`id_articulo`
-     INNER JOIN `color` co ON a.`id_color` = co.`id_color`
-     INNER JOIN `tipo` ti ON r.`id_tipo` = ti.`id_tipo`
-WHERE
-     r.`id_renta` = $P{id_renta}]]>
+		<![CDATA[SELECT * FROM(
+SELECT
+articulo.codigo AS codigo,
+detalle_renta.cantidad AS cantidad,
+CONCAT(articulo.descripcion," ",color.color) AS articulo,
+categoria.descripcion AS categoria,
+"" AS comentario
+FROM detalle_renta AS detalle_renta
+INNER JOIN articulo articulo ON (articulo.id_articulo = detalle_renta.id_articulo)
+INNER JOIN categoria categoria ON (categoria.id_categoria = articulo.id_categoria)
+INNER JOIN color color ON (color.id_color = articulo.id_color)
+WHERE detalle_renta.id_renta = $P{RENTA_ID}
+UNION
+SELECT
+CONCAT("* ",articulo_relation.codigo) AS codigo,
+((
+	SELECT detalle_renta.cantidad
+	FROM detalle_renta detalle_renta
+    WHERE detalle_renta.id_articulo = desglose_almacen.item_init_id
+    AND detalle_renta.id_renta = $P{RENTA_ID}
+)*desglose_almacen.amount) AS cantidad,
+CONCAT(articulo_relation.descripcion," ",color_articulo_relation.color) AS articulo,
+categoria_item_relation.descripcion AS categoria,
+desglose_almacen.comment AS comentario
+FROM desglose_almacen desglose_almacen
+INNER JOIN articulo articulo_relation ON (articulo_relation.id_articulo = desglose_almacen.item_relation_id)
+INNER JOIN categoria categoria_item_relation ON (categoria_item_relation.id_categoria = articulo_relation.id_categoria)
+INNER JOIN color color_articulo_relation ON (color_articulo_relation.id_color = articulo_relation.id_color)
+WHERE desglose_almacen.item_init_id IN (
+	SELECT detalle_renta.id_articulo
+	FROM detalle_renta detalle_renta
+    WHERE detalle_renta.id_renta = $P{RENTA_ID}
+    )
+AND desglose_almacen.fg_active = 1
+) a ORDER BY codigo DESC, articulo]]>
 	</queryString>
-	<field name="Usuario" class="java.lang.String"/>
-	<field name="Articulo" class="java.lang.String"/>
-	<field name="Cliente" class="java.lang.String"/>
-	<field name="fecha_pedido" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="fecha_entrega" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="hora_entrega" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="fecha_devolucion" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="descripcion" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="cantidad" class="java.lang.Float">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="direccion" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="comentario" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="folio" class="java.lang.Long">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="tipo" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="hora_devolucion" class="java.lang.String"/>
-	<field name="tel_movil" class="java.lang.String"/>
-	<field name="tel_fijo" class="java.lang.String"/>
-	<field name="fecha_evento" class="java.lang.String"/>
+	<field name="cantidad" class="java.lang.String"/>
+	<field name="codigo" class="java.lang.String"/>
+	<field name="articulo" class="java.lang.String"/>
+	<field name="categoria" class="java.lang.String"/>
+	<field name="comentario" class="java.lang.String"/>
 	<pageHeader>
-		<band height="212">
+		<band height="123">
 			<textField>
-				<reportElement x="12" y="45" width="314" height="24" uuid="cf2b42e2-14fc-43af-8594-74545538abc8"/>
+				<reportElement x="0" y="20" width="316" height="14" uuid="cf2b42e2-14fc-43af-8594-74545538abc8"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Cliente: "+$F{Cliente}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Cliente: "+$P{NOMBRE_CLIENTE}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="13" y="89" width="509" height="20" uuid="bf7a0c42-eb64-4a72-bb77-f1cdd17ecddd"/>
+				<reportElement x="0" y="48" width="522" height="14" uuid="bf7a0c42-eb64-4a72-bb77-f1cdd17ecddd"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Fecha de elaboracion del pedido: "+$F{fecha_pedido}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Fecha de elaboración del pedido: "+$P{FECHA_EVENTO}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="12" y="109" width="510" height="82" uuid="776bb686-563e-4dae-8289-87002897f527"/>
+				<reportElement x="0" y="72" width="522" height="28" uuid="776bb686-563e-4dae-8289-87002897f527"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DESCRIPCION_EVENTO}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="12" y="10" width="85" height="24" uuid="d85f5de2-799f-45cb-a9b7-acaa123e12f1"/>
+				<reportElement x="0" y="0" width="86" height="20" uuid="d85f5de2-799f-45cb-a9b7-acaa123e12f1"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Folio: "+$F{folio}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Folio: "+$P{FOLIO}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="327" y="45" width="195" height="20" uuid="544b1405-6a1e-4184-81d7-cef508b6e039"/>
+				<reportElement x="315" y="20" width="207" height="14" uuid="544b1405-6a1e-4184-81d7-cef508b6e039"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Tipo: "+$F{tipo}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Tipo: "+$P{TIPO_EVENTO}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="227" y="14" width="269" height="20" uuid="2f7ef6a1-9a0a-45dc-b4b5-c4bccb8a5680"/>
-				<textElement>
+				<reportElement x="86" y="0" width="436" height="20" uuid="2f7ef6a1-9a0a-45dc-b4b5-c4bccb8a5680"/>
+				<textElement textAlignment="Center">
 					<font fontName="Arial" size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[R E P O R T E   D E   E N T R E G A ]]></text>
 			</staticText>
-			<staticText>
-				<reportElement x="12" y="191" width="563" height="20" uuid="99f51c8e-a155-4597-a3b4-3be2ab88aa3d"/>
-				<textElement>
-					<font fontName="Arial" size="14" isBold="true"/>
-				</textElement>
-				<text><![CDATA[D E T A L L E   D E L   P E D I D O]]></text>
-			</staticText>
 			<image>
-				<reportElement x="522" y="0" width="133" height="133" uuid="af06c2bc-4f98-4b30-9aec-d7c54d99d194"/>
+				<reportElement x="535" y="0" width="120" height="120" uuid="af06c2bc-4f98-4b30-9aec-d7c54d99d194"/>
 				<imageExpression><![CDATA[$P{URL_IMAGEN}]]></imageExpression>
 			</image>
+			<staticText>
+				<reportElement x="0" y="106" width="523" height="14" forecolor="#666666" uuid="b7635c00-d060-4233-a0c7-012aa57d07b2"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[* Desglose de almacen por artículo.]]></text>
+			</staticText>
 			<textField>
-				<reportElement x="13" y="65" width="314" height="24" uuid="96ebfb2a-aed3-4986-8069-b09cd7bc6ba3"/>
+				<reportElement x="0" y="34" width="315" height="14" uuid="dca48696-d5f9-4b5f-a374-fe841d4fe980"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Telefonos: "+$F{tel_movil}+", "+$F{tel_fijo}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Telefonos del cliente: "+$P{TELEFONOS_CLIENTE}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="31">
+		<band height="16">
 			<staticText>
-				<reportElement x="13" y="7" width="66" height="20" uuid="1e13b5fe-fa7e-481d-83aa-4a384e860ea7"/>
+				<reportElement x="0" y="2" width="32" height="14" uuid="1e13b5fe-fa7e-481d-83aa-4a384e860ea7"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<text><![CDATA[Cantidad]]></text>
+				<text><![CDATA[Cant.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="117" y="7" width="372" height="20" uuid="c42a8804-092f-45b6-af5a-a5127c1539bd"/>
+				<reportElement x="86" y="2" width="402" height="14" uuid="c42a8804-092f-45b6-af5a-a5127c1539bd"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<text><![CDATA[Descripcion del articulo]]></text>
+				<text><![CDATA[Artículo]]></text>
 			</staticText>
 			<line>
-				<reportElement x="12" y="1" width="630" height="1" forecolor="#999999" uuid="0e24976b-4d00-4ad4-bb68-4ef125311120"/>
+				<reportElement x="0" y="0" width="655" height="1" forecolor="#999999" uuid="0e24976b-4d00-4ad4-bb68-4ef125311120"/>
 			</line>
+			<staticText>
+				<reportElement x="41" y="2" width="45" height="14" uuid="be94d05f-d476-4186-87c3-5721003d7dfc"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<text><![CDATA[Código]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="488" y="1" width="71" height="14" uuid="72838e99-5ae6-43b6-a309-a81dff396f4d"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<text><![CDATA[Categoría]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="559" y="2" width="93" height="14" uuid="6fe1eee3-3050-4e4a-b65a-f16af656545d"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<text><![CDATA[Comentario]]></text>
+			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="19" splitType="Stretch">
+		<band height="13" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="68" height="19" uuid="cd0dc678-302e-4d48-aa9d-4788290ceeb4"/>
-				<textElement textAlignment="Center">
+				<reportElement x="0" y="0" width="22" height="13" forecolor="#666666" uuid="cd0dc678-302e-4d48-aa9d-4788290ceeb4"/>
+				<textElement textAlignment="Right">
 					<font fontName="Arial"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="113" y="0" width="466" height="19" uuid="acbde3cb-1664-4020-bbee-637fbb28294e"/>
+				<reportElement x="86" y="0" width="402" height="13" forecolor="#666666" uuid="acbde3cb-1664-4020-bbee-637fbb28294e"/>
 				<textElement>
 					<font fontName="Arial"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{Articulo}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{articulo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="41" y="0" width="45" height="13" forecolor="#666666" uuid="d8451bc6-e583-4226-a37c-f8f91db78b8c"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="488" y="0" width="71" height="13" forecolor="#666666" uuid="e1e5e770-7e58-4a5f-a6c8-64ea7ed46577"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{categoria}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="559" y="1" width="93" height="12" forecolor="#666666" uuid="3173cfd6-0918-40c2-a99b-ea3796fff8be"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{comentario}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
 	<columnFooter>
 		<band height="229">
 			<textField>
-				<reportElement x="13" y="92" width="615" height="93" uuid="27536c0b-ff9f-4a6b-b9dc-f106ad6c9edb"/>
+				<reportElement x="0" y="85" width="655" height="100" uuid="27536c0b-ff9f-4a6b-b9dc-f106ad6c9edb"/>
 				<textElement>
 					<font fontName="Arial" size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{comentario}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{COMENTARIO_EVENTO}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="13" y="205" width="615" height="20" uuid="4817bd89-272d-44fc-8f00-5d8a61f2eb5f"/>
+				<reportElement x="0" y="205" width="655" height="20" uuid="4817bd89-272d-44fc-8f00-5d8a61f2eb5f"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Atendio: "+$F{Usuario}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Atendió: "+$P{NOMBRE_USUARIO}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement x="13" y="185" width="615" height="20" uuid="60881411-e324-4b2c-9ddb-9b7ea12c0ee2"/>
+				<reportElement x="0" y="185" width="655" height="20" uuid="60881411-e324-4b2c-9ddb-9b7ea12c0ee2"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Chofer: "+$P{chofer}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Chofer: "+$P{NOMBRE_CHOFER}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="13" y="25" width="615" height="20" uuid="5f87aac2-d5c3-47d5-8d46-803ff9826c76"/>
+				<reportElement x="0" y="25" width="655" height="20" uuid="5f87aac2-d5c3-47d5-8d46-803ff9826c76"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Fecha de devolucion: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_devolucion}))+" Hora: "+$F{hora_devolucion}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Fecha de devolucion: "+$P{FECHA_RECOLECCION}+", hora: "+$P{HORA_RECOLECCION}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="13" y="5" width="615" height="20" uuid="5f36e1f3-ce07-4290-a4b0-6f383aa8036a"/>
+				<reportElement x="0" y="5" width="655" height="20" uuid="5f36e1f3-ce07-4290-a4b0-6f383aa8036a"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Fecha de entrega: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_entrega}))+" Hora: "+$F{hora_entrega}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Fecha de entrega: "+$P{FECHA_ENTREGA}+", hora: "+$P{HORA_ENTREGA}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="13" y="72" width="185" height="20" uuid="c20735a4-101d-44c3-8034-370369a76892"/>
+				<reportElement x="0" y="65" width="186" height="20" uuid="c20735a4-101d-44c3-8034-370369a76892"/>
 				<textElement>
 					<font fontName="Arial" size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[C O M E N T A R I O S :]]></text>
 			</staticText>
 			<line>
-				<reportElement x="12" y="2" width="630" height="1" forecolor="#999999" uuid="173459cc-bc7f-44dd-8bda-1410cdc53ce7"/>
+				<reportElement x="0" y="2" width="655" height="1" forecolor="#999999" uuid="173459cc-bc7f-44dd-8bda-1410cdc53ce7"/>
 			</line>
 			<line>
-				<reportElement x="13" y="225" width="630" height="1" forecolor="#999999" uuid="a3c0cc4f-2c07-4721-9328-062fcd2ed66f"/>
+				<reportElement x="1" y="225" width="654" height="1" forecolor="#999999" uuid="a3c0cc4f-2c07-4721-9328-062fcd2ed66f"/>
 			</line>
 			<textField>
-				<reportElement x="13" y="45" width="615" height="20" uuid="03bd5e30-4ee1-43fa-8b9f-9e2b81797f57"/>
+				<reportElement x="0" y="45" width="655" height="20" uuid="03bd5e30-4ee1-43fa-8b9f-9e2b81797f57"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Fecha del evento: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_evento}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Fecha del evento: "+$P{FECHA_EVENTO}]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnFooter>
 	<pageFooter>
 		<band height="22">
 			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement x="1" y="0" width="326" height="20" uuid="a0599559-33c9-49f3-8c1a-4f74889cfa20"/>
+				<reportElement x="0" y="0" width="327" height="20" uuid="a0599559-33c9-49f3-8c1a-4f74889cfa20"/>
 				<textElement>
 					<font fontName="Arial" size="9"/>
 				</textElement>

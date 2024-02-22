@@ -2,7 +2,6 @@ package forms.material.inventory;
 
 import common.constants.ApplicationConstants;
 import common.services.UtilityService;
-import common.utilities.UtilityCommon;
 import java.awt.Desktop;
 import java.io.File;
 import java.util.ArrayList;
@@ -128,11 +127,6 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
         JasperPrint jasperPrint;
         String pathLocation = Utility.getPathLocation();
         String pathFile = pathLocation+ApplicationConstants.JASPER_REPORT_COLLECTION_MATERIAL;
-        System.out.println("Cargando desde: " + pathFile);
-        if (pathFile == null || pathFile.isEmpty()) {
-            JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper: "+pathFile);
-            return;
-        }
         JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(pathFile);
         Map params = new HashMap<>();
         params.put("RENT_ID",this.gRentId);
@@ -254,7 +248,7 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
         btnRecharge = new javax.swing.JButton();
         lblInfo = new javax.swing.JLabel();
 
-        jScrollPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jScrollPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         table.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
         table.setModel(new javax.swing.table.DefaultTableModel(
@@ -270,36 +264,36 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
         ));
         jScrollPane1.setViewportView(table);
 
-        btnPDF.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnPDF.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         btnPDF.setText("Generar PDF");
-        btnPDF.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnPDF.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnPDF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnPDFActionPerformed(evt);
             }
         });
 
-        btnDelete.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnDelete.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         btnDelete.setText("Quitar del reporte");
-        btnDelete.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnDelete.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDeleteActionPerformed(evt);
             }
         });
 
-        btnExcel.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnExcel.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         btnExcel.setText("Generar Excel");
-        btnExcel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExcel.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnExcel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnExcelActionPerformed(evt);
             }
         });
 
-        btnRecharge.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnRecharge.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         btnRecharge.setText("Recargar consulta");
-        btnRecharge.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnRecharge.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnRecharge.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRechargeActionPerformed(evt);
@@ -307,14 +301,15 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
         });
 
         lblInfo.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        lblInfo.setText("lblInfo");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRecharge)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDelete)
@@ -322,28 +317,20 @@ public class GenerateReportMaterialSaleItemsView extends javax.swing.JInternalFr
                 .addComponent(btnPDF)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnExcel))
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 980, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jScrollPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap(27, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnPDF)
-                            .addComponent(btnDelete)
-                            .addComponent(btnExcel)
-                            .addComponent(btnRecharge))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 349, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRecharge)
+                    .addComponent(btnPDF)
+                    .addComponent(btnDelete)
+                    .addComponent(btnExcel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE))
         );
 
         pack();

@@ -8,6 +8,7 @@ import clases.Mail;
 import clases.sqlclass;
 import com.mysql.jdbc.MysqlDataTruncation;
 import common.constants.ApplicationConstants;
+import common.constants.PropertyConstant;
 import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
 import common.exceptions.DataFoundException;
@@ -83,13 +84,11 @@ import forms.proveedores.ProviderStatusBitacoraDialog;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.font.TextAttribute;
-import java.io.IOException;
 import javax.swing.table.TableColumn;
 import lombok.Getter;
 import common.model.providers.StatusProviderByRenta;
 import common.services.providers.ProviderStatusBitacoraService;
 import common.tables.TableViewOrdersProviders;
-import common.utilities.ConnectionDB;
 import common.utilities.JasperPrintUtility;
 import java.awt.Color;
 import java.awt.Component;
@@ -103,7 +102,6 @@ import utilities.dtos.ResultDataShowByDeliveryOrReturnDate;
 
 public class ConsultarRentas extends javax.swing.JInternalFrame {
     
-    private static ConnectionDB connectionDB;
     private Boolean updateItemsInFolio = false;
     private TaskAlmacenUpdateService taskAlmacenUpdateService;
     private TaskDeliveryChoferUpdateService taskDeliveryChoferUpdateService;
@@ -111,6 +109,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private OrderProviderForm orderProviderForm;
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ConsultarRentas.class.getName());
     private static final DecimalFormat decimalFormat = new DecimalFormat(ApplicationConstants.DECIMAL_FORMAT_SHORT);
+    private static final DecimalFormat decimalFormatInteger = new DecimalFormat( "#,###,###,##0" );
     private static final SimpleDateFormat formatDate = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT);
     // variable global para almacenar el id detalle de renta
     public static String g_idDetalleRenta;
@@ -259,7 +258,16 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 }
             }
         });
-         
+        
+        setResizable(true);
+        setIconifiable(true);
+        setMaximizable(true);
+        lblInformation.setText(ApplicationConstants.EMPTY_STRING);
+        lbl_sel.setText(ApplicationConstants.EMPTY_STRING);
+        UtilityCommon.setMaximum(this, PropertyConstant.MAX_WIN_CONSULTAR_RENTA);
+        lbl_eleccion.setText(ApplicationConstants.EMPTY_STRING);
+        lblInformationOrdersProvider.setText(ApplicationConstants.EMPTY_STRING);
+        lblLastStatusProvider.setText(ApplicationConstants.EMPTY_STRING);
     }
     
     private void eventListenerTextHourFields () {
@@ -444,7 +452,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }
     
     public void mostrar_faltantes(String rentaId) {
-        VerFaltantes ventana_faltantes = new VerFaltantes(null, true,rentaId);
+        VerFaltantes ventana_faltantes = new VerFaltantes(null, true,rentaId,0);
         ventana_faltantes.setVisible(true);
         ventana_faltantes.setLocationRelativeTo(null);
     }
@@ -1998,9 +2006,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             TableColumn tc = tabla_prox_rentas.getColumnModel().getColumn(ColumConsultarRentaTable.BOOLEAN.getNumber());
             tc.setCellEditor(tabla_prox_rentas.getDefaultEditor(Boolean.class)); 
             tc.setHeaderRenderer(new CheckBoxHeader(new ItemListenerHeaderCheckbox(ColumConsultarRentaTable.BOOLEAN.getNumber(),tabla_prox_rentas)));
-            
-            jPanel2.setVisible(true);
-
 
         try {
             DefaultTableModel temp = (DefaultTableModel) tabla_prox_rentas.getModel();
@@ -2123,6 +2128,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
               };
               tableModel.addRow(fila);
         });
+        jTabbedPaneItems.setTitleAt(0, "Inventario("+decimalFormatInteger.format(itemsFiltered.size())+")");
     }
     
     public void tabla_abonos(String rentaId) {
@@ -2203,13 +2209,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
         buttonGroup3 = new javax.swing.ButtonGroup();
+        jPanel14 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tabla_prox_rentas = new javax.swing.JTable();
-        lblInformation = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
         jbtn_buscar = new javax.swing.JButton();
         jbtn_refrescar = new javax.swing.JButton();
@@ -2221,7 +2225,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         btnInventoryMaterialReport = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
-        lbl_aviso_resultados = new javax.swing.JLabel();
+        lblInformation = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tabla_prox_rentas = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         panel_datos_generales = new javax.swing.JPanel();
         lbl_folio = new javax.swing.JLabel();
@@ -2248,34 +2254,15 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jLabel37 = new javax.swing.JLabel();
         jLabel38 = new javax.swing.JLabel();
         cmb_fecha_evento = new com.toedter.calendar.JDateChooser();
-        jLabel15 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel41 = new javax.swing.JLabel();
-        jLabel42 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        jLabel43 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
-        txt_iva = new javax.swing.JFormattedTextField();
-        txtPorcentajeDescuento = new javax.swing.JFormattedTextField();
         check_mostrar_precios = new javax.swing.JCheckBox();
-        jLabel48 = new javax.swing.JLabel();
         check_enviar_email = new javax.swing.JCheckBox();
         txtEmailToSend = new javax.swing.JTextField();
-        txt_subtotal = new javax.swing.JTextField();
-        txt_descuento = new javax.swing.JTextField();
-        txt_envioRecoleccion = new javax.swing.JTextField();
-        txt_depositoGarantia = new javax.swing.JTextField();
-        txt_total_iva = new javax.swing.JTextField();
-        txt_calculo = new javax.swing.JTextField();
-        txt_abonos = new javax.swing.JTextField();
-        txt_faltantes = new javax.swing.JTextField();
-        txt_total = new javax.swing.JTextField();
         txtEndDeliveryHour = new javax.swing.JFormattedTextField();
         txtEndReturnHour = new javax.swing.JFormattedTextField();
         txtInitDeliveryHour = new javax.swing.JFormattedTextField();
         txtInitReturnHour = new javax.swing.JFormattedTextField();
         lblCreationDate = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel6 = new javax.swing.JPanel();
         jToolBar3 = new javax.swing.JToolBar();
@@ -2289,27 +2276,31 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jBtnAddOrderProvider = new javax.swing.JButton();
         jTabbedPaneItems = new javax.swing.JTabbedPane();
         panel_articulos = new javax.swing.JPanel();
-        jLabel20 = new javax.swing.JLabel();
-        jLabel21 = new javax.swing.JLabel();
-        lbl_eleccion = new javax.swing.JLabel();
-        jLabel39 = new javax.swing.JLabel();
-        btnGetItemsFromFolio = new javax.swing.JButton();
-        txt_cantidad = new javax.swing.JTextField();
-        txt_precio_unitario = new javax.swing.JTextField();
-        txt_buscar = new javax.swing.JTextField();
+        jPanel12 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tabla_articulos = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
+        jPanel15 = new javax.swing.JPanel();
+        txt_buscar = new javax.swing.JTextField();
+        btnGetItemsFromFolio = new javax.swing.JButton();
+        jLabel20 = new javax.swing.JLabel();
+        txt_cantidad = new javax.swing.JTextField();
+        jLabel21 = new javax.swing.JLabel();
+        txt_precio_unitario = new javax.swing.JTextField();
+        jLabel39 = new javax.swing.JLabel();
         txt_porcentaje_descuento = new javax.swing.JTextField();
+        lbl_eleccion = new javax.swing.JLabel();
         panel_conceptos = new javax.swing.JPanel();
+        jPanel16 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         tabla_detalle = new javax.swing.JTable(){public boolean isCellEditable(int rowIndex,int colIndex){return false;}};
+        jPanel17 = new javax.swing.JPanel();
         jLabel40 = new javax.swing.JLabel();
-        lbl_sel = new javax.swing.JLabel();
-        jLabel44 = new javax.swing.JLabel();
-        jLabel45 = new javax.swing.JLabel();
         txt_editar_cantidad = new javax.swing.JTextField();
         txt_editar_precio_unitario = new javax.swing.JTextField();
+        jLabel44 = new javax.swing.JLabel();
+        jLabel45 = new javax.swing.JLabel();
         txt_editar_porcentaje_descuento = new javax.swing.JTextField();
+        lbl_sel = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
         panel_abonos = new javax.swing.JPanel();
         jScrollPane6 = new javax.swing.JScrollPane();
@@ -2338,12 +2329,34 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jBtnAddOrderProvider1 = new javax.swing.JButton();
         btnCopyOrders = new javax.swing.JButton();
         panelOrderProvidersTable = new javax.swing.JPanel();
+        panelToolBar5 = new javax.swing.JPanel();
         jToolBar5 = new javax.swing.JToolBar();
         jbtn_editar = new javax.swing.JButton();
         jbtn_guardar = new javax.swing.JButton();
         jbtn_agregar_articulos = new javax.swing.JButton();
         jbtn_generar_reporte = new javax.swing.JButton();
         jbtnGenerateTaskAlmacen = new javax.swing.JButton();
+        panelTotales = new javax.swing.JPanel();
+        txt_subtotal = new javax.swing.JTextField();
+        txtPorcentajeDescuento = new javax.swing.JFormattedTextField();
+        txt_descuento = new javax.swing.JTextField();
+        txt_envioRecoleccion = new javax.swing.JTextField();
+        txt_depositoGarantia = new javax.swing.JTextField();
+        txt_iva = new javax.swing.JFormattedTextField();
+        txt_total_iva = new javax.swing.JTextField();
+        txt_calculo = new javax.swing.JTextField();
+        txt_abonos = new javax.swing.JTextField();
+        txt_faltantes = new javax.swing.JTextField();
+        txt_total = new javax.swing.JTextField();
+        jLabel15 = new javax.swing.JLabel();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel41 = new javax.swing.JLabel();
+        jLabel42 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
+        jLabel43 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        jLabel19 = new javax.swing.JLabel();
+        jLabel48 = new javax.swing.JLabel();
         jPanel9 = new javax.swing.JPanel();
         jToolBar2 = new javax.swing.JToolBar();
         jbtn_nuevo_cliente = new javax.swing.JButton();
@@ -2378,6 +2391,17 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         check_apellidos = new javax.swing.JCheckBox();
         check_apodo = new javax.swing.JCheckBox();
 
+        javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
+        jPanel14.setLayout(jPanel14Layout);
+        jPanel14Layout.setHorizontalGroup(
+            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        jPanel14Layout.setVerticalGroup(
+            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
         setClosable(true);
         setMaximizable(true);
         setResizable(true);
@@ -2401,58 +2425,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
         });
 
-        jTabbedPane1.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
-
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Proximas rentas", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 11))); // NOI18N
-
-        tabla_prox_rentas.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        tabla_prox_rentas.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tabla_prox_rentas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        tabla_prox_rentas.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tabla_prox_rentasMouseClicked(evt);
-            }
-        });
-        jScrollPane2.setViewportView(tabla_prox_rentas);
-
-        lblInformation.setFont(new java.awt.Font("Arial", 3, 16)); // NOI18N
-        lblInformation.setForeground(new java.awt.Color(204, 0, 51));
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(4, 4, 4)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1160, Short.MAX_VALUE)
-                    .addComponent(lblInformation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(5, 5, 5)
-                .addComponent(lblInformation, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 1190, 550));
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Parametros"));
+        jTabbedPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jTabbedPane1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
@@ -2578,59 +2552,79 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         });
         jToolBar1.add(jButton7);
 
-        jButton1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        jButton1.setText("Buscar por folio");
+        jButton1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons24/search-24.png"))); // NOI18N
+        jButton1.setToolTipText("Buscar por folio");
         jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
+        jToolBar1.add(jButton1);
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 512, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1)
-                .addContainerGap(523, Short.MAX_VALUE))
+        lblInformation.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        lblInformation.setText("lblInformation");
+
+        tabla_prox_rentas.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        tabla_prox_rentas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tabla_prox_rentas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        tabla_prox_rentas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabla_prox_rentasMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(tabla_prox_rentas);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(lblInformation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1179, Short.MAX_VALUE)
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(2, 2, 2)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton1)
-                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(52, 52, 52))
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblInformation, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, 1180, 70));
-
-        lbl_aviso_resultados.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
-        jPanel1.add(lbl_aviso_resultados, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 160, 510, 30));
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
 
         jTabbedPane1.addTab("General", jPanel1);
 
-        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        panel_datos_generales.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 153, 153)));
-        panel_datos_generales.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
         lbl_folio.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         lbl_folio.setText("lbl_folio");
-        panel_datos_generales.add(lbl_folio, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 40, 190, 20));
 
         lbl_cliente.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         lbl_cliente.setText("lbl_cliente");
-        panel_datos_generales.add(lbl_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 60, 190, 20));
 
         lbl_atiende.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         lbl_atiende.setText("lbl_atiende");
-        panel_datos_generales.add(lbl_atiende, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 80, 190, 20));
 
         cmb_fecha_entrega.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmb_fecha_entrega.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -2643,153 +2637,65 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 cmb_fecha_entregaKeyPressed(evt);
             }
         });
-        panel_datos_generales.add(cmb_fecha_entrega, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 50, 200, 21));
 
         jLabel10.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel10.setText("Fecha de entrega:");
-        panel_datos_generales.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 130, 20));
 
         cmb_fecha_devolucion.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(cmb_fecha_devolucion, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 80, 200, 21));
 
         jLabel12.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel12.setText("Fecha de devolución:");
-        panel_datos_generales.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 130, 20));
 
         jLabel13.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel13.setText("Dirección del evento:");
-        panel_datos_generales.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 20, 160, 10));
 
         jLabel14.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel14.setText("Estado:");
-        panel_datos_generales.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 140, 60, 20));
 
         cmb_estado1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmb_estado1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        panel_datos_generales.add(cmb_estado1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 140, 130, -1));
 
         txt_descripcion.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jScrollPane3.setViewportView(txt_descripcion);
 
-        panel_datos_generales.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 40, 270, 90));
-
         cmb_chofer.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmb_chofer.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        panel_datos_generales.add(cmb_chofer, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 20, 200, -1));
 
         jLabel31.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel31.setText("Chofer:");
-        panel_datos_generales.add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 110, 20));
 
         cmb_tipo.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmb_tipo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        panel_datos_generales.add(cmb_tipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 170, 130, -1));
 
         jLabel1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel1.setText("Tipo:");
-        panel_datos_generales.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 170, 60, 20));
 
         jLabel11.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel11.setText("Hora entrega:");
-        panel_datos_generales.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 90, 20));
 
         jLabel34.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel34.setText("Hora devolución:");
-        panel_datos_generales.add(jLabel34, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 110, 20));
 
         jLabel35.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel35.setText("a");
-        panel_datos_generales.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 140, 20, 20));
 
         jLabel36.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel36.setText("a");
-        panel_datos_generales.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 170, 20, 20));
 
         jLabel33.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel33.setText("Hrs.");
-        panel_datos_generales.add(jLabel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 140, -1, 20));
 
         jLabel37.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel37.setText("Hrs.");
-        panel_datos_generales.add(jLabel37, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 170, -1, 20));
 
         jLabel38.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel38.setText("Fecha del evento:");
-        panel_datos_generales.add(jLabel38, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 130, 20));
 
         cmb_fecha_evento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(cmb_fecha_evento, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 110, 200, 21));
-
-        jLabel15.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel15.setText("Subtotal:");
-        panel_datos_generales.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(839, 20, 100, 20));
-
-        jLabel16.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel16.setText("Descuento % :");
-        panel_datos_generales.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 40, 120, 20));
-
-        jLabel41.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel41.setText("Envío y recolección");
-        panel_datos_generales.add(jLabel41, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 60, 110, 20));
-
-        jLabel42.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel42.setText("Depósito en garantía");
-        panel_datos_generales.add(jLabel42, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 80, 120, 20));
-
-        jLabel17.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel17.setText("IVA % :");
-        panel_datos_generales.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(839, 100, 110, 20));
-
-        jLabel43.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel43.setText("Calculo:");
-        panel_datos_generales.add(jLabel43, new org.netbeans.lib.awtextra.AbsoluteConstraints(839, 120, 100, 20));
-
-        jLabel18.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel18.setText("Pagos:");
-        panel_datos_generales.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(839, 140, 100, 20));
-
-        jLabel19.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel19.setText("Total:");
-        panel_datos_generales.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(839, 180, 100, 20));
-
-        txt_iva.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txt_iva.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txt_iva.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        txt_iva.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txt_ivaFocusLost(evt);
-            }
-        });
-        txt_iva.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_ivaKeyPressed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_iva, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 100, 50, -1));
-
-        txtPorcentajeDescuento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txtPorcentajeDescuento.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtPorcentajeDescuento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        txtPorcentajeDescuento.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtPorcentajeDescuentoFocusLost(evt);
-            }
-        });
-        txtPorcentajeDescuento.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtPorcentajeDescuentoKeyPressed(evt);
-            }
-        });
-        panel_datos_generales.add(txtPorcentajeDescuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 40, 50, -1));
 
         check_mostrar_precios.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         check_mostrar_precios.setText("Mostrar precios en PDF");
         check_mostrar_precios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        panel_datos_generales.add(check_mostrar_precios, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 120, 160, -1));
-
-        jLabel48.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel48.setText("Faltantes:");
-        panel_datos_generales.add(jLabel48, new org.netbeans.lib.awtextra.AbsoluteConstraints(839, 160, 100, 20));
 
         check_enviar_email.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         check_enviar_email.setText("Enviar email confirmación");
@@ -2799,7 +2705,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 check_enviar_emailActionPerformed(evt);
             }
         });
-        panel_datos_generales.add(check_enviar_email, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 140, 180, -1));
 
         txtEmailToSend.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txtEmailToSend.setToolTipText("Para enviar multiples correos deberas separarlos por punto y coma [;]");
@@ -2808,44 +2713,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 txtEmailToSendActionPerformed(evt);
             }
         });
-        panel_datos_generales.add(txtEmailToSend, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 170, 180, -1));
-
-        txt_subtotal.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txt_subtotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 20, 140, 20));
-
-        txt_descuento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txt_descuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 40, 90, -1));
-
-        txt_envioRecoleccion.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        txt_envioRecoleccion.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_envioRecoleccionKeyPressed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_envioRecoleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 60, 140, 20));
-
-        txt_depositoGarantia.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        txt_depositoGarantia.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_depositoGarantiaKeyPressed(evt);
-            }
-        });
-        panel_datos_generales.add(txt_depositoGarantia, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 80, 140, 20));
-
-        txt_total_iva.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txt_total_iva, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 100, 90, -1));
-
-        txt_calculo.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txt_calculo, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 120, 140, 20));
-
-        txt_abonos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txt_abonos, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 140, 140, 20));
-
-        txt_faltantes.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txt_faltantes, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 160, 140, 20));
-
-        txt_total.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txt_total, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 180, 140, 20));
 
         try {
             txtEndDeliveryHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
@@ -2853,7 +2720,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             ex.printStackTrace();
         }
         txtEndDeliveryHour.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txtEndDeliveryHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 140, 60, -1));
 
         try {
             txtEndReturnHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
@@ -2861,7 +2727,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             ex.printStackTrace();
         }
         txtEndReturnHour.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txtEndReturnHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 170, 60, -1));
 
         try {
             txtInitDeliveryHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
@@ -2869,7 +2734,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             ex.printStackTrace();
         }
         txtInitDeliveryHour.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txtInitDeliveryHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 140, 60, -1));
 
         try {
             txtInitReturnHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
@@ -2877,15 +2741,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             ex.printStackTrace();
         }
         txtInitReturnHour.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        panel_datos_generales.add(txtInitReturnHour, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 170, 60, -1));
 
         lblCreationDate.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         lblCreationDate.setText("lblCreationDate");
-        panel_datos_generales.add(lblCreationDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 20, 190, -1));
 
-        jPanel4.add(panel_datos_generales, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 1120, 210));
-
-        jTabbedPane2.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        jTabbedPane2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jTabbedPane2.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jTabbedPane2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jTabbedPane2MouseClicked(evt);
@@ -3000,55 +2861,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         });
         jToolBar3.add(jBtnAddOrderProvider);
 
-        jLabel20.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel20.setText("Cantidad:");
-
-        jLabel21.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel21.setText("Precio:");
-
-        lbl_eleccion.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-
-        jLabel39.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel39.setText("Descuento %:");
-
-        btnGetItemsFromFolio.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        btnGetItemsFromFolio.setText("Obtener articulos de un folio");
-        btnGetItemsFromFolio.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnGetItemsFromFolio.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGetItemsFromFolioActionPerformed(evt);
-            }
-        });
-
-        txt_cantidad.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        txt_cantidad.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_cantidadActionPerformed(evt);
-            }
-        });
-        txt_cantidad.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_cantidadKeyPressed(evt);
-            }
-        });
-
-        txt_precio_unitario.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        txt_precio_unitario.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_precio_unitarioKeyPressed(evt);
-            }
-        });
-
-        txt_buscar.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
-        txt_buscar.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_buscarKeyPressed(evt);
-            }
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txt_buscarKeyReleased(evt);
-            }
-        });
-
         tabla_articulos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         tabla_articulos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -3074,6 +2886,64 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         });
         jScrollPane4.setViewportView(tabla_articulos);
 
+        javax.swing.GroupLayout jPanel12Layout = new javax.swing.GroupLayout(jPanel12);
+        jPanel12.setLayout(jPanel12Layout);
+        jPanel12Layout.setHorizontalGroup(
+            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING)
+        );
+        jPanel12Layout.setVerticalGroup(
+            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
+        );
+
+        txt_buscar.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_buscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_buscarKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txt_buscarKeyReleased(evt);
+            }
+        });
+
+        btnGetItemsFromFolio.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        btnGetItemsFromFolio.setText("Obtener articulos de un folio");
+        btnGetItemsFromFolio.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnGetItemsFromFolio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGetItemsFromFolioActionPerformed(evt);
+            }
+        });
+
+        jLabel20.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel20.setText("Cantidad:");
+
+        txt_cantidad.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        txt_cantidad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_cantidadActionPerformed(evt);
+            }
+        });
+        txt_cantidad.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_cantidadKeyPressed(evt);
+            }
+        });
+
+        jLabel21.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel21.setText("Precio:");
+
+        txt_precio_unitario.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        txt_precio_unitario.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_precio_unitarioKeyPressed(evt);
+            }
+        });
+
+        jLabel39.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel39.setText("Descuento %:");
+
         txt_porcentaje_descuento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_porcentaje_descuento.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -3081,56 +2951,59 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
         });
 
+        lbl_eleccion.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        lbl_eleccion.setText("lbl_eleccion");
+
+        javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
+        jPanel15.setLayout(jPanel15Layout);
+        jPanel15Layout.setHorizontalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel15Layout.createSequentialGroup()
+                .addComponent(txt_buscar, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnGetItemsFromFolio, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lbl_eleccion, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel20)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txt_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel21)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txt_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel39)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txt_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        jPanel15Layout.setVerticalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(txt_buscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnGetItemsFromFolio)
+                .addComponent(jLabel39, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txt_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txt_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txt_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(lbl_eleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+
         javax.swing.GroupLayout panel_articulosLayout = new javax.swing.GroupLayout(panel_articulos);
         panel_articulos.setLayout(panel_articulosLayout);
         panel_articulosLayout.setHorizontalGroup(
             panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_articulosLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panel_articulosLayout.createSequentialGroup()
-                        .addComponent(txt_buscar, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnGetItemsFromFolio)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(lbl_eleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
-                        .addComponent(jLabel20)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel21)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel39)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addContainerGap())
+            .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel15, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         panel_articulosLayout.setVerticalGroup(
             panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_articulosLayout.createSequentialGroup()
-                .addGap(4, 4, 4)
-                .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txt_buscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnGetItemsFromFolio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(panel_articulosLayout.createSequentialGroup()
-                        .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel39, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txt_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txt_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txt_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(lbl_eleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPaneItems.addTab("Inventario", panel_articulos);
@@ -3155,16 +3028,19 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         });
         jScrollPane5.setViewportView(tabla_detalle);
 
+        javax.swing.GroupLayout jPanel16Layout = new javax.swing.GroupLayout(jPanel16);
+        jPanel16.setLayout(jPanel16Layout);
+        jPanel16Layout.setHorizontalGroup(
+            jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.TRAILING)
+        );
+        jPanel16Layout.setVerticalGroup(
+            jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
+        );
+
         jLabel40.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel40.setText("Cantidad:");
-
-        lbl_sel.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-
-        jLabel44.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel44.setText("Precio:");
-
-        jLabel45.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel45.setText("Descuento %:");
 
         txt_editar_cantidad.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_editar_cantidad.addActionListener(new java.awt.event.ActionListener() {
@@ -3185,6 +3061,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
         });
 
+        jLabel44.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel44.setText("Precio:");
+
+        jLabel45.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel45.setText("Descuento %:");
+
         txt_editar_porcentaje_descuento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_editar_porcentaje_descuento.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -3192,47 +3074,55 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
         });
 
+        lbl_sel.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        lbl_sel.setText("lbl_sel");
+
+        javax.swing.GroupLayout jPanel17Layout = new javax.swing.GroupLayout(jPanel17);
+        jPanel17.setLayout(jPanel17Layout);
+        jPanel17Layout.setHorizontalGroup(
+            jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel17Layout.createSequentialGroup()
+                .addComponent(lbl_sel, javax.swing.GroupLayout.PREFERRED_SIZE, 551, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
+                .addComponent(jLabel40)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txt_editar_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel44)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txt_editar_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel45)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txt_editar_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        jPanel17Layout.setVerticalGroup(
+            jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(txt_editar_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txt_editar_precio_unitario)
+                .addComponent(jLabel44, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txt_editar_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(jPanel17Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(lbl_sel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
         javax.swing.GroupLayout panel_conceptosLayout = new javax.swing.GroupLayout(panel_conceptos);
         panel_conceptos.setLayout(panel_conceptosLayout);
         panel_conceptosLayout.setHorizontalGroup(
             panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_conceptosLayout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addGroup(panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane5)
-                    .addGroup(panel_conceptosLayout.createSequentialGroup()
-                        .addComponent(lbl_sel, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 523, Short.MAX_VALUE)
-                        .addComponent(jLabel40)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_editar_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel44)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_editar_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel45)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_editar_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+            .addComponent(jPanel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         panel_conceptosLayout.setVerticalGroup(
             panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_conceptosLayout.createSequentialGroup()
-                .addGroup(panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txt_editar_porcentaje_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txt_editar_precio_unitario, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addComponent(jLabel44, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txt_editar_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panel_conceptosLayout.createSequentialGroup()
-                        .addComponent(lbl_sel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addComponent(jPanel17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27))
+                .addComponent(jPanel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPaneItems.addTab("Articulos (0)", panel_conceptos);
@@ -3243,25 +3133,18 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addComponent(jToolBar3, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(11, 11, 11)
-                .addComponent(jTabbedPaneItems)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTabbedPaneItems))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addComponent(jToolBar3, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addComponent(jTabbedPaneItems, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+            .addComponent(jTabbedPaneItems)
+            .addComponent(jToolBar3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         jTabbedPane2.addTab("Detalle conceptos", jPanel6);
 
-        panel_abonos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Pagos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
-
-        tabla_abonos.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        tabla_abonos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         tabla_abonos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -3285,20 +3168,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         panel_abonos.setLayout(panel_abonosLayout);
         panel_abonosLayout.setHorizontalGroup(
             panel_abonosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_abonosLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 711, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 889, Short.MAX_VALUE)
         );
         panel_abonosLayout.setVerticalGroup(
             panel_abonosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_abonosLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(149, 149, 149))
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE)
         );
-
-        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ingresa el abono", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
         jToolBar4.setFloatable(false);
         jToolBar4.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -3357,30 +3232,30 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         });
         jToolBar4.add(jbtn_guardar_abonos);
 
-        jLabel24.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel24.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel24.setText("Pago");
 
-        txt_comentario.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_comentario.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
-        jLabel25.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel25.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel25.setText("Comentario:");
 
-        txt_abono.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        txt_abono.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txt_abono.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_abonoKeyPressed(evt);
             }
         });
 
-        cmbTipoPago.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmbTipoPago.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         cmbTipoPago.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-        jLabel46.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel46.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel46.setText("Fecha pago:");
 
-        cmb_fecha_pago.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        cmb_fecha_pago.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
-        jLabel47.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel47.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel47.setText("Tipo de pago:");
 
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
@@ -3399,12 +3274,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                         .addComponent(txt_abono))
                     .addComponent(cmb_fecha_pago, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel47))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 102, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jToolBar4, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel10Layout.setVerticalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jToolBar4, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
+            .addComponent(jToolBar4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel10Layout.createSequentialGroup()
                 .addGap(18, 18, 18)
                 .addComponent(jLabel24)
@@ -3433,17 +3308,15 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panel_abonos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(66, Short.MAX_VALUE))
+                .addComponent(panel_abonos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(panel_abonos, javax.swing.GroupLayout.PREFERRED_SIZE, 315, Short.MAX_VALUE)
-                    .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(73, Short.MAX_VALUE))
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panel_abonos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         jTabbedPane2.addTab("Pagos", jPanel8);
@@ -3457,23 +3330,23 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 661, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(502, Short.MAX_VALUE))
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 1164, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(180, Short.MAX_VALUE))
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("Comentarios", jPanel11);
 
         lblInformationOrdersProvider.setFont(new java.awt.Font("Arial", 3, 14)); // NOI18N
         lblInformationOrdersProvider.setForeground(new java.awt.Color(204, 0, 51));
+        lblInformationOrdersProvider.setText("lblInformationOrdersProvider");
 
         lblLastStatusProvider.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        lblLastStatusProvider.setText("lblLastStatusProvider");
         lblLastStatusProvider.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         lblLastStatusProvider.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -3519,7 +3392,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         );
         panelOrderProvidersTableLayout.setVerticalGroup(
             panelOrderProvidersTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 305, Short.MAX_VALUE)
+            .addGap(0, 352, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -3532,8 +3405,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 404, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.DEFAULT_SIZE, 598, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.DEFAULT_SIZE, 606, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnCopyOrders, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jBtnAddOrderProvider1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -3547,11 +3420,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnReloadGetLastStatusProvider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jBtnAddOrderProvider1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(btnCopyOrders, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnCopyOrders, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelOrderProvidersTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -3559,12 +3432,20 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         jTabbedPane2.addTab("Ordenes al proveedor", jPanel5);
 
-        jPanel4.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 220, 1180, 400));
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jTabbedPane2)
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jTabbedPane2)
+        );
 
         jToolBar5.setFloatable(false);
         jToolBar5.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jToolBar5.setRollover(true);
-        jPanel4.add(jToolBar5, new org.netbeans.lib.awtextra.AbsoluteConstraints(1360, 10, -1, 210));
 
         jbtn_editar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/editar_32.png"))); // NOI18N
         jbtn_editar.setMnemonic('E');
@@ -3578,7 +3459,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 jbtn_editarActionPerformed(evt);
             }
         });
-        jPanel4.add(jbtn_editar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 20, 40, 40));
+        jToolBar5.add(jbtn_editar);
 
         jbtn_guardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/floppy-disk-icon.png"))); // NOI18N
         jbtn_guardar.setMnemonic('G');
@@ -3592,7 +3473,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 jbtn_guardarActionPerformed(evt);
             }
         });
-        jPanel4.add(jbtn_guardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 60, 40, 40));
+        jToolBar5.add(jbtn_guardar);
 
         jbtn_agregar_articulos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/shop-cart-down-icon_32.png"))); // NOI18N
         jbtn_agregar_articulos.setToolTipText("Agregar mas articulos");
@@ -3602,7 +3483,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 jbtn_agregar_articulosActionPerformed(evt);
             }
         });
-        jPanel4.add(jbtn_agregar_articulos, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 100, 40, 40));
+        jToolBar5.add(jbtn_agregar_articulos);
 
         jbtn_generar_reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/blank-catalog-icon.png"))); // NOI18N
         jbtn_generar_reporte.setMnemonic('R');
@@ -3621,7 +3502,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 jbtn_generar_reporteActionPerformed(evt);
             }
         });
-        jPanel4.add(jbtn_generar_reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 140, 40, 40));
+        jToolBar5.add(jbtn_generar_reporte);
 
         jbtnGenerateTaskAlmacen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/lista-de-quehaceres-24.png"))); // NOI18N
         jbtnGenerateTaskAlmacen.setMnemonic('R');
@@ -3640,7 +3521,356 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 jbtnGenerateTaskAlmacenActionPerformed(evt);
             }
         });
-        jPanel4.add(jbtnGenerateTaskAlmacen, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 180, 40, 40));
+        jToolBar5.add(jbtnGenerateTaskAlmacen);
+
+        javax.swing.GroupLayout panelToolBar5Layout = new javax.swing.GroupLayout(panelToolBar5);
+        panelToolBar5.setLayout(panelToolBar5Layout);
+        panelToolBar5Layout.setHorizontalGroup(
+            panelToolBar5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 41, Short.MAX_VALUE)
+            .addGroup(panelToolBar5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelToolBar5Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jToolBar5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+        panelToolBar5Layout.setVerticalGroup(
+            panelToolBar5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(panelToolBar5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panelToolBar5Layout.createSequentialGroup()
+                    .addComponent(jToolBar5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
+        );
+
+        txt_subtotal.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        txtPorcentajeDescuento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        txtPorcentajeDescuento.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtPorcentajeDescuento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        txtPorcentajeDescuento.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtPorcentajeDescuentoFocusLost(evt);
+            }
+        });
+        txtPorcentajeDescuento.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtPorcentajeDescuentoKeyPressed(evt);
+            }
+        });
+
+        txt_descuento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        txt_envioRecoleccion.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        txt_envioRecoleccion.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_envioRecoleccionKeyPressed(evt);
+            }
+        });
+
+        txt_depositoGarantia.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        txt_depositoGarantia.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_depositoGarantiaKeyPressed(evt);
+            }
+        });
+
+        txt_iva.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        txt_iva.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txt_iva.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        txt_iva.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txt_ivaFocusLost(evt);
+            }
+        });
+        txt_iva.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_ivaKeyPressed(evt);
+            }
+        });
+
+        txt_total_iva.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        txt_calculo.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        txt_abonos.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        txt_faltantes.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        txt_total.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        jLabel15.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel15.setText("Subtotal:");
+
+        jLabel16.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel16.setText("Descuento % :");
+
+        jLabel41.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel41.setText("Envío y recolección");
+
+        jLabel42.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel42.setText("Depósito en garantía");
+
+        jLabel17.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel17.setText("IVA % :");
+
+        jLabel43.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel43.setText("Calculo:");
+
+        jLabel18.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel18.setText("Pagos:");
+
+        jLabel19.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel19.setText("Total:");
+
+        jLabel48.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel48.setText("Faltantes:");
+
+        javax.swing.GroupLayout panelTotalesLayout = new javax.swing.GroupLayout(panelTotales);
+        panelTotales.setLayout(panelTotalesLayout);
+        panelTotalesLayout.setHorizontalGroup(
+            panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTotalesLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel48, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(panelTotalesLayout.createSequentialGroup()
+                        .addGap(1, 1, 1)
+                        .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel41, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel42, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txt_abonos)
+                    .addComponent(txt_faltantes)
+                    .addComponent(txt_total)
+                    .addComponent(txt_calculo)
+                    .addGroup(panelTotalesLayout.createSequentialGroup()
+                        .addComponent(txtPorcentajeDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(txt_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txt_envioRecoleccion)
+                    .addComponent(txt_depositoGarantia)
+                    .addGroup(panelTotalesLayout.createSequentialGroup()
+                        .addComponent(txt_iva, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(txt_total_iva, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txt_subtotal))
+                .addContainerGap())
+        );
+        panelTotalesLayout.setVerticalGroup(
+            panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTotalesLayout.createSequentialGroup()
+                .addGap(0, 2, Short.MAX_VALUE)
+                .addComponent(txt_subtotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtPorcentajeDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(txt_envioRecoleccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(txt_depositoGarantia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txt_iva, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_total_iva, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txt_calculo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(txt_abonos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(txt_faltantes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(txt_total, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(panelTotalesLayout.createSequentialGroup()
+                .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(panelTotalesLayout.createSequentialGroup()
+                        .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(jLabel41, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(jLabel42, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(jLabel48, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelTotalesLayout.createSequentialGroup()
+                        .addGap(167, 167, 167)
+                        .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout panel_datos_generalesLayout = new javax.swing.GroupLayout(panel_datos_generales);
+        panel_datos_generales.setLayout(panel_datos_generalesLayout);
+        panel_datos_generalesLayout.setHorizontalGroup(
+            panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                        .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(jLabel38, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                                    .addGap(10, 10, 10)
+                                    .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cmb_fecha_entrega, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmb_fecha_devolucion, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmb_fecha_evento, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                                        .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtInitDeliveryHour, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                                        .addComponent(jLabel34, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(txtInitReturnHour, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                                        .addComponent(jLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtEndDeliveryHour, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel33))
+                                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                                        .addComponent(jLabel36, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtEndReturnHour, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel37))))
+                            .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                                .addComponent(jLabel31, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cmb_chofer, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                                .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(cmb_estado1, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(check_mostrar_precios, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(check_enviar_email, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtEmailToSend, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCreationDate, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_folio, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_cliente, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_atiende, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                        .addGap(13, 13, 13)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmb_tipo, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panelTotales, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelToolBar5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        panel_datos_generalesLayout.setVerticalGroup(
+            panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                        .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel31, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmb_chofer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cmb_estado1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cmb_tipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(cmb_fecha_entrega, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cmb_fecha_devolucion, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(cmb_fecha_evento, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel38, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtInitDeliveryHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtEndDeliveryHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel33, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel34, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtInitReturnHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel36, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtEndReturnHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel37, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
+                        .addComponent(lblCreationDate)
+                        .addGap(6, 6, 6)
+                        .addComponent(lbl_folio, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(lbl_cliente, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(lbl_atiende, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(check_mostrar_precios)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(check_enviar_email)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtEmailToSend, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(panelToolBar5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelTotales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(panel_datos_generales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(panel_datos_generales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
 
         jTabbedPane1.addTab("Detalle...", jPanel4);
 
@@ -3696,8 +3926,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
         });
         jToolBar2.add(jbtn_editar_cliente);
-
-        panel_datos_cliente.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos cliente", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
         txt_nombre.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
         txt_nombre.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -3831,10 +4059,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 .addComponent(jLabel29)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txt_rfc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(188, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Clientes en la base de datos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Microsoft Sans Serif", 0, 12))); // NOI18N
 
         tabla_clientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -3894,7 +4120,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                         .addComponent(check_apellidos)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(check_apodo)
-                        .addGap(0, 324, Short.MAX_VALUE)))
+                        .addGap(0, 221, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel13Layout.setVerticalGroup(
@@ -3906,9 +4132,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     .addComponent(check_nombre)
                     .addComponent(check_apellidos)
                     .addComponent(check_apodo))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 492, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
@@ -3921,41 +4146,39 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panel_datos_cliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel9Layout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, 436, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel13, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(jPanel9Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(panel_datos_cliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(128, 128, 128))
+            .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(panel_datos_cliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Datos cliente", jPanel9);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1184, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jTabbedPane1)
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1189, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 652, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -4209,8 +4432,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txt_buscarKeyReleased
 
     private void addItemToEventFromInventory (int selectedRow) {    
+        String itemName = tabla_articulos.getValueAt(selectedRow, 2) + " " + tabla_articulos.getValueAt(selectedRow, 3);
+        
+        if (itemName.length() > 40) {
+            itemName = itemName.substring(0,37).concat("...");
+        }
         canti = Float.parseFloat(tabla_articulos.getValueAt(selectedRow, 5).toString());
-        lbl_eleccion.setText((String) tabla_articulos.getValueAt(selectedRow, 2).toString() + " " + (String) tabla_articulos.getValueAt(selectedRow, 3).toString());
+        lbl_eleccion.setText(itemName);
         txt_precio_unitario.setText(EliminaCaracteres((String) tabla_articulos.getValueAt(selectedRow, 5).toString(), "$,"));
         txt_porcentaje_descuento.setText("");
         txt_cantidad.requestFocus();
@@ -4493,10 +4721,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         if (evt.getClickCount() == 2) {
             if (id_cliente.equals(tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 0))) {
-                JOptionPane.showMessageDialog(null, "Este cliente ya esta asignado a la renta, elije uno diferente", "Error", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Este cliente ya esta asignado a la renta, elije uno diferente", "Error", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 int seleccion = JOptionPane.showOptionDialog(this, "Se cambiara el cliente de la renta ¿Deseas continuar?", "cambiar cliente de la renta", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si");
-                if (seleccion == 0) {//presiono que si
+                if (seleccion == JOptionPane.YES_OPTION) {//presiono que si
 
                     jTabbedPane1.setSelectedIndex(1);
                     jTabbedPane1.setEnabledAt(1, true);
@@ -4504,7 +4732,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     JOptionPane.showMessageDialog(null, "Se a cambiado el cliente con exito...", "Cambio cliente", JOptionPane.INFORMATION_MESSAGE);
                     
                     this.lbl_cliente.setText("Socio: " + (String) tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 1) + " " + (String) tabla_clientes.getValueAt(tabla_clientes.getSelectedRow(), 2));
-                    // funcion.conectate();
                     
                     System.out.println("ID RENTA ES: " + id_renta);
                     System.out.println("ID CLIENTE ES: " + id_cliente);
@@ -4516,9 +4743,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
                     }
-                    // funcion.desconecta();
-                    //tabla_detalle();
-                    tabla_consultar_renta(new HashMap<>());
+
                 }
             }
         }
@@ -4684,9 +4909,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                JOptionPane.showMessageDialog(this, "No se obtuvo los datos de manera correcta, intentalo de nuevo o reinicia el sistema ");
                return;
             }                   
-            JasperPrintUtility.openPDFReportDeliveryChofer(renta.getRentaId()+"", 
-                    renta.getChofer().getNombre()+" "+renta.getChofer().getApellidos(),
-                    renta.getFolio()+"", connectionDB, Utility.getPathLocation());
+            JasperPrintUtility.openPDFReportDeliveryChofer(renta,Utility.getPathLocation());
         } catch (Exception e) {
             Logger.getLogger(ConsultarRentas.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(
@@ -4701,7 +4924,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jtbtnGenerateExcelActionPerformed
 
     
-    public static void generateReportByCategories (final Usuario user) {
+    public static void generateReportByCategories (final List<Usuario> users) {
     
         if (tabla_prox_rentas.getSelectedRow() == - 1){
             JOptionPane.showMessageDialog(null, "Selecciona una fila para generar el reporte...", "Reporte", JOptionPane.INFORMATION_MESSAGE);
@@ -4709,17 +4932,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
         
         String rentaId = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), ColumConsultarRentaTable.ID.getNumber()).toString();
-        //String folio = tabla_prox_rentas.getValueAt(tabla_prox_rentas.getSelectedRow(), ColumConsultarRentaTable.FOLIO.getNumber()).toString();
         
         try {
             Renta renta = saleService.obtenerRentaPorIdSinDetalle(Integer.parseInt(rentaId));
-            JasperPrintUtility.openPDFReportByCategories(
-                      user.getUsuarioId().toString(), 
-                      user.getNombre()+" "+user.getApellidos(),
-                      renta,connectionDB, Utility.getPathLocation());            
+            JasperPrintUtility.openPDFReportByCategories( users, renta,Utility.getPathLocation());            
 
         } catch (Exception e) {
-            System.out.println("Mensaje de Error:" + e.toString());
             JOptionPane.showMessageDialog(null, e);
         }
     }
@@ -4741,11 +4959,14 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
           if (usersInCategoriesAlmacen.isEmpty()) {
               JOptionPane.showMessageDialog(this, "Ops!, no se puede generar el reporte, por que no existen usuarios que tengan categorias asignadas al folio: "+folio, "Error", JOptionPane.ERROR_MESSAGE);
           } else if (usersInCategoriesAlmacen.size() == 1) {
-              generateReportByCategories(usersInCategoriesAlmacen.get(0));
+              generateReportByCategories(usersInCategoriesAlmacen);
           } else {
-              final SelectUserGenerateReportByCategoriesDialog win = new SelectUserGenerateReportByCategoriesDialog(null, true, usersInCategoriesAlmacen);
-              win.setLocationRelativeTo(null);
-              win.setVisible(true);
+              final SelectUserGenerateReportByCategoriesDialog win =
+                      new SelectUserGenerateReportByCategoriesDialog(null, true, usersInCategoriesAlmacen);
+              List<Usuario> users = win.showDialog();
+              if (!users.isEmpty()) {
+                generateReportByCategories(users);
+              }
           }
 
         } catch (DataOriginException e) {
@@ -5050,15 +5271,14 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
     private void btnInventoryMaterialReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInventoryMaterialReportActionPerformed
         
-        String rentaId;
         try {
-            rentaId = getRentaIdFromConsultarRentaTableOnlyOneRowSelected();
+            String rentaId = getRentaIdFromConsultarRentaTableOnlyOneRowSelected();
+            showMaterialSaleItemsWindow(rentaId);
         } catch (BusinessException e) {
             JOptionPane.showMessageDialog(
-                    this,e.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-            return;
+                    this,e.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
         }
-        showMaterialSaleItemsWindow(rentaId);
+        
         
     }//GEN-LAST:event_btnInventoryMaterialReportActionPerformed
 
@@ -5332,12 +5552,18 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
-    public static javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
@@ -5382,12 +5608,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     public static javax.swing.JLabel lblInformationOrdersProvider;
     private javax.swing.JLabel lblLastStatusProvider;
     private javax.swing.JLabel lbl_atiende;
-    private javax.swing.JLabel lbl_aviso_resultados;
     private javax.swing.JLabel lbl_cliente;
     private javax.swing.JLabel lbl_eleccion;
     private javax.swing.JLabel lbl_folio;
     public static javax.swing.JLabel lbl_sel;
     private javax.swing.JPanel panelOrderProvidersTable;
+    private javax.swing.JPanel panelToolBar5;
+    private javax.swing.JPanel panelTotales;
     private javax.swing.JPanel panel_abonos;
     private javax.swing.JPanel panel_articulos;
     private javax.swing.JPanel panel_conceptos;

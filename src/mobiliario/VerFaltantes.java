@@ -1,13 +1,10 @@
 package mobiliario;
 
-import forms.inventario.AsignarFaltante;
 import services.SaleService;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
 import java.awt.Toolkit;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,16 +20,13 @@ import model.Faltante;
 import common.model.Renta;
 import common.services.ItemService;
 import services.FaltanteService;
-import services.SystemService;
 
 public class VerFaltantes extends java.awt.Dialog {
 
     private final sqlclass funcion = new sqlclass();
-    
-    Object[][] dtconduc;
+    private final Integer itemId;
     private final FaltanteService faltanteService = FaltanteService.getInstance();
     private final SaleService saleService;
-    private final SystemService systemService = SystemService.getInstance();
     private ItemService itemService = ItemService.getInstance();
     public static String g_articuloId;
     public static String g_rentaId;
@@ -55,32 +49,10 @@ public class VerFaltantes extends java.awt.Dialog {
     public static int HD_ARTICULOS_DESCRIPCION_ARTICULO = 2;
     public static int HD_ARTICULOS_PRECIO_COBRAR = 3;
    
-    
-   
-    
-    public String conviertemoneda(String valor) {
-
-        DecimalFormatSymbols simbolo = new DecimalFormatSymbols();
-        simbolo.setDecimalSeparator('.');
-        simbolo.setGroupingSeparator(',');
-
-        float entero = Float.parseFloat(valor);
-        DecimalFormat formateador = new DecimalFormat("###,###.##", simbolo);
-        String entero2 = formateador.format(entero);
-
-        if (entero2.contains(".")) {
-            entero2 = "$" + entero2;
-
-        } else {
-            entero2 = "$" + entero2 + ".00";
-        }
-
-        return entero2;
-
-    }
-    public VerFaltantes(java.awt.Frame parent, boolean modal, String rentaId) {
+    public VerFaltantes(java.awt.Frame parent, boolean modal, String rentaId, Integer itemId) {
         super(parent, modal); 
         this.g_rentaId = rentaId;
+        this.itemId = itemId;
         initComponents();
         saleService = SaleService.getInstance();
         funcion.conectate();
@@ -106,14 +78,9 @@ public class VerFaltantes extends java.awt.Dialog {
            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
            return;
        }
-         DefaultTableModel tablaDetalle = (DefaultTableModel) tablaArticulos.getModel();
+         
+        DefaultTableModel tablaDetalle = (DefaultTableModel) tablaArticulos.getModel();
          this.lblInformacionInicial.setText("FOLIO: "+renta.getFolio());
-         int itemId = 0;
-         if(AsignarFaltante.g_articuloId > 0)
-             itemId = AsignarFaltante.g_articuloId;
-//         else if(VerFoliosPorArticulo.g_articuloId > 0)
-            else
-             itemId = VerFoliosPorArticulo.g_articuloId;
          if(renta.getRentaId() == 0 && itemId > 0 )
          {
              Articulo articulo = null;
@@ -134,7 +101,7 @@ public class VerFaltantes extends java.awt.Dialog {
                     tablaDetalle.addRow(fila);
          }else{
             for(DetalleRenta detalle : renta.getDetalleRenta()){
-                    Object fila[] = {                                          
+                    Object fila[] = {
                         detalle.getArticulo().getArticuloId()+"",   
                         detalle.getCantidad()+"",
                         detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor(), 
@@ -757,7 +724,7 @@ public class VerFaltantes extends java.awt.Dialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                VerFaltantes dialog = new VerFaltantes(new java.awt.Frame(), true, null);
+                VerFaltantes dialog = new VerFaltantes(new java.awt.Frame(), true, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

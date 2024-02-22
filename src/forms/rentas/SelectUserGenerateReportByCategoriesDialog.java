@@ -1,24 +1,27 @@
 package forms.rentas;
 
-import common.constants.ApplicationConstants;
 import common.model.Usuario;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane;
 
 public class SelectUserGenerateReportByCategoriesDialog extends javax.swing.JDialog {
+
+    private List<Usuario> usersToReturn = new ArrayList<>();
+    private List<Usuario> initUsers = new ArrayList<>();
     
     public SelectUserGenerateReportByCategoriesDialog(java.awt.Frame parent, boolean modal, List<Usuario> users) {
         super(parent, modal);
         initComponents();
         cmbUsersInCategories.removeAllItems();
-        
-        cmbUsersInCategories.addItem(
-                new Usuario(0, ApplicationConstants.CMB_SELECCIONE)
-        );
+
         users.stream().forEach(t -> {
             cmbUsersInCategories.addItem(t);
         });
+        cmbUsersInCategories.addItem(
+                new Usuario(0, "Generar todos")
+        );
+        initUsers = users;
+        this.setLocationRelativeTo(null);
     }
 
     /**
@@ -81,16 +84,25 @@ public class SelectUserGenerateReportByCategoriesDialog extends javax.swing.JDia
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        if (cmbUsersInCategories.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(this, "Selecciona un usuario para generar el reporte ", "Reporte", JOptionPane.INFORMATION_MESSAGE);
-            return;
+
+        
+        Usuario userSelected = ((Usuario) cmbUsersInCategories.getModel().getSelectedItem());
+
+        if (userSelected.getUsuarioId().equals(0)) {
+            usersToReturn = initUsers;
+        } else {
+            usersToReturn.add(userSelected);
         }
-        Usuario user = ((Usuario) cmbUsersInCategories.getModel().getSelectedItem());
-        ConsultarRentas.generateReportByCategories(user);
+        //ConsultarRentas.generateReportByCategories(user);
+        setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    public List<Usuario> showDialog () {
+        setVisible(true);
+        return usersToReturn;
+    }
+    
     /**
      * @param args the command line arguments
      */

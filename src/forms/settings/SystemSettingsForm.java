@@ -1,4 +1,4 @@
-package mobiliario;
+package forms.settings;
 
 import forms.inventario.InventarioForm;
 import clases.JCMail_enviar_prueba;
@@ -30,8 +30,9 @@ import org.jvnet.substance.SubstanceLookAndFeel;
 import org.jvnet.substance.skin.SkinInfo;
 import services.SystemService;
 import common.utilities.PropertySystemUtil;
+import common.utilities.UtilityCommon;
 
-public class utilerias extends java.awt.Dialog {
+public class SystemSettingsForm extends javax.swing.JInternalFrame {
 
     sqlclass funcion = new sqlclass();
     conectate conexion = new conectate();
@@ -41,16 +42,13 @@ public class utilerias extends java.awt.Dialog {
     String id_categoria;
     public static boolean utiliza_conexion_TLS = false, utiliza_autenticacion = false, status;
     private final SystemService systemService = SystemService.getInstance();
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(utilerias.class.getName());
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SystemSettingsForm.class.getName());
     private List<JButton> buttonsInPanel = new ArrayList<>();
 
-    /**
-     * Creates new form Colores
-     */
-    public utilerias(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
+    public SystemSettingsForm() {
+        
         initComponents();
-        this.setLocationRelativeTo(parent);
+
        
         editarDatosEmail_no();
         traer_datos_email();
@@ -122,6 +120,10 @@ public class utilerias extends java.awt.Dialog {
         // fin informacion de version
         this.info.setEditable(false);
         addSkinsToPanel();
+        UtilityCommon.addEscapeListener(this);
+        setClosable(true);
+        setIconifiable(true);
+        setResizable(true);
         
     }
     
@@ -136,14 +138,27 @@ public class utilerias extends java.awt.Dialog {
                     Boolean.parseBoolean(PropertySystemUtil.get(PropertyConstant.GENERATE_TASK_ALMACEN));
             Boolean generateTaskChofer = 
                     Boolean.parseBoolean(PropertySystemUtil.get(PropertyConstant.GENERATE_TASK_CHOFER));
+            Boolean maxWinAddRent = 
+                    Boolean.parseBoolean(PropertySystemUtil.get(PropertyConstant.MAX_WIN_AGREGAR_RENTA));
+            Boolean maxWinConsultRent = 
+                    Boolean.parseBoolean(PropertySystemUtil.get(PropertyConstant.MAX_WIN_CONSULTAR_RENTA));
+            Boolean maxWinConsultProviders = 
+                    Boolean.parseBoolean(PropertySystemUtil.get(PropertyConstant.MAX_WIN_CONSULTAR_PROVEEDORES));
+            Boolean maxWinInventory = 
+                    Boolean.parseBoolean(PropertySystemUtil.get(PropertyConstant.MAX_WIN_INVENTORY));
+            
+            checkMaxWinInventory.setSelected(maxWinInventory);
+            checkMaxWinConsultarOrdenesProveedor.setSelected(maxWinConsultProviders);
+            checkMaxWinAgregarRenta.setSelected(maxWinAddRent);
+            checkMaxWinConsultarRenta.setSelected(maxWinConsultRent);
             this.checkGenerateTaskAlmacen.setSelected(generateTaskAlmacen);
             this.checkGenerateTaskChofer.setSelected(generateTaskChofer);
         } catch (FileNotFoundException e) {
             log.error(e);
-            JOptionPane.showMessageDialog(this,e, "Error", JOptionPane.ERROR_MESSAGE); 
+            JOptionPane.showMessageDialog(this,e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
         } catch (IOException e) {
             log.error(e);
-            JOptionPane.showMessageDialog(this,e, "Error", JOptionPane.ERROR_MESSAGE); 
+            JOptionPane.showMessageDialog(this,e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
         }
         
     }
@@ -291,11 +306,11 @@ public class utilerias extends java.awt.Dialog {
                         funcion.UpdateRegistro(datos, "update datos_generales set folio=?, folio_cambio=?");
                     } catch (SQLNonTransientConnectionException e) {
                         funcion.conectate();
-                        JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+                        JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo "+e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
                     } catch (SQLException e) {
-                        JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+                        JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
                     } catch (Exception e) {
-                        JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+                        JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
                     }
                     
 
@@ -376,6 +391,13 @@ public class utilerias extends java.awt.Dialog {
         jPanel9 = new javax.swing.JPanel();
         checkGenerateTaskAlmacen = new javax.swing.JCheckBox();
         checkGenerateTaskChofer = new javax.swing.JCheckBox();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel10 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        checkMaxWinAgregarRenta = new javax.swing.JCheckBox();
+        checkMaxWinConsultarRenta = new javax.swing.JCheckBox();
+        checkMaxWinConsultarOrdenesProveedor = new javax.swing.JCheckBox();
+        checkMaxWinInventory = new javax.swing.JCheckBox();
         jPanel8 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtInfoPDFSummary = new javax.swing.JTextArea();
@@ -383,17 +405,11 @@ public class utilerias extends java.awt.Dialog {
         panelLookAndFeel = new javax.swing.JPanel();
         panelInnerLookAndFeel = new javax.swing.JPanel();
 
-        setLocationRelativeTo(jLabel1);
         setTitle("Utilerias");
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                closeDialog(evt);
-            }
-        });
 
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jTabbedPane1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jTabbedPane1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
         jPanel1.setToolTipText("Folio");
         jPanel1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -664,7 +680,7 @@ public class utilerias extends java.awt.Dialog {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 439, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(71, Short.MAX_VALUE))
+                .addContainerGap(70, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("version release", jPanel4);
@@ -735,7 +751,9 @@ public class utilerias extends java.awt.Dialog {
 
         jTabbedPane1.addTab("Datos generales", jPanel5);
 
-        jPanel7.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jPanel7.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
+        jPanel9.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         checkGenerateTaskAlmacen.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         checkGenerateTaskAlmacen.setText("Generar tareas almacen");
@@ -753,6 +771,9 @@ public class utilerias extends java.awt.Dialog {
             }
         });
 
+        jLabel2.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel2.setText("Tareas para mostrar en el sistema de almacen");
+
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
         jPanel9Layout.setHorizontalGroup(
@@ -760,18 +781,93 @@ public class utilerias extends java.awt.Dialog {
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(checkGenerateTaskAlmacen, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(checkGenerateTaskChofer, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(536, Short.MAX_VALUE))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(checkGenerateTaskAlmacen, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(checkGenerateTaskChofer, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
-                .addContainerGap()
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(checkGenerateTaskAlmacen)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(checkGenerateTaskChofer)
-                .addContainerGap(174, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel10.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        jLabel3.setText("Maximizar ventanas");
+
+        checkMaxWinAgregarRenta.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        checkMaxWinAgregarRenta.setText("Maximizar ventana 'Agregar pedido'");
+        checkMaxWinAgregarRenta.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        checkMaxWinAgregarRenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkMaxWinAgregarRentaActionPerformed(evt);
+            }
+        });
+
+        checkMaxWinConsultarRenta.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        checkMaxWinConsultarRenta.setText("Maximizar ventana 'Consultar pedido'");
+        checkMaxWinConsultarRenta.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        checkMaxWinConsultarRenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkMaxWinConsultarRentaActionPerformed(evt);
+            }
+        });
+
+        checkMaxWinConsultarOrdenesProveedor.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        checkMaxWinConsultarOrdenesProveedor.setText("Maximizar ventana 'Consultar ordenes al proveedores'");
+        checkMaxWinConsultarOrdenesProveedor.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        checkMaxWinConsultarOrdenesProveedor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkMaxWinConsultarOrdenesProveedorActionPerformed(evt);
+            }
+        });
+
+        checkMaxWinInventory.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        checkMaxWinInventory.setText("Maximizar ventana 'Inventario'");
+        checkMaxWinInventory.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        checkMaxWinInventory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkMaxWinInventoryActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
+        jPanel10.setLayout(jPanel10Layout);
+        jPanel10Layout.setHorizontalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(checkMaxWinAgregarRenta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(checkMaxWinConsultarRenta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(checkMaxWinConsultarOrdenesProveedor, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(checkMaxWinInventory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel10Layout.setVerticalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(checkMaxWinAgregarRenta)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(checkMaxWinConsultarRenta)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(checkMaxWinConsultarOrdenesProveedor)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(checkMaxWinInventory)
+                .addGap(0, 18, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
@@ -780,18 +876,22 @@ public class utilerias extends java.awt.Dialog {
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(416, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(276, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(275, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Configuración", jPanel7);
+        jTabbedPane1.addTab("Comportamiento del sistema", jPanel7);
 
         jPanel8.setToolTipText("");
         jPanel8.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -840,7 +940,7 @@ public class utilerias extends java.awt.Dialog {
         );
         panelInnerLookAndFeelLayout.setVerticalGroup(
             panelInnerLookAndFeelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 390, Short.MAX_VALUE)
+            .addGap(0, 389, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout panelLookAndFeelLayout = new javax.swing.GroupLayout(panelLookAndFeel);
@@ -1122,19 +1222,19 @@ public class utilerias extends java.awt.Dialog {
                             funcion.UpdateRegistro(datos, "UPDATE email set cuenta_correo=?,contrasenia=?,servidor=?,puerto=?,utiliza_conexion_TLS=?,utiliza_autenticacion=?,gmail=?,hotmail=?,personalizada=? where id=? ");
                         } catch (SQLNonTransientConnectionException e) {
                             funcion.conectate();
-                            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+                            JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo "+e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
                         } catch (SQLException e) {
-                            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+                            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
                         } catch (Exception e) {
-                            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+                            JOptionPane.showMessageDialog(null, "ocurrio un error inesperado "+e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
                         }
                     } else {
                         try {
                             String datos2[] = {this.txt_cuenta_email.getText(), this.txt_contraseña_email.getText(), this.txt_servidor_email.getText(), this.txt_puerto_email.getText(), conexion_tls, autenticacion, gmail, hotmail, personalizada};
                             funcion.InsertarRegistro(datos2, "INSERT INTO email (cuenta_correo,contrasenia,servidor,puerto,utiliza_conexion_TLS,utiliza_autenticacion,gmail,hotmail,personalizada) values (?,?,?,?,?,?,?,?,?) ");
                         } catch (SQLException ex) {
-                            Logger.getLogger(utilerias.class.getName()).log(Level.SEVERE, null, ex);
-                            JOptionPane.showMessageDialog(null, "Error al insertar registro ", "Error", JOptionPane.ERROR);
+                            Logger.getLogger(SystemSettingsForm.class.getName()).log(Level.SEVERE, null, ex);
+                            JOptionPane.showMessageDialog(null, "Error al insertar registro ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR);
                         }
                     }
                     this.Jbtn_guardar_email.setVisible(false);
@@ -1203,7 +1303,7 @@ public class utilerias extends java.awt.Dialog {
                 systemService.updateInfoPDFSummary(data);
                 JOptionPane.showMessageDialog(this, "Se actualizó con éxito, cierra y abre de nuevo el sistema para ver los cambios.", "ATENCIÓN", JOptionPane.INFORMATION_MESSAGE);
             } catch (DataOriginException e) {
-                JOptionPane.showMessageDialog(this, e,"Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, e,ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
             }
             btnEditPdfSummary.setText("Editar");
             txtInfoPDFSummary.setEnabled(false);
@@ -1218,7 +1318,7 @@ public class utilerias extends java.awt.Dialog {
         
         } catch (IOException e) {
             log.error(e);
-            JOptionPane.showMessageDialog(this,e, "Error", JOptionPane.ERROR_MESSAGE); 
+            JOptionPane.showMessageDialog(this,e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
         }
     }//GEN-LAST:event_checkGenerateTaskAlmacenActionPerformed
 
@@ -1230,26 +1330,49 @@ public class utilerias extends java.awt.Dialog {
         
         } catch (IOException e) {
             log.error(e);
-            JOptionPane.showMessageDialog(this,e, "Error", JOptionPane.ERROR_MESSAGE); 
+            JOptionPane.showMessageDialog(this,e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
         }
     }//GEN-LAST:event_checkGenerateTaskChoferActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                utilerias dialog = new utilerias(new java.awt.Frame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+    private void checkMaxWinAgregarRentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkMaxWinAgregarRentaActionPerformed
+        try {
+            PropertySystemUtil.save(PropertyConstant.MAX_WIN_AGREGAR_RENTA.getKey(), this.checkMaxWinAgregarRenta.isSelected()+"");
+        
+        } catch (IOException e) {
+            log.error(e);
+            JOptionPane.showMessageDialog(this,e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
+        }
+    }//GEN-LAST:event_checkMaxWinAgregarRentaActionPerformed
+
+    private void checkMaxWinConsultarRentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkMaxWinConsultarRentaActionPerformed
+        try {
+            PropertySystemUtil.save(PropertyConstant.MAX_WIN_CONSULTAR_RENTA.getKey(), this.checkMaxWinConsultarRenta.isSelected()+"");
+        
+        } catch (IOException e) {
+            log.error(e);
+            JOptionPane.showMessageDialog(this,e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
+        }
+    }//GEN-LAST:event_checkMaxWinConsultarRentaActionPerformed
+
+    private void checkMaxWinConsultarOrdenesProveedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkMaxWinConsultarOrdenesProveedorActionPerformed
+        try {
+            PropertySystemUtil.save(PropertyConstant.MAX_WIN_CONSULTAR_PROVEEDORES.getKey(), this.checkMaxWinConsultarOrdenesProveedor.isSelected()+"");
+        
+        } catch (IOException e) {
+            log.error(e);
+            JOptionPane.showMessageDialog(this,e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
+        }
+    }//GEN-LAST:event_checkMaxWinConsultarOrdenesProveedorActionPerformed
+
+    private void checkMaxWinInventoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkMaxWinInventoryActionPerformed
+        try {
+            PropertySystemUtil.save(PropertyConstant.MAX_WIN_INVENTORY.getKey(), this.checkMaxWinInventory.isSelected()+"");
+        
+        } catch (IOException e) {
+            log.error(e);
+            JOptionPane.showMessageDialog(this,e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
+        }
+    }//GEN-LAST:event_checkMaxWinInventoryActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1263,6 +1386,10 @@ public class utilerias extends java.awt.Dialog {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox checkGenerateTaskAlmacen;
     private javax.swing.JCheckBox checkGenerateTaskChofer;
+    private javax.swing.JCheckBox checkMaxWinAgregarRenta;
+    private javax.swing.JCheckBox checkMaxWinConsultarOrdenesProveedor;
+    private javax.swing.JCheckBox checkMaxWinConsultarRenta;
+    private javax.swing.JCheckBox checkMaxWinInventory;
     private javax.swing.JCheckBox check_autenticacion;
     private javax.swing.JCheckBox check_conexion_tls;
     private javax.swing.JCheckBox check_gmail;
@@ -1272,6 +1399,8 @@ public class utilerias extends java.awt.Dialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel100;
     private javax.swing.JLabel jLabel101;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel93;
     private javax.swing.JLabel jLabel94;
     private javax.swing.JLabel jLabel95;
@@ -1279,6 +1408,7 @@ public class utilerias extends java.awt.Dialog {
     private javax.swing.JLabel jLabel97;
     private javax.swing.JLabel jLabel99;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;

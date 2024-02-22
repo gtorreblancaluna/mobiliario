@@ -12,15 +12,11 @@ import common.tables.TableItems;
 import common.utilities.UtilityCommon;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 
 public class DesgloseAlmacenForm extends javax.swing.JInternalFrame {
@@ -41,19 +37,8 @@ public class DesgloseAlmacenForm extends javax.swing.JInternalFrame {
         desgloseAlmacenByItemInitTable = new DesgloseAlmacenByItemInitTable();
         initComponents();
         init();
-    }
-    
-    // close dialog when esc is pressed.
-    private void addEscapeListener() {
-        ActionListener escListener = (ActionEvent e) -> {
-            setVisible(false);
-            dispose();
-        };
-
-        this.getRootPane().registerKeyboardAction(escListener,
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-
+        UtilityCommon.addEscapeListener(this);
+        
     }
         
     private void init () {
@@ -68,7 +53,7 @@ public class DesgloseAlmacenForm extends javax.swing.JInternalFrame {
         // center window
         
         this.setTitle("Desglose de almacen por artículo.");
-        addEscapeListener();
+
         this.lblTitle.setText("Desglose de almacen para el artículo: "
                 +item.getDescripcion() + " " + item.getColor().getColor());
         disableButtons();
@@ -102,15 +87,24 @@ public class DesgloseAlmacenForm extends javax.swing.JInternalFrame {
             @Override
             public void keyReleased(KeyEvent evt) {
                 JTextField textField = (JTextField) evt.getSource();
-                if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-                    if (desgloseAlmacenIdToUpdate == null) {
-                        insertItem();
-                    } else {
-                        save();
-                    }
-                } else if (!textField.getText().isEmpty()) {
+                if(evt.getKeyCode() != KeyEvent.VK_ENTER 
+                        && !textField.getText().isEmpty()) {
                     String onlyNumber = UtilityCommon.onlyNumbers(textField.getText().trim());
                     textField.setText(onlyNumber);
+                }
+            }
+        });
+        
+        txtAmount.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent evt) {
+                JTextField textField = (JTextField) evt.getSource();
+                if(evt.getKeyCode() == KeyEvent.VK_ENTER 
+                        && desgloseAlmacenIdToUpdate == null) {
+                    insertItem();
+                } else if (evt.getKeyCode() == KeyEvent.VK_ENTER 
+                        && desgloseAlmacenIdToUpdate != null) {
+                    save();
                 }
             }
         });
@@ -418,6 +412,9 @@ public class DesgloseAlmacenForm extends javax.swing.JInternalFrame {
 
         txtAmount.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txtAmount.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtAmountKeyPressed(evt);
+            }
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txtAmountKeyReleased(evt);
             }
@@ -562,6 +559,7 @@ public class DesgloseAlmacenForm extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnShowItemsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowItemsActionPerformed
+        txtAmount.requestFocus();
         AgregarArticuloDisponibilidadDialog dialog = new AgregarArticuloDisponibilidadDialog(null, true, items);
         itemRelationId = dialog.showDialog();
         if (itemRelationId != null) {            
@@ -656,6 +654,10 @@ public class DesgloseAlmacenForm extends javax.swing.JInternalFrame {
     private void txtAmountKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtAmountKeyReleased
         // TODO add your handling code here:
     }//GEN-LAST:event_txtAmountKeyReleased
+
+    private void txtAmountKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtAmountKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAmountKeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

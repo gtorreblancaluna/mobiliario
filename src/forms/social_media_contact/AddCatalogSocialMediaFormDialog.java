@@ -1,5 +1,5 @@
 
-package forms.socialMediaContact;
+package forms.social_media_contact;
 
 import common.constants.ApplicationConstants;
 import common.exceptions.BusinessException;
@@ -10,16 +10,12 @@ import common.tables.TableCatalogSocialMediaContact;
 import common.utilities.UtilityCommon;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 
 
@@ -43,25 +39,13 @@ public class AddCatalogSocialMediaFormDialog extends javax.swing.JDialog {
         UtilityCommon.addJtableToPane(950, 400, panelTable, tableCatalogSocialMediaContact);
         fillTable();
         addEventListenerTable();
-        this.setTitle("Catalogo Medio de contacto.");
-        addEscapeListener();
+        this.setTitle("Catalogo 'Medio de contacto'.");
+        btnSave.setEnabled(false);
+        UtilityCommon.addEscapeListener(this);
         
-    }
+    }    
     
-    // close dialog when esc is pressed.
-    private void addEscapeListener() {
-        ActionListener escListener = (ActionEvent e) -> {
-            setVisible(false);
-            dispose();
-        };
-
-        this.getRootPane().registerKeyboardAction(escListener,
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-    }
-    
-    private void addEventListenerTable () {
+    private void addEventListenerTable () {        
     
         tableCatalogSocialMediaContact.addMouseListener(new MouseAdapter() {
             @Override
@@ -80,11 +64,9 @@ public class AddCatalogSocialMediaFormDialog extends javax.swing.JDialog {
                                     TableCatalogSocialMediaContact.Column.ID.getNumber()).toString();
                     
                     idToUpdate = Integer.parseInt(id);
-
+                    btnSave.setEnabled(true);
                     txtDescription.setText(description);
                     txtDescription.selectAll();
-
-                    btnSave.setEnabled(true);
                     txtDescription.requestFocus();
                 }
             }
@@ -185,6 +167,7 @@ public class AddCatalogSocialMediaFormDialog extends javax.swing.JDialog {
             init();
             successfulChangesDetected = true;
             fillTable();
+            idToUpdate = null;
         } catch (DataOriginException e) {
             JOptionPane.showMessageDialog(this, e, 
                     ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
@@ -310,9 +293,12 @@ public class AddCatalogSocialMediaFormDialog extends javax.swing.JDialog {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtDescriptionKeyPressed(evt);
             }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtDescriptionKeyReleased(evt);
+            }
         });
 
-        jLabel1.setText("Descripcion:");
+        jLabel1.setText("Descripción:");
 
         javax.swing.GroupLayout panelTableLayout = new javax.swing.GroupLayout(panelTable);
         panelTable.setLayout(panelTableLayout);
@@ -389,10 +375,23 @@ public class AddCatalogSocialMediaFormDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void txtDescriptionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDescriptionKeyPressed
-        if (evt.getKeyCode() == 10) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             save();
+        } else if (!txtDescription.getText().isEmpty()) {
+            btnSave.setEnabled(true);
+        } else {
+            btnSave.setEnabled(false);
         }
     }//GEN-LAST:event_txtDescriptionKeyPressed
+
+    private void txtDescriptionKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDescriptionKeyReleased
+        if (evt.getKeyCode() != KeyEvent.VK_ENTER 
+                && !txtDescription.getText().isEmpty()) {
+            btnSave.setEnabled(true);
+        } else {
+            btnSave.setEnabled(false);
+        }
+    }//GEN-LAST:event_txtDescriptionKeyReleased
 
     /**
      * @param args the command line arguments

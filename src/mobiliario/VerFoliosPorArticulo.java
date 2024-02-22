@@ -5,8 +5,6 @@ import services.SaleService;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
 import common.services.UtilityService;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
@@ -17,7 +15,6 @@ import javax.swing.table.TableRowSorter;
 import common.model.DetalleRenta;
 import model.Faltante;
 import common.model.Renta;
-import common.services.ItemService;
 import services.FaltanteService;
 
 /**
@@ -28,44 +25,21 @@ import services.FaltanteService;
 public class VerFoliosPorArticulo extends java.awt.Dialog {
 
     sqlclass funcion = new sqlclass();
-    
-    Object[][] dtconduc;
     boolean existe, editar = false;
     String id_color;
     float cant = 0; 
     private final SaleService saleService;
     private final UtilityService utilityService = UtilityService.getInstance();
-    private final ItemService itemService = ItemService.getInstance();
     public static String g_rentaId;
     public static int g_articuloId;
     private final FaltanteService faltanteService = FaltanteService.getInstance();
    
+    public void mostrar_faltantes(String rentaId) {
+        VerFaltantes win = new VerFaltantes(null, true, rentaId, g_articuloId);
+        win.setVisible(true);
+        win.setLocationRelativeTo(null);
+    }
     
-    public String conviertemoneda(String valor) {
-
-        DecimalFormatSymbols simbolo = new DecimalFormatSymbols();
-        simbolo.setDecimalSeparator('.');
-        simbolo.setGroupingSeparator(',');
-
-        float entero = Float.parseFloat(valor);
-        DecimalFormat formateador = new DecimalFormat("###,###.##", simbolo);
-        String entero2 = formateador.format(entero);
-
-        if (entero2.contains(".")) {
-            entero2 = "$" + entero2;
-
-        } else {
-            entero2 = "$" + entero2 + ".00";
-        }
-
-        return entero2;
-
-    }
-     public void mostrar_faltantes(String rentaId) {
-        VerFaltantes ventana_faltantes = new VerFaltantes(null, true, rentaId);
-        ventana_faltantes.setVisible(true);
-        ventana_faltantes.setLocationRelativeTo(null);
-    }
     public VerFoliosPorArticulo(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         
@@ -514,7 +488,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-//        InventarioForm.validar_colores = true;
+
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog

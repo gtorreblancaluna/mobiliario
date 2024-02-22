@@ -1,62 +1,33 @@
 package forms.inventario;
 
-import services.SaleService;
 import clases.sqlclass;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import common.constants.ApplicationConstants;
+import common.exceptions.BusinessException;
 import javax.swing.JOptionPane;
 import common.model.DetalleRenta;
 import common.model.Renta;
-import common.services.ItemService;
+import common.services.RentaService;
+import common.utilities.UtilityCommon;
 import mobiliario.VerFaltantes;
 
 public class AsignarFaltante extends java.awt.Dialog {
 
-    sqlclass funcion = new sqlclass();
+    private final sqlclass funcion;    
+    private final RentaService rentaService;    
+    private final int itemIdGlobal;
     
-    Object[][] dtconduc;      
-    SaleService saleService;
-    ItemService itemService = ItemService.getInstance();
-    public static int g_articuloId;
-    public static int g_rentaId;
-    public static String g_descripcionArticulo;
-    
-    public String conviertemoneda(String valor) {
-
-        DecimalFormatSymbols simbolo = new DecimalFormatSymbols();
-        simbolo.setDecimalSeparator('.');
-        simbolo.setGroupingSeparator(',');
-
-        float entero = Float.parseFloat(valor);
-        DecimalFormat formateador = new DecimalFormat("###,###.##", simbolo);
-        String entero2 = formateador.format(entero);
-
-        if (entero2.contains(".")) {
-            entero2 = "$" + entero2;
-
-        } else {
-            entero2 = "$" + entero2 + ".00";
-        }
-
-        return entero2;
-    }
     public AsignarFaltante(java.awt.Frame parent, boolean modal) {
         super(parent, modal);        
         initComponents();
-        saleService = SaleService.getInstance();
-        funcion.conectate();
+        rentaService = RentaService.getInstance();  
         this.setLocationRelativeTo(null);        
         this.setTitle("Asignar faltante ");   
-        this.g_articuloId = InventarioForm.g_articuloId;
+        this.itemIdGlobal = InventarioForm.g_articuloId;
         this.txtDescripcionArticulo.setText(InventarioForm.g_descripcionArticulo);
+        funcion = new sqlclass();
+        funcion.conectate();
       
     }
-     
-     
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -169,61 +140,54 @@ public class AsignarFaltante extends java.awt.Dialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-//        InventarioForm.validar_colores = true;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog
      public void mostrar_faltantes(String rentaId) {
-        VerFaltantes ventana_faltantes = new VerFaltantes(null, true, rentaId);
+        VerFaltantes ventana_faltantes = new VerFaltantes(null, true, rentaId,this.itemIdGlobal);
         ventana_faltantes.setVisible(true);
         ventana_faltantes.setLocationRelativeTo(null);
     }   
      
-     public void asignarFaltante(){
-        String folio = this.txtFolio.getText();
-        Renta renta = null;
-        boolean articuloEncontrado = false;
+    private void asignarFaltante(){
         
-        if(!folio.equals("") && !this.checkAccidenteLaboral.isSelected()){           
-            try {
-                Map<String, Object> parameters = new HashMap<>();
-                parameters.put("folio", folio);
-                List<Renta> rentas = saleService.obtenerRentasPorParametros(parameters);
-                if (!rentas.isEmpty()) {
-                    renta = rentas.get(0);
-                }    
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Ingresa solo n\u00FAmeros\n"+e, "Error", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-            if(renta == null){
-                JOptionPane.showMessageDialog(null, "No se encontr\u00F3 el folio en la base de datos ", "Error", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-            
-            for(DetalleRenta detalle : renta.getDetalleRenta()){
-                if(detalle.getArticulo().getArticuloId() == this.g_articuloId)
-                    articuloEncontrado = true;
-            }
-            if(!articuloEncontrado)
-            {
-                JOptionPane.showMessageDialog(null, "Este articulo no se encuentra en el folio :"+renta.getFolio(), "Error", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-            this.g_rentaId = renta.getRentaId();
-            mostrar_faltantes(this.g_rentaId+"");
-        }else if(this.checkAccidenteLaboral.isSelected() && folio.equals("")){
-            this.g_rentaId = 0;
-            mostrar_faltantes(this.g_rentaId+"");
-        }else{
-            JOptionPane.showMessageDialog(null, "Selecciona solo una opci\u00F3n ", "Error", JOptionPane.INFORMATION_MESSAGE);
+        final String folio = UtilityCommon.onlyNumbers(txtFolio.getText());
+        boolean articuloEncontrado = false;
+        int rentaId = 0;
+        
+        if(!folio.isEmpty() && this.checkAccidenteLaboral.isSelected()){
+            JOptionPane.showMessageDialog(this, "Selecciona solo una opci\u00F3n ", 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
             return;
         }
+        try { 
+            if(!this.checkAccidenteLaboral.isSelected() && !folio.isEmpty()){
+
+                    Renta renta = rentaService.getByFolio(Integer.parseInt(folio));
+                    if(renta == null){
+                        throw new BusinessException("No se encontr\u00F3 el folio en la base de datos ");
+                    }
+                    renta.setDetalleRenta(rentaService.getDetailByRentId(renta.getRentaId()+""));
+                    for(DetalleRenta detalle : renta.getDetalleRenta()){
+                        if(detalle.getArticulo().getArticuloId() == itemIdGlobal) {
+                            articuloEncontrado = true;
+                        }
+                    }
+                    if(!articuloEncontrado){
+                        throw new BusinessException("Este artículo no se encuentra en el folio :"+renta.getFolio());                    
+                    }
+                    rentaId = renta.getRentaId();
+            }        
+            mostrar_faltantes(rentaId+"");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+        }
+        
      
      }
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-       
+     
         this.asignarFaltante();
         
         

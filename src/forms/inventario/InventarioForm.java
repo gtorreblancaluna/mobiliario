@@ -3,6 +3,7 @@ package forms.inventario;
 import common.form.items.AgregarArticuloDisponibilidadDialog;
 import common.form.items.VerDisponibilidadArticulos;
 import common.constants.ApplicationConstants;
+import common.constants.PropertyConstant;
 import common.exceptions.BusinessException;
 import common.exceptions.DataOriginException;
 import common.exceptions.InvalidDataException;
@@ -50,8 +51,6 @@ import java.beans.PropertyChangeEvent;
 import static mobiliario.IndexForm.jDesktopPane1;
 import common.model.ItemByFolioResultQuery;
 import common.model.SearchItemByFolioParams;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import utilities.Utility;
 
 public class InventarioForm extends javax.swing.JInternalFrame {
@@ -104,6 +103,12 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         }
 
         this.setTitle(TITLE);
+        setMaximizable(true);
+        setResizable(true);
+        setIconifiable(true);
+        
+        UtilityCommon.setMaximum(this, PropertyConstant.MAX_WIN_INVENTORY);
+        
         lblInfoConsultarDisponibilidad.setText(ApplicationConstants.EMPTY_STRING);
         
         txtDisponibilidadFechaInicial.getDateEditor().addPropertyChangeListener((PropertyChangeEvent e) -> {
@@ -883,7 +888,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 928, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 940, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel8)
@@ -899,7 +904,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(16, 16, 16)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 570, Short.MAX_VALUE))
         );
 
         jToolBar1.setBorder(null);
@@ -1159,7 +1164,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 504, Short.MAX_VALUE)
+            .addGap(0, 542, Short.MAX_VALUE)
         );
 
         txtDisponibilidadFechaInicial.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
@@ -1442,7 +1447,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                         .addComponent(jbtnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(473, Short.MAX_VALUE))
+                .addContainerGap(485, Short.MAX_VALUE))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1499,7 +1504,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         );
         panelTableItemsByFolioLayout.setVerticalGroup(
             panelTableItemsByFolioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 443, Short.MAX_VALUE)
+            .addGap(0, 485, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
@@ -1550,16 +1555,11 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(tabGeneral, javax.swing.GroupLayout.PREFERRED_SIZE, 1219, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(tabGeneral)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tabGeneral)
-                .addContainerGap())
+            .addComponent(tabGeneral, javax.swing.GroupLayout.DEFAULT_SIZE, 696, Short.MAX_VALUE)
         );
 
         pack();
