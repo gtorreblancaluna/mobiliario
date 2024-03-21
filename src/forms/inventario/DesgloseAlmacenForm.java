@@ -562,7 +562,7 @@ public class DesgloseAlmacenForm extends javax.swing.JInternalFrame {
         txtAmount.requestFocus();
         AgregarArticuloDisponibilidadDialog dialog = new AgregarArticuloDisponibilidadDialog(null, true, items);
         itemRelationId = dialog.showDialog();
-        if (itemRelationId != null) {            
+        if (itemRelationId != null) {
             Articulo itemRelation = itemService.obtenerArticuloPorId(Integer.parseInt(itemRelationId));
             cleanTextFields();
             txtItem.setText(itemRelation.getDescripcion()+" "+itemRelation.getColor().getColor());
@@ -570,7 +570,6 @@ public class DesgloseAlmacenForm extends javax.swing.JInternalFrame {
             btnAdd.setEnabled(true);
             enableTextFields();
         }
-        //addItem(itemId);
     }//GEN-LAST:event_btnShowItemsActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
@@ -606,7 +605,7 @@ public class DesgloseAlmacenForm extends javax.swing.JInternalFrame {
                 + "Total de elementos a eliminar: ["+ ids.size() + "]. Confirma para continuar.", 
                 ApplicationConstants.MESSAGE_TITLE_CONFIRM_DELETE, 
                 JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si");
-        if (seleccion != 0) {//presiono que no
+        if (seleccion != JOptionPane.YES_NO_OPTION) {//presiono que no
            return;
         }
         

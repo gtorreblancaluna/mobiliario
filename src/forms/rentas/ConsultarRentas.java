@@ -515,53 +515,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         return ids.get(0);
     }
     
-    private void generateReporteFromRenta (final Renta renta) {
-        JasperPrint jasperPrint;
-        try {
-            String pathLocation = Utility.getPathLocation();
-            String archivo = pathLocation+ApplicationConstants.RUTA_REPORTE_CONSULTA;
-            System.out.println("Cargando desde: " + archivo);
-            if (archivo == null) {
-                JOptionPane.showMessageDialog(rootPane, "No se encuentra el Archivo jasper");
-                return;
-            }
-            JasperReport masterReport = (JasperReport) JRLoader.loadObjectFromFile(archivo);  
-           
-            DatosGenerales datosGenerales = systemService.getGeneralData();
-            
-            Map parametro = new HashMap<>();
-            parametro.put("NOMBRE_EMPRESA",datosGenerales.getCompanyName());
-            parametro.put("DIRECCION_1",datosGenerales.getAddress1() != null ? datosGenerales.getAddress1() : "");
-            parametro.put("DIRECCION_2",datosGenerales.getAddress2() != null ? datosGenerales.getAddress2() : "");
-            parametro.put("DIRECCION_3",datosGenerales.getAddress3() != null ? datosGenerales.getAddress3() : "");
-            //guardamos el parámetro
-            parametro.put("URL_IMAGEN",pathLocation+ApplicationConstants.LOGO_EMPRESA );
-            parametro.put("id_renta", renta.getRentaId()+"");
-            parametro.put("abonos", renta.getTotalAbonos()+"");
-            parametro.put("subTotal", renta.getSubTotal()+"");
-            parametro.put("chofer", renta.getChofer().getNombre()+" "+renta.getChofer().getApellidos());
-            parametro.put("descuento", renta.getCalculoDescuento()+"");
-            parametro.put("iva", renta.getCalculoIVA()+"");
-            parametro.put("total_faltantes", renta.getTotalFaltantes()+"");
-            parametro.put("mensaje_faltantes", renta.getMensajeFaltantes());  
-            parametro.put("URL_SUB_REPORT_CONSULTA", pathLocation+ApplicationConstants.URL_SUB_REPORT_CONSULTA);
-            parametro.put("INFO_SUMMARY_FOLIO",datosGenerales.getInfoSummaryFolio());
-         
-            jasperPrint = JasperFillManager.fillReport(masterReport, parametro, funcion.getConnection());
-            JasperExportManager.exportReportToPdfFile(jasperPrint, pathLocation+ApplicationConstants.NOMBRE_REPORTE_CONSULTA);
-            File file2 = new File(pathLocation+ApplicationConstants.NOMBRE_REPORTE_CONSULTA);
-                
-            Desktop.getDesktop().open(file2);
-            
-        } catch (Exception e) {
-            log.error(e);
-            System.out.println("Mensaje de Error:" + e.toString());
-            JOptionPane.showMessageDialog(rootPane, "Error cargando el reporte maestro: " + e.getMessage());
-        }
     
-    }
-    
-    public void reporte() throws RuntimeException {
+    public void reporte() {
         
         String rentaId;
         
@@ -587,15 +542,24 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             return;
         }
         
-        generateReporteFromRenta(renta);
         
+        generateReporteFromRenta(renta);
         
         
     }
     
+    private void generateReporteFromRenta (final Renta renta) {
+        
+        try {
+            DatosGenerales datosGenerales = systemService.getGeneralData();
+            JasperPrintUtility.generatePDFConsultaRenta(renta,datosGenerales,Utility.getPathLocation());
+        } catch (Exception exception) {
+            JOptionPane.showMessageDialog(this, exception);
+        } 
+    }
+    
     public void guardar_cliente() {
         
-        // funcion.conectate();
         String nombre, ap, apodo, tel1, tel2, email, dir, loc, rfc;
         nombre = txt_nombre.getText();
         ap = txt_apellidos.getText();
@@ -4802,7 +4766,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jbtn_generar_reporte1ActionPerformed
 
     private void jbtn_generar_reporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_generar_reporteActionPerformed
-        // TODO add your handling code here:
+
         generateReporteFromRenta(globalRenta);
 
     }//GEN-LAST:event_jbtn_generar_reporteActionPerformed

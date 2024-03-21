@@ -51,6 +51,8 @@ import java.beans.PropertyChangeEvent;
 import static mobiliario.IndexForm.jDesktopPane1;
 import common.model.ItemByFolioResultQuery;
 import common.model.SearchItemByFolioParams;
+import javax.swing.JTextField;
+import lombok.val;
 import utilities.Utility;
 
 public class InventarioForm extends javax.swing.JInternalFrame {
@@ -477,22 +479,28 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             
             float cant = 0f;
             float precioRenta = 0f;
+            float precioCompra = 0f;
             try {
                 cant = Float.parseFloat(txt_cantidad.getText());
                 precioRenta = Float.parseFloat(txt_precio_renta.getText());
+                precioCompra = Float.parseFloat(txt_precio_compra.getText());
             } catch (NumberFormatException e) {
                 message.append(++cont + "Error al formatear numero, porfavor verifica que cantidades numericas esten correctas\n");
             }
             
-            if(cant < 0)
+            if(message.toString().isEmpty() && cant < 0)
                 message.append(++cont + "Cantidad no puede ser menor a cero\n");
-            if(precioRenta < 0)
+            if(message.toString().isEmpty() && precioRenta < 0)
                 message.append(++cont + "Precio de renta no puede ser menor a cero\n");
             if(!txt_descripcion.getText().equals(ApplicationConstants.EMPTY_STRING) && txt_descripcion.getText().length()>250)
                  message.append(++cont + "La descripcion sobrepasa la longitud permitida, 250 caracteres\n");
             
+            if(message.toString().isEmpty() && precioCompra < 0) {
+                message.append(++cont + "Precio de compra no puede ser menor a cero\n");
+            }
+            
             if(!message.toString().equals(ApplicationConstants.EMPTY_STRING)){
-                JOptionPane.showMessageDialog(null, message.toString(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, message.toString(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
                 return;
             }
             log.debug("validaci\u00F3n exitosa para agregar articulo ");
@@ -767,10 +775,18 @@ public class InventarioForm extends javax.swing.JInternalFrame {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_precio_rentaKeyPressed(evt);
             }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txt_precio_rentaKeyReleased(evt);
+            }
         });
         jPanel1.add(txt_precio_renta, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 350, 70, -1));
 
         txt_precio_compra.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
+        txt_precio_compra.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txt_precio_compraKeyReleased(evt);
+            }
+        });
         jPanel1.add(txt_precio_compra, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 300, 70, -1));
 
         jLabel4.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -810,6 +826,11 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         txt_cantidad.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_cantidadActionPerformed(evt);
+            }
+        });
+        txt_cantidad.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txt_cantidadKeyReleased(evt);
             }
         });
         jPanel1.add(txt_cantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 160, -1));
@@ -1944,6 +1965,21 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 UtilityCommon.applyFilterToItems(items,txtSearch.getText());      
         fillItemTable(itemsFiltered);
     }//GEN-LAST:event_txtSearchKeyReleased
+
+    private void txt_precio_compraKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_precio_compraKeyReleased
+        JTextField textField = (JTextField) evt.getSource();
+        textField.setText(UtilityCommon.onlyNumbersAndPoint(textField.getText()));
+    }//GEN-LAST:event_txt_precio_compraKeyReleased
+
+    private void txt_precio_rentaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_precio_rentaKeyReleased
+        JTextField textField = (JTextField) evt.getSource();
+        textField.setText(UtilityCommon.onlyNumbersAndPoint(textField.getText()));
+    }//GEN-LAST:event_txt_precio_rentaKeyReleased
+
+    private void txt_cantidadKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_cantidadKeyReleased
+        JTextField textField = (JTextField) evt.getSource();
+        textField.setText(UtilityCommon.onlyNumbers(textField.getText()));
+    }//GEN-LAST:event_txt_cantidadKeyReleased
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

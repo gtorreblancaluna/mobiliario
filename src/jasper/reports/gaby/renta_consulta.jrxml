@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="renta" pageWidth="695" pageHeight="900" columnWidth="655" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="af0ab36d-faf5-45a3-a784-d9f82f7a9acc">
-	<property name="ireport.zoom" value="1.7715610000000044"/>
+	<property name="ireport.zoom" value="1.948717100000007"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="457"/>
 	<parameter name="id_renta" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["C:\\Users\\Carlos Alberto\\Documents\\NetBeansProjects\\mobiliario\\reportes\\"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="abonos" class="java.lang.String"/>
-	<parameter name="subTotal" class="java.lang.String"/>
+	<parameter name="SUB_TOTAL" class="java.lang.String"/>
 	<parameter name="chofer" class="java.lang.String"/>
 	<parameter name="descuento" class="java.lang.String"/>
 	<parameter name="iva" class="java.lang.String"/>
@@ -21,6 +21,20 @@
 	<parameter name="DIRECCION_1" class="java.lang.String"/>
 	<parameter name="DIRECCION_2" class="java.lang.String"/>
 	<parameter name="DIRECCION_3" class="java.lang.String"/>
+	<parameter name="FECHA_REGISTRO" class="java.lang.String"/>
+	<parameter name="FECHA_EVENTO" class="java.lang.String"/>
+	<parameter name="TELEFONOS_CLIENTE" class="java.lang.String"/>
+	<parameter name="FECHA_ENTREGA" class="java.lang.String"/>
+	<parameter name="FECHA_RECOLECCION" class="java.lang.String"/>
+	<parameter name="ENVIO_RECOLECCION" class="java.lang.String"/>
+	<parameter name="DEPOSITO_GARANTIA" class="java.lang.String"/>
+	<parameter name="DESCRIPCION_ABONOS" class="java.lang.String"/>
+	<parameter name="DESCRIPCION_DESCUENTO" class="java.lang.String"/>
+	<parameter name="DESCRIPCION_IVA" class="java.lang.String"/>
+	<parameter name="DESCRIPCION_TOTAL_FALTANTES" class="java.lang.String"/>
+	<parameter name="DESCRIPCION_ENVIO_RECOLECCION" class="java.lang.String"/>
+	<parameter name="DESCRIPCION_DEPOSITO_GARANTIA" class="java.lang.String"/>
+	<parameter name="TOTAL" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT IF(d.porcentaje_descuento > 0 , (d.cantidad * d.p_unitario) * (d.porcentaje_descuento / 100) , 0 ) AS totalDescuento,
      CONCAT(u.`nombre`," ",u.`apellidos`) AS Usuario,
@@ -103,11 +117,8 @@ WHERE
 	<field name="totalDescuento" class="java.lang.String"/>
 	<field name="mostrar_precios_pdf" class="java.lang.String"/>
 	<field name="p_compra" class="java.lang.String"/>
-	<variable name="Total" class="java.lang.String">
-		<variableExpression><![CDATA[new Float(String.valueOf($P{subTotal}))-new Float(String.valueOf($P{abonos}))]]></variableExpression>
-	</variable>
 	<pageHeader>
-		<band height="318">
+		<band height="308">
 			<textField>
 				<reportElement x="516" y="89" width="140" height="24" uuid="d85f5de2-799f-45cb-a9b7-acaa123e12f1"/>
 				<textElement>
@@ -141,17 +152,17 @@ WHERE
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Fecha registro: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_pedido}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Fecha registro: "+$P{FECHA_REGISTRO}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="1" y="164" width="633" height="19" uuid="18294d50-6591-4985-924e-5742fbfed862"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Telefono(s) cliente: "+$F{tel_movil}+", "+$F{tel_fijo}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Telefono(s) cliente: "+$P{TELEFONOS_CLIENTE}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="4" y="203" width="630" height="48" uuid="246889d4-4210-43e9-8d05-585cbc588ce6"/>
+				<reportElement x="1" y="203" width="633" height="48" uuid="246889d4-4210-43e9-8d05-585cbc588ce6"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
@@ -166,7 +177,7 @@ WHERE
 				<subreportExpression><![CDATA[$P{URL_SUB_REPORT_CONSULTA} + "subReport_faltantes.jasper"]]></subreportExpression>
 			</subreport>
 			<textField>
-				<reportElement x="9" y="251" width="636" height="20" uuid="cfb29059-2d84-45ea-8a62-b1005953bb5d"/>
+				<reportElement x="1" y="251" width="644" height="20" uuid="cfb29059-2d84-45ea-8a62-b1005953bb5d"/>
 				<textElement>
 					<font fontName="Arial"/>
 				</textElement>
@@ -267,14 +278,14 @@ WHERE
 				</textElement>
 				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
+			<textField pattern="#,##0.00">
 				<reportElement x="443" y="0" width="70" height="15" uuid="264e5627-4980-45b0-80ac-5d111ce0ac62"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : new Float(String.valueOf($F{p_unitario}))]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
+			<textField pattern="#,##0.00">
 				<reportElement x="583" y="0" width="70" height="15" uuid="d10adc81-14d0-43a2-a939-04235e436e6b"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="9"/>
@@ -284,14 +295,14 @@ WHERE
 			<line>
 				<reportElement x="1" y="15" width="654" height="1" forecolor="#CCCCCC" uuid="768c0afe-f3d5-4b57-bdf8-2c49a63267b2"/>
 			</line>
-			<textField pattern="¤ #,##0.00">
+			<textField pattern="#,##0.00">
 				<reportElement x="373" y="0" width="70" height="15" uuid="705705e9-5cbc-4e6a-9937-6d2a21162ea9"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : new Float(String.valueOf($F{p_compra}))]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
+			<textField pattern="#,##0.00">
 				<reportElement x="513" y="0" width="70" height="15" uuid="c6088cde-9e0a-4dee-a39d-4f597feccb6b"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="9"/>
@@ -306,50 +317,47 @@ WHERE
 				<reportElement mode="Opaque" x="473" y="69" width="181" height="132" forecolor="#999999" uuid="05fb0933-ee02-4f84-a183-ecdd970bc804"/>
 			</rectangle>
 			<textField>
-				<reportElement x="10" y="60" width="453" height="102" uuid="27536c0b-ff9f-4a6b-b9dc-f106ad6c9edb"/>
+				<reportElement x="1" y="60" width="462" height="102" uuid="27536c0b-ff9f-4a6b-b9dc-f106ad6c9edb"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{comentario}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="9" y="0" width="633" height="20" uuid="5f36e1f3-ce07-4290-a4b0-6f383aa8036a"/>
+				<reportElement x="0" y="0" width="642" height="20" uuid="5f36e1f3-ce07-4290-a4b0-6f383aa8036a"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Entrega: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_entrega}))+" Hora: "+$F{hora_entrega}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Entrega: "+$P{FECHA_ENTREGA}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="10" y="181" width="387" height="20" uuid="4817bd89-272d-44fc-8f00-5d8a61f2eb5f"/>
+				<reportElement x="1" y="181" width="396" height="20" uuid="4817bd89-272d-44fc-8f00-5d8a61f2eb5f"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Atendió: "+$F{Usuario}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement x="10" y="161" width="387" height="20" uuid="60881411-e324-4b2c-9ddb-9b7ea12c0ee2"/>
+				<reportElement x="0" y="161" width="397" height="20" uuid="60881411-e324-4b2c-9ddb-9b7ea12c0ee2"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Chofer: "+$P{chofer}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="9" y="20" width="632" height="20" uuid="7004e105-71f0-4fd8-8a95-8fa865a42f0e"/>
+				<reportElement x="0" y="20" width="641" height="20" uuid="7004e105-71f0-4fd8-8a95-8fa865a42f0e"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Devolución: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_devolucion}))+" Hora: "+$F{hora_devolucion}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Devolución: "+$P{FECHA_RECOLECCION}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="9" y="40" width="446" height="20" uuid="ce3a8925-34ef-4b37-81f2-c391756f0904"/>
+				<reportElement x="1" y="40" width="454" height="20" uuid="ce3a8925-34ef-4b37-81f2-c391756f0904"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Fecha del evento: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_evento}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Fecha del evento: "+$P{FECHA_EVENTO}]]></textFieldExpression>
 			</textField>
-			<line direction="BottomUp">
-				<reportElement x="654" y="60" width="1" height="121" forecolor="#999999" uuid="99434016-5237-4f54-a6bd-f25c075b0b52"/>
-			</line>
 			<staticText>
 				<reportElement x="475" y="184" width="108" height="16" uuid="c8d1df98-e9ed-4b5e-ae11-fa26fe07b7b7"/>
 				<textElement>
@@ -357,12 +365,12 @@ WHERE
 				</textElement>
 				<text><![CDATA[Total:]]></text>
 			</staticText>
-			<textField pattern="¤ #,##0.00">
+			<textField pattern="">
 				<reportElement x="582" y="115" width="70" height="16" uuid="3864b126-a239-4365-8ce5-884a892f70f2"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($F{deposito_garantia})) <= 0f ? "" : new Float(String.valueOf($F{deposito_garantia}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DEPOSITO_GARANTIA}]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="473" y="182" width="181" height="1" forecolor="#999999" uuid="5e562573-85ae-4ec1-826e-7c50952974d2"/>
@@ -372,56 +380,56 @@ WHERE
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{iva})) <= 0 ? "" : "IVA:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DESCRIPCION_IVA}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
 				<reportElement x="476" y="83" width="106" height="16" uuid="4d241650-0260-46d5-9a78-7f4c520b3a15"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{descuento})) <= 0 ? "" : "Descuento:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DESCRIPCION_DESCUENTO}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
+			<textField pattern="">
 				<reportElement x="582" y="131" width="70" height="16" uuid="29311edf-8319-4339-af48-007bdb66c84e"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{iva})) <= 0f ? "" : new Float(String.valueOf($P{iva}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{iva}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
 				<reportElement x="476" y="115" width="106" height="16" uuid="8eb7eb97-dbec-4bff-a391-3c2ac1909eb2"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($F{deposito_garantia})) <= 0 ? "" : "Depòsito en garantìa:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DESCRIPCION_DEPOSITO_GARANTIA}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
+			<textField pattern="">
 				<reportElement x="582" y="84" width="69" height="16" uuid="00a2f1ab-ba3c-4d06-be4b-c6af0fe7d99f"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{descuento})) <= 0f ? "" : new Float(String.valueOf($P{descuento}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{descuento}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
+			<textField pattern="">
 				<reportElement x="584" y="184" width="68" height="16" uuid="8bc1b065-e6f9-4b1c-9c32-713abd544565"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{subTotal}))-new Float(String.valueOf($P{abonos}))-new Float(String.valueOf($P{descuento}))+ new Float(String.valueOf($P{iva})) + new Float(String.valueOf($F{envio_recoleccion})) +  new Float(String.valueOf($F{deposito_garantia})) + new Float(String.valueOf($P{total_faltantes}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{TOTAL}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
+			<textField pattern="">
 				<reportElement x="582" y="69" width="69" height="15" uuid="cf3d7ee3-e6f6-4ef8-a170-797d93ac69bb"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{subTotal}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{SUB_TOTAL}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
 				<reportElement x="475" y="147" width="107" height="16" uuid="4be7bc9e-1ca7-4b01-ae04-0eaeaef5cc8f"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{abonos})) <= 0 ? "" : "Pagos:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DESCRIPCION_ABONOS}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="476" y="69" width="106" height="15" uuid="89d83da3-96d0-43ee-87c1-9f958da782d3"/>
@@ -430,40 +438,40 @@ WHERE
 				</textElement>
 				<text><![CDATA[Subtotal:]]></text>
 			</staticText>
-			<textField pattern="¤ #,##0.00">
+			<textField pattern="">
 				<reportElement x="582" y="147" width="70" height="16" uuid="24ee1f33-85d2-4a9c-b719-c42f932c2606"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{abonos})) <= 0f ? "" : new Float(String.valueOf($P{abonos}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{abonos}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
+			<textField pattern="">
 				<reportElement x="582" y="99" width="70" height="16" uuid="a04f7b93-8b8f-49e0-93c9-c7630fbad5a9"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($F{envio_recoleccion})) <= 0f ? "" : new Float(String.valueOf($F{envio_recoleccion}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{ENVIO_RECOLECCION}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
 				<reportElement x="475" y="99" width="107" height="16" uuid="b2d55c8e-b59d-4993-89fe-d8b49d0b5266"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($F{envio_recoleccion})) <= 0 ? "" : "Envio y recolecciòn:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DESCRIPCION_ENVIO_RECOLECCION}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
 				<reportElement x="475" y="165" width="107" height="16" uuid="f3c44cb0-6420-42a6-b5b0-7966fd259692"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{total_faltantes})) <= 0 ? "" : "Faltante por cubrir:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DESCRIPCION_TOTAL_FALTANTES}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
+			<textField pattern="">
 				<reportElement x="582" y="165" width="70" height="16" uuid="d8208efb-18bc-4828-be7e-01ea6deed514"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{total_faltantes})) <= 0f ? "" : new Float(String.valueOf($P{total_faltantes}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_faltantes}]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnFooter>
