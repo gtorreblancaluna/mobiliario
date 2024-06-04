@@ -20,7 +20,6 @@ import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyVetoException;
 import java.io.File;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
@@ -192,7 +191,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
     }
 
-    public ConsultarRentas() throws PropertyVetoException {
+    public ConsultarRentas() {
         
         funcion.conectate();
         initComponents();
@@ -264,10 +263,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         setMaximizable(true);
         lblInformation.setText(ApplicationConstants.EMPTY_STRING);
         lbl_sel.setText(ApplicationConstants.EMPTY_STRING);
-        UtilityCommon.setMaximum(this, PropertyConstant.MAX_WIN_CONSULTAR_RENTA);
+       
         lbl_eleccion.setText(ApplicationConstants.EMPTY_STRING);
         lblInformationOrdersProvider.setText(ApplicationConstants.EMPTY_STRING);
         lblLastStatusProvider.setText(ApplicationConstants.EMPTY_STRING);
+        
+        UtilityCommon.setMaximum(this, PropertyConstant.MAX_WIN_CONSULTAR_RENTA);
+        
     }
     
     private void eventListenerTextHourFields () {

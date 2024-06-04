@@ -486,7 +486,7 @@ public class IndexForm extends javax.swing.JFrame {
         lblPuesto.setText("lblPuesto");
 
         jLabel5.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel5.setText("Versión 1.4.20240315");
+        jLabel5.setText("Versión 1.4.20240513");
 
         jLabel6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel6.setText("Contacto: L.I. Gerardo Torreblanca Luna");

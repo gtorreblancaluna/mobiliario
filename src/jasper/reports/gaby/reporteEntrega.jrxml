@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="renta" pageWidth="695" pageHeight="900" columnWidth="655" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="af0ab36d-faf5-45a3-a784-d9f82f7a9acc">
-	<property name="ireport.zoom" value="16.252058915082742"/>
-	<property name="ireport.x" value="419"/>
-	<property name="ireport.y" value="2275"/>
+	<property name="ireport.zoom" value="2.9230756500000306"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="RENTA_ID" class="java.lang.String"/>
 	<parameter name="NOMBRE_CLIENTE" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["C:\\Users\\Carlos Alberto\\Documents\\NetBeansProjects\\mobiliario\\reportes\\"]]></defaultValueExpression>
@@ -14,12 +14,11 @@
 	<parameter name="FOLIO" class="java.lang.String"/>
 	<parameter name="COMENTARIO_EVENTO" class="java.lang.String"/>
 	<parameter name="URL_IMAGEN" class="java.lang.String"/>
-	<parameter name="HORA_ENTREGA" class="java.lang.String"/>
-	<parameter name="HORA_RECOLECCION" class="java.lang.String"/>
 	<parameter name="TIPO_EVENTO" class="java.lang.String"/>
 	<parameter name="NOMBRE_USUARIO" class="java.lang.String"/>
 	<parameter name="NOMBRE_CHOFER" class="java.lang.String"/>
 	<parameter name="TELEFONOS_CLIENTE" class="java.lang.String"/>
+	<parameter name="FECHA_PEDIDO" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT * FROM(
 SELECT
@@ -72,11 +71,11 @@ AND desglose_almacen.fg_active = 1
 				<textFieldExpression><![CDATA["Cliente: "+$P{NOMBRE_CLIENTE}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="48" width="522" height="14" uuid="bf7a0c42-eb64-4a72-bb77-f1cdd17ecddd"/>
+				<reportElement x="0" y="55" width="522" height="14" uuid="bf7a0c42-eb64-4a72-bb77-f1cdd17ecddd"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Fecha de elaboración del pedido: "+$P{FECHA_EVENTO}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Fecha de elaboración del pedido: "+$P{FECHA_PEDIDO}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="0" y="72" width="522" height="28" uuid="776bb686-563e-4dae-8289-87002897f527"/>
@@ -118,7 +117,7 @@ AND desglose_almacen.fg_active = 1
 				<text><![CDATA[* Desglose de almacen por artículo.]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="0" y="34" width="315" height="14" uuid="dca48696-d5f9-4b5f-a374-fe841d4fe980"/>
+				<reportElement x="0" y="38" width="315" height="14" uuid="dca48696-d5f9-4b5f-a374-fe841d4fe980"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
@@ -235,14 +234,14 @@ AND desglose_almacen.fg_active = 1
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Fecha de devolucion: "+$P{FECHA_RECOLECCION}+", hora: "+$P{HORA_RECOLECCION}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Fecha de devolucion: "+$P{FECHA_RECOLECCION}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="0" y="5" width="655" height="20" uuid="5f36e1f3-ce07-4290-a4b0-6f383aa8036a"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Fecha de entrega: "+$P{FECHA_ENTREGA}+", hora: "+$P{HORA_ENTREGA}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Fecha de entrega: "+$P{FECHA_ENTREGA}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="0" y="65" width="186" height="20" uuid="c20735a4-101d-44c3-8034-370369a76892"/>

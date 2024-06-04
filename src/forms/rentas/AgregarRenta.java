@@ -52,6 +52,7 @@ import common.services.TaskDeliveryChoferUpdateService;
 import common.services.TipoEventoService;
 import common.tables.TableCustomer;
 import common.utilities.JasperPrintUtility;
+import common.utilities.PropertySystemUtil;
 import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
@@ -154,8 +155,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         setIconifiable(true);
         lbl_eleccion.setText(ApplicationConstants.EMPTY_STRING);
         lbl_sel.setText(ApplicationConstants.EMPTY_STRING);
-        UtilityCommon.setMaximum(this, PropertyConstant.MAX_WIN_AGREGAR_RENTA);        
-        
+
+        UtilityCommon.setMaximum(this, PropertyConstant.MAX_WIN_AGREGAR_RENTA);
+                
         
     }
     

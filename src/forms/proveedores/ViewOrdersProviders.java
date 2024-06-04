@@ -33,6 +33,7 @@ import common.services.providers.OrderProviderService;
 import common.tables.TableViewOrdersProviders;
 import common.tables.TableViewOrdersProvidersDetail;
 import common.utilities.JasperPrintUtility;
+import common.utilities.PropertySystemUtil;
 import java.awt.Frame;
 import java.util.ArrayList;
 import mobiliario.iniciar_sesion;
@@ -52,6 +53,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
     private final TableViewOrdersProviders tableViewOrdersProviders;
     private final TableViewOrdersProvidersDetail tableViewOrdersProvidersDetail;
     private final RentaService rentaService = RentaService.getInstance();
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ViewOrdersProviders.class.getName());
 
     public ViewOrdersProviders() {
         initComponents();
@@ -83,6 +85,8 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
                 }
             }
         });
+        
+        
         UtilityCommon.setMaximum(this, PropertyConstant.MAX_WIN_CONSULTAR_PROVEEDORES);
         
     }

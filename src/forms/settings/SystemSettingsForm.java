@@ -932,6 +932,12 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Info PDF resumen", jPanel8);
 
+        panelInnerLookAndFeel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                panelInnerLookAndFeelMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelInnerLookAndFeelLayout = new javax.swing.GroupLayout(panelInnerLookAndFeel);
         panelInnerLookAndFeel.setLayout(panelInnerLookAndFeelLayout);
         panelInnerLookAndFeelLayout.setHorizontalGroup(
@@ -966,7 +972,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
         jTabbedPane1.getAccessibleContext().setAccessibleName("Folio");
         jTabbedPane1.getAccessibleContext().setAccessibleDescription("Folio");
 
-        add(jPanel2, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -1373,6 +1379,10 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(this,e, ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE); 
         }
     }//GEN-LAST:event_checkMaxWinInventoryActionPerformed
+
+    private void panelInnerLookAndFeelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelInnerLookAndFeelMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_panelInnerLookAndFeelMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

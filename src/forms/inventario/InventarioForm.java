@@ -51,8 +51,8 @@ import java.beans.PropertyChangeEvent;
 import static mobiliario.IndexForm.jDesktopPane1;
 import common.model.ItemByFolioResultQuery;
 import common.model.SearchItemByFolioParams;
+import common.utilities.PropertySystemUtil;
 import javax.swing.JTextField;
-import lombok.val;
 import utilities.Utility;
 
 public class InventarioForm extends javax.swing.JInternalFrame {
@@ -83,6 +83,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private final TableItemsByFolio tableItemsByFolio;
     //private final SaleService saleService = SaleService.getInstance();
     private static TableDisponibilidadArticulosShow tablaDisponibilidadArticulos;
+    private static final String POINT_AND_SPACE = ". ";
     
 
     public InventarioForm() {
@@ -109,7 +110,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         setResizable(true);
         setIconifiable(true);
         
-        UtilityCommon.setMaximum(this, PropertyConstant.MAX_WIN_INVENTORY);
+
         
         lblInfoConsultarDisponibilidad.setText(ApplicationConstants.EMPTY_STRING);
         
@@ -135,6 +136,9 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         
         getInitialItems();
         UtilityCommon.setTimeout( () -> txtSearch.requestFocus(), 1000);
+        
+        UtilityCommon.setMaximum(this, PropertyConstant.MAX_WIN_INVENTORY);
+       
     }
     
     private void fillParametersSearchByItemsByFolio () {
@@ -528,34 +532,110 @@ public class InventarioForm extends javax.swing.JInternalFrame {
 
         }
     }
+    
+    private boolean validateNumber (String number) {
+        boolean valid = true;
+        try {
+            Float.parseFloat(number);
+        } catch (NumberFormatException numberFormatException) {
+            valid = false;
+        } 
+        
+        return valid;
+    }
+    
+    private void validateFormBeforeSaveItem () throws InvalidDataException {
+        
+        StringBuilder stringBuilder = new StringBuilder();
+        int count = 0;
+        
+        if (txt_cantidad.getText().equals(ApplicationConstants.EMPTY_STRING)){
+            stringBuilder.append(++count);
+            stringBuilder.append(POINT_AND_SPACE);
+            stringBuilder.append("Cantidad es requerido.");
+        } else if (!validateNumber(txt_cantidad.getText())){
+            stringBuilder.append(++count);
+            stringBuilder.append(POINT_AND_SPACE);
+            stringBuilder.append("Ingresa un número valido para 'cantidad'.");
+        }
+        
+        if (txt_descripcion.getText().equals(ApplicationConstants.EMPTY_STRING)){
+            stringBuilder.append(++count);
+            stringBuilder.append(POINT_AND_SPACE);
+            stringBuilder.append("Descripción es requerido.");
+        }
+        
+        if (txt_precio_compra.getText().equals(ApplicationConstants.EMPTY_STRING)){
+            stringBuilder.append(++count);
+            stringBuilder.append(POINT_AND_SPACE);
+            stringBuilder.append("Precio de compra es requerido.");
+        } else if (!validateNumber(txt_precio_compra.getText())){
+            stringBuilder.append(++count);
+            stringBuilder.append(POINT_AND_SPACE);
+            stringBuilder.append("Ingresa un número valido para 'precio de compra'.");
+        }
+        
+        if (txt_precio_renta.getText().equals(ApplicationConstants.EMPTY_STRING)){
+            stringBuilder.append(++count);
+            stringBuilder.append(POINT_AND_SPACE);
+            stringBuilder.append("Precio de renta es requerido.");
+        } else if (!validateNumber(txt_precio_renta.getText())){
+            stringBuilder.append(++count);
+            stringBuilder.append(POINT_AND_SPACE);
+            stringBuilder.append("Ingresa un número valido para 'precio de renta'.");
+        }
+        
+        if (cmb_categoria.getSelectedIndex() == 0){
+            stringBuilder.append(++count);
+            stringBuilder.append(POINT_AND_SPACE);
+            stringBuilder.append("Categoría es requerido.");
+        }
+        
+        if (cmb_color.getSelectedIndex() == 0){
+            stringBuilder.append(++count);
+            stringBuilder.append(POINT_AND_SPACE);
+            stringBuilder.append("Color es requerido.");
+        }
+        
+        if (!stringBuilder.toString().isEmpty()) {
+            throw new InvalidDataException(stringBuilder.toString());
+        }
+    }
 
     public void guardar() {
-        if (txt_cantidad.getText().equals(ApplicationConstants.EMPTY_STRING) || txt_descripcion.getText().equals(ApplicationConstants.EMPTY_STRING) || txt_precio_compra.getText().equals(ApplicationConstants.EMPTY_STRING) || txt_precio_renta.getText().equals(ApplicationConstants.EMPTY_STRING) || cmb_categoria.getSelectedIndex() == 0 || cmb_color.getSelectedIndex() == 0 ) {
-            JOptionPane.showMessageDialog(null, "Faltan parametros", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            Articulo articuloAnterior = itemService.obtenerArticuloPorId(Integer.parseInt(id_articulo));
-            log.debug("articulo antes de editar es: "+articuloAnterior.toString());
+        
+        try {
+            validateFormBeforeSaveItem();
+        } catch (InvalidDataException invalidDataException) {
+            JOptionPane.showMessageDialog(this, 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, 
+                    invalidDataException.getMessage(), JOptionPane.ERROR_MESSAGE);
+        }        
 
-            Articulo articulo = new Articulo();
-            CategoriaDTO categoria = (CategoriaDTO) cmb_categoria.getModel().getSelectedItem();
-            Color color = (Color) cmb_color.getModel().getSelectedItem();
-            articulo.setArticuloId(Integer.parseInt(id_articulo));
-            articulo.setColor(color);
-            articulo.setCategoria(categoria);
-            articulo.setCantidad(Float.parseFloat(txt_cantidad.getText()));
-            articulo.setDescripcion(txt_descripcion.getText());
-            articulo.setPrecioCompra(Float.parseFloat(txt_precio_compra.getText()));
-            articulo.setPrecioRenta(Float.parseFloat(txt_precio_renta.getText()));
-            articulo.setCodigo(txtCodigo.getText());
-            articulo.setFechaUltimaModificacion(new Timestamp(System.currentTimeMillis()));
-            itemService.actualizarArticulo(articulo);
-            log.debug("articulo despues de actualizar: "+articulo.toString());
-            JOptionPane.showMessageDialog(null, "se a actualizado con \u00E9xito el articulo: "+articulo.getDescripcion(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-            log.debug("el usuario: "+iniciar_sesion.usuarioGlobal.getNombre()+" "+iniciar_sesion.usuarioGlobal.getApellidos()+" a modificado el articulo: "+articulo.getDescripcion()+" con id: "+articulo.getArticuloId());
+        Articulo articuloAnterior = itemService.obtenerArticuloPorId(Integer.parseInt(id_articulo));
+        log.debug("articulo antes de editar es: "+articuloAnterior.toString());
 
-            this.formato_tabla_articulos();
-            limpiar();
-        }
+        Articulo articulo = new Articulo();
+        CategoriaDTO categoria = (CategoriaDTO) cmb_categoria.getModel().getSelectedItem();
+        Color color = (Color) cmb_color.getModel().getSelectedItem();
+        articulo.setArticuloId(Integer.parseInt(id_articulo));
+        articulo.setColor(color);
+        articulo.setCategoria(categoria);
+        articulo.setCantidad(Float.parseFloat(txt_cantidad.getText()));
+        articulo.setDescripcion(txt_descripcion.getText());
+        articulo.setPrecioCompra(Float.parseFloat(txt_precio_compra.getText()));
+        articulo.setPrecioRenta(Float.parseFloat(txt_precio_renta.getText()));
+        articulo.setCodigo(txtCodigo.getText());
+        articulo.setFechaUltimaModificacion(new Timestamp(System.currentTimeMillis()));
+        itemService.actualizarArticulo(articulo);
+        log.debug("articulo despues de actualizar: "+articulo.toString());
+        JOptionPane.showMessageDialog(null, "se a actualizado con \u00E9xito el articulo: "+articulo.getDescripcion(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
+        log.debug("el usuario: "+iniciar_sesion.usuarioGlobal.getNombre()+" "+iniciar_sesion.usuarioGlobal.getApellidos()+" a modificado el articulo: "+articulo.getDescripcion()+" con id: "+articulo.getArticuloId());
+
+        this.formato_tabla_articulos();
+        limpiar();
+        jbtn_guardar.setEnabled(false);
+        jbtn_agregar.setEnabled(true);
     }
 
     public void fecha_sistema() {
@@ -1650,10 +1730,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jbtn_editarActionPerformed
 
     private void jbtn_guardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_guardarActionPerformed
-        // TODO add your handling code here:
+
         guardar();
-        jbtn_guardar.setEnabled(false);
-        jbtn_agregar.setEnabled(true);
 
 
     }//GEN-LAST:event_jbtn_guardarActionPerformed
