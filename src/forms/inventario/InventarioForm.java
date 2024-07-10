@@ -81,7 +81,6 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private final EstadoEventoService estadoEventoService = EstadoEventoService.getInstance();
     private final TipoEventoService tipoEventoService = TipoEventoService.getInstance();
     private final TableItemsByFolio tableItemsByFolio;
-    //private final SaleService saleService = SaleService.getInstance();
     private static TableDisponibilidadArticulosShow tablaDisponibilidadArticulos;
     private static final String POINT_AND_SPACE = ". ";
     

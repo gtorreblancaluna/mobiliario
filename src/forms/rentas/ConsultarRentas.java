@@ -846,9 +846,9 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jTabbedPane2.setTitleAt(TabDetail.ITEMS.getNumber(), "Detalle conceptos ("+tabla_detalle.getRowCount()+")");
     }
     
-    private void itemExist (String itemIdToFind) throws DataFoundException{
+    private void itemExist (String itemIdToFindId) throws DataFoundException{
         for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
-            if (itemIdToFind.equals(
+            if (itemIdToFindId.equals(
                     String.valueOf(tabla_detalle.getValueAt(i, ColumnTableDetail.ITEM_ID.getNumber())))){
                 throw new DataFoundException("Found Exception.");
             }
@@ -4401,15 +4401,16 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         String itemName = tabla_articulos.getValueAt(selectedRow, 2) + " " + tabla_articulos.getValueAt(selectedRow, 3);
         
         if (itemName.length() > 40) {
-            itemName = itemName.substring(0,37).concat("...");
+            lbl_eleccion.setText(itemName.substring(0,37).concat("..."));
+        } else {
+            lbl_eleccion.setText(itemName);
         }
         canti = Float.parseFloat(tabla_articulos.getValueAt(selectedRow, 5).toString());
-        lbl_eleccion.setText(itemName);
         txt_precio_unitario.setText(EliminaCaracteres((String) tabla_articulos.getValueAt(selectedRow, 5).toString(), "$,"));
         txt_porcentaje_descuento.setText("");
         txt_cantidad.requestFocus();
         txt_cantidad.selectAll();
-        id_articulo = (String) tabla_articulos.getValueAt(selectedRow, 0).toString();
+        id_articulo = String.valueOf(tabla_articulos.getValueAt(selectedRow, 0));
         txt_precio_unitario.setEditable(false);
     }
     

@@ -52,7 +52,6 @@ import common.services.TaskDeliveryChoferUpdateService;
 import common.services.TipoEventoService;
 import common.tables.TableCustomer;
 import common.utilities.JasperPrintUtility;
-import common.utilities.PropertySystemUtil;
 import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
@@ -110,6 +109,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private List<TipoAbono> tiposAbonosGlobal = new ArrayList<>();
     private final EstadoEventoService estadoEventoService = EstadoEventoService.getInstance();
     private final TipoEventoService tipoEventoService = TipoEventoService.getInstance();
+    private Articulo itemToEdit;
 
     public AgregarRenta() {
         
@@ -157,7 +157,28 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         lbl_sel.setText(ApplicationConstants.EMPTY_STRING);
 
         UtilityCommon.setMaximum(this, PropertyConstant.MAX_WIN_AGREGAR_RENTA);
-                
+        
+    }
+    //"Cantidad", "id_articulo", "Articulo", "P.Unitario","Descuento %","Descuento", "Importe","Utiles"};
+    private enum ColumnTableDetail {
+        AMOUNT(0),
+        ITEM_ID(1),
+        ITEM_DESCRIPTION(2),
+        ITEM_PRICE(3),
+        ITEM_PERCENT_DISCOUNT(4),
+        ITEM_TOTAL_DISCOUNT(5),
+        IMPORT(6),
+        UTILS(7);
+        
+        ColumnTableDetail (Integer number) {
+            this.number = number;
+        }
+        
+        private final Integer number;
+
+        public Integer getNumber() {
+            return number;
+        }
         
     }
     
@@ -1422,8 +1443,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             tabla_detalle.getColumnModel().getColumn(inn).setPreferredWidth(anchos[inn]);
         }
 
-        DefaultTableCellRenderer TablaRenderer = new DefaultTableCellRenderer();
-        TablaRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
+        DefaultTableCellRenderer alignRight = new DefaultTableCellRenderer();
+        alignRight.setHorizontalAlignment(SwingConstants.RIGHT);
 
         DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
         centrar.setHorizontalAlignment(SwingConstants.CENTER);
@@ -1434,14 +1455,17 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         } catch (ArrayIndexOutOfBoundsException e) {
             ;
         }
+        
+        
+        
         tabla_detalle.getColumnModel().getColumn(1).setMaxWidth(0);
         tabla_detalle.getColumnModel().getColumn(1).setMinWidth(0);
         tabla_detalle.getColumnModel().getColumn(1).setPreferredWidth(0);
         tabla_detalle.getColumnModel().getColumn(0).setCellRenderer(centrar);
-        tabla_detalle.getColumnModel().getColumn(3).setCellRenderer(centrar);
-        tabla_detalle.getColumnModel().getColumn(4).setCellRenderer(centrar);
-        tabla_detalle.getColumnModel().getColumn(5).setCellRenderer(centrar);
-        tabla_detalle.getColumnModel().getColumn(6).setCellRenderer(centrar);
+        tabla_detalle.getColumnModel().getColumn(ColumnTableDetail.ITEM_PRICE.getNumber()).setCellRenderer(alignRight);
+        tabla_detalle.getColumnModel().getColumn(ColumnTableDetail.ITEM_PERCENT_DISCOUNT.getNumber()).setCellRenderer(alignRight);
+        tabla_detalle.getColumnModel().getColumn(ColumnTableDetail.ITEM_TOTAL_DISCOUNT.getNumber()).setCellRenderer(alignRight);
+        tabla_detalle.getColumnModel().getColumn(ColumnTableDetail.IMPORT.getNumber()).setCellRenderer(alignRight);
         tabla_detalle.getColumnModel().getColumn(2).setCellRenderer(centrar);
         tabla_detalle.getColumnModel().getColumn(7).setMaxWidth(0);
         tabla_detalle.getColumnModel().getColumn(7).setMinWidth(0);
@@ -1490,7 +1514,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                 try {
                     porcentajeDescuento = Float.parseFloat(this.txt_porcentaje_descuento.getText()+"");
                 } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(null, "Ingresa un número valido para porcentaje descuento "+e, "Error", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Ingresa un número valido para porcentaje descuento "+e, "Error", JOptionPane.INFORMATION_MESSAGE);
                     Toolkit.getDefaultToolkit().beep();
                     return;
                 }
@@ -1504,7 +1528,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             }
                 existe = false;
                 for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
-                    if (lbl_eleccion.getText().equals(tabla_detalle.getValueAt(i, 2).toString())) {
+                    if (itemToEdit.getArticuloId().toString()
+                            .equals(tabla_detalle.getValueAt(i, ColumnTableDetail.ITEM_ID.getNumber()).toString())) {
                         existe = true;
                         break;
                     }
@@ -1527,7 +1552,14 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                     String xprecio = conviertemoneda(Float.toString(precio));
                     String ximporte = conviertemoneda(Float.toString(importe));
 
-                    Object nuevo1[] = {txt_cantidad.getText(), id_articulo, lbl_eleccion.getText(), xprecio,porcentajeDescuento+"", conviertemoneda(totalDescuento+"") , ximporte, itemUtilesGlobal};
+                    Object nuevo1[] = {
+                        txt_cantidad.getText(), 
+                        itemToEdit.getArticuloId(),
+                        itemToEdit.getDescripcion(), 
+                        xprecio,porcentajeDescuento+"", 
+                        conviertemoneda(totalDescuento+"") , 
+                        ximporte, 
+                        itemToEdit.getUtiles()};
                     temp.addRow(nuevo1);
                     subTotal();
                     total();
@@ -1602,8 +1634,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         
 
         DefaultTableModel tableModel = new DefaultTableModel(data, columNames);
-        DefaultTableCellRenderer TablaRenderer = new DefaultTableCellRenderer();
-        TablaRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
+        
+        DefaultTableCellRenderer rightAlign = new DefaultTableCellRenderer();
+        rightAlign.setHorizontalAlignment(SwingConstants.RIGHT);
 
         DefaultTableCellRenderer centrar = new DefaultTableCellRenderer();
         centrar.setHorizontalAlignment(SwingConstants.CENTER);
@@ -1619,7 +1652,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         tabla_articulos.getColumnModel().getColumn(0).setMaxWidth(0);
         tabla_articulos.getColumnModel().getColumn(0).setMinWidth(0);
         tabla_articulos.getColumnModel().getColumn(0).setPreferredWidth(0);
-        tabla_articulos.getColumnModel().getColumn(5).setCellRenderer(centrar);
+        tabla_articulos.getColumnModel().getColumn(5).setCellRenderer(rightAlign);
         tabla_articulos.getColumnModel().getColumn(6).setMaxWidth(0);
         tabla_articulos.getColumnModel().getColumn(6).setMinWidth(0);
         tabla_articulos.getColumnModel().getColumn(6).setPreferredWidth(0);
@@ -3193,9 +3226,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             String characterToDelete = "$,";
             lbl_sel.setText(itemSelected);
             rowSelectedToEdit = tabla_detalle.getSelectedRow();
-            Float amount = Float.parseFloat(EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 0).toString(),characterToDelete));
-            Float price = Float.parseFloat(EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 3).toString(),characterToDelete));
-            Float discountRate = Float.parseFloat(EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), 4).toString(),characterToDelete));
+            Float amount = Float.parseFloat(EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.AMOUNT.getNumber()).toString(),characterToDelete));
+            Float price = Float.parseFloat(EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.ITEM_PRICE.getNumber()).toString(),characterToDelete));
+            Float discountRate = Float.parseFloat(EliminaCaracteres(tabla_detalle.getValueAt(tabla_detalle.getSelectedRow(), ColumnTableDetail.ITEM_PERCENT_DISCOUNT.getNumber()).toString(),characterToDelete));
             
             txtAmountEdit.setText(amount.toString());
             txtDiscountRateEdit.setText(discountRate.toString());
@@ -3415,13 +3448,18 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txt_porcentaje_descuentoActionPerformed
 
     private void addItemToEventFromInventory (int selectedRow) {
-        
+        itemToEdit = new Articulo();
         String itemName = tabla_articulos.getValueAt(selectedRow, 3) + " " + tabla_articulos.getValueAt(selectedRow, 4);
-        
-        if (itemName.length() > 50) {
-            itemName = itemName.substring(0,47).concat("...");
+        itemToEdit.setDescripcion(itemName);
+        if (itemName.length() > 40) {
+            lbl_eleccion.setText(itemName.substring(0,37).concat("..."));
+        } else {
+            lbl_eleccion.setText(itemName);
         }
-        lbl_eleccion.setText(itemName);
+        itemToEdit.setPrecioRenta(Float.parseFloat(EliminaCaracteres((String) tabla_articulos.getValueAt(selectedRow, 5).toString(), "$,")));
+        itemToEdit.setArticuloId(Integer.parseInt(String.valueOf(tabla_articulos.getValueAt(selectedRow, 0))));
+        itemToEdit.setUtiles(Float.parseFloat(tabla_articulos.getValueAt(selectedRow, 6).toString()));
+        
         txt_precio_unitario.setText(EliminaCaracteres((String) tabla_articulos.getValueAt(selectedRow, 5).toString(), "$,"));
         txt_cantidad.setText("");
         txt_cantidad.requestFocus();
