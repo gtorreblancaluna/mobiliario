@@ -213,6 +213,28 @@
                             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>
                           </AuxValues>
                         </Component>
+                        <Component class="javax.swing.JButton" name="jbtn_generar_reporte2">
+                          <Properties>
+                            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                              <Image iconType="3" name="/img/icons32/archivo-pdf-32.png"/>
+                            </Property>
+                            <Property name="mnemonic" type="int" value="82"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Generar reporte con imagenes"/>
+                            <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                              <Color id="Hand Cursor"/>
+                            </Property>
+                            <Property name="focusable" type="boolean" value="false"/>
+                            <Property name="horizontalTextPosition" type="int" value="0"/>
+                            <Property name="verticalTextPosition" type="int" value="3"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jbtn_generar_reporte2MouseClicked"/>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbtn_generar_reporte2ActionPerformed"/>
+                          </Events>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>
+                          </AuxValues>
+                        </Component>
                         <Component class="javax.swing.JButton" name="jbtnGenerarReporteEntregas">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
@@ -950,7 +972,7 @@
                         </DimensionLayout>
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jTabbedPane2" alignment="0" max="32767" attributes="0"/>
+                              <Component id="jTabbedPane2" alignment="0" pref="442" max="32767" attributes="0"/>
                           </Group>
                         </DimensionLayout>
                       </Layout>
@@ -991,7 +1013,7 @@
                                 </DimensionLayout>
                                 <DimensionLayout dim="1">
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jTabbedPaneItems" max="32767" attributes="0"/>
+                                      <Component id="jTabbedPaneItems" pref="414" max="32767" attributes="0"/>
                                       <Component id="jToolBar3" alignment="0" max="32767" attributes="0"/>
                                   </Group>
                                 </DimensionLayout>
@@ -1191,7 +1213,7 @@
                                             </DimensionLayout>
                                             <DimensionLayout dim="1">
                                               <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="jScrollPane4" alignment="0" pref="358" max="32767" attributes="0"/>
+                                                  <Component id="jScrollPane4" alignment="0" pref="354" max="32767" attributes="0"/>
                                               </Group>
                                             </DimensionLayout>
                                           </Layout>
@@ -1405,7 +1427,7 @@
                                             </DimensionLayout>
                                             <DimensionLayout dim="1">
                                               <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="jScrollPane5" alignment="0" pref="361" max="32767" attributes="0"/>
+                                                  <Component id="jScrollPane5" alignment="0" pref="357" max="32767" attributes="0"/>
                                               </Group>
                                             </DimensionLayout>
                                           </Layout>
@@ -1603,7 +1625,7 @@
                                     </DimensionLayout>
                                     <DimensionLayout dim="1">
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="jScrollPane6" alignment="0" pref="405" max="32767" attributes="0"/>
+                                          <Component id="jScrollPane6" alignment="0" pref="401" max="32767" attributes="0"/>
                                       </Group>
                                     </DimensionLayout>
                                   </Layout>
@@ -1867,7 +1889,7 @@
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
                                           <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="jScrollPane7" pref="405" max="32767" attributes="0"/>
+                                          <Component id="jScrollPane7" pref="401" max="32767" attributes="0"/>
                                       </Group>
                                   </Group>
                                 </DimensionLayout>
@@ -2025,7 +2047,7 @@
                                     </DimensionLayout>
                                     <DimensionLayout dim="1">
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <EmptySpace min="0" pref="352" max="32767" attributes="0"/>
+                                          <EmptySpace min="0" pref="348" max="32767" attributes="0"/>
                                       </Group>
                                     </DimensionLayout>
                                   </Layout>
@@ -2130,7 +2152,7 @@
                                 <Property name="mnemonic" type="int" value="82"/>
                                 <Property name="toolTipText" type="java.lang.String" value="Generar reporte (Alt+R)"/>
                                 <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                                  <Color id="Default Cursor"/>
+                                  <Color id="Hand Cursor"/>
                                 </Property>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -2144,23 +2166,23 @@
                                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>
                               </AuxValues>
                             </Component>
-                            <Component class="javax.swing.JButton" name="jbtnGenerateTaskAlmacen">
+                            <Component class="javax.swing.JButton" name="btnReportPdfWithImages">
                               <Properties>
                                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                                  <Image iconType="3" name="/img/lista-de-quehaceres-24.png"/>
+                                  <Image iconType="3" name="/img/icons32/archivo-pdf-32.png"/>
                                 </Property>
                                 <Property name="mnemonic" type="int" value="82"/>
-                                <Property name="toolTipText" type="java.lang.String" value="Generar tarea de almacen"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Generar reporte con imagenes"/>
                                 <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-                                  <Color id="Default Cursor"/>
+                                  <Color id="Hand Cursor"/>
                                 </Property>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="horizontalTextPosition" type="int" value="0"/>
                                 <Property name="verticalTextPosition" type="int" value="3"/>
                               </Properties>
                               <Events>
-                                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jbtnGenerateTaskAlmacenMouseClicked"/>
-                                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbtnGenerateTaskAlmacenActionPerformed"/>
+                                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btnReportPdfWithImagesMouseClicked"/>
+                                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnReportPdfWithImagesActionPerformed"/>
                               </Events>
                               <AuxValues>
                                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>
@@ -2220,7 +2242,7 @@
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="1" attributes="0">
-                                  <EmptySpace min="0" pref="2" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="10" max="32767" attributes="0"/>
                                   <Component id="txt_subtotal" min="-2" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="txtPorcentajeDescuento" min="-2" max="-2" attributes="0"/>

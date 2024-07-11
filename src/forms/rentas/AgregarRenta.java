@@ -1236,7 +1236,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             }).start();
         }
 
-        seleccion = JOptionPane.showOptionDialog(this, "¿Deseas agregar otro evento?", "Evento nuevo ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "No");
+        /**seleccion = JOptionPane.showOptionDialog(this, "¿Deseas agregar otro evento?", "Evento nuevo ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "No");
         
         
         if (seleccion == 0) {//presiono que si
@@ -1250,7 +1250,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             panel_conceptos.setVisible(false);
         } else { //presiono que no
             this.dispose();
-        }
+        }*/
 
     }
     
@@ -1838,6 +1838,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jToolBar2 = new javax.swing.JToolBar();
         jbtn_agregar_evento = new javax.swing.JButton();
         jbtn_reporte = new javax.swing.JButton();
+        btnReportWithImgs = new javax.swing.JButton();
         jbtn_nuevo_evento = new javax.swing.JButton();
         panelTotales = new javax.swing.JPanel();
         txt_subtotal = new javax.swing.JTextField();
@@ -2164,7 +2165,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jLabel33.setText("Hrs.");
 
         check_generar_reporte.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        check_generar_reporte.setText("Generar reporte al guardar");
+        check_generar_reporte.setText("Generar reporte con imgs");
         check_generar_reporte.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         check_generar_reporte.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2827,6 +2828,20 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         });
         jToolBar2.add(jbtn_reporte);
 
+        btnReportWithImgs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons32/archivo-pdf-32.png"))); // NOI18N
+        btnReportWithImgs.setMnemonic('R');
+        btnReportWithImgs.setToolTipText("Generar reporte con imagenes");
+        btnReportWithImgs.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnReportWithImgs.setFocusable(false);
+        btnReportWithImgs.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnReportWithImgs.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnReportWithImgs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReportWithImgsActionPerformed(evt);
+            }
+        });
+        jToolBar2.add(btnReportWithImgs);
+
         jbtn_nuevo_evento.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Document-Add-icon.png"))); // NOI18N
         jbtn_nuevo_evento.setToolTipText("Nuevo evento");
         jbtn_nuevo_evento.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -3333,7 +3348,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jbtn_disponibleActionPerformed
 
     private void jbtn_nuevo_eventoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_nuevo_eventoActionPerformed
-        // TODO add your handling code here:
         nuevo_evento();
         limpiar();
         jTabbedPane1.setEnabledAt(1, false);
@@ -3701,6 +3715,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_txtIvaKeyReleased
 
+    private void btnReportWithImgsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportWithImgsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnReportWithImgsActionPerformed
+
     private void fillTableFromItemsFolio (Renta renta) {
         DefaultTableModel tableModel = (DefaultTableModel) tabla_detalle.getModel();
         
@@ -3745,6 +3763,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGetItemsFromFolio;
+    private javax.swing.JButton btnReportWithImgs;
     private javax.swing.JCheckBox check_enviar_email;
     private javax.swing.JCheckBox check_generar_reporte;
     private javax.swing.JCheckBox check_mostrar_precios;

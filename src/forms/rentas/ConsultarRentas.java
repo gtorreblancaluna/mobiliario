@@ -343,7 +343,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         map.put("systemDate", fecha_sistema );
         map.put("type", ApplicationConstants.TIPO_PEDIDO );
         tabla_consultar_renta(map);
-        jbtnGenerateTaskAlmacen.setVisible(false);
         jTabbedPaneItems.setSelectedIndex(1);
         
     }
@@ -2184,6 +2183,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jbtn_buscar = new javax.swing.JButton();
         jbtn_refrescar = new javax.swing.JButton();
         jbtn_generar_reporte1 = new javax.swing.JButton();
+        jbtn_generar_reporte2 = new javax.swing.JButton();
         jbtnGenerarReporteEntregas = new javax.swing.JButton();
         jtbtnGenerateExcel = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -2301,7 +2301,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jbtn_guardar = new javax.swing.JButton();
         jbtn_agregar_articulos = new javax.swing.JButton();
         jbtn_generar_reporte = new javax.swing.JButton();
-        jbtnGenerateTaskAlmacen = new javax.swing.JButton();
+        btnReportPdfWithImages = new javax.swing.JButton();
         panelTotales = new javax.swing.JPanel();
         txt_subtotal = new javax.swing.JTextField();
         txtPorcentajeDescuento = new javax.swing.JFormattedTextField();
@@ -2443,6 +2443,25 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
         });
         jToolBar1.add(jbtn_generar_reporte1);
+
+        jbtn_generar_reporte2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons32/archivo-pdf-32.png"))); // NOI18N
+        jbtn_generar_reporte2.setMnemonic('R');
+        jbtn_generar_reporte2.setToolTipText("Generar reporte con imagenes");
+        jbtn_generar_reporte2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbtn_generar_reporte2.setFocusable(false);
+        jbtn_generar_reporte2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbtn_generar_reporte2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jbtn_generar_reporte2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jbtn_generar_reporte2MouseClicked(evt);
+            }
+        });
+        jbtn_generar_reporte2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbtn_generar_reporte2ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jbtn_generar_reporte2);
 
         jbtnGenerarReporteEntregas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/truck.png"))); // NOI18N
         jbtnGenerarReporteEntregas.setToolTipText("reporte para entregas");
@@ -2860,7 +2879,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
         );
 
         txt_buscar.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
@@ -3002,7 +3021,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         );
         jPanel16Layout.setVerticalGroup(
             jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
         );
 
         jLabel40.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
@@ -3104,7 +3123,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPaneItems)
+            .addComponent(jTabbedPaneItems, javax.swing.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE)
             .addComponent(jToolBar3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -3138,7 +3157,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         );
         panel_abonosLayout.setVerticalGroup(
             panel_abonosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
         );
 
         jToolBar4.setFloatable(false);
@@ -3302,7 +3321,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE))
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("Comentarios", jPanel11);
@@ -3358,7 +3377,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         );
         panelOrderProvidersTableLayout.setVerticalGroup(
             panelOrderProvidersTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 352, Short.MAX_VALUE)
+            .addGap(0, 348, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -3406,7 +3425,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane2)
+            .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
         );
 
         jToolBar5.setFloatable(false);
@@ -3454,7 +3473,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jbtn_generar_reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/blank-catalog-icon.png"))); // NOI18N
         jbtn_generar_reporte.setMnemonic('R');
         jbtn_generar_reporte.setToolTipText("Generar reporte (Alt+R)");
-        jbtn_generar_reporte.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jbtn_generar_reporte.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jbtn_generar_reporte.setFocusable(false);
         jbtn_generar_reporte.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbtn_generar_reporte.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -3470,24 +3489,24 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         });
         jToolBar5.add(jbtn_generar_reporte);
 
-        jbtnGenerateTaskAlmacen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/lista-de-quehaceres-24.png"))); // NOI18N
-        jbtnGenerateTaskAlmacen.setMnemonic('R');
-        jbtnGenerateTaskAlmacen.setToolTipText("Generar tarea de almacen");
-        jbtnGenerateTaskAlmacen.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jbtnGenerateTaskAlmacen.setFocusable(false);
-        jbtnGenerateTaskAlmacen.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jbtnGenerateTaskAlmacen.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jbtnGenerateTaskAlmacen.addMouseListener(new java.awt.event.MouseAdapter() {
+        btnReportPdfWithImages.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons32/archivo-pdf-32.png"))); // NOI18N
+        btnReportPdfWithImages.setMnemonic('R');
+        btnReportPdfWithImages.setToolTipText("Generar reporte con imagenes");
+        btnReportPdfWithImages.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnReportPdfWithImages.setFocusable(false);
+        btnReportPdfWithImages.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnReportPdfWithImages.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnReportPdfWithImages.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jbtnGenerateTaskAlmacenMouseClicked(evt);
+                btnReportPdfWithImagesMouseClicked(evt);
             }
         });
-        jbtnGenerateTaskAlmacen.addActionListener(new java.awt.event.ActionListener() {
+        btnReportPdfWithImages.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbtnGenerateTaskAlmacenActionPerformed(evt);
+                btnReportPdfWithImagesActionPerformed(evt);
             }
         });
-        jToolBar5.add(jbtnGenerateTaskAlmacen);
+        jToolBar5.add(btnReportPdfWithImages);
 
         javax.swing.GroupLayout panelToolBar5Layout = new javax.swing.GroupLayout(panelToolBar5);
         panelToolBar5.setLayout(panelToolBar5Layout);
@@ -3632,7 +3651,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         panelTotalesLayout.setVerticalGroup(
             panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTotalesLayout.createSequentialGroup()
-                .addGap(0, 2, Short.MAX_VALUE)
+                .addGap(0, 10, Short.MAX_VALUE)
                 .addComponent(txt_subtotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtPorcentajeDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -5320,36 +5339,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btnGetItemsFromFolioActionPerformed
 
-    private void jbtnGenerateTaskAlmacenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jbtnGenerateTaskAlmacenMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jbtnGenerateTaskAlmacenMouseClicked
-
-    private void jbtnGenerateTaskAlmacenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnGenerateTaskAlmacenActionPerformed
-        
-        int seleccion = JOptionPane.showOptionDialog(this, "¿Generar tarea para almacen?", "Confirmar", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si");
-        if (seleccion != 0) {//presiono que no
-            return;
-        }
-        String message;
-        
-        try {
-            taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
-            message = taskAlmacenUpdateService.saveWhenIsNewEvent(
-                    Long.parseLong(String.valueOf(globalRenta.getRentaId())), 
-                    String.valueOf(globalRenta.getFolio()), 
-                    iniciar_sesion.usuarioGlobal.getUsuarioId().toString()
-            );
-        } catch (NoDataFoundException e) {
-            message = e.getMessage();
-            log.error(message);
-        } catch (DataOriginException e) {
-            log.error(e.getMessage(),e);
-            message = "Ocurrió un error al generar la tarea a almacén, DETALLE: "+e.getMessage();
-        }
-        Utility.pushNotification(message);
-        JOptionPane.showMessageDialog(this, message, "Tareas almacen", JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_jbtnGenerateTaskAlmacenActionPerformed
-
     private void txt_envioRecoleccionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_envioRecoleccionKeyPressed
         if (evt.getKeyCode() == 10) {
                 total();
@@ -5443,12 +5432,29 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 
     }//GEN-LAST:event_btnCopyOrdersActionPerformed
 
+    private void jbtn_generar_reporte2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jbtn_generar_reporte2MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jbtn_generar_reporte2MouseClicked
+
+    private void jbtn_generar_reporte2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_generar_reporte2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jbtn_generar_reporte2ActionPerformed
+
+    private void btnReportPdfWithImagesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReportPdfWithImagesMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnReportPdfWithImagesMouseClicked
+
+    private void btnReportPdfWithImagesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportPdfWithImagesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnReportPdfWithImagesActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCopyOrders;
     private javax.swing.JButton btnGetItemsFromFolio;
     public static javax.swing.JButton btnInventoryMaterialReport;
     private javax.swing.JButton btnReloadGetLastStatusProvider;
+    public static javax.swing.JButton btnReportPdfWithImages;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;
@@ -5549,7 +5555,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JToolBar jToolBar4;
     private javax.swing.JToolBar jToolBar5;
     public static javax.swing.JButton jbtnGenerarReporteEntregas;
-    public static javax.swing.JButton jbtnGenerateTaskAlmacen;
     private javax.swing.JButton jbtn_agregar_abono;
     private javax.swing.JButton jbtn_agregar_articulo;
     private javax.swing.JButton jbtn_agregar_articulos;
@@ -5562,6 +5567,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JButton jbtn_editar_dinero;
     public static javax.swing.JButton jbtn_generar_reporte;
     public static javax.swing.JButton jbtn_generar_reporte1;
+    public static javax.swing.JButton jbtn_generar_reporte2;
     private javax.swing.JButton jbtn_guardar;
     private javax.swing.JButton jbtn_guardar_abonos;
     private javax.swing.JButton jbtn_guardar_cliente;

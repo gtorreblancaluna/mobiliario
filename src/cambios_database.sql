@@ -315,3 +315,6 @@ REFERENCES catalog_social_media_contact(id) ON DELETE CASCADE;
 -- agregar columna 
 ALTER TABLE clientes ADD COLUMN created_at TIMESTAMP NULL DEFAULT NULL AFTER activo;
 ALTER TABLE clientes ADD COLUMN updated_at TIMESTAMP NULL DEFAULT NULL AFTER activo;
+
+-- 2024-jul-10
+ALTER TABLE articulo ADD COLUMN image BLOB NULL DEFAULT NULL;
