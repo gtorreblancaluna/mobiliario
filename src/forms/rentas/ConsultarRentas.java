@@ -549,6 +549,16 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
     }
     
+    private void generateReporteWithImagesFromRenta (final Renta renta) {
+        
+        try {            
+            DatosGenerales datosGenerales = systemService.getGeneralData();
+            JasperPrintUtility.generatePDFConsultaRentaWithImages(renta,datosGenerales,Utility.getPathLocation());
+        } catch (Exception exception) {
+            JOptionPane.showMessageDialog(this, exception);
+        } 
+    }
+    
     private void generateReporteFromRenta (final Renta renta) {
         
         try {
@@ -5437,7 +5447,14 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jbtn_generar_reporte2MouseClicked
 
     private void jbtn_generar_reporte2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_generar_reporte2ActionPerformed
-        // TODO add your handling code here:
+        try {
+            String rentaId = getRentaIdFromConsultarRentaTableOnlyOneRowSelected();
+            Renta renta = saleService.obtenerRentaPorId(Integer.parseInt(rentaId));
+            generateReporteWithImagesFromRenta(renta);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(
+                    this, ex.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_jbtn_generar_reporte2ActionPerformed
 
     private void btnReportPdfWithImagesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReportPdfWithImagesMouseClicked
@@ -5445,7 +5462,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnReportPdfWithImagesMouseClicked
 
     private void btnReportPdfWithImagesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportPdfWithImagesActionPerformed
-        // TODO add your handling code here:
+        generateReporteWithImagesFromRenta(globalRenta);
     }//GEN-LAST:event_btnReportPdfWithImagesActionPerformed
 
 

@@ -134,6 +134,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         txt_descuento.setEditable(false);
         txt_descuento.setHorizontalAlignment(SwingConstants.RIGHT);
         jbtn_reporte.setEnabled(false);
+        btnReportWithImgs.setEnabled(false);
         jbtn_disponible.setEnabled(false);
         check_mostrar_precios.setSelected(true);
         check_generar_reporte.setSelected(true);
@@ -672,6 +673,18 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         mail.setMessage(mensaje+"");
         mail.SEND();
     }
+    
+    private void generateReporteWithImagesFromRenta () {
+        
+        try {
+            Renta renta = saleService.obtenerRentaPorId(Integer.parseInt(id_ultima_renta));
+            DatosGenerales datosGenerales = systemService.getGeneralData();
+            JasperPrintUtility
+                    .generatePDFConsultaRentaWithImages(renta,datosGenerales,Utility.getPathLocation());
+        } catch (Exception exception) {
+            JOptionPane.showMessageDialog(this, exception);
+        } 
+    }
 
     public void reporte() {
         
@@ -1178,7 +1191,8 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         }
         
         if (check_generar_reporte.isSelected()){
-            reporte();
+            generateReporteWithImagesFromRenta();
+            //reporte();
         }
 
         if (check_enviar_email.isSelected()){
@@ -1236,7 +1250,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             }).start();
         }
 
-        /**seleccion = JOptionPane.showOptionDialog(this, "¿Deseas agregar otro evento?", "Evento nuevo ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "No");
+        seleccion = JOptionPane.showOptionDialog(this, "¿Deseas agregar otro evento?", "Evento nuevo ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "No");
         
         
         if (seleccion == 0) {//presiono que si
@@ -1250,7 +1264,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             panel_conceptos.setVisible(false);
         } else { //presiono que no
             this.dispose();
-        }*/
+        }
 
     }
     
@@ -3716,7 +3730,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txtIvaKeyReleased
 
     private void btnReportWithImgsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportWithImgsActionPerformed
-        // TODO add your handling code here:
+        generateReporteWithImagesFromRenta();
     }//GEN-LAST:event_btnReportWithImgsActionPerformed
 
     private void fillTableFromItemsFolio (Renta renta) {
