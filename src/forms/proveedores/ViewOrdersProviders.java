@@ -284,7 +284,7 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
             parameter.setStatus(this.cmbStatus.getSelectedItem().toString());
         }
      }
-     parameter.setLimit(Integer.parseInt(this.cmbLimit.getSelectedItem().toString()));
+     parameter.setLimit(Integer.parseInt(String.valueOf(this.cmbLimit.getSelectedItem())));
      return parameter;
    }
    
@@ -295,21 +295,10 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
        
         try{
             list = orderService.getDetailOrderSupplierCustomize(parameter);
-        }catch(NoDataFoundException e){
-            this.lblInfoGeneral.setText("No se han obtenido resultados :(");
-            return;
-        }catch(BusinessException e){
-            LOGGER.error(e);
-            JOptionPane.showMessageDialog(this, e.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
-        return;
-        }finally{
-           Toolkit.getDefaultToolkit().beep();
-        }
-
-        this.lblInfoGeneral.setText("Registros: "+list.size()+". Límite: "+
+            this.lblInfoGeneral.setText("Registros: "+list.size()+". Límite: "+
                 this.cmbLimit.getSelectedItem().toString());
-
-       DefaultTableModel tableModel = (DefaultTableModel) tableViewOrdersProvidersDetail.getModel();
+            
+            DefaultTableModel tableModel = (DefaultTableModel) tableViewOrdersProvidersDetail.getModel();
 
        for(DetailOrderSupplierQueryResult detail : list){
             Object fila[] = {                                          
@@ -331,8 +320,14 @@ public class ViewOrdersProviders extends javax.swing.JInternalFrame {
               tableModel.addRow(fila);
 
        }
-        
-       
+        }catch(NoDataFoundException e){
+            this.lblInfoGeneral.setText("No se han obtenido resultados :(");
+        }catch(BusinessException e){
+            LOGGER.error(e);
+            JOptionPane.showMessageDialog(this, e.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+        }finally{
+           Toolkit.getDefaultToolkit().beep();
+        }
        
    }
    

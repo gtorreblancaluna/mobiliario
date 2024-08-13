@@ -51,11 +51,16 @@ import common.model.ItemByFolioResultQuery;
 import common.model.SearchItemByFolioParams;
 import common.tables.TableItemsInventory;
 import java.awt.Image;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -94,7 +99,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
     private static TableDisponibilidadArticulosShow tablaDisponibilidadArticulos;
     private static final String POINT_AND_SPACE = ". ";
     private String pathFromUploadImage = null;
-    private TableItemsInventory tableItemsInventory;
+    private String currentPathLoadedImage = null;
+    private final TableItemsInventory tableItemsInventory;
     
 
     public InventarioForm() {
@@ -152,7 +158,42 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         UtilityCommon.setMaximum(this, PropertyConstant.MAX_WIN_INVENTORY);
         lblInfo.setText(ApplicationConstants.EMPTY_STRING);
         
+        setDropTargetInLabelImage();
+        
        
+    }
+    
+    private void setDropTargetInLabelImage () {
+        
+        lblImage.setDropTarget(new DropTarget() {
+            @Override
+            public synchronized void drop(DropTargetDropEvent dropEvent) {
+                
+                if (!dropEvent.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    dropEvent.rejectDrop();
+                    return;
+                }
+                dropEvent.acceptDrop(dropEvent.getDropAction());
+                
+                try {
+                    
+                    Transferable transferable = dropEvent.getTransferable();
+                    List<File> droppedFiles = (List<File>)
+                        transferable.getTransferData(DataFlavor.javaFileListFlavor);
+                    if (!droppedFiles.isEmpty() && droppedFiles.size() > 1) {
+                        throw new BusinessException("Ey, tranquilo, una imagen a la vez -.-");
+                    }                    
+                    dropEvent.dropComplete(true);                            
+                    readAbsolutePathAndLoadInLabelImage(droppedFiles.get(0).getAbsolutePath());
+                    
+                } catch (Exception exception) {
+                    Toolkit.getDefaultToolkit().beep();
+                    JOptionPane.showMessageDialog(
+                            null, exception.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);  
+                }
+            }
+        });
+    
     }
     
     private void fillParametersSearchByItemsByFolio () {
@@ -517,9 +558,55 @@ public class InventarioForm extends javax.swing.JInternalFrame {
 
     }
 
-    public void agregar() {
+    public void agregar() {        
+
+        try {
+
+            validateAddItemForm();
+            Articulo articulo = new Articulo();
+            CategoriaDTO categoria = (CategoriaDTO) cmb_categoria.getModel().getSelectedItem();
+            Color color = (Color) cmb_color.getModel().getSelectedItem();
+            articulo.setColor(color);
+            articulo.setCategoria(categoria);
+            articulo.setUsuarioId(iniciar_sesion.usuarioGlobal.getUsuarioId());
+            articulo.setCantidad(Float.parseFloat(txt_cantidad.getText()));
+            articulo.setDescripcion(txt_descripcion.getText());
+            articulo.setPrecioCompra(Float.parseFloat(txt_precio_compra.getText()));
+            articulo.setPrecioRenta(Float.parseFloat(txt_precio_renta.getText()));
+            articulo.setCodigo(txtCodigo.getText().trim());
+            fecha_sistema();
+            articulo.setFechaIngreso(fecha_sistema);
+            articulo.setActivo("1");
+            if (pathFromUploadImage != null){
+
+                    InputStream inputStream = new FileInputStream(new File(pathFromUploadImage));
+                    articulo.setImage(IOUtils.toByteArray(inputStream));
+
+            }
+            itemService.insertarArticulo(articulo);
+            items.add(articulo);
+            tableItemsInventory.format();
+            fillItemTable(items);
+            log.debug("se a insertado con \u00E9xito el articulo: "+articulo.getDescripcion());
+            lblInfo.setText("Se agregó el artículo: "+articulo.getDescripcion());
+
+            limpiar();
+        } catch (Exception ex) {
+            
+            JOptionPane.showMessageDialog(this,ex.getMessage(),
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(InventarioForm.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            Toolkit.getDefaultToolkit().beep();
+        }
+
+    }
+    
+    private void validateAddItemForm () throws BusinessException {
+                
+        log.debug("validaci\u00F3n exitosa para agregar articulo ");
         int cont = 0;
-        StringBuilder message = new StringBuilder();       
+        StringBuilder message = new StringBuilder();
         
         if (txt_cantidad.getText().equals(ApplicationConstants.EMPTY_STRING) 
                 || txt_descripcion.getText().equals(ApplicationConstants.EMPTY_STRING) 
@@ -527,9 +614,8 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 || txtCodigo.getText().equals(ApplicationConstants.EMPTY_STRING)
                 || cmb_categoria.getSelectedIndex() == 0 
                 || cmb_color.getSelectedIndex() == 0) {
-            
-            JOptionPane.showMessageDialog(this, "Faltan parametros", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-        } else {            
+            message.append("Faltan parametros\n");
+        } else {
             
             float cant = 0f;
             float precioRenta = 0f;
@@ -539,64 +625,30 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 precioRenta = Float.parseFloat(txt_precio_renta.getText());
                 precioCompra = Float.parseFloat(txt_precio_compra.getText());
             } catch (NumberFormatException e) {
-                message.append(++cont + "Error al formatear numero, porfavor verifica que cantidades numericas esten correctas\n");
+                message.append(++cont);
+                message.append("Error al formatear numero, porfavor verifica que cantidades numericas esten correctas\n");
             }
-            
-            if(message.toString().isEmpty() && cant < 0)
-                message.append(++cont + "Cantidad no puede ser menor a cero\n");
-            if(message.toString().isEmpty() && precioRenta < 0)
-                message.append(++cont + "Precio de renta no puede ser menor a cero\n");
-            if(!txt_descripcion.getText().equals(ApplicationConstants.EMPTY_STRING) && txt_descripcion.getText().length()>250)
-                 message.append(++cont + "La descripcion sobrepasa la longitud permitida, 250 caracteres\n");
-            
+
+            if(message.toString().isEmpty() && cant < 0){
+                message.append(++cont);
+                message.append("Cantidad no puede ser menor a cero\n");
+            }
+            if(message.toString().isEmpty() && precioRenta < 0){
+                message.append(++cont);
+                message.append("Precio de renta no puede ser menor a cero\n");
+            }
+            if(!txt_descripcion.getText().equals(ApplicationConstants.EMPTY_STRING) && txt_descripcion.getText().length()>250){
+                message.append(++cont);
+                message.append("La descripcion sobrepasa la longitud permitida, 250 caracteres\n");
+            }
             if(message.toString().isEmpty() && precioCompra < 0) {
-                message.append(++cont + "Precio de compra no puede ser menor a cero\n");
+                message.append(++cont);
+                message.append("Precio de compra no puede ser menor a cero\n");
             }
-            
-            if(!message.toString().equals(ApplicationConstants.EMPTY_STRING)){
-                JOptionPane.showMessageDialog(this, message.toString(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            log.debug("validaci\u00F3n exitosa para agregar articulo ");
-            try {
-                
-                Articulo articulo = new Articulo();
-                CategoriaDTO categoria = (CategoriaDTO) cmb_categoria.getModel().getSelectedItem();
-                Color color = (Color) cmb_color.getModel().getSelectedItem();
-                articulo.setColor(color);
-                articulo.setCategoria(categoria);
-                articulo.setUsuarioId(iniciar_sesion.usuarioGlobal.getUsuarioId());
-                articulo.setCantidad(Float.parseFloat(txt_cantidad.getText()));
-                articulo.setDescripcion(txt_descripcion.getText());
-                articulo.setPrecioCompra(Float.parseFloat(txt_precio_compra.getText()));
-                articulo.setPrecioRenta(Float.parseFloat(txt_precio_renta.getText()));
-                articulo.setCodigo(txtCodigo.getText().trim());
-                fecha_sistema();
-                articulo.setFechaIngreso(fecha_sistema);
-                articulo.setActivo("1");
-                if (pathFromUploadImage != null){
-
-                        InputStream inputStream = new FileInputStream(new File(pathFromUploadImage));
-                        articulo.setImage(IOUtils.toByteArray(inputStream));
-
-                }
-                itemService.insertarArticulo(articulo);
-                items.add(articulo);
-                tableItemsInventory.format();
-                fillItemTable(items);
-                log.debug("se a insertado con \u00E9xito el articulo: "+articulo.getDescripcion());
-                lblInfo.setText("Se agregó el artículo: "+articulo.getDescripcion());
-
-                limpiar();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, 
-                    ApplicationConstants.MESSAGE_TITLE_ERROR, 
-                        ex.getMessage(), JOptionPane.ERROR_MESSAGE);
-                Logger.getLogger(InventarioForm.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                Toolkit.getDefaultToolkit().beep();
-            }
-
+       
+        }
+        if(!message.toString().isEmpty()){
+            throw new BusinessException(message.toString());
         }
     }
     
@@ -1053,7 +1105,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
                 .addComponent(txt_precio_renta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblImage, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(111, Short.MAX_VALUE))
+                .addContainerGap(122, Short.MAX_VALUE))
         );
 
         txtSearch.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
@@ -1371,7 +1423,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 542, Short.MAX_VALUE)
+            .addGap(0, 565, Short.MAX_VALUE)
         );
 
         txtDisponibilidadFechaInicial.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
@@ -1711,7 +1763,7 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         );
         panelTableItemsByFolioLayout.setVerticalGroup(
             panelTableItemsByFolioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 485, Short.MAX_VALUE)
+            .addGap(0, 508, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
@@ -2186,26 +2238,48 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         textField.setText(UtilityCommon.onlyNumbers(textField.getText()));
     }//GEN-LAST:event_txt_cantidadKeyReleased
 
+    private void readAbsolutePathAndLoadInLabelImage (final String absolutePath) throws BusinessException {
+        
+        try {
+            UtilityCommon.validateImageFromAbsolutePath(absolutePath);
+            BufferedImage bufferedImage = ImageIO.read(new File(absolutePath));
+            Image image = bufferedImage.getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+            ImageIcon imageIcon = new ImageIcon(image);
+            lblImage.setText(ApplicationConstants.EMPTY_STRING);
+            lblImage.setIcon(imageIcon);
+            log.debug("ABSOLUTE PATH: "+absolutePath);
+            pathFromUploadImage = absolutePath;
+            currentPathLoadedImage = Path.of(absolutePath).getParent().toString();
+            log.debug("CURRENT PATH: "+currentPathLoadedImage);
+        } catch (IOException ex) {
+            lblImage.setText("Cargar imagen");
+            throw new BusinessException(ex.getMessage(),ex);            
+        } finally {
+            Toolkit.getDefaultToolkit().beep();
+        }
+    }
     
-    private void chooseImage () {
-        final String descriptionText = "Cargar imagen";
+    private void chooseImage () {        
             
-            try {
-                String absolutePath = UtilityCommon.validateAndGetAbsolutePathFromjFileChooser(this);
-                if (absolutePath == null) {
-                    return;
-                }
-                BufferedImage bufferedImage = ImageIO.read(new File(absolutePath));
-                Image image = bufferedImage.getScaledInstance(150, 150, Image.SCALE_SMOOTH);
-                ImageIcon imageIcon = new ImageIcon(image);
-                lblImage.setText(ApplicationConstants.EMPTY_STRING);
-                lblImage.setIcon(imageIcon);
-                pathFromUploadImage = absolutePath;
-            } catch (IOException | BusinessException ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);  
-                Logger.getLogger(InventarioForm.class.getName()).log(Level.SEVERE, null, ex);
-                lblImage.setText(descriptionText);
+        try {
+            
+            String absolutePath;
+            
+            if (currentPathLoadedImage != null) {                
+                absolutePath = UtilityCommon.
+                        getAbsolutePathFromjFileChooserWithCurrentDirectory(this,currentPathLoadedImage);
+            } else {
+                 absolutePath = UtilityCommon.getAbsolutePathFromjFileChooser(this);
             }
+            if (absolutePath == null) {
+                return;
+            }                
+            readAbsolutePathAndLoadInLabelImage(absolutePath);                
+
+        } catch (BusinessException ex) {
+            JOptionPane.
+                    showMessageDialog(this, ex.getMessage(), ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);                
+        }
         
     }
     

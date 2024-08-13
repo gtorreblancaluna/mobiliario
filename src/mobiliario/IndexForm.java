@@ -51,7 +51,8 @@ public class IndexForm extends javax.swing.JFrame {
         
         generalDataGlobal = systemService.getGeneralData();
         LOGGER.info(">>> datos generales obtenidos: "+generalDataGlobal);
-        this.setTitle(generalDataGlobal.getCompanyName().toUpperCase());        
+        this.setTitle(generalDataGlobal.getCompanyName().toUpperCase());      
+        
         
     }
 
@@ -297,7 +298,6 @@ public class IndexForm extends javax.swing.JFrame {
         );
 
         jToolBar1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jToolBar1.setFloatable(false);
         jToolBar1.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jToolBar1.setRollover(true);
         jToolBar1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -486,7 +486,7 @@ public class IndexForm extends javax.swing.JFrame {
         lblPuesto.setText("lblPuesto");
 
         jLabel5.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel5.setText("Versión 1.4.20240513");
+        jLabel5.setText("Versión 1.4.20240808");
 
         jLabel6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel6.setText("Contacto: L.I. Gerardo Torreblanca Luna");
@@ -562,7 +562,7 @@ public class IndexForm extends javax.swing.JFrame {
                 .addComponent(jDesktopPane1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 669, Short.MAX_VALUE)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 669, Short.MAX_VALUE)
         );
 
         pack();

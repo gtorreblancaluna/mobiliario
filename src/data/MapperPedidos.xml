@@ -298,10 +298,12 @@
             (
                 SELECT COALESCE(SUM(detalle_orden_proveedor.cantidad * detalle_orden_proveedor.precio),0)
                 FROM orden_proveedor orden_proveedor
-                    INNER JOIN detalle_orden_proveedor detalle_orden_proveedor ON (detalle_orden_proveedor.id_orden_proveedor = orden_proveedor.id)
-                WHERE orden_proveedor.id_renta = r.id_renta
-                AND orden_proveedor.fg_activo = '1'
+                    INNER JOIN detalle_orden_proveedor detalle_orden_proveedor 
+                        ON (detalle_orden_proveedor.id_orden_proveedor = orden_proveedor.id)
+                WHERE orden_proveedor.id_renta = r.id_renta 
+                AND orden_proveedor.fg_activo = '1' 
                 AND detalle_orden_proveedor.fg_activo = '1'
+                AND orden_proveedor.status <![CDATA[ <> ]]> '3' 
             ) AS total_orders_provider
         FROM renta r
             INNER JOIN estado e ON (e.id_estado = r.id_estado)
