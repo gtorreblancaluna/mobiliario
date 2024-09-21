@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="renta" pageWidth="695" pageHeight="900" columnWidth="655" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="af0ab36d-faf5-45a3-a784-d9f82f7a9acc">
-	<property name="ireport.zoom" value="2.9230756500000306"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.zoom" value="4.279675059165052"/>
+	<property name="ireport.x" value="50"/>
+	<property name="ireport.y" value="315"/>
 	<parameter name="RENTA_ID" class="java.lang.String"/>
 	<parameter name="NOMBRE_CLIENTE" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["C:\\Users\\Carlos Alberto\\Documents\\NetBeansProjects\\mobiliario\\reportes\\"]]></defaultValueExpression>
@@ -26,7 +26,8 @@ articulo.codigo AS codigo,
 detalle_renta.cantidad AS cantidad,
 CONCAT(articulo.descripcion," ",color.color) AS articulo,
 categoria.descripcion AS categoria,
-"" AS comentario
+"" AS comentario,
+articulo.image AS image_item
 FROM detalle_renta AS detalle_renta
 INNER JOIN articulo articulo ON (articulo.id_articulo = detalle_renta.id_articulo)
 INNER JOIN categoria categoria ON (categoria.id_categoria = articulo.id_categoria)
@@ -43,7 +44,8 @@ CONCAT("* ",articulo_relation.codigo) AS codigo,
 )*desglose_almacen.amount) AS cantidad,
 CONCAT(articulo_relation.descripcion," ",color_articulo_relation.color) AS articulo,
 categoria_item_relation.descripcion AS categoria,
-desglose_almacen.comment AS comentario
+desglose_almacen.comment AS comentario,
+articulo_relation.image AS image_item
 FROM desglose_almacen desglose_almacen
 INNER JOIN articulo articulo_relation ON (articulo_relation.id_articulo = desglose_almacen.item_relation_id)
 INNER JOIN categoria categoria_item_relation ON (categoria_item_relation.id_categoria = articulo_relation.id_categoria)
@@ -61,6 +63,7 @@ AND desglose_almacen.fg_active = 1
 	<field name="articulo" class="java.lang.String"/>
 	<field name="categoria" class="java.lang.String"/>
 	<field name="comentario" class="java.lang.String"/>
+	<field name="image_item" class="java.io.InputStream"/>
 	<pageHeader>
 		<band height="123">
 			<textField>
@@ -128,16 +131,16 @@ AND desglose_almacen.fg_active = 1
 	<columnHeader>
 		<band height="16">
 			<staticText>
-				<reportElement x="0" y="2" width="32" height="14" uuid="1e13b5fe-fa7e-481d-83aa-4a384e860ea7"/>
+				<reportElement x="0" y="2" width="51" height="14" uuid="1e13b5fe-fa7e-481d-83aa-4a384e860ea7"/>
 				<textElement>
-					<font fontName="Arial" size="12"/>
+					<font fontName="Arial" size="10"/>
 				</textElement>
-				<text><![CDATA[Cant.]]></text>
+				<text><![CDATA[Cant]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="86" y="2" width="402" height="14" uuid="c42a8804-092f-45b6-af5a-a5127c1539bd"/>
+				<reportElement x="111" y="2" width="377" height="14" uuid="c42a8804-092f-45b6-af5a-a5127c1539bd"/>
 				<textElement>
-					<font fontName="Arial" size="12"/>
+					<font fontName="Arial" size="10"/>
 				</textElement>
 				<text><![CDATA[Artículo]]></text>
 			</staticText>
@@ -145,65 +148,72 @@ AND desglose_almacen.fg_active = 1
 				<reportElement x="0" y="0" width="655" height="1" forecolor="#999999" uuid="0e24976b-4d00-4ad4-bb68-4ef125311120"/>
 			</line>
 			<staticText>
-				<reportElement x="41" y="2" width="45" height="14" uuid="be94d05f-d476-4186-87c3-5721003d7dfc"/>
+				<reportElement x="62" y="2" width="45" height="14" uuid="be94d05f-d476-4186-87c3-5721003d7dfc"/>
 				<textElement>
-					<font fontName="Arial" size="12"/>
+					<font fontName="Arial" size="10"/>
 				</textElement>
 				<text><![CDATA[Código]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="488" y="1" width="71" height="14" uuid="72838e99-5ae6-43b6-a309-a81dff396f4d"/>
 				<textElement>
-					<font fontName="Arial" size="12"/>
+					<font fontName="Arial" size="10"/>
 				</textElement>
 				<text><![CDATA[Categoría]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="559" y="2" width="93" height="14" uuid="6fe1eee3-3050-4e4a-b65a-f16af656545d"/>
+				<reportElement x="559" y="2" width="96" height="14" uuid="6fe1eee3-3050-4e4a-b65a-f16af656545d"/>
 				<textElement>
-					<font fontName="Arial" size="12"/>
+					<font fontName="Arial" size="10"/>
 				</textElement>
 				<text><![CDATA[Comentario]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="13" splitType="Stretch">
+		<band height="28" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="22" height="13" forecolor="#666666" uuid="cd0dc678-302e-4d48-aa9d-4788290ceeb4"/>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
+				<reportElement x="0" y="0" width="22" height="26" forecolor="#666666" uuid="cd0dc678-302e-4d48-aa9d-4788290ceeb4"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="86" y="0" width="402" height="13" forecolor="#666666" uuid="acbde3cb-1664-4020-bbee-637fbb28294e"/>
-				<textElement>
-					<font fontName="Arial"/>
+				<reportElement x="111" y="0" width="377" height="26" forecolor="#666666" uuid="acbde3cb-1664-4020-bbee-637fbb28294e"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{articulo}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="41" y="0" width="45" height="13" forecolor="#666666" uuid="d8451bc6-e583-4226-a37c-f8f91db78b8c"/>
-				<textElement>
-					<font fontName="Arial"/>
+				<reportElement x="62" y="0" width="45" height="26" forecolor="#666666" uuid="d8451bc6-e583-4226-a37c-f8f91db78b8c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="488" y="0" width="71" height="13" forecolor="#666666" uuid="e1e5e770-7e58-4a5f-a6c8-64ea7ed46577"/>
-				<textElement>
-					<font fontName="Arial"/>
+				<reportElement x="488" y="0" width="71" height="26" forecolor="#666666" uuid="e1e5e770-7e58-4a5f-a6c8-64ea7ed46577"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{categoria}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="559" y="1" width="93" height="12" forecolor="#666666" uuid="3173cfd6-0918-40c2-a99b-ea3796fff8be"/>
-				<textElement>
-					<font fontName="Arial"/>
+				<reportElement x="559" y="1" width="96" height="25" forecolor="#666666" uuid="3173cfd6-0918-40c2-a99b-ea3796fff8be"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{comentario}]]></textFieldExpression>
 			</textField>
+			<image scaleImage="FillFrame">
+				<reportElement x="28" y="1" width="29" height="25" uuid="67f4c6d8-7d71-421f-a92d-13d9942b4e54"/>
+				<imageExpression><![CDATA[$F{image_item}]]></imageExpression>
+			</image>
+			<line>
+				<reportElement x="0" y="26" width="655" height="1" forecolor="#E7E7E7" uuid="173459cc-bc7f-44dd-8bda-1410cdc53ce7"/>
+			</line>
 		</band>
 	</detail>
 	<columnFooter>
@@ -250,9 +260,6 @@ AND desglose_almacen.fg_active = 1
 				</textElement>
 				<text><![CDATA[C O M E N T A R I O S :]]></text>
 			</staticText>
-			<line>
-				<reportElement x="0" y="2" width="655" height="1" forecolor="#999999" uuid="173459cc-bc7f-44dd-8bda-1410cdc53ce7"/>
-			</line>
 			<line>
 				<reportElement x="1" y="225" width="654" height="1" forecolor="#999999" uuid="a3c0cc4f-2c07-4721-9328-062fcd2ed66f"/>
 			</line>

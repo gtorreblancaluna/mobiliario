@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporte_por_categorias" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d16cf63b-3404-463d-935c-2e064e5dbd9b">
 	<property name="ireport.zoom" value="2.357947691000032"/>
-	<property name="ireport.x" value="485"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="USUARIO_ID" class="java.lang.String"/>
 	<parameter name="RENTA_ID" class="java.lang.String"/>
@@ -22,7 +22,8 @@ articulo.codigo AS codigo,
 detalle_renta.cantidad AS cantidad,
 CONCAT(articulo.descripcion," ",color.color) AS articulo,
 categoria.descripcion AS categoria,
-"" AS comentario
+"" AS comentario,
+articulo.image AS image_item
 FROM detalle_renta AS detalle_renta
 INNER JOIN articulo articulo ON (articulo.id_articulo = detalle_renta.id_articulo)
 INNER JOIN categoria categoria ON (categoria.id_categoria = articulo.id_categoria)
@@ -40,7 +41,8 @@ CONCAT("* ",articulo_relation.codigo) AS codigo,
 )*desglose_almacen.amount) AS cantidad,
 CONCAT(articulo_relation.descripcion," ",color_articulo_relation.color) AS articulo,
 categoria_item_relation.descripcion AS categoria,
-desglose_almacen.comment AS comentario
+desglose_almacen.comment AS comentario,
+articulo_relation.image AS image_item
 FROM desglose_almacen desglose_almacen
 INNER JOIN articulo articulo_relation ON (articulo_relation.id_articulo = desglose_almacen.item_relation_id)
 INNER JOIN categoria categoria_item_relation ON (categoria_item_relation.id_categoria = articulo_relation.id_categoria)
@@ -59,6 +61,7 @@ AND desglose_almacen.fg_active = 1
 	<field name="articulo" class="java.lang.String"/>
 	<field name="categoria" class="java.lang.String"/>
 	<field name="comentario" class="java.lang.String"/>
+	<field name="image_item" class="java.io.InputStream"/>
 	<pageHeader>
 		<band height="150" splitType="Stretch">
 			<staticText>
@@ -157,7 +160,7 @@ AND desglose_almacen.fg_active = 1
 				<text><![CDATA[Cant.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="117" y="5" width="585" height="15" uuid="e06300b8-7a5a-4733-b444-ae485aad9399"/>
+				<reportElement x="144" y="5" width="571" height="15" uuid="e06300b8-7a5a-4733-b444-ae485aad9399"/>
 				<textElement>
 					<font fontName="Arial" size="12" isBold="true"/>
 				</textElement>
@@ -173,35 +176,39 @@ AND desglose_almacen.fg_active = 1
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="19" splitType="Stretch">
+		<band height="26" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="3" width="66" height="13" forecolor="#666666" uuid="5b85f887-ff8f-48fc-9ddc-43d94ab5cfa0"/>
-				<textElement verticalAlignment="Top">
+				<reportElement x="1" y="0" width="66" height="25" forecolor="#666666" uuid="5b85f887-ff8f-48fc-9ddc-43d94ab5cfa0"/>
+				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="66" y="3" width="31" height="13" forecolor="#666666" uuid="75d628e6-7d5d-440d-a30c-61e5bf7a7477"/>
-				<textElement textAlignment="Right" verticalAlignment="Top">
+				<reportElement x="66" y="0" width="31" height="25" forecolor="#666666" uuid="75d628e6-7d5d-440d-a30c-61e5bf7a7477"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="117" y="3" width="585" height="13" forecolor="#666666" uuid="b5fee8cc-4877-4774-be5c-0d7839fdb486"/>
-				<textElement verticalAlignment="Top">
+				<reportElement x="144" y="0" width="571" height="25" forecolor="#666666" uuid="b5fee8cc-4877-4774-be5c-0d7839fdb486"/>
+				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{articulo}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="715" y="3" width="87" height="13" forecolor="#666666" uuid="4159bc0e-93dd-42af-8a78-f89e1a2d366f"/>
-				<textElement verticalAlignment="Top">
+				<reportElement x="715" y="0" width="87" height="25" forecolor="#666666" uuid="4159bc0e-93dd-42af-8a78-f89e1a2d366f"/>
+				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{categoria}]]></textFieldExpression>
 			</textField>
+			<image scaleImage="FillFrame">
+				<reportElement x="109" y="0" width="29" height="25" uuid="74a12a7b-319b-4021-8985-26950a343b7b"/>
+				<imageExpression><![CDATA[$F{image_item}]]></imageExpression>
+			</image>
 		</band>
 	</detail>
 	<columnFooter>
