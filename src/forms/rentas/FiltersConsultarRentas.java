@@ -1,6 +1,20 @@
 package forms.rentas;
 
 import common.constants.ApplicationConstants;
+import common.enums.FilterConsultarRentaEnum;
+import static common.enums.FilterConsultarRentaEnum.CHANGE_STATUS_ID;
+import static common.enums.FilterConsultarRentaEnum.CHANGE_TYPE_ID;
+import static common.enums.FilterConsultarRentaEnum.CURRENT_TYPE_ID;
+import static common.enums.FilterConsultarRentaEnum.DRIVER_ID;
+import static common.enums.FilterConsultarRentaEnum.END_CREATED_DATE;
+import static common.enums.FilterConsultarRentaEnum.END_DELIVERY_DATE;
+import static common.enums.FilterConsultarRentaEnum.END_EVENT_DATE;
+import static common.enums.FilterConsultarRentaEnum.INIT_CREATED_DATE;
+import static common.enums.FilterConsultarRentaEnum.INIT_DELIVERY_DATE;
+import static common.enums.FilterConsultarRentaEnum.INIT_EVENT_DATE;
+import static common.enums.FilterConsultarRentaEnum.ORDER_STATUS_CHANGE_END_DATE;
+import static common.enums.FilterConsultarRentaEnum.ORDER_STATUS_CHANGE_INIT_DATE;
+import static common.enums.FilterConsultarRentaEnum.STATUS_ID;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.text.SimpleDateFormat;
@@ -12,27 +26,48 @@ import javax.swing.JOptionPane;
 import common.model.EstadoEvento;
 import common.model.Tipo;
 import common.model.Usuario;
-
+import java.text.ParseException;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ComboBoxModel;
+import javax.swing.JComboBox;
 
 public class FiltersConsultarRentas extends javax.swing.JDialog {
     
     private List<Tipo> typesGlobal;
     private List<EstadoEvento> statusListGlobal;
     private List<Usuario> choferes;
+    private Map<String, Object> parameters = new HashMap<>();
+    private final String FORMAT_DATE = "dd/MM/yyyy"; 
+    private final String FORMAT_DATE_QUERY = "yyyy-MM-dd";
+    private final Logger logger = Logger.getLogger(FiltersConsultarRentas.class.getName());
 
 
-    public FiltersConsultarRentas(java.awt.Frame parent, boolean modal, List<Tipo> typesGlobal, List<EstadoEvento> statusListGlobal, List<Usuario> choferes ) {
+    public FiltersConsultarRentas(
+            java.awt.Frame parent, boolean modal, 
+            List<Tipo> typesGlobal, 
+            List<EstadoEvento> statusListGlobal, 
+            List<Usuario> choferes,
+            Map<String, Object> parameters) {
         super(parent, modal);
         initComponents();
         this.typesGlobal = typesGlobal;
         this.statusListGlobal = statusListGlobal;
         this.choferes = choferes;
+        this.parameters = parameters;
         initInfo();
         addEventListener();
+        setValuesFromParams();
     }
 
     private FiltersConsultarRentas(JFrame jFrame, boolean b) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+    
+    public Map<String, Object> showDialog () {
+        setVisible(true);
+        return parameters;
     }
     
     private void addEventListener() {
@@ -635,11 +670,196 @@ public class FiltersConsultarRentas extends javax.swing.JDialog {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtEventEndDateKeyPressed
 
+    
+    private void setValuesFromParams () {
+        
+        SimpleDateFormat formatDate = new SimpleDateFormat(FORMAT_DATE);
+
+            parameters
+                .forEach((key,value) -> {
+                        System.out.println("Key: " + key + ": Value: " + value);
+                
+                if (value == null || value.equals("null")) {
+                    return;
+                }                       
+                FilterConsultarRentaEnum filter = FilterConsultarRentaEnum.searchByKey(key);
+                        
+                switch (filter) {
+                case INIT_CREATED_DATE:
+                    {
+                        try {
+                            txtCreatedInitDate.setDate((Date) formatDate.parse(String.valueOf(value)) );
+                        } catch (ParseException ex) {
+                            logger.log(Level.SEVERE,null,ex);
+                        }
+                    }
+                break;
+
+                case END_CREATED_DATE:
+                    {
+                        try {
+                            txtCreatedEndDate.setDate((Date) formatDate.parse(String.valueOf(value)) );
+                        } catch (ParseException ex) {
+                            logger.log(Level.SEVERE,null,ex);
+                        }
+                    }
+                break;
+                case TYPE:
+                    cmbEventType.getModel().setSelectedItem(
+                            new Tipo(Integer.parseInt(String.valueOf(value))));
+                break;
+                case CUSTOMER:
+                     txtCustomer.setText(String.valueOf(value));
+                break;
+                case INIT_DELIVERY_DATE:
+                    {
+                        try {
+                            txtDeliveryInitDate.setDate((Date) formatDate.parse(String.valueOf(value)) );
+                        } catch (ParseException ex) {
+                            logger.log(Level.SEVERE,null,ex);                            
+                        }
+                    }
+                break;
+                case END_DELIVERY_DATE:
+                    {
+                        try {
+                            txtDeliveryEndDate.setDate((Date) formatDate.parse(String.valueOf(value)) );
+                        } catch (ParseException ex) {
+                            logger.log(Level.SEVERE,null,ex);
+                        }
+                    }
+                    break;
+                case INIT_EVENT_DATE:
+                    {
+                        try {
+                            txtEventInitDate.setDate((Date) formatDate.parse(String.valueOf(value)) );
+                        } catch (ParseException ex) {
+                            logger.log(Level.SEVERE,null,ex);
+                        }
+                    }
+                break;
+                case END_EVENT_DATE:
+                    {
+                        try {
+                            txtEventEndDate.setDate((Date) formatDate.parse(String.valueOf(value)));
+                        } catch (ParseException ex) {
+                            logger.log(Level.SEVERE,null,ex);
+                        }
+                    }
+                break;
+                case STATUS_ID:                            
+                    setIndexComboEstadoEvento(
+                            this.cmbStatus,Integer.parseInt(String.valueOf(value)));
+                break;
+                case DRIVER_ID:
+                    setIndexComboUsuario(
+                            this.cmbDriver,Integer.parseInt(String.valueOf(value)));
+                break;                   
+                case CURRENT_STATUS_ID:
+                    setIndexComboEstadoEvento(
+                            this.cmbUpdateCurrentStatus,Integer.parseInt(String.valueOf(value)));
+                break;
+                case CHANGE_STATUS_ID:
+                    setIndexComboEstadoEvento(
+                            this.cmbUpdateChangeStatus,Integer.parseInt(String.valueOf(value)));
+                break;
+                case ORDER_STATUS_CHANGE_INIT_DATE:
+                    {
+                        try {
+                            txtUpdateStatusInit.setDate((Date) formatDate.parse(String.valueOf(value)));
+                        } catch (ParseException ex) {
+                            logger.log(Level.SEVERE,null,ex);
+                        }
+                    }
+                break;
+                case ORDER_STATUS_CHANGE_END_DATE:
+                    {
+                        try {
+                            txtUpdateStatusEnd.setDate((Date) formatDate.parse(String.valueOf(value)));
+                        } catch (ParseException ex) {
+                            logger.log(Level.SEVERE,null,ex);
+                        }
+                    }
+                break;
+                case CURRENT_TYPE_ID:
+                    setIndexComboTipo(
+                            this.cmbUpdateCurrentType,Integer.parseInt(String.valueOf(value)));
+                break;
+                case CHANGE_TYPE_ID:
+                    setIndexComboTipo(
+                            this.cmbUpdateChangeType,Integer.parseInt(String.valueOf(value)));
+                break;
+                case ORDER_TYPE_CHANGE_INIT_DATE:
+                    {
+                        try {
+                            txtUpdateTypeInit.setDate((Date) formatDate.parse(String.valueOf(value)));
+                        } catch (ParseException ex) {
+                            logger.log(Level.SEVERE,null,ex);
+                        }
+                    }
+                break;
+                case ORDER_TYPE_CHANGE_END_DATE:
+                    {
+                        try {
+                            txtUpdateTypeEnd.setDate((Date) formatDate.parse(String.valueOf(value)));
+                        } catch (ParseException ex) {
+                            logger.log(Level.SEVERE,null,ex);
+                        }
+                    }
+                break;
+                case LIMIT:
+                    cmbLimit.setSelectedItem(String.valueOf(value));
+                break;
+
+                    
+                default:
+                    break;
+            }
+                                
+        });
+        
+    }
+    
+    private void setIndexComboTipo (JComboBox<Tipo> jcombo, int valueId) {
+        ComboBoxModel model = jcombo.getModel();
+        int size = model.getSize();
+        for(int i=0;i<size;i++) {
+            Tipo tipo = (Tipo) model.getElementAt(i);
+            if (tipo.getTipoId().equals(valueId)) {
+                jcombo.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
+    
+    private void setIndexComboEstadoEvento (JComboBox<EstadoEvento> jcombo, int valueId) {
+        ComboBoxModel model = jcombo.getModel();
+        int size = model.getSize();
+        for(int i=0;i<size;i++) {
+            EstadoEvento estadoEvento = (EstadoEvento) model.getElementAt(i);
+            if (estadoEvento.getEstadoId().equals(valueId)) {
+                jcombo.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
+    
+    private void setIndexComboUsuario (JComboBox<Usuario> jcombo, int valueId) {
+        ComboBoxModel model = jcombo.getModel();
+        int size = model.getSize();
+        for(int i=0;i<size;i++) {
+            Usuario driver = (Usuario) model.getElementAt(i);
+            if (driver.getUsuarioId().equals(valueId)) {
+                jcombo.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
+    
     private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed
         try {
            
-           final String FORMAT_DATE = "dd/MM/yyyy"; 
-           final String FORMAT_DATE_QUERY = "yyyy-MM-dd"; 
+ 
            Usuario chofer = (Usuario) cmbDriver.getModel().getSelectedItem(); 
            EstadoEvento estadoEvento = (EstadoEvento) cmbStatus.getModel().getSelectedItem();
            EstadoEvento currentStatus = (EstadoEvento) cmbUpdateCurrentStatus.getModel().getSelectedItem();
@@ -647,7 +867,7 @@ public class FiltersConsultarRentas extends javax.swing.JDialog {
            Tipo eventType = (Tipo) cmbEventType.getModel().getSelectedItem();
            Tipo changeType = (Tipo) cmbUpdateChangeType.getModel().getSelectedItem();
            Tipo currentType = (Tipo) cmbUpdateCurrentType.getModel().getSelectedItem();
-           Integer limit = Integer.parseInt(cmbLimit.getSelectedItem().toString());
+           Integer limit = Integer.valueOf(cmbLimit.getSelectedItem().toString());
            String customer = txtCustomer.getText();
            String initDeliveryDate = txtDeliveryInitDate.getDate() != null ? new SimpleDateFormat(FORMAT_DATE).format(txtDeliveryInitDate.getDate()) : null;
            String endDeliveryDate = txtDeliveryEndDate.getDate() != null ? new SimpleDateFormat(FORMAT_DATE).format(txtDeliveryEndDate.getDate()) : null;
@@ -660,29 +880,29 @@ public class FiltersConsultarRentas extends javax.swing.JDialog {
            String orderTypeChangeInitDate = txtUpdateTypeInit.getDate() != null ? new SimpleDateFormat(FORMAT_DATE_QUERY).format(txtUpdateTypeInit.getDate()) + " 00:00:01" : null;
            String orderTypeChangeEndDate = txtUpdateTypeEnd.getDate() != null ? new SimpleDateFormat(FORMAT_DATE_QUERY).format(txtUpdateTypeEnd.getDate()) + " 23:59:59" : null;
            
-           Map<String, Object> parameters = new HashMap<>();
-           parameters.put("initCreatedDate", initCreatedDate);
-           parameters.put("endCreatedDate", endCreatedDate);
-           parameters.put("limit", limit);
-           parameters.put("type", eventType.getTipoId());
-           parameters.put("customer", customer);
-           parameters.put("initDeliveryDate", initDeliveryDate);
-           parameters.put("endDeliveryDate", endDeliveryDate);
-           parameters.put("initEventDate", initEventDate);
-           parameters.put("endEventDate", endEventDate);
-           parameters.put("statusId", estadoEvento.getEstadoId());
-           parameters.put("driverId", chofer.getUsuarioId());
-           parameters.put("currentStatusId", currentStatus.getEstadoId());
-           parameters.put("changeStatusId", changeStatus.getEstadoId());
-           parameters.put("orderStatusChangeInitDate", orderStatusChangeInitDate );
-           parameters.put("orderStatusChangeEndDate", orderStatusChangeEndDate);
            
-           parameters.put("currentTypeId", currentType.getTipoId());
-           parameters.put("changeTypeId", changeType.getTipoId());
-           parameters.put("orderTypeChangeInitDate", orderTypeChangeInitDate );
-           parameters.put("orderTypeChangeEndDate", orderTypeChangeEndDate);
+           parameters.put(FilterConsultarRentaEnum.INIT_CREATED_DATE.getName(), initCreatedDate);
+           parameters.put(FilterConsultarRentaEnum.END_CREATED_DATE.getName(), endCreatedDate);
+           parameters.put(FilterConsultarRentaEnum.LIMIT.getName(), limit);
+           parameters.put(FilterConsultarRentaEnum.TYPE.getName(), eventType.getTipoId());
+           parameters.put(FilterConsultarRentaEnum.CUSTOMER.getName(), customer);
+           parameters.put(FilterConsultarRentaEnum.INIT_DELIVERY_DATE.getName(), initDeliveryDate);
+           parameters.put(FilterConsultarRentaEnum.END_DELIVERY_DATE.getName(), endDeliveryDate);
+           parameters.put(FilterConsultarRentaEnum.INIT_EVENT_DATE.getName(), initEventDate);
+           parameters.put(FilterConsultarRentaEnum.END_EVENT_DATE.getName(), endEventDate);
+           parameters.put(FilterConsultarRentaEnum.STATUS_ID.getName(), estadoEvento.getEstadoId());
+           parameters.put(FilterConsultarRentaEnum.DRIVER_ID.getName(), chofer.getUsuarioId());
+           parameters.put(FilterConsultarRentaEnum.CURRENT_STATUS_ID.getName(), currentStatus.getEstadoId());
+           parameters.put(FilterConsultarRentaEnum.CHANGE_STATUS_ID.getName(), changeStatus.getEstadoId());
+           parameters.put(FilterConsultarRentaEnum.ORDER_STATUS_CHANGE_INIT_DATE.getName(), orderStatusChangeInitDate );
+           parameters.put(FilterConsultarRentaEnum.ORDER_STATUS_CHANGE_END_DATE.getName(), orderStatusChangeEndDate);
            
-           ConsultarRentas.tabla_consultar_renta(parameters);
+           parameters.put(FilterConsultarRentaEnum.CURRENT_TYPE_ID.getName(), currentType.getTipoId());
+           parameters.put(FilterConsultarRentaEnum.CHANGE_TYPE_ID.getName(), changeType.getTipoId());
+           parameters.put(FilterConsultarRentaEnum.ORDER_TYPE_CHANGE_INIT_DATE.getName(), orderTypeChangeInitDate );
+           parameters.put(FilterConsultarRentaEnum.ORDER_TYPE_CHANGE_END_DATE.getName(), orderTypeChangeEndDate);
+           
+           //ConsultarRentas.tabla_consultar_renta(parameters);
            this.dispose();
            
         } catch (Exception e) {

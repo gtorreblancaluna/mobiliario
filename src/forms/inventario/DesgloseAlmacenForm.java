@@ -561,7 +561,13 @@ public class DesgloseAlmacenForm extends javax.swing.JInternalFrame {
     private void btnShowItemsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowItemsActionPerformed
         txtAmount.requestFocus();
         AgregarArticuloDisponibilidadDialog dialog = new AgregarArticuloDisponibilidadDialog(null, true, items);
-        itemRelationId = dialog.showDialog();
+        List<Integer> itemsId = dialog.showDialog();
+        if (itemsId != null && !itemsId.isEmpty() && itemsId.size() == 1) {
+            itemRelationId = String.valueOf(items.get(0));
+        } else if (itemsId != null && !itemsId.isEmpty() && itemsId.size() > 1){
+            JOptionPane.showMessageDialog(this, "ops. Elige solo un artículo.", 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+        }
         if (itemRelationId != null) {
             Articulo itemRelation = itemService.obtenerArticuloPorId(Integer.parseInt(itemRelationId));
             cleanTextFields();

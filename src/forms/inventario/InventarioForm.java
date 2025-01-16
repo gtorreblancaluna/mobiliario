@@ -329,24 +329,20 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         
     }
     
-    public static boolean agregarArticulo (String id) {
+    public static boolean agregarArticulo (Integer id) {
         
-        Articulo articulo = itemService.obtenerArticuloPorId(Integer.parseInt(id));
         
-        if(articulo == null)
+        if (checkIfItemIdExist(id)) {
             return false;
-
-        String dato = null;
-         
-         // verificamos que el elemento no se encuentre en la lista
-        for (int i = 0; i < tablaDisponibilidadArticulos.getRowCount(); i++) {
-            dato = tablaDisponibilidadArticulos.getValueAt(i, TableDisponibilidadArticulosShow.Column.ID.getNumber()).toString();
-            System.out.println("dato seleccionado" + " " + " - " + dato + " - ");
-            if (dato.equals(String.valueOf(articulo.getArticuloId()))) {
-                 JOptionPane.showMessageDialog(null, "Ya se encuentra el elemento en la lista  ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-                 return false;
-            }
         }
+        
+        Articulo articulo = itemService.obtenerArticuloPorId(id);
+        
+        if(articulo == null){
+            return false;
+        }
+
+        
         
          DefaultTableModel temp = (DefaultTableModel) tablaDisponibilidadArticulos.getModel();
          Object fila[] = {
@@ -499,13 +495,36 @@ public class InventarioForm extends javax.swing.JInternalFrame {
         ventana.setVisible(true);
     }
     
+    private static boolean checkIfItemIdExist (Integer itemId) {
+        
+        boolean existItemId = false;
+        
+        for (int i = 0; i < tablaDisponibilidadArticulos.getRowCount(); i++) {            
+            Integer itemIdInTable = Integer.parseInt(
+                    tablaDisponibilidadArticulos.getValueAt(
+                            i, TableDisponibilidadArticulosShow.Column.ID.getNumber()).toString());
+            if (itemIdInTable.equals(itemId)) {
+                existItemId = true;
+                break;
+            }
+        }
+            
+        return existItemId;
+    }
+    
     public void mostrar_agregar_articulo() {
         if (items.isEmpty()) {
             items = itemService.obtenerArticulosActivos();
         }
         AgregarArticuloDisponibilidadDialog dialog = new AgregarArticuloDisponibilidadDialog(null, true, items);
-        String itemId = dialog.showDialog();
-        agregarArticulo(itemId);
+        List<Integer> items = dialog.showDialog();
+        
+        if (items != null) {
+            for (Integer itemId : items) {
+                agregarArticulo(itemId);
+            }
+        }
+
     }
     
      public void mostrar_ver_disponibilidad_articulos() {

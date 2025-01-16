@@ -70,7 +70,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jTabbedPane1" pref="1184" max="32767" attributes="0"/>
+              <Component id="jTabbedPane1" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -139,7 +139,6 @@
                   <SubComponents>
                     <Container class="javax.swing.JToolBar" name="jToolBar1">
                       <Properties>
-                        <Property name="floatable" type="boolean" value="false"/>
                         <Property name="rollover" type="boolean" value="true"/>
                       </Properties>
 
@@ -1021,7 +1020,6 @@
                               <SubComponents>
                                 <Container class="javax.swing.JToolBar" name="jToolBar3">
                                   <Properties>
-                                    <Property name="floatable" type="boolean" value="false"/>
                                     <Property name="orientation" type="int" value="1"/>
                                     <Property name="rollover" type="boolean" value="true"/>
                                   </Properties>
@@ -1265,7 +1263,7 @@
                                                       <EmptySpace max="-2" attributes="0"/>
                                                       <Component id="btnGetItemsFromFolio" min="-2" pref="187" max="-2" attributes="0"/>
                                                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                                      <Component id="lbl_eleccion" pref="212" max="32767" attributes="0"/>
+                                                      <Component id="lbl_eleccion" pref="218" max="32767" attributes="0"/>
                                                       <EmptySpace max="-2" attributes="0"/>
                                                       <Component id="jLabel20" min="-2" max="-2" attributes="0"/>
                                                       <EmptySpace max="-2" attributes="0"/>
@@ -1475,7 +1473,7 @@
                                               <Group type="103" groupAlignment="0" attributes="0">
                                                   <Group type="102" alignment="1" attributes="0">
                                                       <Component id="lbl_sel" min="-2" pref="551" max="-2" attributes="0"/>
-                                                      <EmptySpace pref="141" max="32767" attributes="0"/>
+                                                      <EmptySpace pref="145" max="32767" attributes="0"/>
                                                       <Component id="jLabel40" min="-2" max="-2" attributes="0"/>
                                                       <EmptySpace max="-2" attributes="0"/>
                                                       <Component id="txt_editar_cantidad" min="-2" pref="80" max="-2" attributes="0"/>
@@ -1620,7 +1618,7 @@
                                   <Layout>
                                     <DimensionLayout dim="0">
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="jScrollPane6" alignment="0" pref="889" max="32767" attributes="0"/>
+                                          <Component id="jScrollPane6" alignment="0" pref="906" max="32767" attributes="0"/>
                                       </Group>
                                     </DimensionLayout>
                                     <DimensionLayout dim="1">
@@ -1717,7 +1715,6 @@
                                   <SubComponents>
                                     <Container class="javax.swing.JToolBar" name="jToolBar4">
                                       <Properties>
-                                        <Property name="floatable" type="boolean" value="false"/>
                                         <Property name="orientation" type="int" value="1"/>
                                         <Property name="rollover" type="boolean" value="true"/>
                                       </Properties>
@@ -1881,7 +1878,7 @@
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
                                           <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="jScrollPane7" pref="1164" max="32767" attributes="0"/>
+                                          <Component id="jScrollPane7" pref="1173" max="32767" attributes="0"/>
                                       </Group>
                                   </Group>
                                 </DimensionLayout>
@@ -1931,7 +1928,7 @@
                                               <Group type="102" attributes="0">
                                                   <Component id="lblInformationOrdersProvider" min="-2" pref="404" max="-2" attributes="0"/>
                                                   <EmptySpace max="-2" attributes="0"/>
-                                                  <Component id="lblLastStatusProvider" pref="606" max="32767" attributes="0"/>
+                                                  <Component id="lblLastStatusProvider" pref="623" max="32767" attributes="0"/>
                                                   <EmptySpace max="-2" attributes="0"/>
                                                   <Component id="btnCopyOrders" min="-2" pref="39" max="-2" attributes="0"/>
                                                   <EmptySpace max="-2" attributes="0"/>
@@ -2063,7 +2060,7 @@
                       <Layout>
                         <DimensionLayout dim="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <EmptySpace min="0" pref="41" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="46" max="32767" attributes="0"/>
                               <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="1" attributes="0">
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -2087,7 +2084,6 @@
                       <SubComponents>
                         <Container class="javax.swing.JToolBar" name="jToolBar5">
                           <Properties>
-                            <Property name="floatable" type="boolean" value="false"/>
                             <Property name="orientation" type="int" value="1"/>
                             <Property name="rollover" type="boolean" value="true"/>
                           </Properties>
@@ -2504,7 +2500,6 @@
               <SubComponents>
                 <Container class="javax.swing.JToolBar" name="jToolBar2">
                   <Properties>
-                    <Property name="floatable" type="boolean" value="false"/>
                     <Property name="orientation" type="int" value="1"/>
                     <Property name="rollover" type="boolean" value="true"/>
                   </Properties>
@@ -2831,7 +2826,7 @@
                                       <Component id="check_apellidos" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="check_apodo" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="221" max="32767" attributes="0"/>
+                                      <EmptySpace min="0" pref="237" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>

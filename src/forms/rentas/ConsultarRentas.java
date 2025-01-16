@@ -9,6 +9,7 @@ import clases.sqlclass;
 import com.mysql.jdbc.MysqlDataTruncation;
 import common.constants.ApplicationConstants;
 import common.constants.PropertyConstant;
+import common.enums.FilterConsultarRentaEnum;
 import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
 import common.exceptions.DataFoundException;
@@ -149,6 +150,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private final int DELAY_SECONDS = 7_000;   
     private final static String FORMAT_HOUR = "%s%s";
     private final static String FILL_HOUR_ZERO = "0";
+    private Map<String, Object> filterConsultarRentaParams = new HashMap<>();
     
     private enum TabDetail {
         ITEMS(0),
@@ -1013,8 +1015,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 txt_abono.requestFocus();
                 id_abonos = tabla_abonos.getValueAt(tabla_abonos.getSelectedRow(), 0).toString();
                 final TipoAbono tipoAbonoSelected = new TipoAbono(
-                                                        Integer.parseInt(tabla_abonos.getValueAt(tabla_abonos.getSelectedRow(), 6).toString()), 
-                                                        tabla_abonos.getValueAt(tabla_abonos.getSelectedRow(), 5).toString()
+                    Integer.parseInt(tabla_abonos.getValueAt(tabla_abonos.getSelectedRow(), 6).toString()), 
+                    tabla_abonos.getValueAt(tabla_abonos.getSelectedRow(), 5).toString()
                 );
                 this.cmbTipoPago.getModel().setSelectedItem(tipoAbonoSelected);
                 jbtn_guardar_abonos.setEnabled(true);
@@ -2404,7 +2406,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jTabbedPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jTabbedPane1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
-        jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
         jbtn_buscar.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
@@ -2748,7 +2749,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
         });
 
-        jToolBar3.setFloatable(false);
         jToolBar3.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jToolBar3.setRollover(true);
 
@@ -2958,7 +2958,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnGetItemsFromFolio, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lbl_eleccion, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+                .addComponent(lbl_eleccion, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel20)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -3078,7 +3078,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel17Layout.createSequentialGroup()
                 .addComponent(lbl_sel, javax.swing.GroupLayout.PREFERRED_SIZE, 551, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 145, Short.MAX_VALUE)
                 .addComponent(jLabel40)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txt_editar_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -3163,14 +3163,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         panel_abonos.setLayout(panel_abonosLayout);
         panel_abonosLayout.setHorizontalGroup(
             panel_abonosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 889, Short.MAX_VALUE)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 906, Short.MAX_VALUE)
         );
         panel_abonosLayout.setVerticalGroup(
             panel_abonosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
         );
 
-        jToolBar4.setFloatable(false);
         jToolBar4.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jToolBar4.setRollover(true);
 
@@ -3325,7 +3324,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 1164, Short.MAX_VALUE))
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 1173, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3400,7 +3399,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 404, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.DEFAULT_SIZE, 606, Short.MAX_VALUE)
+                        .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.DEFAULT_SIZE, 623, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnCopyOrders, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -3438,7 +3437,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
         );
 
-        jToolBar5.setFloatable(false);
         jToolBar5.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jToolBar5.setRollover(true);
 
@@ -3522,7 +3520,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         panelToolBar5.setLayout(panelToolBar5Layout);
         panelToolBar5Layout.setHorizontalGroup(
             panelToolBar5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 41, Short.MAX_VALUE)
+            .addGap(0, 46, Short.MAX_VALUE)
             .addGroup(panelToolBar5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelToolBar5Layout.createSequentialGroup()
                     .addGap(0, 0, Short.MAX_VALUE)
@@ -3869,7 +3867,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Detalle...", jPanel4);
 
-        jToolBar2.setFloatable(false);
         jToolBar2.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jToolBar2.setRollover(true);
 
@@ -4115,7 +4112,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                         .addComponent(check_apellidos)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(check_apodo)
-                        .addGap(0, 221, Short.MAX_VALUE)))
+                        .addGap(0, 237, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel13Layout.setVerticalGroup(
@@ -4156,7 +4153,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1184, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -5295,9 +5292,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "Ocurrió un error inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE);  
         }
         
-        FiltersConsultarRentas win = new FiltersConsultarRentas(null,true,typesGlobal,statusListGlobal,choferes);
-        win.setLocationRelativeTo(this);
-        win.setVisible(true);
+        FiltersConsultarRentas win = new FiltersConsultarRentas(null,true,typesGlobal,statusListGlobal,choferes,filterConsultarRentaParams);
+        filterConsultarRentaParams = win.showDialog();
+        if (!filterConsultarRentaParams.isEmpty()) {
+            tabla_consultar_renta(filterConsultarRentaParams);
+        }
 
     }//GEN-LAST:event_jbtn_buscarActionPerformed
 
@@ -5308,10 +5307,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
         try {
             String onlyNumber = UtilityCommon.onlyNumbers(folio);
-            Integer number = Integer.parseInt(onlyNumber);
+            Integer number = Integer.valueOf(onlyNumber);
             Map<String, Object> parameters = new HashMap<>();
-            parameters.put("folio", number);
-            parameters.put("limit", 1250);
+            parameters.put(FilterConsultarRentaEnum.FOLIO.getName(), number);
+            parameters.put(FilterConsultarRentaEnum.LIMIT.getName(), 1250);
             tabla_consultar_renta(parameters);
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Folio no válido, ingresa un número válido para continuar ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
@@ -5325,13 +5324,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
         
         try {
-            Renta renta = saleService.obtenerRentaPorFolio(Integer.parseInt(folio));
+            Renta renta = saleService.obtenerRentaPorFolio(Integer.valueOf(folio));
             if (renta == null) {
                 JOptionPane.showMessageDialog(null, "No se encontró el evento con el folio ingresado ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (renta.getDetalleRenta().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "No se encontraron articulos en el evento con el folio ingresado ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "No se encontraron articulos en el evento con el folio ingresado ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
                 return;
             }
             log.info("Se ha obtenido el folio: "+ renta.getFolio() + ", para agregar los articulos a la renta.");

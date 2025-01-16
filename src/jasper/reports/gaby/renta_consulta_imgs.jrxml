@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="renta" pageWidth="695" pageHeight="900" columnWidth="655" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="af0ab36d-faf5-45a3-a784-d9f82f7a9acc">
 	<property name="ireport.zoom" value="1.948717100000007"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="480"/>
+	<property name="ireport.y" value="320"/>
 	<parameter name="id_renta" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["C:\\Users\\Carlos Alberto\\Documents\\NetBeansProjects\\mobiliario\\reportes\\"]]></defaultValueExpression>
@@ -219,7 +219,7 @@ WHERE
 			<staticText>
 				<reportElement x="103" y="0" width="132" height="15" uuid="fad16d66-40b8-4bf0-814e-3bd69238fb85"/>
 				<textElement>
-					<font fontName="Arial" size="10"/>
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<text><![CDATA[Articulo]]></text>
 			</staticText>
@@ -227,37 +227,37 @@ WHERE
 				<reportElement x="1" y="14" width="654" height="1" forecolor="#999999" uuid="b7c4dc89-02cd-42b2-bb0a-340fc285c285"/>
 			</line>
 			<textField pattern="¤ #,##0.00">
-				<reportElement x="488" y="0" width="58" height="14" uuid="ec6e579e-4181-400d-a49d-11db4ede4b45"/>
+				<reportElement x="516" y="0" width="47" height="14" uuid="ec6e579e-4181-400d-a49d-11db4ede4b45"/>
 				<textElement textAlignment="Right">
-					<font fontName="Arial" size="10"/>
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : "Precio unitario"]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00">
-				<reportElement x="546" y="0" width="56" height="14" uuid="fba17c79-f781-4025-ad50-b9321f234469"/>
+				<reportElement x="565" y="0" width="48" height="14" uuid="fba17c79-f781-4025-ad50-b9321f234469"/>
 				<textElement textAlignment="Right">
-					<font fontName="Arial" size="10"/>
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : "Descuento"]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00">
-				<reportElement x="602" y="0" width="52" height="14" uuid="02b76764-b034-4346-a66a-c8752b0e25e3"/>
+				<reportElement x="613" y="0" width="41" height="14" uuid="02b76764-b034-4346-a66a-c8752b0e25e3"/>
 				<textElement textAlignment="Right">
-					<font fontName="Arial" size="10"/>
+					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : "Importe"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : "Imp"]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="5" y="0" width="45" height="14" uuid="118e2cd5-1ab9-439d-a3ff-8178e8878fa2"/>
 				<textElement>
-					<font fontName="Arial" size="10"/>
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<text><![CDATA[Cantidad]]></text>
 			</staticText>
 			<textField pattern="¤ #,##0.00">
-				<reportElement x="443" y="0" width="45" height="14" uuid="a7a18b13-c3e2-40cb-9820-5b2a46f1c29e"/>
+				<reportElement x="411" y="0" width="105" height="14" uuid="a7a18b13-c3e2-40cb-9820-5b2a46f1c29e"/>
 				<textElement textAlignment="Right">
-					<font fontName="Arial" size="10"/>
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : "Costo reposición"]]></textFieldExpression>
 			</textField>
@@ -280,14 +280,14 @@ WHERE
 				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="488" y="0" width="58" height="25" uuid="264e5627-4980-45b0-80ac-5d111ce0ac62"/>
+				<reportElement x="516" y="0" width="47" height="25" uuid="264e5627-4980-45b0-80ac-5d111ce0ac62"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : new Float(String.valueOf($F{p_unitario}))]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="602" y="0" width="51" height="25" uuid="d10adc81-14d0-43a2-a939-04235e436e6b"/>
+				<reportElement x="613" y="0" width="40" height="25" uuid="d10adc81-14d0-43a2-a939-04235e436e6b"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
@@ -297,14 +297,14 @@ WHERE
 				<reportElement x="-1" y="25" width="654" height="1" forecolor="#CCCCCC" uuid="768c0afe-f3d5-4b57-bdf8-2c49a63267b2"/>
 			</line>
 			<textField pattern="#,##0.00">
-				<reportElement x="443" y="0" width="45" height="25" uuid="705705e9-5cbc-4e6a-9937-6d2a21162ea9"/>
+				<reportElement x="443" y="0" width="73" height="25" uuid="705705e9-5cbc-4e6a-9937-6d2a21162ea9"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : new Float(String.valueOf($F{p_compra}))]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="546" y="0" width="56" height="25" uuid="c6088cde-9e0a-4dee-a39d-4f597feccb6b"/>
+				<reportElement x="565" y="0" width="48" height="25" uuid="c6088cde-9e0a-4dee-a39d-4f597feccb6b"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
