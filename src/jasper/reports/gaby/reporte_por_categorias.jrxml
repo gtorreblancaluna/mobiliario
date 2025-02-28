@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporte_por_categorias" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d16cf63b-3404-463d-935c-2e064e5dbd9b">
-	<property name="ireport.zoom" value="2.357947691000032"/>
+	<property name="ireport.zoom" value="1.331000000000018"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="USUARIO_ID" class="java.lang.String"/>
@@ -15,6 +15,7 @@
 	<parameter name="FECHA_RECOLECCION" class="java.lang.String"/>
 	<parameter name="COMENTARIO_EVENTO" class="java.lang.String"/>
 	<parameter name="FECHA_ENTREGA" class="java.lang.String"/>
+	<parameter name="NOMBRE_ATENDIO" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT * FROM(
 SELECT
@@ -72,7 +73,7 @@ AND desglose_almacen.fg_active = 1
 				<text><![CDATA[REPORTE DE CATEGORIAS ASIGNADAS A UN USUARIO]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="144" y="18" width="329" height="20" uuid="71ffa44d-7262-4982-92cf-13ad411e7b82"/>
+				<reportElement x="144" y="18" width="327" height="20" uuid="71ffa44d-7262-4982-92cf-13ad411e7b82"/>
 				<textElement>
 					<font fontName="Arial" size="10"/>
 				</textElement>
@@ -83,7 +84,7 @@ AND desglose_almacen.fg_active = 1
 				<imageExpression><![CDATA[$P{URL_IMAGEN}]]></imageExpression>
 			</image>
 			<textField>
-				<reportElement x="473" y="18" width="301" height="20" uuid="9b2895fb-dcf3-48b4-bcdc-9b35f3e36f05"/>
+				<reportElement x="473" y="18" width="329" height="20" uuid="9b2895fb-dcf3-48b4-bcdc-9b35f3e36f05"/>
 				<textElement>
 					<font fontName="Arial" size="10"/>
 				</textElement>
@@ -97,7 +98,7 @@ AND desglose_almacen.fg_active = 1
 				<textFieldExpression><![CDATA["Lugar evento: "+$P{DESCRIPCION_EVENTO}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="144" y="38" width="329" height="20" uuid="b023467c-fe63-4821-aff2-2946e73f8253"/>
+				<reportElement x="144" y="38" width="327" height="20" uuid="b023467c-fe63-4821-aff2-2946e73f8253"/>
 				<textElement>
 					<font fontName="Arial"/>
 				</textElement>
@@ -118,7 +119,7 @@ AND desglose_almacen.fg_active = 1
 				<textFieldExpression><![CDATA["Fecha entrega: "+$P{FECHA_ENTREGA}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="144" y="58" width="643" height="20" uuid="5f4e3376-f2a7-4bbb-b0f1-ba50164f748f"/>
+				<reportElement x="473" y="58" width="329" height="20" uuid="5f4e3376-f2a7-4bbb-b0f1-ba50164f748f"/>
 				<textElement>
 					<font fontName="Arial"/>
 				</textElement>
@@ -138,6 +139,13 @@ AND desglose_almacen.fg_active = 1
 				</textElement>
 				<text><![CDATA[* Desglose de almacen por artículo]]></text>
 			</staticText>
+			<textField>
+				<reportElement x="144" y="58" width="327" height="20" uuid="74c4ef3d-ab39-4f4f-af6c-7f95b9a88de7"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Atendió: "+$P{NOMBRE_ATENDIO}]]></textFieldExpression>
+			</textField>
 		</band>
 	</pageHeader>
 	<columnHeader>
@@ -212,7 +220,7 @@ AND desglose_almacen.fg_active = 1
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="49" splitType="Stretch">
+		<band height="92" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="0" width="190" height="20" uuid="e4cd07fb-6f2b-4265-b352-134f93a7a49e"/>
 				<textElement>
@@ -221,7 +229,7 @@ AND desglose_almacen.fg_active = 1
 				<text><![CDATA[C O M E N T A R I O S :]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="0" y="20" width="802" height="25" uuid="74ae1d67-43f8-4cb3-9ac7-8aab2af00ec9"/>
+				<reportElement x="0" y="20" width="802" height="72" uuid="74ae1d67-43f8-4cb3-9ac7-8aab2af00ec9"/>
 				<textElement>
 					<font fontName="Arial" size="10"/>
 				</textElement>

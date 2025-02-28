@@ -318,3 +318,21 @@ ALTER TABLE clientes ADD COLUMN updated_at TIMESTAMP NULL DEFAULT NULL AFTER act
 
 -- 2024-jul-10
 ALTER TABLE articulo ADD COLUMN image BLOB NULL DEFAULT NULL;
+
+
+-- 2025-enero-16
+UPDATE tipo SET tipo='Renta' WHERE id_tipo = 1;
+UPDATE tipo SET tipo='Venta' WHERE id_tipo = 3;
+
+-- 2025-enero-16
+ALTER TABLE detalle_orden_proveedor ADD COLUMN id_proveedores INT(11) NOT NULL DEFAULT 1 AFTER tipo_orden_detalle_proveedor_id, 
+ADD FOREIGN KEY fk_detalle_orden_proveedor(id_proveedores) REFERENCES proveedores(id) ON DELETE CASCADE;
+
+-- 2025-enero-16 - Para obtener el detalle de pagos por proveedor y detalle de proveedor
+ALTER TABLE pagos_proveedor ADD COLUMN id_proveedor INT(11) NOT NULL DEFAULT 1 AFTER actualizado, 
+ADD FOREIGN KEY fk_pagos_proveedor_id_proveedor_id(id_proveedor) REFERENCES proveedores(id) ON DELETE CASCADE;
+
+ALTER TABLE datos_generales ADD COLUMN info_summary_folio_venta VARCHAR(9028) DEFAULT NULL;
+
+-- 20-febrero-2025
+ALTER TABLE orden_proveedor ADD COLUMN fecha_bodega TIMESTAMP NULL DEFAULT NULL AFTER comentario;

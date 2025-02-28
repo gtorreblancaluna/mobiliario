@@ -164,7 +164,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
     }
 
     public void conectar() {
-        // conexion.setIp(IpServer);
+
           try {        
             conexion.conectate();
         } catch (SQLException e) {
@@ -180,6 +180,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
         this.txtAdress.setText(datosGenerales.getAddress1());
         this.txtTels.setText(datosGenerales.getAddress2());
         txtInfoPDFSummary.setText(datosGenerales.getInfoSummaryFolio());
+        txtInfoPDFSummaryVenta.setText(datosGenerales.getInfoSummaryFolioVenta());
         
         this.txtCompanyName.setEnabled(false);
         this.txtAdress.setEnabled(false);
@@ -187,6 +188,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
         this.btnSave.setEnabled(false);
         this.btnEdit.setEnabled(true);
         txtInfoPDFSummary.setEnabled(false);
+        txtInfoPDFSummaryVenta.setEnabled(false);
         
     }
     
@@ -402,6 +404,10 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         txtInfoPDFSummary = new javax.swing.JTextArea();
         btnEditPdfSummary = new javax.swing.JButton();
+        jPanel11 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        txtInfoPDFSummaryVenta = new javax.swing.JTextArea();
+        btnEditPdfSummaryVenta = new javax.swing.JButton();
         panelLookAndFeel = new javax.swing.JPanel();
         panelInnerLookAndFeel = new javax.swing.JPanel();
 
@@ -433,7 +439,6 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 10, -1, -1));
         jLabel1.getAccessibleContext().setAccessibleName("Folio:asd");
 
-        jToolBar1.setFloatable(false);
         jToolBar1.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jToolBar1.setRollover(true);
 
@@ -595,7 +600,6 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
         });
         panel_enviar_prueba.add(Jbnt_enviar_prueba, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 210, 100, 25));
 
-        jToolBar2.setFloatable(false);
         jToolBar2.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jToolBar2.setRollover(true);
 
@@ -641,7 +645,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
                 .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panel_enviar_prueba, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panel_enviar_prueba, javax.swing.GroupLayout.DEFAULT_SIZE, 919, Short.MAX_VALUE)
                     .addComponent(subPanel_configuracion_email, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -650,7 +654,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(subPanel_configuracion_email, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -672,7 +676,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 751, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1018, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -879,7 +883,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(416, Short.MAX_VALUE))
+                .addContainerGap(690, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -888,7 +892,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
                 .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(275, Short.MAX_VALUE))
+                .addContainerGap(273, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Comportamiento del sistema", jPanel7);
@@ -915,7 +919,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 751, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1018, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnEditPdfSummary)))
@@ -932,6 +936,47 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Info PDF resumen", jPanel8);
 
+        txtInfoPDFSummaryVenta.setColumns(20);
+        txtInfoPDFSummaryVenta.setFont(new java.awt.Font("Arial", 0, 9)); // NOI18N
+        txtInfoPDFSummaryVenta.setRows(5);
+        jScrollPane3.setViewportView(txtInfoPDFSummaryVenta);
+
+        btnEditPdfSummaryVenta.setText("Editar");
+        btnEditPdfSummaryVenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditPdfSummaryVentaActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
+        jPanel11.setLayout(jPanel11Layout);
+        jPanel11Layout.setHorizontalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel11Layout.createSequentialGroup()
+                .addContainerGap(948, Short.MAX_VALUE)
+                .addComponent(btnEditPdfSummaryVenta)
+                .addContainerGap())
+            .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel11Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 1018, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+        jPanel11Layout.setVerticalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel11Layout.createSequentialGroup()
+                .addContainerGap(482, Short.MAX_VALUE)
+                .addComponent(btnEditPdfSummaryVenta)
+                .addContainerGap())
+            .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel11Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 471, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(38, Short.MAX_VALUE)))
+        );
+
+        jTabbedPane1.addTab("Info Venta PDF resumen ", jPanel11);
+
         panelInnerLookAndFeel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 panelInnerLookAndFeelMouseClicked(evt);
@@ -942,7 +987,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
         panelInnerLookAndFeel.setLayout(panelInnerLookAndFeelLayout);
         panelInnerLookAndFeelLayout.setHorizontalGroup(
             panelInnerLookAndFeelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 751, Short.MAX_VALUE)
+            .addGap(0, 1018, Short.MAX_VALUE)
         );
         panelInnerLookAndFeelLayout.setVerticalGroup(
             panelInnerLookAndFeelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -968,7 +1013,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Apariencia", panelLookAndFeel);
 
-        jPanel2.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 780, 550));
+        jPanel2.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 1030, 550));
         jTabbedPane1.getAccessibleContext().setAccessibleName("Folio");
         jTabbedPane1.getAccessibleContext().setAccessibleDescription("Folio");
 
@@ -1384,6 +1429,25 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_panelInnerLookAndFeelMouseClicked
 
+    private void btnEditPdfSummaryVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditPdfSummaryVentaActionPerformed
+        String textButton = btnEditPdfSummaryVenta.getText();
+        if (textButton.equals("Editar")) {
+            txtInfoPDFSummaryVenta.setEnabled(true);
+            btnEditPdfSummaryVenta.setText("Actualizar");
+        } else {
+            DatosGenerales data = new DatosGenerales();
+            data.setInfoSummaryFolioVenta(txtInfoPDFSummaryVenta.getText().trim());
+            try {
+                systemService.updateInfoPDFSummaryVenta(data);
+                JOptionPane.showMessageDialog(this, "Se actualizó con éxito, cierra y abre de nuevo el sistema para ver los cambios.", "ATENCIÓN", JOptionPane.INFORMATION_MESSAGE);
+            } catch (DataOriginException e) {
+                JOptionPane.showMessageDialog(this, e,ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+            }
+            btnEditPdfSummaryVenta.setText("Editar");
+            txtInfoPDFSummaryVenta.setEnabled(false);
+        }
+    }//GEN-LAST:event_btnEditPdfSummaryVentaActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Jbnt_enviar_prueba;
@@ -1392,6 +1456,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
     private javax.swing.JButton Jbtn_guardar_email;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnEditPdfSummary;
+    private javax.swing.JButton btnEditPdfSummaryVenta;
     private javax.swing.JButton btnSave;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox checkGenerateTaskAlmacen;
@@ -1419,6 +1484,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel99;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -1430,6 +1496,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane21;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
@@ -1445,6 +1512,7 @@ public class SystemSettingsForm extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtAdress;
     private javax.swing.JTextField txtCompanyName;
     private javax.swing.JTextArea txtInfoPDFSummary;
+    private javax.swing.JTextArea txtInfoPDFSummaryVenta;
     private javax.swing.JTextField txtTels;
     public static javax.swing.JTextField txt_asunto;
     public static javax.swing.JPasswordField txt_contraseña_email;

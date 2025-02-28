@@ -9,7 +9,7 @@ import forms.rentas.AgregarRenta;
 import forms.rentas.ConsultarRentas;
 import forms.contabilidad.ContabilidadForm;
 import forms.material.inventory.MaterialInventoryView;
-import forms.proveedores.ViewOrdersProviders;
+import common.form.provider.ViewOrdersProviders;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +19,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import static mobiliario.iniciar_sesion.usuarioGlobal;
 import common.model.DatosGenerales;
+import java.net.URISyntaxException;
 import services.SystemService;
 import utilities.Utility;
 
@@ -102,10 +103,14 @@ public class IndexForm extends javax.swing.JFrame {
              if(!Utility.showWindowDataUpdateSession()){
                 return;
             }
-            viewOrdersProviders = new ViewOrdersProviders();
-            viewOrdersProviders.setLocation(this.getWidth() / 2 - viewOrdersProviders.getWidth() / 2, this.getHeight() / 2 - viewOrdersProviders.getHeight() / 2 - 20);
-            jDesktopPane1.add(viewOrdersProviders);
-            viewOrdersProviders.show();
+            try{
+                viewOrdersProviders = new ViewOrdersProviders(usuarioGlobal,generalDataGlobal,jDesktopPane1,Utility.getPathLocation());                
+                jDesktopPane1.add(viewOrdersProviders);
+                viewOrdersProviders.show();
+            } catch (URISyntaxException uRISyntaxException) {
+                JOptionPane.showMessageDialog(
+                        this, uRISyntaxException);
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Ahi ta la ventana =)");
         }
@@ -486,7 +491,7 @@ public class IndexForm extends javax.swing.JFrame {
         lblPuesto.setText("lblPuesto");
 
         jLabel5.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel5.setText("Versión 1.4.20240925");
+        jLabel5.setText("Versión 1.4.20250228");
 
         jLabel6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel6.setText("Contacto: L.I. Gerardo Torreblanca Luna");

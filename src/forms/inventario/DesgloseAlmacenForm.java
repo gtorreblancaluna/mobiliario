@@ -563,7 +563,7 @@ public class DesgloseAlmacenForm extends javax.swing.JInternalFrame {
         AgregarArticuloDisponibilidadDialog dialog = new AgregarArticuloDisponibilidadDialog(null, true, items);
         List<Integer> itemsId = dialog.showDialog();
         if (itemsId != null && !itemsId.isEmpty() && itemsId.size() == 1) {
-            itemRelationId = String.valueOf(items.get(0));
+            itemRelationId = String.valueOf(itemsId.get(0));
         } else if (itemsId != null && !itemsId.isEmpty() && itemsId.size() > 1){
             JOptionPane.showMessageDialog(this, "ops. Elige solo un artículo.", 
                     ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);

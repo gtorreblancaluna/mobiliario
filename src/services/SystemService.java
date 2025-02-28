@@ -55,5 +55,9 @@ public class SystemService {
         systemDao.updateInfoPDFSummary(datosGenerales);
     }
     
+    public void updateInfoPDFSummaryVenta(DatosGenerales datosGenerales) throws DataOriginException{
+        systemDao.updateInfoPDFSummaryVenta(datosGenerales);
+    }
+    
     
 }

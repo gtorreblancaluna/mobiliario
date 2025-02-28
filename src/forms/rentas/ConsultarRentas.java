@@ -16,7 +16,7 @@ import common.exceptions.DataFoundException;
 import common.exceptions.DataOriginException;
 import common.exceptions.NoDataFoundException;
 import forms.material.inventory.GenerateReportMaterialSaleItemsView;
-import forms.proveedores.OrderProviderForm;
+import common.form.provider.OrderProviderForm;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -80,7 +80,7 @@ import common.services.TaskAlmacenUpdateService;
 import common.services.TaskDeliveryChoferUpdateService;
 import common.utilities.CheckBoxHeader;
 import common.utilities.ItemListenerHeaderCheckbox;
-import forms.proveedores.ProviderStatusBitacoraDialog;
+import common.form.provider.ProviderStatusBitacoraDialog;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.font.TextAttribute;
@@ -96,6 +96,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URISyntaxException;
 import javax.swing.JTextField;
 import utilities.OptionPaneService;
 import utilities.dtos.ResultDataShowByDeliveryOrReturnDate;
@@ -200,6 +201,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         saleService = SaleService.getInstance();
         itemService = ItemService.getInstance();
         providerStatusBitacoraService = ProviderStatusBitacoraService.getInstance();
+        
        
         
         jTabbedPane1.setEnabledAt(1, false);
@@ -208,6 +210,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jbtn_guardar_abonos.setEnabled(false);
         txt_subtotal.setEnabled(false);
         txt_subtotal.setHorizontalAlignment(SwingConstants.RIGHT);
+        txtPorcentajeDescuento.setHorizontalAlignment(SwingConstants.RIGHT);
         txt_faltantes.setEnabled(false);
         txt_abonos.setEnabled(false);
         txt_descuento.setEnabled(false);
@@ -252,10 +255,16 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     String folio = tableViewOrdersProviders.
                             getValueAt(tableViewOrdersProviders.getSelectedRow(), 
                                     TableViewOrdersProviders.Column.FOLIO_RENTA.getNumber()).toString();
-
-                    orderProviderForm = new OrderProviderForm(folio, orderId, rentaId);
-                    IndexForm.jDesktopPane1.add(orderProviderForm);
-                    orderProviderForm.show();
+                    try {
+                        orderProviderForm = new OrderProviderForm(
+                                folio, orderId, rentaId,iniciar_sesion.usuarioGlobal, systemService.getGeneralData(),Utility.getPathLocation(),
+                        IndexForm.jDesktopPane1);
+                        IndexForm.jDesktopPane1.add(orderProviderForm);
+                        orderProviderForm.show();
+                    } catch (URISyntaxException uRISyntaxException) {
+                        JOptionPane.showMessageDialog(
+                                null, uRISyntaxException);
+                    }
                 }
             }
         });
@@ -275,6 +284,18 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     }
     
     private void eventListenerTextHourFields () {
+        
+        txtPorcentajeDescuento.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent evt) {
+                if (evt.getKeyCode() == KeyEvent.VK_ENTER ) {
+                    total();
+                } else {
+                    JTextField textField = (JTextField) evt.getSource();                
+                    txtPorcentajeDescuento.setText(UtilityCommon.onlyNumbersAndPoint(textField.getText()));
+                }
+            }
+        });
         
         txtEndReturnHour.addKeyListener(new KeyAdapter() {
             @Override
@@ -462,10 +483,15 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     
      public void mostrar_agregar_orden_proveedor(String folio, String orderId, String rentaId) {
        if (UtilityCommon.verifyIfInternalFormIsOpen(orderProviderForm,IndexForm.jDesktopPane1)) {
-            orderProviderForm = new OrderProviderForm(folio, orderId, rentaId);
-            orderProviderForm.setLocation(this.getWidth() / 2 - orderProviderForm.getWidth() / 2, this.getHeight() / 2 - orderProviderForm.getHeight() / 2 - 20);
-            IndexForm.jDesktopPane1.add(orderProviderForm);
-            orderProviderForm.show();
+           try{
+                orderProviderForm = new OrderProviderForm(folio, orderId, rentaId,iniciar_sesion.usuarioGlobal, systemService.getGeneralData(),Utility.getPathLocation(),
+                IndexForm.jDesktopPane1);
+                IndexForm.jDesktopPane1.add(orderProviderForm);
+                orderProviderForm.show();
+            } catch (URISyntaxException uRISyntaxException) {
+                        JOptionPane.showMessageDialog(
+                                null, uRISyntaxException);
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Ahi ta la ventana =)");
         }
@@ -1185,6 +1211,17 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     
     public void actualizar_renta() {
         
+        if (!txtPorcentajeDescuento.getText().isEmpty()) {            
+            try {
+                UtilityCommon.validatePorcentajeDescuento(txtPorcentajeDescuento.getText());
+            } catch (BusinessException businessException) {
+                JOptionPane.showMessageDialog(this, "ERROR en PORCENTAJE DE DESCUENTO.\n"+ businessException.getMessage(), 
+                        ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+                            
+        }
+        
         if (cmb_fecha_entrega.getDate() == null) {
             JOptionPane.showMessageDialog(null, "Falta fecha de entrega ", "Error", JOptionPane.INFORMATION_MESSAGE);
         } else if (cmb_fecha_devolucion.getDate() == null) {
@@ -1352,14 +1389,26 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         
         String porcentajeDescuentoRenta;
         String cantidadDescuento;
-        if (!txt_descuento.getText().equals("") && !txtPorcentajeDescuento.getText().equals("")) {
-            cantidadDescuento = EliminaCaracteres(txt_descuento.getText(), "$");
-            cantidadDescuento = cantidadDescuento.replaceAll(",", "");
-            porcentajeDescuentoRenta = this.txtPorcentajeDescuento.getText()+"";
+        if (!txt_descuento.getText().isEmpty() && !txtPorcentajeDescuento.getText().isEmpty()) {
+            cantidadDescuento = UtilityCommon.onlyNumbers(txt_descuento.getText());
+            porcentajeDescuentoRenta = UtilityCommon.onlyNumbersAndPoint(this.txtPorcentajeDescuento.getText());
         } else {
             porcentajeDescuentoRenta = "0";
             cantidadDescuento = "0";
         }
+        
+        try {
+            Float.valueOf(porcentajeDescuentoRenta);
+        } catch (NumberFormatException numberFormatException) {
+            JOptionPane.showMessageDialog(this, "Ingresa un número válido para el 'PORCENTAJE DE DESCUENTO'.\n"
+                    + "Valor invalido: "+porcentajeDescuentoRenta, 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+                txtPorcentajeDescuento.requestFocus();
+                txtPorcentajeDescuento.selectAll();
+                throw new BusinessException("Ingresa un número válido para el 'PORCENTAJE DE DESCUENTO'");
+        }
+             
+        
         String iva;
         if (!txt_iva.getText().equals("")) {
             iva = EliminaCaracteres(txt_iva.getText(), "$");
@@ -1442,6 +1491,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             }
         }).start();
         disableEvent();
+        total();
     }
     
     private void checkNewItemsAndUpdateRenta () {
@@ -2316,7 +2366,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         btnReportPdfWithImages = new javax.swing.JButton();
         panelTotales = new javax.swing.JPanel();
         txt_subtotal = new javax.swing.JTextField();
-        txtPorcentajeDescuento = new javax.swing.JFormattedTextField();
         txt_descuento = new javax.swing.JTextField();
         txt_envioRecoleccion = new javax.swing.JTextField();
         txt_depositoGarantia = new javax.swing.JTextField();
@@ -2335,6 +2384,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         jLabel48 = new javax.swing.JLabel();
+        txtPorcentajeDescuento = new javax.swing.JTextField();
         jPanel9 = new javax.swing.JPanel();
         jToolBar2 = new javax.swing.JToolBar();
         jbtn_nuevo_cliente = new javax.swing.JButton();
@@ -2588,7 +2638,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(lblInformation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1179, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1196, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2885,11 +2935,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jPanel12.setLayout(jPanel12Layout);
         jPanel12Layout.setHorizontalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(jPanel12Layout.createSequentialGroup()
+                .addComponent(jScrollPane4)
+                .addContainerGap())
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
         );
 
         txt_buscar.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 12)); // NOI18N
@@ -2958,7 +3010,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnGetItemsFromFolio, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lbl_eleccion, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
+                .addComponent(lbl_eleccion, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel20)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -2990,8 +3042,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         panel_articulos.setLayout(panel_articulosLayout);
         panel_articulosLayout.setHorizontalGroup(
             panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel15, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(panel_articulosLayout.createSequentialGroup()
+                .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         panel_articulosLayout.setVerticalGroup(
             panel_articulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3027,11 +3081,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jPanel16.setLayout(jPanel16Layout);
         jPanel16Layout.setHorizontalGroup(
             jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(jPanel16Layout.createSequentialGroup()
+                .addComponent(jScrollPane5)
+                .addContainerGap())
         );
         jPanel16Layout.setVerticalGroup(
             jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
         );
 
         jLabel40.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
@@ -3078,7 +3134,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel17Layout.createSequentialGroup()
                 .addComponent(lbl_sel, javax.swing.GroupLayout.PREFERRED_SIZE, 551, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 145, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 138, Short.MAX_VALUE)
                 .addComponent(jLabel40)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txt_editar_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -3109,8 +3165,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         panel_conceptos.setLayout(panel_conceptosLayout);
         panel_conceptosLayout.setHorizontalGroup(
             panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_conceptosLayout.createSequentialGroup()
+                .addGroup(panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel16, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         panel_conceptosLayout.setVerticalGroup(
             panel_conceptosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3129,11 +3188,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addComponent(jToolBar3, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPaneItems))
+                .addComponent(jTabbedPaneItems)
+                .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPaneItems, javax.swing.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE)
+            .addComponent(jTabbedPaneItems, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addComponent(jToolBar3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -3163,11 +3223,11 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         panel_abonos.setLayout(panel_abonosLayout);
         panel_abonosLayout.setHorizontalGroup(
             panel_abonosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 906, Short.MAX_VALUE)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 911, Short.MAX_VALUE)
         );
         panel_abonosLayout.setVerticalGroup(
             panel_abonosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE)
         );
 
         jToolBar4.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -3324,13 +3384,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 1173, Short.MAX_VALUE))
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 1178, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE))
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("Comentarios", jPanel11);
@@ -3386,7 +3446,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         );
         panelOrderProvidersTableLayout.setVerticalGroup(
             panelOrderProvidersTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 348, Short.MAX_VALUE)
+            .addGap(0, 346, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -3399,7 +3459,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(lblInformationOrdersProvider, javax.swing.GroupLayout.PREFERRED_SIZE, 404, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.DEFAULT_SIZE, 623, Short.MAX_VALUE)
+                        .addComponent(lblLastStatusProvider, javax.swing.GroupLayout.DEFAULT_SIZE, 628, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnCopyOrders, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -3430,11 +3490,13 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane2)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addComponent(jTabbedPane2)
+                .addContainerGap())
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
+            .addComponent(jTabbedPane2)
         );
 
         jToolBar5.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -3520,11 +3582,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         panelToolBar5.setLayout(panelToolBar5Layout);
         panelToolBar5Layout.setHorizontalGroup(
             panelToolBar5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 46, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
             .addGroup(panelToolBar5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelToolBar5Layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(jToolBar5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jToolBar5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(40, 40, 40)))
         );
         panelToolBar5Layout.setVerticalGroup(
             panelToolBar5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3532,24 +3595,10 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
             .addGroup(panelToolBar5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panelToolBar5Layout.createSequentialGroup()
                     .addComponent(jToolBar5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+                    .addGap(0, 30, Short.MAX_VALUE)))
         );
 
         txt_subtotal.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-
-        txtPorcentajeDescuento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        txtPorcentajeDescuento.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtPorcentajeDescuento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        txtPorcentajeDescuento.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtPorcentajeDescuentoFocusLost(evt);
-            }
-        });
-        txtPorcentajeDescuento.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtPorcentajeDescuentoKeyPressed(evt);
-            }
-        });
 
         txt_descuento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
@@ -3618,88 +3667,92 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jLabel48.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel48.setText("Faltantes:");
 
+        txtPorcentajeDescuento.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+
         javax.swing.GroupLayout panelTotalesLayout = new javax.swing.GroupLayout(panelTotales);
         panelTotales.setLayout(panelTotalesLayout);
         panelTotalesLayout.setHorizontalGroup(
             panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTotalesLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel48, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panelTotalesLayout.createSequentialGroup()
-                        .addGap(1, 1, 1)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel48, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(panelTotalesLayout.createSequentialGroup()
+                                .addGap(1, 1, 1)
+                                .addComponent(jLabel42, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(panelTotalesLayout.createSequentialGroup()
+                        .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel41, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel42, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                            .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txt_abonos)
-                    .addComponent(txt_faltantes)
                     .addComponent(txt_total)
+                    .addComponent(txt_faltantes)
+                    .addComponent(txt_abonos)
                     .addComponent(txt_calculo)
+                    .addComponent(txt_subtotal)
                     .addGroup(panelTotalesLayout.createSequentialGroup()
                         .addComponent(txtPorcentajeDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(txt_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_descuento))
                     .addComponent(txt_envioRecoleccion)
                     .addComponent(txt_depositoGarantia)
                     .addGroup(panelTotalesLayout.createSequentialGroup()
                         .addComponent(txt_iva, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
-                        .addComponent(txt_total_iva, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(txt_subtotal))
+                        .addComponent(txt_total_iva, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         panelTotalesLayout.setVerticalGroup(
             panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTotalesLayout.createSequentialGroup()
-                .addGap(0, 10, Short.MAX_VALUE)
-                .addComponent(txt_subtotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtPorcentajeDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txt_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addComponent(txt_envioRecoleccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(txt_depositoGarantia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txt_iva, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txt_total_iva, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txt_calculo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(txt_abonos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(txt_faltantes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(txt_total, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGroup(panelTotalesLayout.createSequentialGroup()
-                .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelTotalesLayout.createSequentialGroup()
+                        .addComponent(txt_subtotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txt_descuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtPorcentajeDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txt_envioRecoleccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel41, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, 0)
+                        .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txt_depositoGarantia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel42, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(txt_iva, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txt_total_iva, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txt_calculo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, 0)
+                        .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txt_abonos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(panelTotalesLayout.createSequentialGroup()
                         .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(jLabel41, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(jLabel42, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(jLabel48, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panelTotalesLayout.createSequentialGroup()
-                        .addGap(167, 167, 167)
-                        .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(34, 34, 34)))
+                .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel48, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_faltantes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelTotalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txt_total, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 6, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout panel_datos_generalesLayout = new javax.swing.GroupLayout(panel_datos_generales);
@@ -3756,9 +3809,14 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                                 .addComponent(jLabel31, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(cmb_chofer, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(12, 12, 12)
+                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(panel_datos_generalesLayout.createSequentialGroup()
-                        .addGap(12, 12, 12)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmb_tipo, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(322, 322, 322))
+                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
                         .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(panel_datos_generalesLayout.createSequentialGroup()
                                 .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -3775,16 +3833,12 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                             .addComponent(lblCreationDate, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lbl_folio, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lbl_cliente, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_atiende, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
-                        .addGap(13, 13, 13)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_atiende, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmb_tipo, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(panelTotales, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelToolBar5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(panelTotales, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                .addComponent(panelToolBar5, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         panel_datos_generalesLayout.setVerticalGroup(
@@ -3858,11 +3912,15 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panel_datos_generales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(panel_datos_generales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panel_datos_generales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(panel_datos_generales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("Detalle...", jPanel4);
@@ -4112,7 +4170,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                         .addComponent(check_apellidos)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(check_apodo)
-                        .addGap(0, 237, Short.MAX_VALUE)))
+                        .addGap(0, 254, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel13Layout.setVerticalGroup(
@@ -4226,7 +4284,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 orden.getId(),
                 orden.getRenta().getFolio(),
                 orden.getUsuario().getNombre()+" "+orden.getUsuario().getApellidos(),
-                orden.getProveedor().getNombre()+" "+orden.getProveedor().getApellidos(),
                 orden.getStatusDescription(),
                 orden.getCreado(),
                 orden.getActualizado(),
@@ -4235,7 +4292,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
                 decimalFormat.format(orden.getTotal()),
                 decimalFormat.format(orden.getAbonos()),
                 decimalFormat.format((orden.getTotal() - orden.getAbonos())),
-                orden.getRenta().getFechaEvento()
+                orden.getRenta().getFechaEvento(),
+                orden.getFechaEnBodega()
               };
               tableModel.addRow(fila);
             }
@@ -4997,25 +5055,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_txt_porcentaje_descuentoKeyPressed
 
-    private void txtPorcentajeDescuentoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPorcentajeDescuentoFocusLost
-        // TODO add your handling code here:
-        if (txtPorcentajeDescuento.getText().equals("")) {
-            txtPorcentajeDescuento.setText("0");
-        }
-    }//GEN-LAST:event_txtPorcentajeDescuentoFocusLost
-
-    private void txtPorcentajeDescuentoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPorcentajeDescuentoKeyPressed
-        if (evt.getKeyCode() == 10) {
-            if (txt_subtotal.getText().equals("")) {
-                JOptionPane.showMessageDialog(null, "Es necesario incluir subtotal para realizar el calculo", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-                Toolkit.getDefaultToolkit().beep();
-            } else {
-                total();
-                Toolkit.getDefaultToolkit().beep();
-            }
-        }
-    }//GEN-LAST:event_txtPorcentajeDescuentoKeyPressed
-
     private void jbtn_generar_reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jbtn_generar_reporteMouseClicked
         // TODO add your handling code here:
     }//GEN-LAST:event_jbtn_generar_reporteMouseClicked
@@ -5370,7 +5409,8 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         Frame frame = JOptionPane.getFrameForComponent(this);
 
         ProviderStatusBitacoraDialog win =
-        new ProviderStatusBitacoraDialog(frame,true,Long.parseLong(globalRenta.getRentaId()+""), globalRenta.getFolio()+"");
+        new ProviderStatusBitacoraDialog(frame,true,Long.parseLong(globalRenta.getRentaId()+""), 
+                globalRenta.getFolio()+"", systemService.getGeneralData(),iniciar_sesion.usuarioGlobal);
         win.setLocationRelativeTo(this);
         win.setVisible(true);
     }//GEN-LAST:event_lblLastStatusProviderMouseClicked
@@ -5619,7 +5659,7 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
     private javax.swing.JFormattedTextField txtEndReturnHour;
     private javax.swing.JFormattedTextField txtInitDeliveryHour;
     private javax.swing.JFormattedTextField txtInitReturnHour;
-    private javax.swing.JFormattedTextField txtPorcentajeDescuento;
+    private javax.swing.JTextField txtPorcentajeDescuento;
     private javax.swing.JTextField txt_abono;
     private javax.swing.JTextField txt_abonos;
     private javax.swing.JTextField txt_apellidos;

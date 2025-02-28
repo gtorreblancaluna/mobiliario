@@ -329,11 +329,11 @@ WHERE
 				<textFieldExpression><![CDATA[$F{comentario}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="0" width="642" height="20" uuid="5f36e1f3-ce07-4290-a4b0-6f383aa8036a"/>
+				<reportElement x="1" y="0" width="641" height="20" uuid="5f36e1f3-ce07-4290-a4b0-6f383aa8036a"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Entrega: "+$P{FECHA_ENTREGA}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{FECHA_ENTREGA}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="1" y="181" width="396" height="20" uuid="4817bd89-272d-44fc-8f00-5d8a61f2eb5f"/>
@@ -354,14 +354,14 @@ WHERE
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Devolución: "+$P{FECHA_RECOLECCION}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{FECHA_RECOLECCION}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="1" y="40" width="454" height="20" uuid="ce3a8925-34ef-4b37-81f2-c391756f0904"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Fecha del evento: "+$P{FECHA_EVENTO}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{FECHA_EVENTO}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="475" y="184" width="108" height="16" uuid="c8d1df98-e9ed-4b5e-ae11-fa26fe07b7b7"/>

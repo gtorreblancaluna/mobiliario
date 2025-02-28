@@ -2,7 +2,7 @@ package forms.material.inventory;
 
 import common.constants.ApplicationConstants;
 import common.services.UtilityService;
-import forms.proveedores.SelectProviderToOrder;
+import common.form.provider.SelectProviderToOrder;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;

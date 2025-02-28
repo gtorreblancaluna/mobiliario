@@ -61,7 +61,8 @@ CREATE TABLE datos_generales (
   direccion3 varchar(900) DEFAULT NULL,
   folio int(10) unsigned NOT NULL,
   folio_cambio varchar(2) DEFAULT NULL,
-   info_summary_folio VARCHAR(9028) DEFAULT NULL,
+  info_summary_folio VARCHAR(9028) DEFAULT NULL,
+  info_summary_folio_venta VARCHAR(9028) DEFAULT NULL,
   PRIMARY KEY (id_datos_generales)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -359,6 +360,7 @@ CREATE TABLE orden_proveedor (
   fg_activo enum('1','0') NOT NULL DEFAULT '1',
   status enum('1','2','3','4') NOT NULL,
   comentario varchar(450) DEFAULT NULL,
+  fecha_bodega TIMESTAMP NULL DEFAULT NULL,
   creado timestamp NULL DEFAULT NULL,
   actualizado timestamp NULL DEFAULT NULL,
   PRIMARY KEY (id),
@@ -385,12 +387,14 @@ CREATE TABLE detalle_orden_proveedor (
   creado timestamp NULL DEFAULT NULL,
   actualizado timestamp NULL DEFAULT NULL,
   status enum('1','2') NOT NULL DEFAULT '1',
+  id_proveedores INT(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (id),
   KEY fk_detalle_orden_proveedor_orden_proveedor_id (id_orden_proveedor),
   KEY fk_orden_proveedor_id_articulo (id_articulo),
   CONSTRAINT fk_tipo_orden_detalle_proveedor_id FOREIGN KEY (tipo_orden_detalle_proveedor_id) REFERENCES tipo_detalle_orden_proveedor (id),
   CONSTRAINT fk_detalle_orden_proveedor_orden_proveedor_id FOREIGN KEY (id_orden_proveedor) REFERENCES orden_proveedor (id),
-  CONSTRAINT fk_orden_proveedor_id_articulo FOREIGN KEY (id_articulo) REFERENCES articulo (id_articulo)
+  CONSTRAINT fk_orden_proveedor_id_articulo FOREIGN KEY (id_articulo) REFERENCES articulo (id_articulo),
+  CONSTRAINT fk_detalle_orden_proveedor FOREIGN KEY (id_proveedores) REFERENCES proveedores (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -446,13 +450,15 @@ CREATE TABLE pagos_proveedor (
   fg_activo enum('1','0') NOT NULL DEFAULT '1',
   creado timestamp NULL DEFAULT NULL,
   actualizado timestamp NULL DEFAULT NULL,
+  id_proveedor INT(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (id),
   KEY fk_abono_proveedor_orden_proveedor_id (id_orden_proveedor),
   KEY fk_abono_proveedor_tipo_abono_id (id_tipo_abono),
   KEY fk_abono_proveedor_usuario_id (id_usuario),
   CONSTRAINT fk_abono_proveedor_orden_proveedor_id FOREIGN KEY (id_orden_proveedor) REFERENCES orden_proveedor (id),
   CONSTRAINT fk_abono_proveedor_tipo_abono_id FOREIGN KEY (id_tipo_abono) REFERENCES tipo_abono (id_tipo_abono),
-  CONSTRAINT fk_abono_proveedor_usuario_id FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuarios)
+  CONSTRAINT fk_abono_proveedor_usuario_id FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuarios),
+  CONSTRAINT fk_pagos_proveedor_id_proveedor_id FOREIGN KEY (id_proveedor) REFERENCES proveedores (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
