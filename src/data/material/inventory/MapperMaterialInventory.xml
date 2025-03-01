@@ -5,6 +5,21 @@
   
 <mapper namespace="MapperMaterialInventory">
     
+    <resultMap id="resultMapMapperMaterialSaleItemReport" type="model.material.inventory.MaterialSaleItemReport">
+        <result property="amount" column="amount"/>
+        <result property="measurementUnitDescription" column="measurement_unit_description"/>
+        <result property="materialInventoryDescription" column="material_inventory_description"/>
+        <result property="purchaseAmount" column="purchase_amount"/>
+        <result property="purchaseAmountRound" column="purchase_amount_round"/>
+        <result property="purchaseMeasurementUnitDescription" column="purchase_measurement_unit_description"/>
+        <result property="providerId" column="provider_id"/>
+        <result property="providerName" column="provider_name"/>
+        <result property="providerAddress" column="provider_address"/>
+        <result property="providerPhoneNumber" column="provider_phone_number"/>
+        <result property="amountItem" column="amount_item"/>
+        <result property="descriptionItem" column="description_item"/>
+    </resultMap>
+    
     <resultMap id="resultMapMapperMaterialSaleItem" type="model.material.inventory.MaterialSaleItem">
         
         <result property="id" column="id"/>
@@ -59,6 +74,46 @@
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
+    
+    <select id="getMaterialSaleItemsByItemsIdReport" resultMap="resultMapMapperMaterialSaleItemReport" parameterType="java.lang.String" >
+        SELECT
+        detalle_renta.cantidad AS amount_item,
+        articulo.descripcion AS description_item,
+        SUM(material_sale_items.amount*detalle_renta.cantidad) AS amount,
+        measurement_units.description AS measurement_unit_description,
+        material_inventory.description AS material_inventory_description,
+        ROUND(SUM((material_sale_items.amount*detalle_renta.cantidad)/material_inventory.purchase_amount),2) AS purchase_amount,
+        (
+            CASE
+                WHEN SUM((material_sale_items.amount*detalle_renta.cantidad)/material_inventory.purchase_amount) BETWEEN 0 AND 1 THEN '1'
+                ELSE CEILING(SUM((material_sale_items.amount*detalle_renta.cantidad)/material_inventory.purchase_amount))
+            END
+        ) AS purchase_amount_round,
+        measurement_units_purchase.description AS purchase_measurement_unit_description,
+        CONCAT(proveedores.nombre," ",proveedores.apellidos) AS provider_name,
+        proveedores.id AS provider_id,
+        proveedores.direccion AS provider_address,
+        proveedores.telefonos AS provider_phone_number
+        FROM renta renta 
+        INNER JOIN detalle_renta detalle_renta ON (renta.id_renta = detalle_renta.id_renta)
+        INNER JOIN articulo articulo ON (detalle_renta.id_articulo = articulo.id_articulo)
+        INNER JOIN material_sale_items material_sale_items ON (articulo.id_articulo = material_sale_items.item_id)
+        INNER JOIN material_inventory material_inventory ON (material_inventory.id = material_sale_items.material_inventory_id)
+        INNER JOIN proveedores proveedores ON (proveedores.id = material_sale_items.provider_id)
+        INNER JOIN measurement_units measurement_units ON (measurement_units.id = material_inventory.measurement_unit_id)
+        INNER JOIN measurement_units measurement_units_purchase ON (measurement_units_purchase.id = material_inventory.measurement_unit_purchase_id)
+        WHERE renta.id_renta = #{rentId}
+        GROUP BY 
+            description_item,
+            amount_item,
+            measurement_unit_description,
+            material_inventory_description,
+            purchase_measurement_unit_description,
+            provider_name,
+            provider_address,
+            provider_phone_number,
+            provider_id
+    </select>
     
     <insert id="insertMaterialSaleItem" parameterType="model.material.inventory.MaterialSaleItem" >
         INSERT INTO material_sale_items

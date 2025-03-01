@@ -5,7 +5,7 @@
   
 <mapper namespace="MapperTipoAbonos">
   
-    <resultMap id="resultMapTipoAbonos" type="model.TipoAbono">        
+    <resultMap id="resultMapTipoAbonos" type="common.model.TipoAbono">        
         <result property="tipoAbonoId" column="id_tipo_abono"/>
         <result property="descripcion" column="descripcion"/>    
         <result property="fgActivo" column="fg_activo"/>
@@ -55,7 +55,7 @@
         WHERE t.descripcion = #{description}   
     </select> 
     
-    <insert id="insertTipoAbono" parameterType="model.TipoAbono">
+    <insert id="insertTipoAbono" parameterType="common.model.TipoAbono">
         INSERT INTO tipo_abono
         (
             descripcion,

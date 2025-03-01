@@ -1,21 +1,29 @@
 package services.material.inventory;
 
+import clases.sqlclass;
 import dao.material.inventory.MaterialInventoryDAO;
-import exceptions.BusinessException;
-import exceptions.DataOriginException;
+import common.exceptions.BusinessException;
+import common.exceptions.DataOriginException;
 import java.util.List;
 import java.util.Map;
 import model.material.inventory.MaterialArea;
 import model.material.inventory.MaterialInventory;
 import model.material.inventory.MaterialSaleItem;
+import model.material.inventory.MaterialSaleItemReport;
 import model.material.inventory.MeasurementUnit;
+import services.SaleService;
 
 public class MaterialInventoryService {
     
     // singlenton instance
     private static final MaterialInventoryService SINGLE_INSTANCE = null;
+    private final SaleService saleService;
+    private final sqlclass funcion = new sqlclass();  
     
-    private MaterialInventoryService () {}
+    private MaterialInventoryService () {
+        saleService = SaleService.getInstance();
+        funcion.conectate();
+    }
     
     public static MaterialInventoryService getInstance() {
         if (SINGLE_INSTANCE == null) {
@@ -53,6 +61,15 @@ public class MaterialInventoryService {
     public List<MaterialSaleItem> getMaterialSaleItemsByItemsId (String itemsId) throws BusinessException{
         try {
             return materialInventoryDAO.getMaterialSaleItemsByItemsId(itemsId);
+        } catch (DataOriginException e) {
+            throw new BusinessException(e.getMessage(),e);
+        }
+    }
+    
+    public List<MaterialSaleItemReport> getMaterialSaleItemsByItemsIdReport (String rentId) throws BusinessException{
+        try {
+                       
+            return materialInventoryDAO.getMaterialSaleItemsByItemsIdReport(rentId);
         } catch (DataOriginException e) {
             throw new BusinessException(e.getMessage(),e);
         }

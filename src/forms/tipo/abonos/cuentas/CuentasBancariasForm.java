@@ -1,33 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package forms.tipo.abonos.cuentas;
 
+import common.constants.ApplicationConstants;
 import forms.contabilidad.ContabilidadForm;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import mobiliario.ApplicationConstants;
-import mobiliario.agregar_renta;
-import model.Cuenta;
+import forms.rentas.AgregarRenta;
+import common.model.Cuenta;
 import services.AccountService;
 
-/**
- *
- * @author Carlos Alberto
- */
 public class CuentasBancariasForm extends java.awt.Dialog {
     
     boolean existe, editar = false;
    
-    AccountService accountService = new AccountService();
+    private AccountService accountService = new AccountService();
     String id_tipo_abono;
 
-    /**
-     * Creates new form Colores
-     */
     public CuentasBancariasForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -251,7 +239,7 @@ public void formato_tabla(){
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-        agregar_renta.validad_tipo_abonos = true;
+        AgregarRenta.validad_tipo_abonos = true;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog

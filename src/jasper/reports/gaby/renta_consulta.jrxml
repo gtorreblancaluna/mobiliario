@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="renta" language="groovy" pageWidth="695" pageHeight="900" columnWidth="655" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="af0ab36d-faf5-45a3-a784-d9f82f7a9acc">
-	<property name="ireport.zoom" value="0.75"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="renta" pageWidth="695" pageHeight="900" columnWidth="655" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="af0ab36d-faf5-45a3-a784-d9f82f7a9acc">
+	<property name="ireport.zoom" value="1.948717100000007"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="467"/>
+	<property name="ireport.y" value="457"/>
 	<parameter name="id_renta" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["C:\\Users\\Carlos Alberto\\Documents\\NetBeansProjects\\mobiliario\\reportes\\"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="abonos" class="java.lang.String"/>
-	<parameter name="subTotal" class="java.lang.String"/>
+	<parameter name="SUB_TOTAL" class="java.lang.String"/>
 	<parameter name="chofer" class="java.lang.String"/>
 	<parameter name="descuento" class="java.lang.String"/>
 	<parameter name="iva" class="java.lang.String"/>
@@ -16,6 +16,25 @@
 	<parameter name="total_faltantes" class="java.lang.String"/>
 	<parameter name="mensaje_faltantes" class="java.lang.String"/>
 	<parameter name="URL_SUB_REPORT_CONSULTA" class="java.lang.String"/>
+	<parameter name="INFO_SUMMARY_FOLIO" class="java.lang.String"/>
+	<parameter name="NOMBRE_EMPRESA" class="java.lang.String"/>
+	<parameter name="DIRECCION_1" class="java.lang.String"/>
+	<parameter name="DIRECCION_2" class="java.lang.String"/>
+	<parameter name="DIRECCION_3" class="java.lang.String"/>
+	<parameter name="FECHA_REGISTRO" class="java.lang.String"/>
+	<parameter name="FECHA_EVENTO" class="java.lang.String"/>
+	<parameter name="TELEFONOS_CLIENTE" class="java.lang.String"/>
+	<parameter name="FECHA_ENTREGA" class="java.lang.String"/>
+	<parameter name="FECHA_RECOLECCION" class="java.lang.String"/>
+	<parameter name="ENVIO_RECOLECCION" class="java.lang.String"/>
+	<parameter name="DEPOSITO_GARANTIA" class="java.lang.String"/>
+	<parameter name="DESCRIPCION_ABONOS" class="java.lang.String"/>
+	<parameter name="DESCRIPCION_DESCUENTO" class="java.lang.String"/>
+	<parameter name="DESCRIPCION_IVA" class="java.lang.String"/>
+	<parameter name="DESCRIPCION_TOTAL_FALTANTES" class="java.lang.String"/>
+	<parameter name="DESCRIPCION_ENVIO_RECOLECCION" class="java.lang.String"/>
+	<parameter name="DESCRIPCION_DEPOSITO_GARANTIA" class="java.lang.String"/>
+	<parameter name="TOTAL" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT IF(d.porcentaje_descuento > 0 , (d.cantidad * d.p_unitario) * (d.porcentaje_descuento / 100) , 0 ) AS totalDescuento,
      CONCAT(u.`nombre`," ",u.`apellidos`) AS Usuario,
@@ -30,6 +49,7 @@
      d.`cantidad` ,
      d.`p_unitario`,
      c.`direccion`,
+     a.`precio_compra` AS p_compra,
      r.`comentario`,
      r.`folio`,
      ti.`tipo`,
@@ -96,83 +116,60 @@ WHERE
 	<field name="deposito_garantia" class="java.lang.String"/>
 	<field name="totalDescuento" class="java.lang.String"/>
 	<field name="mostrar_precios_pdf" class="java.lang.String"/>
-	<variable name="Total" class="java.lang.String">
-		<variableExpression><![CDATA[new Float(String.valueOf($P{subTotal}))-new Float(String.valueOf($P{abonos}))]]></variableExpression>
-	</variable>
+	<field name="p_compra" class="java.lang.String"/>
 	<pageHeader>
-		<band height="318">
+		<band height="308">
 			<textField>
-				<reportElement uuid="d85f5de2-799f-45cb-a9b7-acaa123e12f1" x="493" y="25" width="149" height="24"/>
+				<reportElement x="516" y="89" width="140" height="24" uuid="d85f5de2-799f-45cb-a9b7-acaa123e12f1"/>
 				<textElement>
 					<font fontName="Arial" size="14" isBold="true" isUnderline="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Folio: "+$F{folio}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="a982fdfa-53b0-4123-992d-7be097147e24" x="493" y="62" width="149" height="20"/>
+				<reportElement x="516" y="113" width="139" height="20" uuid="a982fdfa-53b0-4123-992d-7be097147e24"/>
 				<textElement>
 					<font fontName="Arial" size="14" isBold="true" isUnderline="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Tipo: "+$F{tipo}]]></textFieldExpression>
 			</textField>
 			<image>
-				<reportElement uuid="6302a48b-2236-4f02-8a2c-917794354ba6" x="0" y="0" width="133" height="133"/>
+				<reportElement x="0" y="0" width="133" height="133" uuid="6302a48b-2236-4f02-8a2c-917794354ba6"/>
 				<imageExpression><![CDATA[$P{URL_IMAGEN}]]></imageExpression>
 			</image>
-			<staticText>
-				<reportElement uuid="bdcaa47c-8062-48a3-8a70-068cc6f2cd2f" x="163" y="9" width="318" height="20"/>
-				<textElement textAlignment="Center">
-					<font fontName="Arial" size="12"/>
-				</textElement>
-				<text><![CDATA[Servicio Para Eventos Gabriela S. de R.L. de C.V.]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="7ab46503-9322-4336-9f0e-40d3e9f597b9" x="163" y="29" width="318" height="20"/>
-				<textElement textAlignment="Center">
-					<font fontName="Arial" size="12"/>
-				</textElement>
-				<text><![CDATA[3636-8046]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="5d97dc91-059e-4aef-b531-26152db0dbc8" x="163" y="49" width="318" height="33"/>
-				<textElement textAlignment="Center">
-					<font fontName="Arial" size="12"/>
-				</textElement>
-				<text><![CDATA[Ramon Corona #493, Colonia Santa Anita, San Pedro Tlaquepaque, Jalisco C.P. 45645, contacto@casagaby.com, www.casagaby.com]]></text>
-			</staticText>
 			<line>
-				<reportElement uuid="253083d9-98ad-4df3-99a5-7bdcd058d278" x="4" y="137" width="633" height="1" forecolor="#999999"/>
+				<reportElement x="4" y="137" width="633" height="1" forecolor="#999999" uuid="253083d9-98ad-4df3-99a5-7bdcd058d278"/>
 			</line>
 			<textField>
-				<reportElement uuid="91716982-a4a7-4431-8f40-b1ef2a579f32" x="1" y="140" width="633" height="24"/>
+				<reportElement x="1" y="140" width="633" height="24" uuid="91716982-a4a7-4431-8f40-b1ef2a579f32"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Cliente: "+$F{Cliente}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="a020e122-90fd-436b-b62d-fc61741a1f3b" x="1" y="183" width="633" height="20"/>
+				<reportElement x="1" y="183" width="633" height="20" uuid="a020e122-90fd-436b-b62d-fc61741a1f3b"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Fecha registro: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_pedido}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Fecha registro: "+$P{FECHA_REGISTRO}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="18294d50-6591-4985-924e-5742fbfed862" x="1" y="164" width="633" height="19"/>
+				<reportElement x="1" y="164" width="633" height="19" uuid="18294d50-6591-4985-924e-5742fbfed862"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Telefono(s) cliente: "+$F{tel_movil}+", "+$F{tel_fijo}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Telefono(s) cliente: "+$P{TELEFONOS_CLIENTE}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="246889d4-4210-43e9-8d05-585cbc588ce6" x="4" y="203" width="630" height="48"/>
+				<reportElement x="1" y="203" width="633" height="48" uuid="246889d4-4210-43e9-8d05-585cbc588ce6"/>
 				<textElement>
 					<font fontName="Arial" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
 			</textField>
 			<subreport isUsingCache="true">
-				<reportElement uuid="6df701b1-4caf-4575-9e3c-9099148e8c35" x="0" y="271" width="647" height="35"/>
+				<reportElement x="0" y="271" width="647" height="35" uuid="6df701b1-4caf-4575-9e3c-9099148e8c35"/>
 				<subreportParameter name="id_renta">
 					<subreportParameterExpression><![CDATA[$P{id_renta}]]></subreportParameterExpression>
 				</subreportParameter>
@@ -180,283 +177,322 @@ WHERE
 				<subreportExpression><![CDATA[$P{URL_SUB_REPORT_CONSULTA} + "subReport_faltantes.jasper"]]></subreportExpression>
 			</subreport>
 			<textField>
-				<reportElement uuid="cfb29059-2d84-45ea-8a62-b1005953bb5d" x="9" y="251" width="636" height="20"/>
+				<reportElement x="1" y="251" width="644" height="20" uuid="cfb29059-2d84-45ea-8a62-b1005953bb5d"/>
 				<textElement>
 					<font fontName="Arial"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{mensaje_faltantes}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="148" y="5" width="506" height="20" uuid="628ed839-8987-48a5-a07e-6bcc196d59ed"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOMBRE_EMPRESA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="148" y="25" width="506" height="20" uuid="ab2f9dab-4610-4a6b-a378-4f1a14a1d5d3"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DIRECCION_1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="148" y="45" width="504" height="20" uuid="ede5bcb8-95c9-4b02-ab09-621d141c1848"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DIRECCION_2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="148" y="65" width="508" height="20" uuid="1afb2ad5-e064-406a-85de-54e83f0db2e9"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DIRECCION_3}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
 	<columnHeader>
 		<band height="16">
 			<staticText>
-				<reportElement uuid="118e2cd5-1ab9-439d-a3ff-8178e8878fa2" x="19" y="0" width="59" height="15"/>
+				<reportElement x="50" y="0" width="115" height="15" uuid="fad16d66-40b8-4bf0-814e-3bd69238fb85"/>
 				<textElement>
-					<font fontName="Arial" size="12"/>
-				</textElement>
-				<text><![CDATA[Cantidad]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="fad16d66-40b8-4bf0-814e-3bd69238fb85" x="89" y="0" width="59" height="15"/>
-				<textElement>
-					<font fontName="Arial" size="12"/>
+					<font fontName="Arial" size="10"/>
 				</textElement>
 				<text><![CDATA[Articulo]]></text>
 			</staticText>
 			<line>
-				<reportElement uuid="b7c4dc89-02cd-42b2-bb0a-340fc285c285" x="1" y="14" width="641" height="1" forecolor="#999999"/>
+				<reportElement x="1" y="14" width="654" height="1" forecolor="#999999" uuid="b7c4dc89-02cd-42b2-bb0a-340fc285c285"/>
 			</line>
 			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="ec6e579e-4181-400d-a49d-11db4ede4b45" x="358" y="0" width="105" height="15"/>
+				<reportElement x="443" y="0" width="69" height="14" uuid="ec6e579e-4181-400d-a49d-11db4ede4b45"/>
 				<textElement textAlignment="Right">
-					<font fontName="Arial" size="12"/>
+					<font fontName="Arial" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : "Precio unitario"]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="fba17c79-f781-4025-ad50-b9321f234469" x="463" y="0" width="102" height="15"/>
+				<reportElement x="513" y="0" width="69" height="14" uuid="fba17c79-f781-4025-ad50-b9321f234469"/>
 				<textElement textAlignment="Right">
-					<font fontName="Arial" size="12"/>
+					<font fontName="Arial" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : "Descuento"]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="02b76764-b034-4346-a66a-c8752b0e25e3" x="565" y="0" width="78" height="15"/>
+				<reportElement x="584" y="0" width="70" height="14" uuid="02b76764-b034-4346-a66a-c8752b0e25e3"/>
 				<textElement textAlignment="Right">
-					<font fontName="Arial" size="12"/>
+					<font fontName="Arial" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : "Importe"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="5" y="0" width="45" height="14" uuid="118e2cd5-1ab9-439d-a3ff-8178e8878fa2"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="359" y="0" width="84" height="14" uuid="a7a18b13-c3e2-40cb-9820-5b2a46f1c29e"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : "Costo reposición"]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="20" splitType="Stretch">
 			<textField>
-				<reportElement uuid="acbde3cb-1664-4020-bbee-637fbb28294e" x="78" y="0" width="280" height="15"/>
+				<reportElement x="50" y="0" width="323" height="15" uuid="acbde3cb-1664-4020-bbee-637fbb28294e"/>
 				<textElement>
-					<font fontName="Arial"/>
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{Articulo}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="cd0dc678-302e-4d48-aa9d-4788290ceeb4" x="9" y="0" width="68" height="15"/>
+				<reportElement x="1" y="0" width="49" height="15" uuid="cd0dc678-302e-4d48-aa9d-4788290ceeb4"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial"/>
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="264e5627-4980-45b0-80ac-5d111ce0ac62" x="358" y="0" width="78" height="15"/>
+			<textField pattern="#,##0.00">
+				<reportElement x="443" y="0" width="70" height="15" uuid="264e5627-4980-45b0-80ac-5d111ce0ac62"/>
 				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : new Float(String.valueOf($F{p_unitario}))]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="d10adc81-14d0-43a2-a939-04235e436e6b" x="565" y="0" width="72" height="15"/>
+			<textField pattern="#,##0.00">
+				<reportElement x="583" y="0" width="70" height="15" uuid="d10adc81-14d0-43a2-a939-04235e436e6b"/>
 				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" :new Float(String.valueOf($F{Importe}))]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="c6088cde-9e0a-4dee-a39d-4f597feccb6b" x="463" y="0" width="74" height="15"/>
+			<line>
+				<reportElement x="1" y="15" width="654" height="1" forecolor="#CCCCCC" uuid="768c0afe-f3d5-4b57-bdf8-2c49a63267b2"/>
+			</line>
+			<textField pattern="#,##0.00">
+				<reportElement x="373" y="0" width="70" height="15" uuid="705705e9-5cbc-4e6a-9937-6d2a21162ea9"/>
 				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : new Float(String.valueOf($F{p_compra}))]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="513" y="0" width="70" height="15" uuid="c6088cde-9e0a-4dee-a39d-4f597feccb6b"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{mostrar_precios_pdf}).equals("0") ? "" : (($F{totalDescuento}).equals("0") ? "" : new Float(String.valueOf($F{totalDescuento})))]]></textFieldExpression>
 			</textField>
-			<line>
-				<reportElement uuid="768c0afe-f3d5-4b57-bdf8-2c49a63267b2" x="1" y="15" width="642" height="1" forecolor="#CCCCCC"/>
-			</line>
 		</band>
 	</detail>
 	<columnFooter>
 		<band height="212">
 			<rectangle>
-				<reportElement uuid="05fb0933-ee02-4f84-a183-ecdd970bc804" mode="Opaque" x="473" y="69" width="181" height="132" forecolor="#999999"/>
+				<reportElement mode="Opaque" x="473" y="69" width="181" height="132" forecolor="#999999" uuid="05fb0933-ee02-4f84-a183-ecdd970bc804"/>
 			</rectangle>
 			<textField>
-				<reportElement uuid="27536c0b-ff9f-4a6b-b9dc-f106ad6c9edb" x="10" y="60" width="453" height="102"/>
+				<reportElement x="1" y="60" width="462" height="102" uuid="27536c0b-ff9f-4a6b-b9dc-f106ad6c9edb"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{comentario}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="5f36e1f3-ce07-4290-a4b0-6f383aa8036a" x="9" y="0" width="633" height="20"/>
+				<reportElement x="0" y="0" width="642" height="20" uuid="5f36e1f3-ce07-4290-a4b0-6f383aa8036a"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Entrega: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_entrega}))+" Hora: "+$F{hora_entrega}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Entrega: "+$P{FECHA_ENTREGA}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="4817bd89-272d-44fc-8f00-5d8a61f2eb5f" x="10" y="181" width="387" height="20"/>
+				<reportElement x="1" y="181" width="396" height="20" uuid="4817bd89-272d-44fc-8f00-5d8a61f2eb5f"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Atendió: "+$F{Usuario}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement uuid="60881411-e324-4b2c-9ddb-9b7ea12c0ee2" x="10" y="161" width="387" height="20"/>
+				<reportElement x="0" y="161" width="397" height="20" uuid="60881411-e324-4b2c-9ddb-9b7ea12c0ee2"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Chofer: "+$P{chofer}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="7004e105-71f0-4fd8-8a95-8fa865a42f0e" x="9" y="20" width="632" height="20"/>
+				<reportElement x="0" y="20" width="641" height="20" uuid="7004e105-71f0-4fd8-8a95-8fa865a42f0e"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Devolución: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_devolucion}))+" Hora: "+$F{hora_devolucion}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Devolución: "+$P{FECHA_RECOLECCION}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="ce3a8925-34ef-4b37-81f2-c391756f0904" x="9" y="40" width="446" height="20"/>
+				<reportElement x="1" y="40" width="454" height="20" uuid="ce3a8925-34ef-4b37-81f2-c391756f0904"/>
 				<textElement>
 					<font fontName="Arial" size="11"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Fecha del evento: "+new SimpleDateFormat("EEEEE' 'dd' de 'MMMMM' de 'yyyy").format(new SimpleDateFormat("dd/MM/yyyy").parse($F{fecha_evento}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Fecha del evento: "+$P{FECHA_EVENTO}]]></textFieldExpression>
 			</textField>
-			<line direction="BottomUp">
-				<reportElement uuid="99434016-5237-4f54-a6bd-f25c075b0b52" x="654" y="60" width="1" height="121" forecolor="#999999"/>
-			</line>
 			<staticText>
-				<reportElement uuid="c8d1df98-e9ed-4b5e-ae11-fa26fe07b7b7" x="475" y="184" width="108" height="16"/>
+				<reportElement x="475" y="184" width="108" height="16" uuid="c8d1df98-e9ed-4b5e-ae11-fa26fe07b7b7"/>
 				<textElement>
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<text><![CDATA[Total:]]></text>
 			</staticText>
-			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="3864b126-a239-4365-8ce5-884a892f70f2" x="582" y="115" width="70" height="16"/>
+			<textField pattern="">
+				<reportElement x="582" y="115" width="70" height="16" uuid="3864b126-a239-4365-8ce5-884a892f70f2"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($F{deposito_garantia})) <= 0f ? "" : new Float(String.valueOf($F{deposito_garantia}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DEPOSITO_GARANTIA}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement uuid="5e562573-85ae-4ec1-826e-7c50952974d2" x="473" y="182" width="181" height="1" forecolor="#999999"/>
+				<reportElement x="473" y="182" width="181" height="1" forecolor="#999999" uuid="5e562573-85ae-4ec1-826e-7c50952974d2"/>
 			</line>
 			<textField pattern="#,##0.00">
-				<reportElement uuid="91ea9b80-029f-4751-84a0-6054f555aeb5" x="475" y="131" width="107" height="16"/>
+				<reportElement x="475" y="131" width="107" height="16" uuid="91ea9b80-029f-4751-84a0-6054f555aeb5"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{iva})) <= 0 ? "" : "IVA:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DESCRIPCION_IVA}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement uuid="4d241650-0260-46d5-9a78-7f4c520b3a15" x="476" y="83" width="106" height="16"/>
+				<reportElement x="476" y="83" width="106" height="16" uuid="4d241650-0260-46d5-9a78-7f4c520b3a15"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{descuento})) <= 0 ? "" : "Descuento:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DESCRIPCION_DESCUENTO}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="29311edf-8319-4339-af48-007bdb66c84e" x="582" y="131" width="70" height="16"/>
+			<textField pattern="">
+				<reportElement x="582" y="131" width="70" height="16" uuid="29311edf-8319-4339-af48-007bdb66c84e"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{iva})) <= 0f ? "" : new Float(String.valueOf($P{iva}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{iva}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement uuid="8eb7eb97-dbec-4bff-a391-3c2ac1909eb2" x="476" y="115" width="106" height="16"/>
+				<reportElement x="476" y="115" width="106" height="16" uuid="8eb7eb97-dbec-4bff-a391-3c2ac1909eb2"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($F{deposito_garantia})) <= 0 ? "" : "Depòsito en garantìa:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DESCRIPCION_DEPOSITO_GARANTIA}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="00a2f1ab-ba3c-4d06-be4b-c6af0fe7d99f" x="582" y="84" width="69" height="16"/>
+			<textField pattern="">
+				<reportElement x="582" y="84" width="69" height="16" uuid="00a2f1ab-ba3c-4d06-be4b-c6af0fe7d99f"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{descuento})) <= 0f ? "" : new Float(String.valueOf($P{descuento}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{descuento}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="8bc1b065-e6f9-4b1c-9c32-713abd544565" x="584" y="184" width="68" height="16"/>
+			<textField pattern="">
+				<reportElement x="584" y="184" width="68" height="16" uuid="8bc1b065-e6f9-4b1c-9c32-713abd544565"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{subTotal}))-new Float(String.valueOf($P{abonos}))-new Float(String.valueOf($P{descuento}))+ new Float(String.valueOf($P{iva})) + new Float(String.valueOf($F{envio_recoleccion})) +  new Float(String.valueOf($F{deposito_garantia})) + new Float(String.valueOf($P{total_faltantes}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{TOTAL}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="cf3d7ee3-e6f6-4ef8-a170-797d93ac69bb" x="582" y="69" width="69" height="15"/>
+			<textField pattern="">
+				<reportElement x="582" y="69" width="69" height="15" uuid="cf3d7ee3-e6f6-4ef8-a170-797d93ac69bb"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{subTotal}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{SUB_TOTAL}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement uuid="4be7bc9e-1ca7-4b01-ae04-0eaeaef5cc8f" x="475" y="147" width="107" height="16"/>
+				<reportElement x="475" y="147" width="107" height="16" uuid="4be7bc9e-1ca7-4b01-ae04-0eaeaef5cc8f"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{abonos})) <= 0 ? "" : "Pagos:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DESCRIPCION_ABONOS}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="89d83da3-96d0-43ee-87c1-9f958da782d3" x="476" y="69" width="106" height="15"/>
+				<reportElement x="476" y="69" width="106" height="15" uuid="89d83da3-96d0-43ee-87c1-9f958da782d3"/>
 				<textElement>
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<text><![CDATA[Subtotal:]]></text>
 			</staticText>
-			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="24ee1f33-85d2-4a9c-b719-c42f932c2606" x="582" y="147" width="70" height="16"/>
+			<textField pattern="">
+				<reportElement x="582" y="147" width="70" height="16" uuid="24ee1f33-85d2-4a9c-b719-c42f932c2606"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{abonos})) <= 0f ? "" : new Float(String.valueOf($P{abonos}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{abonos}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="a04f7b93-8b8f-49e0-93c9-c7630fbad5a9" x="582" y="99" width="70" height="16"/>
+			<textField pattern="">
+				<reportElement x="582" y="99" width="70" height="16" uuid="a04f7b93-8b8f-49e0-93c9-c7630fbad5a9"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($F{envio_recoleccion})) <= 0f ? "" : new Float(String.valueOf($F{envio_recoleccion}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{ENVIO_RECOLECCION}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement uuid="b2d55c8e-b59d-4993-89fe-d8b49d0b5266" x="475" y="99" width="107" height="16"/>
+				<reportElement x="475" y="99" width="107" height="16" uuid="b2d55c8e-b59d-4993-89fe-d8b49d0b5266"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($F{envio_recoleccion})) <= 0 ? "" : "Envio y recolecciòn:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DESCRIPCION_ENVIO_RECOLECCION}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement uuid="f3c44cb0-6420-42a6-b5b0-7966fd259692" x="475" y="165" width="107" height="16"/>
+				<reportElement x="475" y="165" width="107" height="16" uuid="f3c44cb0-6420-42a6-b5b0-7966fd259692"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{total_faltantes})) <= 0 ? "" : "Faltante por cubrir:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{DESCRIPCION_TOTAL_FALTANTES}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.00">
-				<reportElement uuid="d8208efb-18bc-4828-be7e-01ea6deed514" x="582" y="165" width="70" height="16"/>
+			<textField pattern="">
+				<reportElement x="582" y="165" width="70" height="16" uuid="d8208efb-18bc-4828-be7e-01ea6deed514"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Float(String.valueOf($P{total_faltantes})) <= 0f ? "" : new Float(String.valueOf($P{total_faltantes}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{total_faltantes}]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnFooter>
 	<pageFooter>
 		<band height="21">
 			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement uuid="d967c547-70ac-48d2-a896-4b20e7511f2b" x="1" y="0" width="358" height="20"/>
+				<reportElement x="1" y="0" width="358" height="20" uuid="d967c547-70ac-48d2-a896-4b20e7511f2b"/>
 				<textElement>
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Fecha de impresión: "+new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="1d327f29-875f-4b27-a5ca-b52382e4ca81" x="505" y="0" width="97" height="20"/>
+				<reportElement x="505" y="0" width="97" height="20" uuid="1d327f29-875f-4b27-a5ca-b52382e4ca81"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement uuid="45d27ca4-9d7d-4cdf-a413-f68ec96b101b" x="602" y="0" width="52" height="20"/>
+				<reportElement x="602" y="0" width="52" height="20" uuid="45d27ca4-9d7d-4cdf-a413-f68ec96b101b"/>
 				<textElement>
 					<font fontName="Arial" size="9"/>
 				</textElement>
@@ -467,96 +503,26 @@ WHERE
 	<summary>
 		<band height="860">
 			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement uuid="3898028c-9d91-4939-93d9-222ebd6ce4b0" x="1" y="840" width="358" height="20"/>
+				<reportElement x="1" y="840" width="358" height="20" uuid="3898028c-9d91-4939-93d9-222ebd6ce4b0"/>
 				<textElement>
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Fecha de impresión: "+new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="d1577ccd-682e-4239-a2aa-d8ee6fd889fd" x="505" y="840" width="97" height="20"/>
+				<reportElement x="505" y="840" width="150" height="20" uuid="d1577ccd-682e-4239-a2aa-d8ee6fd889fd"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of "+$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement uuid="f5366451-0bce-4179-a26d-a5e6fea1b820" x="19" y="16" width="646" height="824"/>
-				<textElement textAlignment="Justified">
+			<textField>
+				<reportElement x="4" y="0" width="650" height="840" uuid="1f89fd73-cd06-41e8-aec4-032a8026fd34"/>
+				<textElement>
 					<font fontName="Arial" size="7"/>
 				</textElement>
-				<text><![CDATA[POLÍTICAS Y NORMAS DE RENTA
-Gracias por su confianza.
-Para asegurar que “Servicio para Eventos Gabriela S de RL de CV” pueda brindar el mejor servicio a nuestros clientes, te pedimos leas las siguientes indicaciones y condiciones con la finalidad de evitar malentendidos, cuidar nuestra calidad de servicio y garantizar su evento.
-
-CONTRATACIÓN
-Para apartar el evento, se tiene que hacer vía telefónica, mensaje WhatsApp o correo electrónico, para asegurar que el día que solicitan el servicio se encuentre disponible.
-
-Las cotizaciones tienen una vigencia de 24 horas a partir de la fecha de creación y automáticamente se desbloquea el mueble al no tener registrado un pago de por lo menos el 50% . El pago lo puedes realizar a las cuentas bancarias descritas en la sección pagos. El monto restante deberá ser liquidado en su totalidad Máximo hasta 4 días antes de la fecha de entrega que solicitó, como fecha límite, de lo contrario no se programará la entrega de este y se perderá el dinero del apartado. Deberá hacernos llegar el pago realizado anexando Nombre y número de FOLIO de su nota, de lo contrario, no se dará por enterado el apartado del servicio, por lo que la empresa “Servicio para Eventos Gabriela S de RL de CV” no se hará responsable de programar su entrega. Una vez realizado el apartado o liquidación del evento no se aceptarán cambios, cancelaciones ni devoluciones.
-
-FACTURACIÓN
-NUESTROS PRECIOS NO INCLUYEN IVA
-En caso de requerir factura, deberá de estar liquidada la nota al 100% (dentro de los días correspondientes al mes en curso), posteriormente deberá solicitarlo directamente con su vendedor y proporcionarle los siguientes datos:
-
-Razón Social
-RFC
-Dirección (Calle, Número, Colonia, Ciudad, Municipio o Delegación y Código Postal)
-
-Teléfono
-Correo Electrónico
-El número de nota Pagada
-Uso de CFDI
-
-De hacer caso omiso al límite del tiempo estipulado, la empresa “Servicio para Eventos Gabriela S de RL de CV” no se hace responsable sobre facturas solicitadas fuera de tiempo.
-
-DEPOSITOS EN GARANTIA Y/O REPOSICIONES
-Se cobrará un depósito en garantía por el producto rentado, mismo que se regresará en su totalidad únicamente si el producto se regresa en óptimas condiciones y completo (mantelería, mobiliario, vajilla y/o cristalería). El depósito se reintegra mediante un formato de devolución, el cual deberá solicitar con su vendedor y otorgar los siguientes datos:
-
-Titular de la cuenta
-RFC
-Razón social
-
-Nombre del contacto
-Teléfono
-Cuenta bancaria / Clabe interbancaria
-
-Banco
-Correo electrónico
-El tiempo para el retorno de su depósito en garantía será de 5 días hábiles a partir de que retorno el producto y de haber recibido el formato. La persona que esté encargado de recibir el producto deberá de revisarlo junto con la persona que le hace entrega, misma que será la responsable de retornar el producto rentado, esta deberá firmar de enterado para evitar malentendidos. La reclamación del retorno del depósito en garantía tiene una vigencia de 30 días hábiles que corren a partir de la fecha de su evento. Cristalería y Vajilla rota, estrellada, despostillada o faltante se cobrará como nueva. Mantelería quemada, rota, rasgada o faltante se cobrará como nueva. Mobiliario dañado se cobra el monto de reparación o en su caso reposición completa.
-
-ENTREGAS, FLETES Y/O MONTAJES
-Para la entrega del producto rentado deberá estar la persona encargada presente en el día y hora acordado, de lo contrario el personal no estará obligado a dejarlo y se retirará del lugar perdiendo así su turno de entrega y sin posibilidad de volver a programarlo. Favor de revisar todo lo que reciba, ya que de lo contrario la empresa no se hará responsable y el cliente asumirá los cargos correspondientes al costo de reposición por producto dañado o faltante. Al momento de contratar deberá de especificar el lugar donde requiere el producto, de lo contrario, si se requiere una maniobra adicional (montaje, desmontaje y/o recorrer una distancia mayor a 8 metros o subir/bajar pisos adicionales) tendrá un cargo extra que se cobrará en el momento de la entrega, de lo contrario el personal no estará obligado en dejar el producto y/o ofrecer el servicio. Si el servicio o producto  que solicitó no está registrado en la cotización y/o nota, no será responsabilidad de la empresa otorgarlo. Horarios, fechas de entrega y/o recolección, servicios adicionales, montajes etc. deberán estar marcados dentro de la nota, de lo contrario la empresa “Servicio para Eventos Gabriela S de RL de CV” no sé hará responsable de realizarlo. Si el producto lo solicitan el mismo día se genera un costo extra obligatorio por envío y recolección ya que se realiza mediante empresa externa de flete, mismo que deberá de pagar el cliente. La empresa NO labora los domingos y días festivos, si requieren de nuestros servicios, esto tendrá cargo extra. Tendrá costo extra retirar el producto solicitado el mismo día del evento fuera de la jornada laboral de la empresa, siendo esta de lunes a viernes de 9:00 hrs. a 16:00 hrs. y sábados de 9:00 hrs. a 12:00 hrs. El cliente tendrá la responsabilidad de salvaguardar el producto rentado hasta que la empresa recoja el mismo.  No nos hacemos responsables por cambios climatológicos.
-
-RENTA DE TOLDOS
-Dentro del costo de la renta del Toldo ya incluye montaje y desmontaje. La empresa no se hace responsable en cuanto errores de medidas del lugar del evento. Una vez instalado el toldo no podrá moverse por personas ajenas a la empresa, en caso de ser removido, se cobrará un cargo adicional dependiendo del tipo de toldo, sin excepción de que tenga o no daño.
-
-NOS COMPROMETEMOS
-A la puntualidad de la entrega del servicio solicitado dentro del rango de horario marcado en tu nota. A la entrega del servicio completo que se solicitó dentro de tu nota, garantizando la funcionalidad de cada uno de los artículos con la limpieza adecuada. A brindarle siempre una atención personalizada. A la seguridad y garantía en la entrega del producto, ya que contamos con transporte de modelo reciente y personal capacitado para trasladar el mobiliario.
-
-PAGOS
-Al realizar el pago del apartado o total del evento que consta este documento queda en manifiesto que usted está de acuerdo con los términos y condiciones de nuestras políticas de renta sin necesidad de firma alguna.
- Puede realizar sus pagos a través de TRANSFERENCIA, DEPOSITO, TAJETA DE CREDITO, TARJETA DE DEBITO.
-
-
-CUENTA BBVA
-NOMBRE: “Servicio para Eventos Gabriela S de RL de CV”
-RFC: SEG1402107MA
-No. CUENTA: 0110690430
-CLABE INTERBANCARIA: 012320001106904308
-No. PLASTICO: 4555113008258255
-
-
-CUENTA BANAMEX
-NOMBRE: “Servicio para Eventos Gabriela S de RL de CV”
-RFC: SEG1402107MA
-No. CUENTA: 7013 2073102
-CLABE INTERBANCARIA: 002320701320731023
-
-Gracias por su preferencia.
-Nuestro aviso de privacidad lo podrá encontrar en www.casagaby.com
-Gracias por su preferencia.
-]]></text>
-			</staticText>
+				<textFieldExpression><![CDATA[$P{INFO_SUMMARY_FOLIO}]]></textFieldExpression>
+			</textField>
 		</band>
 	</summary>
 </jasperReport>

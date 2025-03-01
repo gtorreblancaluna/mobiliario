@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dao;
 
+import common.utilities.MyBatisConnectionFactory;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -17,10 +13,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
-/**
- *
- * @author jerry
- */
 public class ContabilidadDAO {
     
     private static Logger log = Logger.getLogger(ContabilidadDAO.class.getName());

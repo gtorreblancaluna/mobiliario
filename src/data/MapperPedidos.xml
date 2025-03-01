@@ -3,15 +3,104 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
-<mapper namespace="MapperPedidos">
+<mapper namespace="MapperPedidos">    
+    
+    <resultMap id="resultMapRenta" type="common.model.Renta">
+        <result property="rentaId" column="id_renta"/>
+        <result property="detalleRenta" column="detalle_renta"/>
+        <!-- customer info-->
+        <result property="cliente.id" column="cliente_id"/>
+        <result property="cliente.nombre" column="cliente_nombre"/>
+        <result property="cliente.apellidos" column="cliente_apellidos"/>
+        <result property="cliente.telMovil" column="cliente_tel_movil"/>
+        <result property="cliente.telFijo" column="cliente_tel_fijo"/>
+        <!--user info-->
+        <result property="usuario.usuarioId" column="usuario_id"/>
+        <result property="usuario.nombre" column="usuario_nombre"/>
+        <result property="usuario.apellidos" column="usuario_apellidos"/>
+        
+        <result property="fechaPedido" column="fecha_pedido"/>
+        <result property="fechaEntrega" column="fecha_entrega"/>
+        <result property="horaEntrega" column="hora_entrega"/>
+        <result property="fechaDevolucion" column="fecha_devolucion"/>
+        <result property="descripcion" column="descripcion"/>
+        <result property="descuento" column="descuento"/>
+        <result property="cantidadDescuento" column="cantidad_descuento"/>
+        <result property="iva" column="iva"/>
+        <result property="comentario" column="comentario"/>
+        <result property="folio" column="folio"/>
+        <result property="stock" column="stock"/>
+        <!--event type-->
+        <result property="tipo.tipoId" column="tipo_id"/>
+        <result property="tipo.tipo" column="tipo_tipo"/>
+        <result property="totalAbonos" column="total_abonos"/>
+        <result property="horaDevolucion" column="hora_devolucion"/>
+        <result property="fechaEvento" column="fecha_evento"/>
+        <result property="depositoGarantia" column="deposito_garantia"/>      
+        <result property="envioRecoleccion" column="envio_recoleccion"/>
+        <!-- driver info-->
+        <result property="chofer.usuarioId" column="chofer_id"/>
+        <result property="chofer.nombre" column="chofer_nombre"/>
+        <result property="chofer.apellidos" column="chofer_apellidos"/>
+        <!--status event-->
+        <result property="estado.estadoId" column="id_estado"/>
+        <result property="estado.descripcion" column="estado_descripcion"/>
+        <result property="mostrarPreciosPdf" column="mostrar_precios_pdf"/>
+        <result property="totalAbonos" column="total_abonos"/>
+        <result property="totalFaltantes" column="total_faltantes"/>
+        <result property="subTotal" column="sub_total"/>
+        <result property="totalOrdersProvider" column="total_orders_provider"/>
+    </resultMap>
   
-    <resultMap id="resultMapTipoAbono" type="model.TipoAbono">        
+    <resultMap id="resultMapTipoAbono" type="common.model.TipoAbono">        
         <result property="tipoAbonoId" column="id_tipo_abono"/>
         <result property="descripcion" column="descripcion"/>
         <result property="fgActivo" column="fg_activo"/>
         <result property="fechaRegistro" column="fecha_registro"/>
       
-    </resultMap>    
+    </resultMap> 
+    
+    <resultMap id="resultMapDetalleRenta" type="common.model.DetalleRenta">        
+        
+        <result property="detalleRentaId" column="id_detalle_renta"/>
+        <result property="rentaId" column="id_renta"/>
+        <result property="cantidad" column="cantidad"/>
+        <result property="precioUnitario" column="p_unitario"/>
+        <result property="porcentajeDescuento" column="porcentaje_descuento"/>
+
+        <result property="articulo.cantidad" column="item_cantidad"/>
+        <result property="articulo.articuloId" column="item_id"/>
+        <result property="articulo.descripcion" column="item_description"/>
+        <result property="articulo.color.color" column="item_color"/>
+        <result property="articulo.codigo" column="item_codigo"/>
+        <result property="articulo.precioCompra" column="item_purchase_amount"/>
+        
+        <result property="articulo.rentados" column="rentados" />
+        <result property="articulo.faltantes" column="faltantes" />
+        <result property="articulo.reparacion" column="reparacion" />
+        <result property="articulo.accidenteTrabajo" column="accidente_trabajo" />
+        <result property="articulo.devolucion" column="devolucion" />
+        
+        <result property="articulo.totalCompras" column="total_compras" />
+        <result property="articulo.totalShopProvider" column="total_shop_provider" />
+      
+    </resultMap>
+    
+    <select id="getDetailByRentId" resultMap="resultMapDetalleRenta" parameterType="java.lang.String">
+        SELECT d.*,
+            articulo.id_articulo AS item_id,
+            articulo.descripcion AS item_description,
+            articulo.precio_compra AS item_purchase_amount,
+            c.color AS item_color,
+            articulo.codigo AS item_codigo,
+            d.porcentaje_descuento,
+            d.p_unitario AS p_unitario
+        FROM detalle_renta d
+        INNER JOIN articulo articulo ON (articulo.id_articulo = d.id_articulo)
+        INNER JOIN color c ON (c.id_color = articulo.id_color)
+        WHERE d.id_renta = #{id}
+        ORDER BY articulo.descripcion
+    </select>    
    
     
     <select id="obtenerTipoAbonoPorDescripcion" resultMap="resultMapTipoAbono" parameterType="java.lang.String">
@@ -20,7 +109,7 @@
         WHERE descripcion = #{descripcion}   
     </select> 
     
-    <update id="actualizarAbonoPorId" parameterType="model.Abono">
+    <update id="actualizarAbonoPorId" parameterType="common.model.Abono">
         UPDATE abonos
         <set>
             <if test="abono != null">abono = #{abono},</if>
@@ -30,7 +119,265 @@
         </set>       
         WHERE id_abonos = #{abonoId}
     </update>
-  
-  
+    
+    <select id="obtenerRentaPorId" resultMap="resultMapRenta" parameterType="java.lang.Integer">
+        SELECT
+            r.id_renta,
+            c.id_clientes AS cliente_id,
+            c.nombre AS cliente_nombre,
+            c.apellidos AS cliente_apellidos,
+            c.tel_movil AS cliente_tel_movil,
+            c.tel_fijo AS cliente_tel_fijo,
+            u.id_usuarios AS usuario_id,
+            u.nombre AS usuario_nombre,
+            u.apellidos AS usuario_apellidos,
+            r.fecha_pedido,
+            r.fecha_entrega,
+            r.hora_entrega,
+            r.fecha_devolucion,
+            r.descripcion,
+            r.descuento,
+            r.cantidad_descuento,
+            r.iva,
+            r.comentario,
+            r.folio,
+            r.stock,
+            t.id_tipo AS tipo_id,
+            t.tipo AS tipo_tipo,
+            r.hora_devolucion,
+            r.fecha_evento,
+            r.deposito_garantia,
+            r.envio_recoleccion,
+            r.mostrar_precios_pdf,
+            chofer.id_usuarios AS chofer_id,
+            chofer.nombre AS chofer_nombre,
+            chofer.apellidos AS chofer_apellidos,
+            e.id_estado,
+            e.descripcion AS estado_descripcion,
+               (
+                   SELECT COALESCE(SUM(a.abono),0)
+                   FROM abonos a 
+                   WHERE a.id_renta = #{id}
+               ) AS total_abonos,
+               (
+                   SELECT COALESCE(SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) ),0)AS total
+                   FROM faltantes f
+                   INNER JOIN articulo a ON (f.id_articulo = a.id_articulo)
+                   WHERE f.id_renta=#{id}
+                   AND f.fg_activo = '1'
+               ) AS total_faltantes,
+               (
+                   SELECT COALESCE(IF(porcentaje_descuento >= 0,
+                   (SUM( (cantidad*p_unitario) - ((cantidad*p_unitario) * (porcentaje_descuento / 100) ))),
+                   (SUM( (cantidad*p_unitario) ))),0) AS suma
+                   FROM detalle_renta WHERE id_renta = #{id}
+               ) AS sub_total
+        FROM renta r
+            INNER JOIN estado e ON (e.id_estado = r.id_estado)
+            INNER JOIN clientes c ON (c.id_clientes = r.id_clientes)
+            INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios)
+            INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer)
+            INNER JOIN tipo t ON (t.id_tipo = r.id_tipo)
+        WHERE id_renta = #{id}
+    </select>
+    
+    <select id="obtenerRentaPorIdSinSumas" resultMap="resultMapRenta" parameterType="java.lang.Integer">
+        SELECT r.* FROM renta r WHERE r.id_renta = #{id}
+    </select>
+    
+    <select id="obtenerRentaPorFolio" resultMap="resultMapRenta" parameterType="java.lang.Integer">
+        SELECT
+            r.id_renta,
+            c.id_clientes AS cliente_id,
+            c.nombre AS cliente_nombre,
+            c.apellidos AS cliente_apellidos,
+            u.id_usuarios AS usuario_id,
+            u.nombre AS usuario_nombre,
+            u.apellidos AS usuario_apellidos,
+            r.fecha_pedido,
+            r.fecha_entrega,
+            r.hora_entrega,
+            r.fecha_devolucion,
+            r.descripcion,
+            r.descuento,
+            r.cantidad_descuento,
+            r.iva,
+            r.comentario,
+            r.folio,
+            r.stock,
+            t.id_tipo AS tipo_id,
+            t.tipo AS tipo_tipo,
+            r.hora_devolucion,
+            r.fecha_evento,
+            r.deposito_garantia,
+            r.envio_recoleccion,
+            r.mostrar_precios_pdf,
+            chofer.id_usuarios AS chofer_id,
+            chofer.nombre AS chofer_nombre,
+            chofer.apellidos AS chofer_apellidos,
+            e.id_estado,
+            e.descripcion AS estado_descripcion,
+            (
+                SELECT SUM(a.abono)
+                FROM abonos a 
+                WHERE a.id_renta = #{id}
+            ) AS total_abonos,
+            (
+                SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) )AS total
+                FROM faltantes f
+                INNER JOIN articulo a ON (f.id_articulo = a.id_articulo)
+                WHERE f.id_renta=#{id}
+                AND f.fg_activo = '1'
+            ) AS total_faltantes,
+            (
+                SELECT IF(porcentaje_descuento >= 0,
+                (SUM( (cantidad*p_unitario) - ((cantidad*p_unitario) * (porcentaje_descuento / 100) ))),
+                (SUM( (cantidad*p_unitario) ))) AS suma
+                FROM detalle_renta WHERE id_renta = #{id}
+            ) AS sub_total
+        FROM renta r
+            INNER JOIN estado e ON (e.id_estado = r.id_estado)
+            INNER JOIN clientes c ON (c.id_clientes = r.id_clientes)
+            INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios)
+            INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer)
+            INNER JOIN tipo t ON (t.id_tipo = r.id_tipo)
+        WHERE r.folio = #{folio}
+    </select>
+    
+    <!--Esta consulta se ocupa en el formulario ConsultarRenta.java para mostrar rapido y resumido las rentas-->
+    <select id="obtenerRentaPorParametros" resultMap="resultMapRenta" parameterType="java.util.Map">
+        SELECT
+            r.id_renta,
+            c.id_clientes AS cliente_id,
+            c.nombre AS cliente_nombre,
+            c.apellidos AS cliente_apellidos,
+            u.id_usuarios AS usuario_id,
+            u.nombre AS usuario_nombre,
+            u.apellidos AS usuario_apellidos,
+            r.fecha_pedido,
+            r.fecha_entrega,
+            r.hora_entrega,
+            r.fecha_devolucion,
+            r.descripcion,
+            r.descuento,
+            r.cantidad_descuento,
+            r.iva,
+            r.comentario,
+            r.folio,
+            r.stock,
+            t.id_tipo AS tipo_id,
+            t.tipo AS tipo_tipo,
+            r.hora_devolucion,
+            r.fecha_evento,
+            r.deposito_garantia,
+            r.envio_recoleccion,
+            r.mostrar_precios_pdf,
+            chofer.id_usuarios AS chofer_id,
+            chofer.nombre AS chofer_nombre,
+            chofer.apellidos AS chofer_apellidos,
+            e.id_estado,
+            e.descripcion AS estado_descripcion,
+            (
+                SELECT SUM(a.abono)
+                FROM abonos a 
+                WHERE a.id_renta = r.id_renta
+            ) AS total_abonos,
+            (
+                SELECT SUM(IF( ( f.fg_devolucion = '0' AND f.fg_accidente_trabajo = '0'),(f.cantidad * f.precio_cobrar),0) )AS total
+                FROM faltantes f
+                INNER JOIN articulo a ON (f.id_articulo = a.id_articulo)
+                WHERE f.id_renta = r.id_renta
+                AND f.fg_activo = '1'
+            ) AS total_faltantes,
+            (
+                SELECT IF(porcentaje_descuento >= 0,
+                (SUM( (cantidad*p_unitario) - ((cantidad*p_unitario) * (porcentaje_descuento / 100) ))),
+                (SUM( (cantidad*p_unitario) ))) AS suma
+                FROM detalle_renta WHERE id_renta = r.id_renta
+            ) AS sub_total,
+            (
+                SELECT COALESCE(SUM(detalle_orden_proveedor.cantidad * detalle_orden_proveedor.precio),0)
+                FROM orden_proveedor orden_proveedor
+                    INNER JOIN detalle_orden_proveedor detalle_orden_proveedor 
+                        ON (detalle_orden_proveedor.id_orden_proveedor = orden_proveedor.id)
+                WHERE orden_proveedor.id_renta = r.id_renta 
+                AND orden_proveedor.fg_activo = '1' 
+                AND detalle_orden_proveedor.fg_activo = '1'
+                AND orden_proveedor.status <![CDATA[ <> ]]> '3' 
+            ) AS total_orders_provider
+        FROM renta r
+            INNER JOIN estado e ON (e.id_estado = r.id_estado)
+            INNER JOIN clientes c ON (c.id_clientes = r.id_clientes)
+            INNER JOIN usuarios u ON (u.id_usuarios = r.id_usuarios)
+            INNER JOIN usuarios chofer ON (chofer.id_usuarios = r.id_usuario_chofer)
+            INNER JOIN tipo t ON (t.id_tipo = r.id_tipo)
+        
+        <if test="currentTypeId != null and currentTypeId != '' and currentTypeId != 0 
+                and changeTypeId != null and changeTypeId != '' and changeTypeId != 0 ">   
+            AND r.id_renta IN (
+                    SELECT order_type_changes.renta_id 
+                    FROM order_type_changes order_type_changes 
+                    WHERE order_type_changes.current_type_id = #{currentTypeId} AND order_type_changes.change_type_id = #{changeTypeId}  
+                    AND order_type_changes.fg_active = '1'
+                    <if test="orderTypeChangeInitDate != null and orderTypeChangeInitDate != ''
+                                and orderTypeChangeEndDate != null and orderTypeChangeEndDate != ''">
+                            AND order_type_changes.created_at <![CDATA[ >= ]]> #{orderTypeChangeInitDate}
+                            AND order_type_changes.created_at <![CDATA[ <= ]]> #{orderTypeChangeEndDate}
+                    </if>
+                    GROUP BY order_type_changes.renta_id
+                )   
+        </if>
+        <if test="currentStatusId != null and currentStatusId != '' and currentStatusId != 0 
+                and changeStatusId != null and changeStatusId != '' and changeStatusId != 0 ">   
+            AND r.id_renta IN (
+                SELECT order_status_changes.renta_id 
+                FROM order_status_changes order_status_changes 
+                WHERE order_status_changes.current_status_id = #{currentStatusId} AND order_status_changes.change_status_id = #{changeStatusId}  
+                AND order_status_changes.fg_active = '1'
+                <if test="orderStatusChangeInitDate != null and orderStatusChangeInitDate != ''
+                            and orderStatusChangeEndDate != null and orderStatusChangeEndDate != ''">
+                        AND order_status_changes.created_at <![CDATA[ >= ]]> #{orderStatusChangeInitDate}
+                        AND order_status_changes.created_at <![CDATA[ <= ]]> #{orderStatusChangeEndDate}
+                </if>
+                GROUP BY order_status_changes.renta_id
+            )
+            
+        </if>
+        <if test="folio != null and folio != '' ">
+            AND r.folio = #{folio}
+        </if>
+        <if test="systemDate != null and systemDate != '' ">
+            AND STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') <![CDATA[ >= ]]> STR_TO_DATE(#{systemDate}, '%d/%m/%Y' )
+        </if>
+        <if test="applyDiff != null and applyDiff != '' ">
+            AND r.id_estado <![CDATA[ <> ]]> #{applyDiff}   
+        </if>
+        <if test="type != null and type != '' and type != 0 ">
+            AND t.id_tipo = #{type}
+        </if>
+        <if test="customer != null and customer != '' ">
+            AND CONCAT(c.nombre," ",c.apellidos) LIKE CONCAT('%',#{customer},'%')
+        </if>
+        <if test="initDeliveryDate != null and endDeliveryDate != null ">
+            AND STR_TO_DATE(r.fecha_entrega,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initDeliveryDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDeliveryDate},'%d/%m/%Y')
+        </if>
+        
+        <if test="initEventDate != null and endEventDate != null ">
+            AND STR_TO_DATE(r.fecha_evento,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initEventDate},'%d/%m/%Y') AND STR_TO_DATE(#{endEventDate},'%d/%m/%Y')
+        </if>
+        <if test="initCreatedDate != null and endCreatedDate != null ">
+            AND STR_TO_DATE(r.fecha_pedido,'%d/%m/%Y') BETWEEN STR_TO_DATE(#{initCreatedDate},'%d/%m/%Y') AND STR_TO_DATE(#{endCreatedDate},'%d/%m/%Y')
+        </if>
+        <if test="statusId != null and statusId != '' and statusId != 0 ">
+            AND r.id_estado = #{statusId}
+        </if>
+        <if test="driverId != null and driverId != '' and driverId != 0 ">
+            AND r.id_usuario_chofer = #{driverId}
+        </if>
+        
+        ORDER BY STR_TO_DATE(r.fecha_entrega, '%d/%m/%Y') LIMIT #{limit}
+        
+    </select>    
+
   
 </mapper>

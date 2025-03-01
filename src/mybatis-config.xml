@@ -9,35 +9,47 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
     <environments default="development">
         <environment id="development">
             <transactionManager type="JDBC"/>
-            
-           
-            
+                   
             <dataSource type="POOLED">
-                <property name="driver" value="${driver}"/>
-                <property name="url" value="${url}"/>
-                <property name="username" value="${username}"/>
-                <property name="password" value="${password}"/>
+                <property name="driver" value="${db.driver}"/>
+                <property name="url" value="${db.url}"/>
+                <property name="username" value="${db.username}"/>
+                <property name="password" value="${db.password}"/>
             </dataSource>
-            
-            
+
         </environment>
     </environments>    
     <mappers>
-        <mapper resource="data/MapperUsuarios.xml"/>
-        <mapper resource="data/MapperArticulos.xml"/>
+        <mapper resource="common/mappers/MapperUsuarios.xml"/>
+        <mapper resource="common/mappers/MapperArticulos.xml"/>
         <mapper resource="data/MapperCategorias.xml"/>
         <mapper resource="data/MapperPedidos.xml"/>
         <mapper resource="data/MapperContabilidad.xml"/>
         <mapper resource="data/MapperAccounts.xml"/>
         <mapper resource="data/MapperTipoAbonos.xml"/>
         <mapper resource="data/MapperAbonos.xml"/>
-        <mapper resource="data/MapperDatosGenerales.xml"/>
+        <mapper resource="common/mappers/MapperDatosGenerales.xml"/>
         <mapper resource="data/MapperCompras.xml"/>
-        <mapper resource="data/providers/MapperProveedores.xml"/>
-        <mapper resource="data/providers/MapperOrdenProveedor.xml"/>
-        <mapper resource="data/providers/MapperDetalleOrdenProveedor.xml"/>
-        <mapper resource="data/providers/MapperPagosProveedor.xml"/>
+        
+        <mapper resource="common/mappers/providers/MapperProveedores.xml"/>
+        <mapper resource="common/mappers/providers/MapperOrdenProveedor.xml"/>
+        <mapper resource="common/mappers/providers/MapperDetalleOrdenProveedor.xml"/>
+        <mapper resource="common/mappers/providers/MapperPagosProveedor.xml"/>
+        <mapper resource="common/mappers/providers/MapperStatusProvider.xml"/>
+        
         <mapper resource="data/material/inventory/MapperMaterialInventory.xml"/>
+        <mapper resource="common/mappers/MapperEstadoEvento.xml"/>
+        <mapper resource="common/mappers/MapperTipoEvento.xml"/>
+        <mapper resource="data/MapperCustomer.xml"/>
+        <mapper resource="data/MapperOrderTypeChanges.xml"/>
+        <mapper resource="common/mappers/MapperOrderStatusChanges.xml"/>
+        <mapper resource="common/mappers/MapperTaskAlmacenUpdate.xml"/>
+        <mapper resource="common/mappers/MapperTaskChoferDelivery.xml"/>
+        
+        <mapper resource="common/mappers/MapperCatalogSocialMediaContact.xml"/>
+        <mapper resource="common/mappers/MapperRentas.xml"/>
+        <mapper resource="common/mappers/MapperDesgloseAlmacen.xml"/>        
+        
         
     </mappers>
     

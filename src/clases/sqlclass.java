@@ -1,12 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package clases;
 
-import com.mysql.jdbc.MysqlDataTruncation;
-import java.awt.Component;
-import java.awt.Container;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,7 +9,6 @@ import java.sql.Statement;
 import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.JOptionPane;
 
 
 public class sqlclass {
@@ -173,22 +165,6 @@ public class sqlclass {
         }
        return id;
     }
-    
-
- //Funcion para deshabilitar un panel
- public static void setEnableContainer(Container c, boolean band) {
-        
-    Component[] components = c.getComponents();
-    c.setEnabled(band);
-    for(int i = 0; i < components.length; i++){           
-     components[i].setEnabled(band);
-
-     if(components[i] instanceof Container){
-      setEnableContainer((Container)components[i], band);
-     }
-   
- }       
-} 
     
     /* INSERTA UN NUEVO REGISTRO EN LA BASE DE DATOS
      * PARAMETROS(Un array de String con los datos a insertar,la instruccion sql)

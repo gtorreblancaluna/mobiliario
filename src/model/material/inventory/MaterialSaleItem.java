@@ -1,8 +1,8 @@
 package model.material.inventory;
 
 import java.util.Date;
-import model.Articulo;
-import model.providers.Proveedor;
+import common.model.Articulo;
+import common.model.providers.Proveedor;
 
 public class MaterialSaleItem {
     

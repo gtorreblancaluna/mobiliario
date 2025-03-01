@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package forms.compras;
 
+import common.constants.ApplicationConstants;
 import java.text.DecimalFormat;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -13,12 +9,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import mobiliario.ApplicationConstants;
-import model.Articulo;
+import common.model.Articulo;
 import model.Compra;
 import services.ComprasService;
 import services.ContabilidadServices;
-import services.SystemService;
 
 /**
  *
@@ -27,7 +21,6 @@ import services.SystemService;
 public class AgregarCompraFormDialog extends java.awt.Dialog {
     
     ContabilidadServices contabilidadServices = new ContabilidadServices();
-    private final SystemService systemService = SystemService.getInstance();
     private final ComprasService comprasService = new ComprasService();
     public static Articulo articulo = null;
    
@@ -281,8 +274,8 @@ public class AgregarCompraFormDialog extends java.awt.Dialog {
             compra.setIdArticulo(articulo.getArticuloId());
             compra.setArticulo(articulo);
             compra.setComentario(this.txtComentario.getText());
-            compra.setCantidad(new Float(this.txtCantidad.getText()));
-            compra.setPrecioCompra(new Float(this.txtPrecioCompra.getText()));
+            compra.setCantidad(Float.parseFloat(this.txtCantidad.getText()));
+            compra.setPrecioCompra(Float.parseFloat(this.txtPrecioCompra.getText()));
             comprasService.insertCompra(compra);
             
             JOptionPane.showMessageDialog(null, ApplicationConstants.MESSAGE_SAVE_SUCCESSFUL, "", JOptionPane.INFORMATION_MESSAGE);

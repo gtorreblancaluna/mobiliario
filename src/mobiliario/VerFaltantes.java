@@ -1,43 +1,33 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
 import services.SaleService;
 import clases.sqlclass;
+import common.constants.ApplicationConstants;
 import java.awt.Toolkit;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import model.Articulo;
-import model.DetalleRenta;
+import common.model.Articulo;
+import common.model.DetalleRenta;
 import model.Faltante;
-import model.Renta;
-import services.ItemService;
-import services.SystemService;
+import common.model.Renta;
+import common.services.ItemService;
+import services.FaltanteService;
 
-/**
- *
- * @author Gerardo Torreblanca
- */
 public class VerFaltantes extends java.awt.Dialog {
 
-    sqlclass funcion = new sqlclass();
-    
-    Object[][] dtconduc;      
-    SaleService saleService = new SaleService();
-    private final SystemService systemService = SystemService.getInstance();
-    ItemService itemService = ItemService.getInstance();
+    private final sqlclass funcion = new sqlclass();
+    private final Integer itemId;
+    private final FaltanteService faltanteService = FaltanteService.getInstance();
+    private final SaleService saleService;
+    private ItemService itemService = ItemService.getInstance();
     public static String g_articuloId;
     public static String g_rentaId;
     public static String g_cantidadEnPedido;
@@ -59,32 +49,12 @@ public class VerFaltantes extends java.awt.Dialog {
     public static int HD_ARTICULOS_DESCRIPCION_ARTICULO = 2;
     public static int HD_ARTICULOS_PRECIO_COBRAR = 3;
    
-    
-   
-    
-    public String conviertemoneda(String valor) {
-
-        DecimalFormatSymbols simbolo = new DecimalFormatSymbols();
-        simbolo.setDecimalSeparator('.');
-        simbolo.setGroupingSeparator(',');
-
-        float entero = Float.parseFloat(valor);
-        DecimalFormat formateador = new DecimalFormat("###,###.##", simbolo);
-        String entero2 = formateador.format(entero);
-
-        if (entero2.contains(".")) {
-            entero2 = "$" + entero2;
-
-        } else {
-            entero2 = "$" + entero2 + ".00";
-        }
-
-        return entero2;
-
-    }
-    public VerFaltantes(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);        
+    public VerFaltantes(java.awt.Frame parent, boolean modal, String rentaId, Integer itemId) {
+        super(parent, modal); 
+        this.g_rentaId = rentaId;
+        this.itemId = itemId;
         initComponents();
+        saleService = SaleService.getInstance();
         funcion.conectate();
         this.setLocationRelativeTo(null);
         this.lblQuitarElemento.setText("");
@@ -100,28 +70,28 @@ public class VerFaltantes extends java.awt.Dialog {
     
     public void llenar_tabla_articulos(){
         
-        if(consultar_renta.g_idRenta != null && !consultar_renta.g_idRenta.equals("")){
-             g_rentaId = consultar_renta.g_idRenta;
-        }
-        else if (VerFoliosPorArticulo.g_rentaId !=null && !VerFoliosPorArticulo.g_rentaId.equals("")){
-             g_rentaId = VerFoliosPorArticulo.g_rentaId;
-        }
-        else{
-             g_rentaId = AsignarFaltante.g_rentaId+"";
-        }
-        
-         Renta renta = saleService.obtenerRentaPorId(new Integer(g_rentaId), funcion);
-         DefaultTableModel tablaDetalle = (DefaultTableModel) tablaArticulos.getModel();
+        Renta renta = null;
+        try{
+            renta = saleService.obtenerRentaPorIdSinSumas(Integer.parseInt(g_rentaId));
+        } catch (Exception e) {
+           Logger.getLogger(VerFaltantes.class.getName()).log(Level.SEVERE, null, e);
+           JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+           return;
+       }
+         
+        DefaultTableModel tablaDetalle = (DefaultTableModel) tablaArticulos.getModel();
          this.lblInformacionInicial.setText("FOLIO: "+renta.getFolio());
-         int itemId = 0;
-         if(AsignarFaltante.g_articuloId > 0)
-             itemId = AsignarFaltante.g_articuloId;
-//         else if(VerFoliosPorArticulo.g_articuloId > 0)
-            else
-             itemId = VerFoliosPorArticulo.g_articuloId;
          if(renta.getRentaId() == 0 && itemId > 0 )
          {
-             Articulo articulo = itemService.obtenerArticuloPorId( funcion , itemId);
+             Articulo articulo = null;
+             
+             try {
+                articulo = itemService.obtenerArticuloPorId(itemId);
+           } catch (Exception e) {
+               Logger.getLogger(VerFaltantes.class.getName()).log(Level.SEVERE, null, e);
+               JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+               return;
+           }
               Object fila[] = {                                          
                         articulo.getArticuloId()+"",   
                         "",
@@ -131,7 +101,7 @@ public class VerFaltantes extends java.awt.Dialog {
                     tablaDetalle.addRow(fila);
          }else{
             for(DetalleRenta detalle : renta.getDetalleRenta()){
-                    Object fila[] = {                                          
+                    Object fila[] = {
                         detalle.getArticulo().getArticuloId()+"",   
                         detalle.getCantidad()+"",
                         detalle.getArticulo().getDescripcion()+" "+detalle.getArticulo().getColor().getColor(), 
@@ -144,7 +114,16 @@ public class VerFaltantes extends java.awt.Dialog {
     
     public void llenar_tabla_faltantes(){        
             
-        List<Faltante> faltantes = itemService.obtenerFaltantesPorRentaId(funcion, new Integer(g_rentaId));
+        List<Faltante> faltantes = null;
+        
+        
+        try {
+             faltantes = faltanteService.obtenerFaltantesPorRentaId(funcion, Integer.parseInt(g_rentaId));
+        } catch (Exception e) {
+            Logger.getLogger(VerFaltantes.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(null, "Ocurrio un inesperado\n "+e, "Error", JOptionPane.ERROR_MESSAGE); 
+            return;
+        }
         
         if(faltantes == null || faltantes.size()<=0)
             return;
@@ -592,9 +571,9 @@ public class VerFaltantes extends java.awt.Dialog {
         float precioCobrar = 0f;
         
         try {
-            cantidad = new Float(this.txtCantidad.getText());
-            cantidadPedido = new Float(g_cantidadEnPedido);
-            precioCobrar = new Float(this.txtPrecioCobrar.getText());
+            cantidad = Float.parseFloat(this.txtCantidad.getText());
+            cantidadPedido = Float.parseFloat(g_cantidadEnPedido);
+            precioCobrar = Float.parseFloat(this.txtPrecioCobrar.getText());
         } catch (NumberFormatException e) {
             mensaje.append(++cont + ". Error al ingresar la cantidad\n");
         } catch (Exception e) {
@@ -745,7 +724,7 @@ public class VerFaltantes extends java.awt.Dialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                VerFaltantes dialog = new VerFaltantes(new java.awt.Frame(), true);
+                VerFaltantes dialog = new VerFaltantes(new java.awt.Frame(), true, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

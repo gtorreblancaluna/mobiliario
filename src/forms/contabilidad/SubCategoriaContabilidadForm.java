@@ -1,31 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package forms.contabilidad;
 
-import forms.tipo.abonos.cuentas.CuentasBancariasForm;
-import static forms.tipo.abonos.cuentas.TiposAbonosForm.cmbCuenta;
+import common.constants.ApplicationConstants;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import mobiliario.ApplicationConstants;
-import mobiliario.inventario;
+import forms.inventario.InventarioForm;
 import model.CategoriaContabilidad;
-import model.Cuenta;
 import model.SubCategoriaContabilidad;
 import services.AccountService;
 import services.ContabilidadServices;
 
 
-/**
- *
- * @author Carlos Alberto
- */
 public class SubCategoriaContabilidadForm extends java.awt.Dialog {
     private ContabilidadServices contabilidadService = new ContabilidadServices();
     private String g_id_sub_categoria=null;
@@ -33,9 +21,7 @@ public class SubCategoriaContabilidadForm extends java.awt.Dialog {
     private static AccountService accountService = new AccountService();
     public static boolean isSubCategoriaContabilidadForm = false;
 
-    /**
-     * Creates new form Colores
-     */
+
     public SubCategoriaContabilidadForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         
@@ -337,7 +323,7 @@ public class SubCategoriaContabilidadForm extends java.awt.Dialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-        inventario.validar_categorias = true;
+        InventarioForm.validar_categorias = true;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog
@@ -369,7 +355,7 @@ public class SubCategoriaContabilidadForm extends java.awt.Dialog {
        SubCategoriaContabilidad subCategoriaContabilidad = new SubCategoriaContabilidad();
        subCategoriaContabilidad.setCategoriaContabilidad(category);
        subCategoriaContabilidad.setDescripcion(txt_categoria.getText().toString());
-       subCategoriaContabilidad.setSubCategoriaContabilidadId(new Integer(g_id_sub_categoria));
+       subCategoriaContabilidad.setSubCategoriaContabilidadId(Integer.parseInt(g_id_sub_categoria));
        
        if(this.radioIngreso.isSelected())
             subCategoriaContabilidad.setIngreso("1");
@@ -449,7 +435,7 @@ public class SubCategoriaContabilidadForm extends java.awt.Dialog {
          String subCategoria = this.tabla_categorias.getValueAt(tabla_categorias.getSelectedRow(), 1).toString();
          int seleccion = JOptionPane.showOptionDialog(this, "¿Eliminar registro: " + subCategoria + "?", "Confirme eliminacion", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "No");
          if ((seleccion + 1) == 1) {
-            contabilidadService.deleteSubCategoryById(new Integer(idSubCategoria));
+            contabilidadService.deleteSubCategoryById(Integer.parseInt(idSubCategoria));
             
             this.limpiar();
             JOptionPane.showMessageDialog(null, ApplicationConstants.MESSAGE_DELETE_SUCCESSFUL, "Sucess update", JOptionPane.INFORMATION_MESSAGE);

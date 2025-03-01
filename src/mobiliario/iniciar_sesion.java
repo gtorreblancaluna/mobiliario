@@ -1,37 +1,28 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
+import common.constants.ApplicationConstants;
+import common.exceptions.DataOriginException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
-import static mobiliario.principal.lbl_logueo;
-import static mobiliario.principal.lblPuesto;
-import model.Usuario;
+import static mobiliario.IndexForm.lbl_logueo;
+import static mobiliario.IndexForm.lblPuesto;
+import common.model.Usuario;
 import org.apache.log4j.Logger;
+import common.services.UserService;
+import common.constants.PropertyConstant;
+import common.constants.SubstanceThemeConstant;
+import java.io.IOException;
 import org.jvnet.substance.SubstanceLookAndFeel;
-import services.UserService;
+import common.utilities.PropertySystemUtil;
+import utilities.Utility;
 
-/**
- *
- * @author Carlos Alberto
- */
 public class iniciar_sesion extends javax.swing.JFrame {
-//initializing the logger
-private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
-//    sqlclass funcion = new sqlclass();   
-//    sqlclass funcion = new sqlclass();    
-//    conectate conexion = new conectate();
-    private principal ventana_principal;
-    private static UserService userService = new UserService();
-    
 
+    private static final Logger log = Logger.getLogger(iniciar_sesion.class.getName());
+
+    private IndexForm ventana_principal;
+    private static final UserService userService = UserService.getInstance();
     private Timer tiempo;
     int cont;
     public final static int TWO_SECOND = 8;
@@ -41,52 +32,24 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
     
     public static Usuario usuarioGlobal;
     
-    
-
-    /**
-     * Creates new form iniciar_sesion
-     */
     public iniciar_sesion() {
-        
-        
-//        funcion.conectate();
+
         initComponents();
-        Image icon = Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png"));
-        setIconImage(icon);
         this.setLocationRelativeTo(null);
-        barrita.setVisible(false);
         JFrame.setDefaultLookAndFeelDecorated(true);
-        SubstanceLookAndFeel.setSkin("org.jvnet.substance.skin.MistAquaSkin");
-        
+        this.setTitle("Iniciar sesión.");
+        setLookAndFeel();
         
     }
 
-//    public void conectar() {
-//        // conexion.setIp(IpServer);
-//        try {        
-//            conexion.conectate();
-//        } catch (SQLException e) {
-//            JOptionPane.showMessageDialog( rootPane,"No se puede establecer la comunicacion con la bd:\n"+e);
-//        }  catch (Exception e) {
-//             JOptionPane.showMessageDialog( rootPane,"Ocurrio un error inesperado, porfavor intentalo de nuevo, verifica tu conexion a internet\n"+e);
-//        }
-//    }
-
-    class TimerListener implements ActionListener {
-
-        public void actionPerformed(ActionEvent e) {
-            cont++;
-            barrita.setValue(cont);
-            if (cont == 100) {
-                tiempo.stop();
-                esconder();
-                ventana_principal = new principal();
-                ventana_principal.setVisible(true);
-                setVisible(false);
-
-            }
-        }
-
+    private void setLookAndFeel () {
+        try{
+            SubstanceLookAndFeel.setSkin(PropertySystemUtil.get(PropertyConstant.SYSTEM_THEME));
+        }catch(IOException e){
+            log.error(e);
+            SubstanceLookAndFeel.setSkin(SubstanceThemeConstant.BUSINESS_SKIN);
+            JOptionPane.showMessageDialog(this, e, ApplicationConstants.MESSAGE_UNEXPECTED_ERROR, JOptionPane.ERROR_MESSAGE);
+        } 
     }
 
     public void esconder() {
@@ -100,37 +63,41 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
     public void entrar() {
         log.debug("iniciando sesion ");       
         String pswd = new String(this.txt_contraseña.getPassword());
-        //String area = null, priv = null;
-//        usuarioGlobal = userService.obtenerUsuarioPorPassword(funcion, pswd);
-        usuarioGlobal = userService.obtenerUsuarioPorPassword(pswd);
-        if(usuarioGlobal == null || usuarioGlobal.getNombre().equals("")){
-            JOptionPane.showMessageDialog(null, ApplicationConstants.DS_MESSAGE_FAIL_LOGIN, ApplicationConstants.TITLE_MESSAGE_FAIL_LOGIN, JOptionPane.ERROR_MESSAGE);
-            this.txt_contraseña.setText("");
-            this.txt_contraseña.requestFocus();
-            return;
-        }                 
-        id_usuario_global = usuarioGlobal.getUsuarioId()+"";    
-        nombre_usuario_global = usuarioGlobal.getNombre();
-        apellidos_usuario_global = usuarioGlobal.getApellidos();
-        administrador_global = usuarioGlobal.getAdministrador();
-        id_puesto_global = usuarioGlobal.getPuesto().getPuestoId()+""; 
-        
-        barrita.setVisible(true);
-        cont = -1;
-        barrita.setValue(0);
-        barrita.setStringPainted(true);
-        tiempo = new Timer(TWO_SECOND, new TimerListener());
-        activar();
-        this.txt_contraseña.setText("");
-        
+        try {
+            usuarioGlobal = userService.getByPassword(pswd);
+            
+            if(usuarioGlobal == null || usuarioGlobal.getNombre().equals("")){
+                JOptionPane.showMessageDialog(null, ApplicationConstants.DS_MESSAGE_FAIL_LOGIN, ApplicationConstants.TITLE_MESSAGE_FAIL_LOGIN, JOptionPane.ERROR_MESSAGE);
+                this.txt_contraseña.requestFocus();
+            } else {
+                id_usuario_global = usuarioGlobal.getUsuarioId()+"";    
+                nombre_usuario_global = usuarioGlobal.getNombre();
+                apellidos_usuario_global = usuarioGlobal.getApellidos();
+                administrador_global = usuarioGlobal.getAdministrador();
+                id_puesto_global = usuarioGlobal.getPuesto().getPuestoId()+""; 
+                ventana_principal = new IndexForm();
+                ventana_principal.setVisible(true);
+                this.dispose();
+            }
+        } catch (DataOriginException e) {
+            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
+            log.error(e);
+        } 
        
     }
     
     public static boolean dataSessionUptade(String password){
-        
-        Usuario user = userService.obtenerUsuarioPorPassword(password);
+        Usuario user;
+        try {
+            user = userService.getByPassword(password);
+        } catch (DataOriginException e) {
+            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.INFORMATION_MESSAGE);
+            return false;
+        }
         if(user != null && !user.getNombre().equals("")){
-            log.debug("actualizacion sesion del usuario "+user.getNombre()+" "+user.getApellidos());
+            String msgUpdateSession = "Actualización sesión: "+user.getNombre()+" "+user.getApellidos();
+            log.info(msgUpdateSession);
+            Utility.pushNotification(msgUpdateSession);
             usuarioGlobal = user;
             id_usuario_global = user.getUsuarioId()+"";    
             nombre_usuario_global = user.getNombre();
@@ -146,46 +113,6 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
         return false;
     }
 
-//    public void entrar() {
-//         String pswd = new String(this.txt_contraseña.getPassword());
-//        //String area = null, priv = null;
-//        int inm = 0;
-//        conectar();
-//        try {
-//            Connection con = conexion.getConnection();
-//            Statement s = con.createStatement();
-//            ResultSet rs = s.executeQuery("SELECT * FROM usuarios WHERE contraseña = '" + pswd + "'");
-//            if (rs.first()) {
-//                inm = 1;
-//                
-//                id_usuario_global = rs.getString("id_usuarios");
-//                usuarioGlobal = userService.obtenerUsuarioPorId(funcion,new Integer(id_usuario_global));
-//                nombre_usuario_global = rs.getString("nombre");
-//                apellidos_usuario_global = rs.getString("apellidos");
-//                administrador_global = rs.getString("administrador");
-//                id_puesto_global = rs.getString("id_puesto");
-//
-//            }
-//            con.close();
-//            if (inm == 1) {
-//                barrita.setVisible(true);
-//                cont = -1;
-//                barrita.setValue(0);
-//                barrita.setStringPainted(true);
-//                tiempo = new Timer(TWO_SECOND, new TimerListener());
-//                activar();
-//                this.txt_contraseña.setText("");
-//
-//            } else {
-//                JOptionPane.showMessageDialog(null, "Contraseña incorrecta ", "Error SQL", JOptionPane.ERROR_MESSAGE);
-//                this.txt_contraseña.setText("");
-//                this.txt_contraseña.requestFocus();
-//            }
-//        } catch (SQLException | HeadlessException ex) {
-//            java.awt.Toolkit.getDefaultToolkit().beep();
-//            JOptionPane.showMessageDialog(null, "Error con la conexión a la base de datos: " + ex, "Error SQL", JOptionPane.ERROR_MESSAGE);
-//        }
-//    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -200,12 +127,10 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
         txt_contraseña = new javax.swing.JPasswordField();
         jLabel1 = new javax.swing.JLabel();
         jbtn_entrar = new javax.swing.JButton();
-        barrita = new javax.swing.JProgressBar();
 
         jPasswordField1.setText("jPasswordField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("LOGUEO....");
 
         txt_contraseña.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 14)); // NOI18N
         txt_contraseña.setToolTipText("Presiona la tecla Enter para ingresar");
@@ -231,16 +156,12 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(barrita, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(txt_contraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jbtn_entrar, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 47, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(txt_contraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jbtn_entrar, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(51, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -251,9 +172,7 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jbtn_entrar, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(txt_contraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(barrita, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                .addGap(25, 25, 25))
+                .addContainerGap(41, Short.MAX_VALUE))
         );
 
         pack();
@@ -315,7 +234,6 @@ private static Logger log = Logger.getLogger(iniciar_sesion.class.getName());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JProgressBar barrita;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JButton jbtn_entrar;

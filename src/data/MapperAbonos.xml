@@ -5,7 +5,7 @@
   
 <mapper namespace="MapperAbonos">
   
-    <resultMap id="resultMapAbonos" type="model.Abono">        
+    <resultMap id="resultMapAbonos" type="common.model.Abono">        
         <result property="abonoId" column="id_abonos"/>
         <result property="fecha" column="fecha"/>
         <result property="abono" column="abono"/>
@@ -34,11 +34,53 @@
        <result property="renta.rentaId" column="renta_id"/>
        <result property="renta.folio" column="renta_folio"/>
        <result property="renta.tipo.tipo" column="renta_tipo"/>
+       <result property="renta.fechaEvento" column="renta_fecha_evento"/>
+       
+       <result property="renta.cliente.nombre" column="nombre_cliente"/>
+       <result property="renta.cliente.apellidos" column="apellidos_cliente"/>
        
         <result property="totalAbonos" column="suma_abonos"/>
         
         
     </resultMap>
+    
+    <select id="getByParameters" resultMap="resultMapAbonos" parameterType="java.util.Map">
+        SELECT abonos.*,
+            tipo.id_tipo_abono AS tipo_id,
+            tipo.descripcion AS tipo_descripcion,
+            tipo.fg_activo AS tipo_fg_activo,
+            tipo.fecha_registro AS tipo_fecha_registro,
+            cuenta.id AS cuenta_id,
+            cuenta.descripcion AS cuenta_descripcion,
+            cuenta.created_at AS cuenta_created_at,
+            cuenta.updated_at AS cuenta_updated_at,
+            cuenta.fg_activo AS cuenta_fg_activo,
+            usuarios.id_usuarios AS usuario_id,
+            usuarios.nombre AS usuario_nombre,
+            usuarios.apellidos AS usuario_apellidos,
+            renta.id_renta AS renta_id,
+            renta.folio AS renta_folio,
+            renta.fecha_evento AS renta_fecha_evento,
+            tipo_renta.tipo AS renta_tipo,
+            clientes.nombre AS nombre_cliente,
+            clientes.apellidos AS apellidos_cliente
+         FROM abonos abonos
+            INNER JOIN tipo_abono tipo ON (tipo.id_tipo_abono = abonos.id_tipo_abono)
+            INNER JOIN cuenta cuenta ON (cuenta.id = tipo.cuenta_id)
+            INNER JOIN usuarios usuarios ON (usuarios.id_usuarios = abonos.id_usuario)
+            INNER JOIN renta renta ON (renta.id_renta = abonos.id_renta)
+            INNER JOIN clientes clientes ON (renta.id_clientes = clientes.id_clientes)
+            INNER JOIN tipo tipo_renta ON (tipo_renta.id_tipo = renta.id_tipo)
+            <if test="createdAtInitDate != null and createdAtInitDate != ''
+                                and createdAtEndDate != null and createdAtEndDate != ''">
+                AND STR_TO_DATE(abonos.fecha,'%d/%m/%Y') BETWEEN STR_TO_DATE (#{createdAtInitDate},'%d/%m/%Y') AND STR_TO_DATE(#{createdAtEndDate},'%d/%m/%Y')
+            </if>
+            <if test="paymentInitDate != null and paymentInitDate != ''
+                                and paymentEndDate != null and paymentEndDate != ''">
+                AND STR_TO_DATE(abonos.fecha_pago,'%d/%m/%Y') BETWEEN STR_TO_DATE (#{paymentInitDate},'%d/%m/%Y') AND STR_TO_DATE(#{paymentEndDate},'%d/%m/%Y')
+            </if>
+            ORDER BY abonos.id_abonos DESC
+    </select>
      
      <select id="getAbonosByDates" resultMap="resultMapAbonos" parameterType="java.util.Map">
         SELECT abonos.*,
@@ -64,8 +106,7 @@
             INNER JOIN renta renta ON (renta.id_renta = abonos.id_renta)
             INNER JOIN tipo tipo_renta ON (tipo_renta.id_tipo = renta.id_tipo)
             WHERE STR_TO_DATE(abonos.fecha_pago,'%d/%m/%Y') 
-            BETWEEN STR_TO_DATE (#{initDate},'%d/%m/%Y')
-            AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
+            BETWEEN STR_TO_DATE (#{initDate},'%d/%m/%Y') AND STR_TO_DATE(#{endDate},'%d/%m/%Y')
 
     </select>
     

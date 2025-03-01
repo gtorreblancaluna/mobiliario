@@ -1,20 +1,20 @@
 package forms.material.inventory;
 
+import common.constants.ApplicationConstants;
+import common.services.UtilityService;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import mobiliario.ApplicationConstants;
 import model.material.inventory.MeasurementUnit;
 import org.apache.log4j.Priority;
-import services.SystemService;
 import services.material.inventory.MaterialInventoryService;
 
 public class UnitMeasurementDialogForm extends javax.swing.JDialog {
 
-    private MaterialInventoryService materialInventoryService;
+    private final MaterialInventoryService materialInventoryService;
     private String idToUpdate;
     private static org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(UnitMeasurementDialogForm.class.getName());
-    private final SystemService systemService = SystemService.getInstance();
+    private final UtilityService utilityService = UtilityService.getInstance();
     
     public UnitMeasurementDialogForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -30,7 +30,7 @@ public class UnitMeasurementDialogForm extends javax.swing.JDialog {
                 String id = table.getValueAt(table.getSelectedRow(), 0).toString();
                 try {
                     MeasurementUnit measurementUnit = new MeasurementUnit();
-                    measurementUnit.setId(new Long(id));
+                    measurementUnit.setId(Long.parseLong(id));
                     materialInventoryService.delete(measurementUnit);
                     MaterialInventoryView.loadComboBoxs();
                     fillTable();
@@ -67,7 +67,7 @@ public class UnitMeasurementDialogForm extends javax.swing.JDialog {
         try {
             MeasurementUnit measurementUnit = new MeasurementUnit();
             if (idToUpdate != null && !idToUpdate.isEmpty()) {
-                measurementUnit.setId(new Long(idToUpdate));
+                measurementUnit.setId(Long.parseLong(idToUpdate));
             }
             measurementUnit.setDescription(txtDescription.getText());
             materialInventoryService.save(measurementUnit);
@@ -329,7 +329,7 @@ public class UnitMeasurementDialogForm extends javax.swing.JDialog {
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       systemService.exportarExcel(table);
+       utilityService.exportarExcel(table);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

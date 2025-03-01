@@ -261,3 +261,78 @@ INSERT INTO material_area (description) VALUES ('Herrería');
 INSERT INTO measurement_units (description) VALUES ('METRO');
 INSERT INTO measurement_units (description) VALUES ('KILO');
 INSERT INTO measurement_units (description) VALUES ('TRAMO');
+
+INSERT INTO tipo_detalle_orden_proveedor (description,created_at,updated_at) VALUES ('Compra','2022-04-22','2022-04-22');
+INSERT INTO tipo_detalle_orden_proveedor (description,created_at,updated_at) VALUES ('Renta','2022-04-22','2022-04-22');
+
+-- modificar id tipo de orden
+ALTER TABLE detalle_orden_proveedor CHANGE COLUMN tipo_orden tipo_orden_detalle_proveedor_id INT(11) NOT NULL;
+
+ALTER TABLE detalle_orden_proveedor
+ADD CONSTRAINT FK_detalle_orden_proveedor_id FOREIGN KEY (tipo_orden_detalle_proveedor_id)
+    REFERENCES detalle_orden_proveedor(id);
+
+-- FIN agregar id tipo de orden
+
+
+ALTER TABLE datos_generales ADD COLUMN info_summary_folio VARCHAR(9028) DEFAULT NULL;
+
+
+INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Nuevo folio','1');
+INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio estado folio','1');
+INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio tipo folio','1');
+INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio tipo y estado folio','1');
+INSERT INTO status_almacen_tasks_catalog (description,fg_active) VALUES ('Cambio en articulos del folio','1');
+
+INSERT INTO attend_almacen_tasks_type_catalog (description,fg_active) VALUES ('Sin atender','1');
+INSERT INTO attend_almacen_tasks_type_catalog (description,fg_active) VALUES ('Atendido','1');
+
+
+ALTER TABLE tasks_almacen DROP COLUMN system_message;
+ALTER TABLE tasks_chofer_delivery DROP COLUMN system_message;
+
+-- modificar columna
+ALTER TABLE tasks_almacen CHANGE COLUMN user_id user_by_category_id INT(11) NOT NULL;
+
+-- agregar columna 
+ALTER TABLE tasks_almacen ADD COLUMN user_id INT(11) NOT NULL DEFAULT 12 AFTER fg_active,
+ADD FOREIGN KEY fk_tasks_almacen_user2_id(user_id) REFERENCES usuarios(id_usuarios) ON DELETE CASCADE;
+
+-- agregar columna 
+ALTER TABLE tasks_chofer_delivery ADD COLUMN user_id INT(11) NOT NULL DEFAULT 12 AFTER fg_active,
+ADD FOREIGN KEY fk_tasks_chofer_delivery_user_id(user_id) REFERENCES usuarios(id_usuarios) ON DELETE CASCADE;
+
+-- agregar columna 
+ALTER TABLE clientes ADD COLUMN birthday TIMESTAMP NULL DEFAULT NULL AFTER activo;
+
+-- agregar columna 
+ALTER TABLE catalog_social_media_contact ADD COLUMN updated_at TIMESTAMP NULL DEFAULT NULL AFTER fg_active;
+
+ALTER TABLE clientes ADD COLUMN catalog_social_media_contact_id INT(11) NOT NULL DEFAULT 1 AFTER activo,
+ADD FOREIGN KEY fk_catalog_social_media_contact(catalog_social_media_contact_id) 
+REFERENCES catalog_social_media_contact(id) ON DELETE CASCADE;
+
+-- agregar columna 
+ALTER TABLE clientes ADD COLUMN created_at TIMESTAMP NULL DEFAULT NULL AFTER activo;
+ALTER TABLE clientes ADD COLUMN updated_at TIMESTAMP NULL DEFAULT NULL AFTER activo;
+
+-- 2024-jul-10
+ALTER TABLE articulo ADD COLUMN image BLOB NULL DEFAULT NULL;
+
+
+-- 2025-enero-16
+UPDATE tipo SET tipo='Renta' WHERE id_tipo = 1;
+UPDATE tipo SET tipo='Venta' WHERE id_tipo = 3;
+
+-- 2025-enero-16
+ALTER TABLE detalle_orden_proveedor ADD COLUMN id_proveedores INT(11) NOT NULL DEFAULT 1 AFTER tipo_orden_detalle_proveedor_id, 
+ADD FOREIGN KEY fk_detalle_orden_proveedor(id_proveedores) REFERENCES proveedores(id) ON DELETE CASCADE;
+
+-- 2025-enero-16 - Para obtener el detalle de pagos por proveedor y detalle de proveedor
+ALTER TABLE pagos_proveedor ADD COLUMN id_proveedor INT(11) NOT NULL DEFAULT 1 AFTER actualizado, 
+ADD FOREIGN KEY fk_pagos_proveedor_id_proveedor_id(id_proveedor) REFERENCES proveedores(id) ON DELETE CASCADE;
+
+ALTER TABLE datos_generales ADD COLUMN info_summary_folio_venta VARCHAR(9028) DEFAULT NULL;
+
+-- 20-febrero-2025
+ALTER TABLE orden_proveedor ADD COLUMN fecha_bodega TIMESTAMP NULL DEFAULT NULL AFTER comentario;

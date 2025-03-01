@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
 import clases.BackUpSample;
@@ -12,10 +7,6 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-/**
- *
- * @author Jorge
- */
 public class bd extends javax.swing.JDialog {
 
     /**
@@ -94,7 +85,7 @@ public class bd extends javax.swing.JDialog {
         if (status == 0) {
             File selectedFile = fileChooser.getSelectedFile();
             String file = selectedFile.getParent() + "/" + selectedFile.getName() + ".sql";
-            new BackUpSample().CrearBackup("localhost", "3306", "root", "america", "mobiliario", file); //@mericaboxes100485
+            new BackUpSample().crearBackup("localhost", "3306", "root", "america", "mobiliario", file);
             this.dispose();
         }
     }//GEN-LAST:event_jButton1ActionPerformed

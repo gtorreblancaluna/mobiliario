@@ -1,33 +1,50 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dao;
 
-import java.sql.Timestamp;
+import common.exceptions.DataOriginException;
+import common.utilities.MyBatisConnectionFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import model.Abono;
+import common.model.Abono;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
-/**
- *
- * @author idscomercial
- */
+
 public class AbonosDAO {
+      
+    private static final AbonosDAO SINGLE_INSTANCE = null;
     
-    private static Logger log = Logger.getLogger(AbonosDAO.class.getName());
-    private SqlSessionFactory sqlSessionFactory;
+    public static AbonosDAO getInstance(){
+        
+        if (SINGLE_INSTANCE == null) {
+            return new AbonosDAO();
+        }
+        return SINGLE_INSTANCE;
+    } 
     
-    public AbonosDAO() {
+    private final Logger log = Logger.getLogger(AbonosDAO.class.getName());
+    private final SqlSessionFactory sqlSessionFactory;
+    
+    private AbonosDAO() {
         sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();
     }
     
-    public List<Abono> getAbonosByDates(String initDate,String endDate){
+    public List<Abono> getByParameters(Map<String,Object> parameters) throws DataOriginException {
+        SqlSession session = sqlSessionFactory.openSession();
+     
+        try{
+            return session.selectList("MapperAbonos.getByParameters",parameters);
+            
+         } catch(Exception e){
+            log.error(e);
+            throw new DataOriginException(e.getMessage(),e);
+        } finally {
+            session.close();
+        }
+    }
+    
+    public List<Abono> getAbonosByDates(String initDate,String endDate) throws DataOriginException {
         SqlSession session = sqlSessionFactory.openSession();
      
         Map<String,Object> map = new HashMap<>();
@@ -37,15 +54,15 @@ public class AbonosDAO {
             List<Abono> list;
                 list = (List<Abono>) session.selectList("MapperAbonos.getAbonosByDates",map);
             return list;
-         }catch(Exception ex){
-            log.error(ex);
-            return null;
+         }catch(Exception e){
+            log.error(e);
+            throw new DataOriginException(e.getMessage(),e);
         } finally {
             session.close();
         }
     }
     
-     public List<Abono> getAbonosByDatesGroupByBankAccounts(String initDate,String endDate){
+     public List<Abono> getAbonosByDatesGroupByBankAccounts(String initDate,String endDate) throws DataOriginException {
         SqlSession session = sqlSessionFactory.openSession();
      
         Map<String,Object> map = new HashMap<>();
@@ -55,9 +72,9 @@ public class AbonosDAO {
             List<Abono> list;
                 list = (List<Abono>) session.selectList("MapperAbonos.getAbonosByDatesGroupByBankAccounts",map);
             return list;
-         }catch(Exception ex){
-            log.error(ex);
-            return null;
+         }catch(Exception e){
+            log.error(e);
+            throw new DataOriginException(e.getMessage(),e);
         } finally {
             session.close();
         }

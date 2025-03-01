@@ -5,8 +5,8 @@ package clases;
  * and open the template in the editor.
  */
 
-import javax.activation.DataHandler;  //para enviar imagen adjunta
-import javax.activation.FileDataSource; //para enviar imagen adjunta
+//import javax.activation.DataHandler;  //para enviar imagen adjunta
+//import javax.activation.FileDataSource; //para enviar imagen adjunta
 import java.util.Date;
 import javax.mail.Message;
 import javax.mail.Session;
@@ -21,7 +21,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.AddressException;
-import mobiliario.utilerias;
+import forms.settings.SystemSettingsForm;
 /**
  *
  * @author SOPORTE KONESH
@@ -42,17 +42,17 @@ public class JCMail_enviar_prueba {
     {
         try {
             System.out.println("datos envio de email...");
-            System.out.println("SERVIDOR: "+utilerias.txt_servidor_email.getText());
-            System.out.println("CONEXION TLS: "+utilerias.utiliza_conexion_TLS);
-             System.out.println("AUTENTICACION: "+utilerias.utiliza_conexion_TLS);
+            System.out.println("SERVIDOR: "+SystemSettingsForm.txt_servidor_email.getText());
+            System.out.println("CONEXION TLS: "+SystemSettingsForm.utiliza_conexion_TLS);
+             System.out.println("AUTENTICACION: "+SystemSettingsForm.utiliza_conexion_TLS);
              System.out.println("USUARIO: usuario");
-             System.out.println("PUERTO: "+utilerias.txt_puerto_email.getText());
+             System.out.println("PUERTO: "+SystemSettingsForm.txt_puerto_email.getText());
             Properties props = new Properties();
-            props.put("mail.smtp.host", utilerias.txt_servidor_email.getText());
-            props.put("mail.smtp.starttls.enable", utilerias.utiliza_conexion_TLS);
-            props.put("mail.smtp.auth", utilerias.utiliza_autenticacion);
+            props.put("mail.smtp.host", SystemSettingsForm.txt_servidor_email.getText());
+            props.put("mail.smtp.starttls.enable", SystemSettingsForm.utiliza_conexion_TLS);
+            props.put("mail.smtp.auth", SystemSettingsForm.utiliza_autenticacion);
             props.put("mail.smtp.user", "gtorreblancaluna");
-            props.put("mail.smtp.port", utilerias.txt_puerto_email.getText());
+            props.put("mail.smtp.port", SystemSettingsForm.txt_puerto_email.getText());
             //
             SMTPAuthenticator auth = new SMTPAuthenticator( getFrom(), getPassword() );
             Session session = Session.getDefaultInstance(props, auth);
@@ -68,7 +68,7 @@ public class JCMail_enviar_prueba {
             String m="";
             BodyPart archivo = new MimeBodyPart();
             if(Adjunto!=""){
-                            archivo.setDataHandler(new DataHandler(new FileDataSource(Adjunto)));
+//                            archivo.setDataHandler(new DataHandler(new FileDataSource(Adjunto)));
                             String[] tmp =Adjunto.split("/");
                             int j=0;
                             while( j < tmp.length){

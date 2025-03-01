@@ -5,7 +5,7 @@
   
 <mapper namespace="MapperAccounts">
   
-    <resultMap id="resultMapAccount" type="model.Cuenta">        
+    <resultMap id="resultMapAccount" type="common.model.Cuenta">        
         
         <result property="id" column="cuenta_id"/>
         <result property="descripcion" column="descripcion"/>    
@@ -33,7 +33,7 @@
          WHERE fg_activo = '1' 
         
     </select> 
-    <insert id="insertAccount" parameterType="model.Cuenta">
+    <insert id="insertAccount" parameterType="common.model.Cuenta">
         INSERT INTO cuenta
         (
             descripcion,

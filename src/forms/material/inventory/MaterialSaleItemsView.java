@@ -1,39 +1,35 @@
 package forms.material.inventory;
 
-import forms.proveedores.SelectProviderToOrder;
+import common.constants.ApplicationConstants;
+import common.services.UtilityService;
+import common.form.provider.SelectProviderToOrder;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import mobiliario.ApplicationConstants;
-import model.Articulo;
+import common.model.Articulo;
 import model.material.inventory.MaterialInventory;
 import model.material.inventory.MaterialSaleItem;
-import model.providers.Proveedor;
+import common.model.providers.Proveedor;
 import org.apache.log4j.Priority;
-import services.ItemService;
-import services.SystemService;
+import common.services.ItemService;
 import services.material.inventory.MaterialInventoryService;
 
 public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
 
     private final MaterialInventoryService materialInventoryService;
     private final ItemService itemService;
-    private final SystemService systemService;
+    private final UtilityService utilityService = UtilityService.getInstance();
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(MaterialSaleItemsView.class.getName());
     private Articulo gItem = null;
     public static String gMaterialId = "";
     public static String gProviderId = "";
     
-    /**
-     * @param itemId .> item id, to add material inventory
-     */
     public MaterialSaleItemsView(String itemId) {
         initComponents();
         this.setTitle("Material para construcción de articulo");
         this.setClosable(true);
         itemService = ItemService.getInstance();
         materialInventoryService = MaterialInventoryService.getInstance();
-        systemService = SystemService.getInstance();
         init(itemId);
     }
     
@@ -42,7 +38,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
             
             String id = table.getValueAt(table.getSelectedRow(), 0).toString();
             try {
-                materialInventoryService.delete(new MaterialSaleItem(new Long(id)));
+                materialInventoryService.delete(new MaterialSaleItem(Long.parseLong(id)));
                 getItems();
             } catch (Exception e) {
                 printLog(e);
@@ -77,10 +73,10 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
             }
             
             MaterialSaleItem materialSaleItem = new MaterialSaleItem();
-            materialSaleItem.setMaterialInventory(new MaterialInventory(new Long(gMaterialId)));
-            materialSaleItem.setProvider(new Proveedor(new Long(gProviderId)));
+            materialSaleItem.setMaterialInventory(new MaterialInventory(Long.parseLong(gMaterialId)));
+            materialSaleItem.setProvider(new Proveedor(Long.parseLong(gProviderId)));
             materialSaleItem.setItem(gItem);
-            materialSaleItem.setAmount(new Float(amount));
+            materialSaleItem.setAmount(Float.parseFloat(amount));
             materialInventoryService.save(materialSaleItem);
             getItems();
             txtAmount.setText("");
@@ -104,7 +100,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
         txtProvider.setEnabled(false);
        
         try {
-            gItem = itemService.getItemAvailable(new Integer(itemId));
+            gItem = itemService.obtenerArticuloPorId(Integer.parseInt(itemId));
             getItems();
         } catch (Exception e) {
             printLog(e);
@@ -119,7 +115,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
         List<MaterialSaleItem> list;
         
         try {
-            list = materialInventoryService.getMaterialSaleItemsByItemId(new Long(gItem.getArticuloId()));
+            list = materialInventoryService.getMaterialSaleItemsByItemId(Long.parseLong(gItem.getArticuloId()+""));
         } catch (Exception e) {
             printLog(e);
             return;
@@ -188,7 +184,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
         lblItem = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtProvider = new javax.swing.JTextField();
-        btnDelete1 = new javax.swing.JButton();
+        btnExportExcel = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
@@ -256,12 +252,12 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
 
         txtProvider.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
 
-        btnDelete1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        btnDelete1.setText("Exportar PDF");
-        btnDelete1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnDelete1.addActionListener(new java.awt.event.ActionListener() {
+        btnExportExcel.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        btnExportExcel.setText("Exportar Excel");
+        btnExportExcel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExportExcel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDelete1ActionPerformed(evt);
+                btnExportExcelActionPerformed(evt);
             }
         });
 
@@ -285,7 +281,6 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
                                         .addComponent(jLabel3)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 173, Short.MAX_VALUE))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(txtMaterial)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -307,7 +302,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnDelete)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnDelete1)
+                        .addComponent(btnExportExcel)
                         .addContainerGap())))
         );
         jPanel1Layout.setVerticalGroup(
@@ -339,7 +334,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
                     .addComponent(btnDelete)
                     .addComponent(btnProviders)
                     .addComponent(btnMaterial)
-                    .addComponent(btnDelete1))
+                    .addComponent(btnExportExcel))
                 .addContainerGap())
         );
 
@@ -420,9 +415,9 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
         save();
     }//GEN-LAST:event_btnAddActionPerformed
 
-    private void btnDelete1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelete1ActionPerformed
-        systemService.exportarExcel(table);
-    }//GEN-LAST:event_btnDelete1ActionPerformed
+    private void btnExportExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportExcelActionPerformed
+        utilityService.exportarExcel(table);
+    }//GEN-LAST:event_btnExportExcelActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         delete();
@@ -438,7 +433,7 @@ public class MaterialSaleItemsView extends javax.swing.JInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnDelete;
-    private javax.swing.JButton btnDelete1;
+    private javax.swing.JButton btnExportExcel;
     private javax.swing.JButton btnMaterial;
     private javax.swing.JButton btnProviders;
     private javax.swing.JLabel jLabel1;

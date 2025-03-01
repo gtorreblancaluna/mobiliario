@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
+import forms.inventario.InventarioForm;
 import services.SaleService;
 import clases.sqlclass;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
+import common.constants.ApplicationConstants;
+import common.services.UtilityService;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
@@ -17,11 +12,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import model.DetalleRenta;
+import common.model.DetalleRenta;
 import model.Faltante;
-import model.Renta;
-import services.ItemService;
-import services.SystemService;
+import common.model.Renta;
+import services.FaltanteService;
 
 /**
  *
@@ -31,47 +25,26 @@ import services.SystemService;
 public class VerFoliosPorArticulo extends java.awt.Dialog {
 
     sqlclass funcion = new sqlclass();
-    
-    Object[][] dtconduc;
     boolean existe, editar = false;
     String id_color;
     float cant = 0; 
-    SaleService saleService = new SaleService();
-    private final SystemService systemService = SystemService.getInstance();
-    ItemService itemService = ItemService.getInstance();
+    private final SaleService saleService;
+    private final UtilityService utilityService = UtilityService.getInstance();
     public static String g_rentaId;
     public static int g_articuloId;
+    private final FaltanteService faltanteService = FaltanteService.getInstance();
    
+    public void mostrar_faltantes(String rentaId) {
+        VerFaltantes win = new VerFaltantes(null, true, rentaId, g_articuloId);
+        win.setVisible(true);
+        win.setLocationRelativeTo(null);
+    }
     
-    public String conviertemoneda(String valor) {
-
-        DecimalFormatSymbols simbolo = new DecimalFormatSymbols();
-        simbolo.setDecimalSeparator('.');
-        simbolo.setGroupingSeparator(',');
-
-        float entero = Float.parseFloat(valor);
-        DecimalFormat formateador = new DecimalFormat("###,###.##", simbolo);
-        String entero2 = formateador.format(entero);
-
-        if (entero2.contains(".")) {
-            entero2 = "$" + entero2;
-
-        } else {
-            entero2 = "$" + entero2 + ".00";
-        }
-
-        return entero2;
-
-    }
-     public void mostrar_faltantes() {
-        VerFaltantes ventana_faltantes = new VerFaltantes(null, true);
-        ventana_faltantes.setVisible(true);
-        ventana_faltantes.setLocationRelativeTo(null);
-    }
     public VerFoliosPorArticulo(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         
-        initComponents();      
+        initComponents();
+        saleService = SaleService.getInstance();
         funcion.conectate();
         this.setLocationRelativeTo(null);
         this.lblEncontrados.setText("");
@@ -193,7 +166,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
         "INNER JOIN articulo articulo ON (detalle.id_articulo = articulo.id_articulo) " +
         "INNER JOIN estado estado ON (estado.id_estado = renta.id_estado) " +
         "INNER JOIN tipo tipo ON (tipo.id_tipo = renta.id_tipo) " +
-        "WHERE articulo.id_articulo = "+inventario.g_articuloId+" " +
+        "WHERE articulo.id_articulo = "+InventarioForm.g_articuloId+" " +
         "ORDER BY renta.folio DESC " +
         "LIMIT 100 ";
          
@@ -225,7 +198,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
     
     public void llenar_tabla_articulos_faltantes(){
         this.formato_tabla_articulos_faltantes();
-        List<Faltante> faltantes = itemService.obtenerFaltantesPorArticuloId(funcion, inventario.g_articuloId);
+        List<Faltante> faltantes = faltanteService.obtenerFaltantesPorArticuloId(funcion, InventarioForm.g_articuloId);
         
         if(faltantes == null || faltantes.size()<= 0)
             return;
@@ -272,7 +245,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
             query.append("INNER JOIN articulo articulo ON (detalle.id_articulo = articulo.id_articulo) ");
             query.append("INNER JOIN estado estado ON (estado.id_estado = renta.id_estado) ");
             query.append("INNER JOIN tipo tipo ON (tipo.id_tipo = renta.id_tipo) ");
-            query.append("WHERE articulo.id_articulo = "+inventario.g_articuloId+" ");
+            query.append("WHERE articulo.id_articulo = "+InventarioForm.g_articuloId+" ");
             query.append("ORDER BY renta.folio DESC ");
             query.append("LIMIT "+limit+" ");
         }else{
@@ -293,7 +266,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
             query.append("INNER JOIN articulo articulo ON (detalle.id_articulo = articulo.id_articulo) ");
             query.append("INNER JOIN estado estado ON (estado.id_estado = renta.id_estado) ");
             query.append("INNER JOIN tipo tipo ON (tipo.id_tipo = renta.id_tipo) ");
-            query.append("WHERE articulo.id_articulo = "+inventario.g_articuloId+" ");
+            query.append("WHERE articulo.id_articulo = "+InventarioForm.g_articuloId+" ");
             if(estadoEvento != null)
                 query.append("AND estado.descripcion = '"+estadoEvento+"' ");
             if(tipoEvento != null)
@@ -515,7 +488,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-//        inventario.validar_colores = true;
+
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog
@@ -534,7 +507,7 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
 
     private void btnExportarExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportarExcelActionPerformed
         // TODO add your handling code here:
-        systemService.exportarExcel(tablaArticulos);
+        utilityService.exportarExcel(tablaArticulos);
     }//GEN-LAST:event_btnExportarExcelActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -546,8 +519,8 @@ public class VerFoliosPorArticulo extends java.awt.Dialog {
         // TODO add your handling code here:
         if (evt.getClickCount() == 2) {
             this.g_rentaId = tablaArticulosFaltantes.getValueAt(tablaArticulosFaltantes.getSelectedRow(), 0).toString();
-            g_articuloId = new Integer (tablaArticulosFaltantes.getValueAt(tablaArticulosFaltantes.getSelectedRow(), 1).toString());
-            this.mostrar_faltantes();
+            g_articuloId = Integer.parseInt(tablaArticulosFaltantes.getValueAt(tablaArticulosFaltantes.getSelectedRow(), 1).toString());
+            this.mostrar_faltantes(this.g_rentaId);
         }
     }//GEN-LAST:event_tablaArticulosFaltantesMouseClicked
 

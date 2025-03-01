@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MapperOrderTypeChanges">
+  
+    <resultMap id="resultMapOrderTypeChange" type="model.OrderTypeChange">        
+        
+        <result property="id" column="id"/>
+        
+        <result property="renta.id" column="renta_id"/>
+        
+        <result property="user.id" column="user_id"/>
+        <result property="user.nombre" column="user_name"/>
+        <result property="user.apellidos" column="user_lastname"/>
+      
+        <result property="currentType.tipoId" column="current_type_id"/>
+        <result property="currentType.tipo" column="current_type_description"/>
+        
+        <result property="changeType.tipoId" column="change_type_id"/>
+        <result property="changeType.tipo" column="change_type_description"/>
+        
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="fgActive" column="fg_active"/>
+        
+    </resultMap>
+     
+    <insert id="insertOrderTypeChange" parameterType="model.OrderTypeChange">
+        INSERT INTO order_type_changes
+        (
+            user_id,
+            renta_id,
+            current_type_id,
+            change_type_id,
+            created_at,
+            updated_at,
+            fg_active
+        )
+        VALUES
+        (
+            #{user.usuarioId},
+            #{renta.rentaId},
+            #{currentType.tipoId},
+            #{changeType.tipoId},
+            #{createdAt},
+            #{updatedAt},
+            #{fgActive}
+        )
+    </insert>
+    
+  
+</mapper>

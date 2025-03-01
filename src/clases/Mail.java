@@ -8,8 +8,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import javax.activation.DataHandler;  //para enviar imagen adjunta
-import javax.activation.FileDataSource; //para enviar imagen adjunta
+//import javax.activation.DataHandler;  //para enviar imagen adjunta
+//import javax.activation.FileDataSource; //para enviar imagen adjunta
 import java.util.Date;
 import javax.mail.Message;
 import javax.mail.Session;
@@ -50,8 +50,6 @@ public class Mail {
     private static String mailToSend = "";
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Mail.class.getName());
 
-    public Mail() {
-    }
     
     public void getPropertiesConection(){
         conectate conectate = new conectate();
@@ -124,7 +122,7 @@ public class Mail {
                 System.out.println("ADJUNTO ES: " + Adjunto);
 
                 if (Adjunto != "") {
-                    archivo.setDataHandler(new DataHandler(new FileDataSource(Adjunto)));
+//                    archivo.setDataHandler(new DataHandler(new FileDataSource(Adjunto)));
                    // archivo.setDataHandler(new DataHandler(new FileDataSource("C:/reportes_mobiliario/reporte_consulta.pdf")));
                     //C:\reporte_mobiliario\reporte.pdf
                     String[] tmp = Adjunto.split("/");

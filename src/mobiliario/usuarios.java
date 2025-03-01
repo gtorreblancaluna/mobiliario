@@ -1,14 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
 import clases.conectate;
 import clases.sqlclass;
-import encryption.exceptions.EncryptionException;
-import encryption.utilities.Crypto;
+import common.exceptions.DataOriginException;
+import common.services.UtilityService;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.List;
@@ -18,10 +13,9 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import model.AsignaCategoria;
-import model.CategoriaDTO;
+import common.model.CategoriaDTO;
 import services.CategoryService;
-import services.SystemService;
-import services.UserService;
+import common.services.UserService;
 
 /**
  *
@@ -31,9 +25,9 @@ public class usuarios extends javax.swing.JInternalFrame {
 private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(usuarios.class.getName());
     sqlclass funcion = new sqlclass();
     conectate conexion = new conectate();
-    UserService userService = new UserService();
+    private final UserService userService = UserService.getInstance();
     CategoryService categoryService = new CategoryService();
-    private final SystemService systemService = SystemService.getInstance();
+    private final UtilityService utilityService = UtilityService.getInstance();
     Object[][] dtconduc;
     Object[] datos_combo;
     String id_usuario;
@@ -674,9 +668,14 @@ private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(u
             if (check_nivel_1.isSelected() == true)
                 nivel_1 = "1";
             
-            if(userService.verificarContraseniaExistente(funcion, txt_contraseña.getText().toString())){
-                JOptionPane.showMessageDialog(null, "Esta contraseña ya esta asignada a un usuario, porfavor introduce una diferente", "Error", JOptionPane.INFORMATION_MESSAGE);
-                return;
+            try {
+                if(userService.checkAlReadyPassword(String.valueOf(txt_contraseña.getPassword()))){
+                    JOptionPane.showMessageDialog(null, "Esta contraseña ya esta asignada a un usuario, porfavor introduce una diferente", "Error", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+            } catch (DataOriginException e) {
+                log.error(e);
+                JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR);
             }
             String id_puesto = funcion.GetData("id_puesto", "select id_puesto from puesto where descripcion = '" + cmb_puesto.getSelectedItem().toString() + "' ");
             
@@ -854,10 +853,15 @@ private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(u
             return;
         }
         
-        if(userService.verificarContraseniaExistente(funcion, contraseña)){
-           JOptionPane.showMessageDialog(null, "Esta contraseña ya esta asignada a un usuario, porfavor introduce una diferente", "Error", JOptionPane.INFORMATION_MESSAGE);
-           return;
-        }
+        try {
+                if(userService.checkAlReadyPassword(String.valueOf(txt_contraseña.getPassword()))){
+                    JOptionPane.showMessageDialog(null, "Esta contraseña ya esta asignada a un usuario, porfavor introduce una diferente", "Error", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+            } catch (DataOriginException e) {
+                log.error(e);
+                JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR);
+            }
             
         String datos[] = {txt_contraseña.getText().toString(), id_usuario};
          try {        
@@ -918,7 +922,7 @@ private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(u
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        systemService.exportarExcel(tabla_usuarios);
+        utilityService.exportarExcel(tabla_usuarios);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void tabla_usuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_usuariosMouseClicked
@@ -934,7 +938,7 @@ private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(u
 //              temp.setRowCount(0);
               String nombre = (tabla_usuarios.getValueAt(tabla_usuarios.getSelectedRow(), 1).toString()) + " " + (tabla_usuarios.getValueAt(tabla_usuarios.getSelectedRow(), 2).toString()) ;
               lblNombreUsuario.setText(nombre);
-              int usuarioId = new Integer (tabla_usuarios.getValueAt(tabla_usuarios.getSelectedRow(), 0).toString());
+              int usuarioId = Integer.parseInt(tabla_usuarios.getValueAt(tabla_usuarios.getSelectedRow(), 0).toString());
               List<AsignaCategoria> categorias = categoryService.obtenerCategoriasAsignadasPorUsuarioId(funcion, usuarioId);
               if(categorias == null || categorias.size()<=0){
                   this.lblEncontrados.setText("No se encontraron categorias asignadas a este usuario :( ");

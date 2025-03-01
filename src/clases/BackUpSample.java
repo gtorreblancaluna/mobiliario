@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package clases;
 
 import java.awt.HeadlessException;
@@ -13,20 +9,16 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author DM KONESH
- */
 public class BackUpSample {
 
-    private int BUFFER = 10485760;
+    private final int BUFFER = 10485760;
     //para guardar en memmoria
     private StringBuffer temp = null;
     //para guardar el archivo SQL
     private FileWriter fichero = null;
     private PrintWriter pw = null;
 
-    public boolean CrearBackup(String host, String port, String user, String password, String db, String file_backup) {
+    public boolean crearBackup(String host, String port, String user, String password, String db, String file_backup) {
         boolean ok = false;
         String path_jar = "";
         path_jar = System.getProperty("user.dir");

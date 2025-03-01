@@ -1,37 +1,74 @@
 
 package forms.material.inventory;
 
-import exceptions.BusinessException;
+import common.constants.ApplicationConstants;
+import common.exceptions.BusinessException;
+import common.services.UtilityService;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import mobiliario.ApplicationConstants;
 import model.material.inventory.MaterialArea;
 import model.material.inventory.MaterialInventory;
 import model.material.inventory.MeasurementUnit;
 import org.apache.log4j.Priority;
-import services.SystemService;
 import services.material.inventory.MaterialInventoryService;
 
 
 public class MaterialInventoryView extends javax.swing.JInternalFrame {
 
     private static MaterialInventoryService materialInventoryService;
-    private final SystemService systemService;
+    private final UtilityService utilityService = UtilityService.getInstance();
     private static org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(MaterialInventoryView.class.getName());
     private String idToUpdate = "";
     
     public MaterialInventoryView() {
         initComponents();
+        cmbMeasurementUnit.addActionListener ((ActionEvent e) -> {
+            getInfo();
+        });
+        cmbMeasurementPurchaseUnit.addActionListener ((ActionEvent e) -> {
+            getInfo();
+        });
+        txtPurchaseAmount.addKeyListener (new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                getInfo();
+            }
+        });
+        
         super.setTitle("Inventario de material");
         materialInventoryService = MaterialInventoryService.getInstance();
-        systemService = SystemService.getInstance();
         this.setClosable(true);
         this.btnUpdate.setEnabled(false);
         loadComboBoxs();
         getItems();
+    }
+    
+    private void getInfo () {
+        
+        try {
+            Float.parseFloat(txtPurchaseAmount.getText());
+        } catch (NumberFormatException e) {
+            System.out.println(e);
+            return;
+        }
+        
+        System.out.println("GET INFO");
+        MeasurementUnit measurementUnit = (MeasurementUnit) cmbMeasurementUnit.getSelectedItem();
+        MeasurementUnit measurementUnitPurchaseUnit = (MeasurementUnit) cmbMeasurementPurchaseUnit.getSelectedItem();
+        String total = txtPurchaseAmount.getText().isEmpty() ? "0" : txtPurchaseAmount.getText();
+        if (measurementUnit.getId() != 0 && measurementUnitPurchaseUnit.getId() != 0) {
+            lblMeasurementUnitInfo.setText(
+                    total + " " +measurementUnit.getDescription() + " PARA COMPRAR UN " + measurementUnitPurchaseUnit.getDescription()
+            );
+        } else {
+            lblMeasurementUnitInfo.setText("");
+        }
     }
     
     private void delete () {
@@ -41,7 +78,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
                 String id = table.getValueAt(table.getSelectedRow(), 0).toString();
                 try {
                     MaterialInventory materialInventory = new MaterialInventory();
-                    materialInventory.setId(new Long(id));
+                    materialInventory.setId(Long.parseLong(id));
                     materialInventoryService.delete(materialInventory);
                     MaterialInventoryView.loadComboBoxs();
                     getItems();
@@ -63,7 +100,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
             
             final String id = table.getValueAt(table.getSelectedRow(), 0).toString();
             try {
-                MaterialInventory materialInventory = materialInventoryService.getById(new Long(id));
+                MaterialInventory materialInventory = materialInventoryService.getById(Long.parseLong(id));
                 
                 if (materialInventory == null) {
                     throw new Exception("No data found");
@@ -143,15 +180,15 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         
         MaterialInventory materialInventory = new MaterialInventory();
         materialInventory.setDescription(description);
-        materialInventory.setPurchaseAmount(new Float(purchaseAmount));
-        materialInventory.setStock(new Float(stock));
+        materialInventory.setPurchaseAmount(Float.parseFloat(purchaseAmount));
+        materialInventory.setStock(Float.parseFloat(stock));
         materialInventory.setMeasurementUnit(measurementUnit);
         materialInventory.setMeasurementUnitPurchase(measurementUnitPurchase);
         materialInventory.setArea(materialArea);
         
         try {
             if (!idToUpdate.isEmpty()) {
-                materialInventory.setId(new Long(idToUpdate));
+                materialInventory.setId(Long.parseLong(idToUpdate));
             }
             materialInventoryService.save(materialInventory);
             cleanForm();
@@ -306,6 +343,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         lblAddMeasurementUnit3 = new javax.swing.JLabel();
         btnSearch = new javax.swing.JButton();
         btnPDF = new javax.swing.JButton();
+        lblMeasurementUnitInfo = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
@@ -427,13 +465,15 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
         });
 
         btnPDF.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-        btnPDF.setText("Exportar PDF");
+        btnPDF.setText("Exportar Excel");
         btnPDF.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnPDF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnPDFActionPerformed(evt);
             }
         });
+
+        lblMeasurementUnitInfo.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -443,16 +483,11 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtPurchaseAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(cmbMeasurementPurchaseUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnPDF)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnSearch))
-                            .addComponent(jLabel5))
+                        .addComponent(txtPurchaseAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnPDF)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSearch)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnAdd)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -463,9 +498,13 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
                         .addComponent(btnUpdate)
                         .addContainerGap())
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(lblMeasurementUnitInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(jLabel5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(lblAddMeasurementUnit))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -477,7 +516,10 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel2)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(lblAddMeasurementUnit2)))))
+                                        .addComponent(lblAddMeasurementUnit2))))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(cmbMeasurementPurchaseUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -516,16 +558,19 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
                     .addComponent(jLabel5)
                     .addComponent(lblAddMeasurementUnit))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtPurchaseAmount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbMeasurementPurchaseUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnAdd)
-                    .addComponent(btnEdit)
-                    .addComponent(btnDelete)
-                    .addComponent(btnUpdate)
-                    .addComponent(btnSearch)
-                    .addComponent(btnPDF))
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtPurchaseAmount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnAdd)
+                        .addComponent(btnEdit)
+                        .addComponent(btnDelete)
+                        .addComponent(btnUpdate)
+                        .addComponent(btnSearch)
+                        .addComponent(btnPDF))
+                    .addComponent(cmbMeasurementPurchaseUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblMeasurementUnitInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(9, Short.MAX_VALUE))
         );
 
         table.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
@@ -561,7 +606,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 15, Short.MAX_VALUE)
+                .addComponent(lblInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -638,7 +683,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPDFActionPerformed
-        systemService.exportarExcel(table);
+        utilityService.exportarExcel(table);
     }//GEN-LAST:event_btnPDFActionPerformed
 
 
@@ -664,6 +709,7 @@ public class MaterialInventoryView extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lblAddMeasurementUnit2;
     private javax.swing.JLabel lblAddMeasurementUnit3;
     private javax.swing.JLabel lblInfo;
+    private javax.swing.JLabel lblMeasurementUnitInfo;
     private javax.swing.JTable table;
     private javax.swing.JTextField txtDescription;
     private javax.swing.JTextField txtPurchaseAmount;
