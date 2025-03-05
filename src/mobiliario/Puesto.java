@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mobiliario;
 
 import clases.conectate;
 import clases.sqlclass;
+import common.constants.ApplicationConstants;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.logging.Level;
@@ -15,10 +11,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author Carlos Alberto
- */
 public class Puesto extends java.awt.Dialog {
 
     sqlclass funcion = new sqlclass();
@@ -38,6 +30,13 @@ public class Puesto extends java.awt.Dialog {
         jbtn_guardar.setEnabled(false);
         txt_buscar.requestFocus();
         this.setLocationRelativeTo(null);
+        
+        if (iniciar_sesion.usuarioGlobal.getPuesto().getPuestoId() != ApplicationConstants.PUESTO_ADMINISTRADOR) {
+            JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_NOT_PERMISIONS_ADMIN, 
+                        ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+            this.dispose();
+        }
+        
     }
 
     public void llenar_tabla() {
@@ -74,7 +73,7 @@ public class Puesto extends java.awt.Dialog {
     }
 
     public void like() {
-        // funcion.conectate();
+
         tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         String[] columNames = {"Id", "Puesto"};
         String[] colName = {"id_puesto", "descripcion"};

@@ -62,18 +62,15 @@ public class CustomerDao {
        
         SqlSession session = sqlSessionFactory.openSession();
         try {
+            cliente.setUpdatedAt(
+                new Timestamp(System.currentTimeMillis())
+            );
            if (cliente.getId() == null) {
                 cliente.setCreatedAt(
                         new Timestamp(System.currentTimeMillis())
                 );
-                cliente.setUpdatedAt(
-                        new Timestamp(System.currentTimeMillis())
-                );
                 session.insert("MapperCustomer.insertCustomer",cliente);
            } else {
-                cliente.setUpdatedAt(
-                        new Timestamp(System.currentTimeMillis())
-                );
                 session.insert("MapperCustomer.updateCustomer",cliente);
            }
            session.commit();

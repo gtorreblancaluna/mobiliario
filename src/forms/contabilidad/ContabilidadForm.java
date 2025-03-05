@@ -24,7 +24,7 @@ import model.CategoriaContabilidad;
 import model.Contabilidad;
 import common.model.Cuenta;
 import model.SubCategoriaContabilidad;
-import services.AbonosService;
+import common.services.AbonosService;
 import services.AccountService;
 import services.ContabilidadServices;
 

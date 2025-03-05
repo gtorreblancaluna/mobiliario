@@ -28,7 +28,7 @@ import javax.swing.SwingUtilities;
 import common.model.DatosGenerales;
 import org.jvnet.substance.SubstanceLookAndFeel;
 import org.jvnet.substance.skin.SkinInfo;
-import services.SystemService;
+import common.services.SystemService;
 import common.utilities.PropertySystemUtil;
 import common.utilities.UtilityCommon;
 

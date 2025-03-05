@@ -336,3 +336,11 @@ ALTER TABLE datos_generales ADD COLUMN info_summary_folio_venta VARCHAR(9028) DE
 
 -- 20-febrero-2025
 ALTER TABLE orden_proveedor ADD COLUMN fecha_bodega TIMESTAMP NULL DEFAULT NULL AFTER comentario;
+
+-- 03-marzo-2025 - agregar columna a renta
+ALTER TABLE renta ADD COLUMN created_at TIMESTAMP NULL DEFAULT NULL AFTER mostrar_precios_pdf;
+ALTER TABLE renta ADD COLUMN updated_at TIMESTAMP NULL DEFAULT NULL AFTER mostrar_precios_pdf;
+
+-- 03-marzo-2025 - agregar columna a renta
+ALTER TABLE abonos ADD COLUMN created_at TIMESTAMP NULL DEFAULT NULL AFTER fecha_pago;
+ALTER TABLE abonos ADD COLUMN updated_at TIMESTAMP NULL DEFAULT NULL AFTER fecha_pago;

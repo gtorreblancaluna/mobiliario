@@ -2,7 +2,7 @@ package forms.rentas;
 
 import common.services.ItemService;
 import services.SaleService;
-import services.SystemService;
+import common.services.SystemService;
 import common.services.UserService;
 import clases.Mail;
 import clases.sqlclass;
@@ -1100,7 +1100,6 @@ public class ConsultarRentas extends javax.swing.JInternalFrame {
         if (cmb_fecha_pago.getDate() != null )
             fechaPago = new SimpleDateFormat(ApplicationConstants.SIMPLE_DATE_FORMAT_SHORT).format(cmb_fecha_pago.getDate());            
         fecha_sistema();
-        // funcion.conectate();
         String tipoAbonoId = funcion.GetData("id_tipo_abono", "SELECT id_tipo_abono FROM tipo_abono "
             + "WHERE descripcion='" + cmbTipoPago.getSelectedItem().toString() + "'");
         String datos[] = {id_renta, iniciar_sesion.id_usuario_global, fecha_sistema, txt_abono.getText(),

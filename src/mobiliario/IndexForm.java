@@ -20,7 +20,7 @@ import javax.swing.JOptionPane;
 import static mobiliario.iniciar_sesion.usuarioGlobal;
 import common.model.DatosGenerales;
 import java.net.URISyntaxException;
-import services.SystemService;
+import common.services.SystemService;
 import utilities.Utility;
 
 public class IndexForm extends javax.swing.JFrame {

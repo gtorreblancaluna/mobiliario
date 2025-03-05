@@ -98,7 +98,7 @@ public class Utility {
        
         IndexForm.txtAreaNotifications.setText(null);
         IndexForm.txtAreaNotifications.setText(messages+"");
-    }     
+    }
     
    
     public static boolean showWindowDataUpdateSession(){

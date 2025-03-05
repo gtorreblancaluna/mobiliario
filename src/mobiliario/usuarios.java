@@ -2,6 +2,7 @@ package mobiliario;
 
 import clases.conectate;
 import clases.sqlclass;
+import common.constants.ApplicationConstants;
 import common.exceptions.DataOriginException;
 import common.services.UtilityService;
 import java.sql.SQLException;
@@ -702,12 +703,13 @@ private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(u
     }//GEN-LAST:event_jbtn_nuevoActionPerformed
 
     private void jbtn_editarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_editarActionPerformed
-        // TODO add your handling code here:
+        if (iniciar_sesion.usuarioGlobal.getPuesto().getPuestoId() != ApplicationConstants.PUESTO_ADMINISTRADOR) {
+            JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_NOT_PERMISIONS_ADMIN, 
+                        ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         if (tabla_usuarios.getSelectedRow() != - 1) {
-             if(iniciar_sesion.usuarioGlobal.getAdministrador().equals("0")){
-                JOptionPane.showMessageDialog(null, "Solo el administrador puede realizar esta accion ", "Error", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
+            
             
             txt_contraseña.setEnabled(false);
             txt_verificar_contraseña.setEnabled(false);
@@ -755,10 +757,11 @@ private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(u
     private void jbtn_guardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_guardarActionPerformed
         // TODO add your handling code here:
         String nivel1 = "0", admin = "0";
-        if(iniciar_sesion.usuarioGlobal.getAdministrador().equals("0")){
-                JOptionPane.showMessageDialog(null, "Solo el administrador puede realizar esta accion ", "Error", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
+        if (iniciar_sesion.usuarioGlobal.getPuesto().getPuestoId() != ApplicationConstants.PUESTO_ADMINISTRADOR) {
+            JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_NOT_PERMISIONS_ADMIN, 
+                        ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         if (txt_nombre.getText().equals("") || txt_apellidos.getText().equals("")) {
             JOptionPane.showMessageDialog(null, "Faltan parametros", "Error", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -830,12 +833,14 @@ private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(u
     }//GEN-LAST:event_txt_verificar_contraseñaActionPerformed
 
     private void jbtn_cambiar_contraseñaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_cambiar_contraseñaActionPerformed
-        // TODO add your handling code here:
+        if (iniciar_sesion.usuarioGlobal.getPuesto().getPuestoId() != ApplicationConstants.PUESTO_ADMINISTRADOR) {
+            JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_NOT_PERMISIONS_ADMIN, 
+                        ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
         id_usuario = tabla_usuarios.getValueAt(tabla_usuarios.getSelectedRow(), 0).toString();
-        if(iniciar_sesion.usuarioGlobal.getAdministrador().equals("0")){
-                JOptionPane.showMessageDialog(null, "Solo el administrador puede realizar esta accion ", "Error", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
+      
         if (tabla_usuarios.getSelectedRow() == -1) {
             JOptionPane.showMessageDialog(null, "Selecciona una fila para continuar ", "Error", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -911,7 +916,11 @@ private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(u
     
     }
     private void lbl_puestoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_puestoMouseClicked
-        // TODO add your handling code here:
+        if (iniciar_sesion.usuarioGlobal.getPuesto().getPuestoId() != ApplicationConstants.PUESTO_ADMINISTRADOR) {
+            JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_NOT_PERMISIONS_ADMIN, 
+                        ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         mostrar_puesto();
         if (validar_puesto == true) {
             llenar_combo_puesto();

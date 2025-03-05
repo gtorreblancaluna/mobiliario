@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporte_por_categorias" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d16cf63b-3404-463d-935c-2e064e5dbd9b">
-	<property name="ireport.zoom" value="3.452271214393107"/>
+	<property name="ireport.zoom" value="1.9487171000000039"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="482"/>
+	<property name="ireport.y" value="125"/>
 	<parameter name="URL_IMAGEN" class="java.lang.String"/>
 	<parameter name="ID_ORDEN" class="java.lang.String"/>
 	<parameter name="NOMBRE_EMPRESA" class="java.lang.String"/>
@@ -32,7 +32,7 @@ INNER JOIN orden_proveedor o ON (o.id = d.id_orden_proveedor)
 INNER JOIN renta r ON (r.id_renta = o.id_renta)
 INNER JOIN articulo a ON (a.id_articulo = d.id_articulo)
 INNER JOIN color c ON (c.id_color = a.id_color)
-INNER JOIN proveedores p ON(p.id = o.id_proveedores)
+INNER JOIN proveedores p ON(p.id = d.id_proveedores)
 INNER JOIN tipo_detalle_orden_proveedor t ON(t.id = d.tipo_orden_detalle_proveedor_id)
 WHERE d.fg_activo = '1'
 AND d.id_orden_proveedor = $P{ID_ORDEN}]]>
@@ -166,7 +166,7 @@ AND d.id_orden_proveedor = $P{ID_ORDEN}]]>
 				<text><![CDATA[Cant.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="211" y="2" width="589" height="18" uuid="c2935854-70b2-41c8-83d9-c85fac0deca1"/>
+				<reportElement x="323" y="2" width="477" height="18" uuid="c2935854-70b2-41c8-83d9-c85fac0deca1"/>
 				<textElement>
 					<font fontName="Arial" size="12" isBold="true"/>
 				</textElement>
@@ -193,6 +193,13 @@ AND d.id_orden_proveedor = $P{ID_ORDEN}]]>
 				</textElement>
 				<text><![CDATA[Importe]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="210" y="2" width="113" height="18" uuid="2255f0ea-112f-4847-8998-605150c81a0c"/>
+				<textElement>
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Proveedor]]></text>
+			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
@@ -208,7 +215,7 @@ AND d.id_orden_proveedor = $P{ID_ORDEN}]]>
 				<reportElement x="0" y="13" width="802" height="1" forecolor="#CCCCCC" uuid="bb0eb9f4-0af6-44f4-acb6-2ae398af3ffb"/>
 			</line>
 			<textField>
-				<reportElement x="211" y="0" width="591" height="13" forecolor="#333333" uuid="85b3b06f-0e38-4f63-bb3a-6dee1a86c380"/>
+				<reportElement x="323" y="0" width="479" height="13" forecolor="#333333" uuid="85b3b06f-0e38-4f63-bb3a-6dee1a86c380"/>
 				<textElement verticalAlignment="Top">
 					<font fontName="Arial" size="10" isBold="false"/>
 				</textElement>
@@ -234,6 +241,13 @@ AND d.id_orden_proveedor = $P{ID_ORDEN}]]>
 					<font fontName="Arial" size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA["$"+$F{total}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="210" y="2" width="113" height="13" forecolor="#333333" uuid="5207989e-36e9-4644-871e-22782ab90fcc"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nombre_proveedor}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

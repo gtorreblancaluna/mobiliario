@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import mobiliario.IndexForm;
 import mobiliario.iniciar_sesion;
 import services.CustomerService;
 import utilities.Utility;
@@ -612,6 +613,13 @@ public class CustomerForm extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jbtn_nuevoActionPerformed
 
     private void editCustomer () {
+        
+        if (iniciar_sesion.usuarioGlobal.getPuesto().getPuestoId() != ApplicationConstants.PUESTO_ADMINISTRADOR) {
+            JOptionPane.showMessageDialog(this, ApplicationConstants.MESSAGE_NOT_PERMISIONS_ADMIN, 
+                        ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
         if (tableCustomer.getSelectedRow() != - 1) {
             jbtn_agregar.setEnabled(false);
             jbtn_guardar.setEnabled(true);
@@ -658,8 +666,8 @@ public class CustomerForm extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jbtn_editarActionPerformed
 
     private void jbtn_guardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_guardarActionPerformed
-        // TODO add your handling code here:
 
+        
         Cliente customer = getModelFromTxts();
         customer.setActivo("1");
         customer.setId(Long.parseLong(id_cliente));

@@ -17,8 +17,8 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import lombok.extern.log4j.Log4j;
 import mobiliario.iniciar_sesion;
-import model.abonos.CustomizePayment;
-import services.AbonosService;
+import common.model.CustomizePayment;
+import common.services.AbonosService;
 import utilities.Utility;
 
 @Log4j

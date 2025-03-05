@@ -3,7 +3,6 @@ package forms.rentas;
 import forms.social_media_contact.AddCatalogSocialMediaFormDialog;
 import forms.tipo.abonos.cuentas.TiposAbonosForm;
 import common.services.UserService;
-import clases.Mail;
 import clases.conectate;
 import clases.sqlclass;
 import common.constants.ApplicationConstants;
@@ -11,10 +10,8 @@ import common.constants.PropertyConstant;
 import common.utilities.UtilityCommon;
 import common.exceptions.BusinessException;
 import common.exceptions.DataOriginException;
-import common.exceptions.NoDataFoundException;
 import java.awt.Toolkit;
 import java.sql.SQLException;
-import java.sql.SQLNonTransientConnectionException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -23,7 +20,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.mail.MessagingException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -36,17 +32,20 @@ import common.model.Renta;
 import common.model.TipoAbono;
 import common.model.Usuario;
 import common.form.items.VerDisponibilidadArticulos;
+import common.model.Abono;
 import common.model.Color;
 import common.model.EstadoEvento;
 import common.model.Tipo;
 import common.model.AvailabilityItemResult;
 import common.model.CatalogSocialMediaContactModel;
+import common.model.DetalleRenta;
 import common.services.CatalogSocialMediaContactService;
 import common.services.EstadoEventoService;
 import services.CustomerService;
 import common.services.ItemService;
+import common.services.RentaService;
 import services.SaleService;
-import services.SystemService;
+import common.services.SystemService;
 import common.services.TaskAlmacenUpdateService;
 import common.services.TaskDeliveryChoferUpdateService;
 import common.services.TipoEventoService;
@@ -63,6 +62,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import mobiliario.IndexForm;
 import utilities.OptionPaneService;
 import utilities.Utility;
 import utilities.dtos.ResultDataShowByDeliveryOrReturnDate;
@@ -110,6 +110,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private final EstadoEventoService estadoEventoService = EstadoEventoService.getInstance();
     private final TipoEventoService tipoEventoService = TipoEventoService.getInstance();
     private Articulo itemToEdit;
+    private RentaService rentaService;
 
     public AgregarRenta() {
         
@@ -158,6 +159,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         lbl_sel.setText(ApplicationConstants.EMPTY_STRING);
 
         UtilityCommon.setMaximum(this, PropertyConstant.MAX_WIN_AGREGAR_RENTA);
+        rentaService = RentaService.getInstance();
         
     }
     //"Cantidad", "id_articulo", "Articulo", "P.Unitario","Descuento %","Descuento", "Importe","Utiles"};
@@ -434,245 +436,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         ventanaVerDisponibilidad.setVisible(true);
         ventanaVerDisponibilidad.setLocationRelativeTo(this);
     }
-
-    public void enviar_email() {
-        String email = this.txtEmailToSend.getText();
-        try{
-            UtilityCommon.isEmail(email);
-        }catch(MessagingException e){
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR);
-            return;            
-        }
-        String asunto;
-        StringBuilder mensaje = new StringBuilder();
-        fecha_sistema();
-        DatosGenerales generalData = systemService.getGeneralData();
-        asunto = generalData.getCompanyName()+" >>> Evento registrado con éxito " + fecha_sistema;
-        
-        mensaje.append("<div id='container-message' style='width:700px; text-align:left; margin:16px;'>");
-        
-        mensaje.append("<font color='black'>Estimad@&nbsp;");
-            mensaje.append(lbl_cliente.getText());
-            mensaje.append(",&nbsp;");
-        mensaje.append(generalData.getCompanyName());
-        mensaje.append("&nbsp;le notifica que el alta de su pedido a nuestros sistemas ha quedado guardado exitosamente, ");
-        mensaje.append("le recordamos que verifique todos los datos contenidos en el folio tanto datos personales y de env&iacute;o ");
-        mensaje.append("as&iacute; como los servicios contratados para su entera satisfacci&oacute;n </font>");
-        mensaje.append("<br/>");
-        mensaje.append("<br/>");
-      
-        mensaje.append("<table style='border-spacing: 4px;border: 1px solid #afadad; border-radius: 2px;'><caption>Datos del pedido</caption>");
-        mensaje.append("<thead><tr><th></th><th></th></tr></thead>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Folio");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(globalFolio);
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Fecha y hora de entrega");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(fecha_entrega);
-                mensaje.append(" ");
-                mensaje.append(hora_entrega);
-                mensaje.append(" horas");
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Fecha y hora devoluci&oacute;n");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(fecha_devolucion);
-                mensaje.append(" ");
-                mensaje.append(hora_devolucion);
-                mensaje.append(" horas");
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Fecha del evento");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(fecha_evento);
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Nombre del chofer");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(chofer);
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Direcci&oacute;n del evento");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(txt_descripcion.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Tipo registro");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(cmb_tipo.getSelectedItem().toString());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Atendi&oacute;");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(iniciar_sesion.usuarioGlobal.getNombre());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Registrado a");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append(this.lbl_cliente.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;'>");
-                mensaje.append("");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append("");
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td colspan=2 style='text-align:center;font-weight:900;padding-top: 16px; border-top: 1px solid #afadad; '>");
-                mensaje.append("DATOS DE FACTURACI&Oacute;N");
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Subtotal");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_subtotal.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Descuento");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_descuento.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Envio y recolecci&oacute;n");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_envioRecoleccion.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-         mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Dep&oacute;sito en garant&iacute;a");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_depositoGarantia.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("IVA");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_total_iva.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Pagos");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_abonos.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("<tr>");
-            mensaje.append("<td style='text-align:left;font-weight:900;'>");
-                mensaje.append("Total");
-            mensaje.append("</td>");
-            mensaje.append("<td style='text-align:right;'>");
-                mensaje.append(txt_abonos.getText());
-            mensaje.append("</td>");
-        mensaje.append("</tr>");
-        
-        mensaje.append("</tbody></table>");
-        
-        mensaje.append("<br/>");
-        
-        mensaje.append("<table style='border-spacing: 4px;border: 1px solid #afadad; border-radius: 2px;'><caption>Detalle pedido</caption><thead><tr><th>cantidad</th><th>articulo</th><th>p. unitario</th><th>descuento</th><th>importe</th></tr></thead>");
-        mensaje.append("<tbody>");
-        for (int i = 0; i < tabla_detalle.getRowCount(); i++) {
-            mensaje.append("<tr>");
-            
-            // CANTIDAD
-            mensaje.append("<td style='text-align:center;'>");
-            mensaje.append(tabla_detalle.getValueAt(i, 0).toString());
-            mensaje.append("</td>");
-            
-            // ARTICULO
-            mensaje.append("<td>");
-            mensaje.append(tabla_detalle.getValueAt(i, 2).toString());
-            mensaje.append("</td>");
-            
-            //P. UNITARIO
-            mensaje.append("<td style='text-align:right;'>");
-            mensaje.append(tabla_detalle.getValueAt(i, 3).toString());
-            mensaje.append("</td>");
-            
-            //DESCUENTO
-            mensaje.append("<td style='text-align:right;'>");
-            mensaje.append(tabla_detalle.getValueAt(i, 5).toString());
-            mensaje.append("</td>");
-            
-            //IMPORTE
-            mensaje.append("<td style='text-align:right;'>");
-            mensaje.append(tabla_detalle.getValueAt(i, 6).toString());
-            mensaje.append("</td>");
-            
-            mensaje.append("</tr>");
-        }
-        
-        mensaje.append("</tbody></table>");
-     
-        mensaje.append("<br/>");
-        mensaje.append("<br/>");
-        mensaje.append("<font color='black'>");
-                mensaje.append(generalData.getCompanyName());
-                mensaje.append("&nbsp;agradece tu preferencia...");
-                mensaje.append("</font>");
-        
-                mensaje.append("</div>");
-        
-
-        System.out.println("MENSAJE: " + mensaje);
-
-        Mail mail = new Mail();
-        mail.setTo(email);
-        mail.setSubject(asunto);
-        mail.setMessage(mensaje+"");
-        mail.SEND();
-    }
     
     private void generateReporteWithImagesFromRenta () {
         
@@ -774,11 +537,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             jbtn_reporte.setEnabled(false);
             jbtn_nuevo_evento.setEnabled(false);
 
-            if (txt_email.getText().equals("")) {
-                check_enviar_email.setSelected(false);
-            } else if (xemail != null && xemail > 0) {
-                check_enviar_email.setSelected(true);
-            }
             
         } catch (BusinessException businessException) {
             JOptionPane.showMessageDialog(this, businessException.getMessage(), 
@@ -979,283 +737,123 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         return nueva_cadena;
     }
 
-    public void renta() {
-        
-        if (check_enviar_email.isSelected()){
-           try {
-                UtilityCommon.isEmail(this.txtEmailToSend.getText());
-           } catch(MessagingException e){
-               JOptionPane.showMessageDialog(this,e.getMessage(), 
-                       ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
-               return;
-           }
-        }
-        
-        if (!txtPorcentajeDescuento.getText().isEmpty()) {
-            try {
-                UtilityCommon.validatePorcentajeDescuento(txtPorcentajeDescuento.getText());
-            } catch (BusinessException businessException) {
-                JOptionPane.showMessageDialog(this, "ERROR en PORCENTAJE DE DESCUENTO.\n"+businessException.getMessage(), 
-                        ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-                            
-        }
-        
-        if (cmb_fecha_entrega.getDate() == null) {
-            JOptionPane.showMessageDialog(this, "Falta fecha de entrega ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_fecha_devolucion.getDate() == null) {
-            JOptionPane.showMessageDialog(this, "Falta fecha de devolucion ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-       } else if (cmb_fecha_evento.getDate() == null) {
-            JOptionPane.showMessageDialog(this, "Falta fecha del evento ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-        } else if (!Utility.validateHour(txtInitDeliveryHour.getText())) {
-            JOptionPane.showMessageDialog(this, "Falta seleccionar hora ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-        } else if (!Utility.validateHour(txtEndDeliveryHour.getText())) {
-            JOptionPane.showMessageDialog(this, "Falta seleccionar segunda hora ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-        } else if (!Utility.validateHour(txtInitReturnHour.getText())) {
-            JOptionPane.showMessageDialog(this, "Falta seleccionar hora devolución ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-        } else if (!Utility.validateHour(txtEndReturnHour.getText())) {
-            JOptionPane.showMessageDialog(this, "Falta seleccionar segunda hora devolución", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-        } else if (cmb_chofer.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(this, "Favor de seleccionar un chofer ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-        } else if (!txt_descripcion.getText().equals("") && txt_descripcion.getText().length() >= 400) {
-            JOptionPane.showMessageDialog(this, "Descripción a rebasado los caracteres permitidos [400 caracteres] ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-            txt_descripcion.requestFocus();
-        } else if (!this.txt_comentario.getText().equals("") && txt_comentario.getText().length() >= 500) {
-            JOptionPane.showMessageDialog(this, "Comentario a rebasado los caracteres permitidos [500 caracteres] ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-            txt_descripcion.requestFocus();
-        } else if (tabla_detalle.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Favor de ingresar detalle de conceptos ", ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.INFORMATION_MESSAGE);
-        } else if (tabla_abonos.getRowCount() == 0) {
-            seleccion = JOptionPane.showOptionDialog(this, "No has registrado abonos,/n ¿Deseas continuar?", "Falta registrar abonos", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "Si");
-            if (seleccion == JOptionPane.YES_OPTION) {//presiono que si
-             try { 
-                 agregar_renta();
-             } catch (SQLNonTransientConnectionException e) {
-                log.error(e);
-                System.out.println("la conexion se ha cerrado "+e);
-                funcion.conectate();
-                System.out.println("volvemos abrir la conexion ");
-                JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n", "Error", JOptionPane.ERROR_MESSAGE);       
-             } catch (Exception e) {
-                 log.error(e);
-                 JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE);
-             }
-            }
 
-        } else {
-             try { 
-                 agregar_renta();
-             } catch (SQLNonTransientConnectionException e) {
-                 log.error(e);
-                System.out.println("la conexion se ha cerrado, intenta de nuevo\n "+e);
-                funcion.conectate();
-                 System.out.println("volvemos abrir la conexion ");
-                 JOptionPane.showMessageDialog(null, "la conexion se ha cerrado, intenta de nuevo\n", "Error", JOptionPane.ERROR_MESSAGE);       
-             } catch (Exception e) {
-                 log.error(e);
-                 JOptionPane.showMessageDialog(null, "Ocurrio un error al agregar la renta\n "+e, "Error", JOptionPane.ERROR_MESSAGE);
-             }
+    private Renta getRentaFromForm () throws BusinessException {
+        
+        try {
+            
+            Renta renta = new Renta();
+            
+            renta.setCliente(new Cliente(Long.valueOf(id_cliente)));
+            
+            renta.setUsuario(iniciar_sesion.usuarioGlobal);
+            renta.setHoraEntregaInicial(txtInitDeliveryHour.getText());
+            renta.setHoraEntregaFinal(this.txtEndDeliveryHour.getText());
+            renta.setHoraDevolucionInicial(this.txtInitReturnHour.getText());
+            renta.setHoraDevolucionFinal(txtEndReturnHour.getText());
+            renta.setFechaEntregaDate(cmb_fecha_entrega.getDate());
+            renta.setFechaDevolucionDate(cmb_fecha_devolucion.getDate());
+            renta.setFechaEventoDate(cmb_fecha_evento.getDate());
+            renta.setEstado((EstadoEvento) cmb_estado.getModel().getSelectedItem());
+            renta.setChofer((Usuario) cmb_chofer.getModel().getSelectedItem());
+            renta.setTipo((Tipo) cmb_tipo.getModel().getSelectedItem());
+
+            renta.setDescuento(Float.valueOf(
+                    UtilityCommon.onlyNumbers(this.txtPorcentajeDescuento.getText())));
+            
+            renta.setDescripcion(txt_descripcion.getText());
+
+            renta.setIva(Float.valueOf(UtilityCommon.onlyNumbers(txtIva.getText())));        
+
+            renta.setMostrarPreciosPdf(check_mostrar_precios.isSelected() ? "1" : "0");
+
+            renta.setEnvioRecoleccion(Float.valueOf(
+                    UtilityCommon.onlyNumbersAndPoint(this.txt_envioRecoleccion.getText())
+            ));
+
+            renta.setDepositoGarantia(Float.valueOf(
+                    UtilityCommon.onlyNumbersAndPoint(this.txt_depositoGarantia.getText())
+            ));
+
+            List<DetalleRenta> detalleRentas = new ArrayList<>();
+            for (int i = 0; i <= tabla_detalle.getRowCount() - 1; i++) {
+                DetalleRenta detalle = new DetalleRenta();         
+
+                detalle.setCantidad(Float.parseFloat(tabla_detalle.getValueAt(i, 0).toString()));
+                // articulo
+                Articulo articulo = new Articulo();
+                articulo.setArticuloId(Integer.valueOf(tabla_detalle.getValueAt(i, 1).toString()));
+                detalle.setArticulo(articulo);
+                
+                detalle.setPrecioUnitario(Float.parseFloat(UtilityCommon.onlyNumbersAndPoint(tabla_detalle.getValueAt(i, 3).toString())));
+                detalle.setSeDesconto("0");
+                detalle.setPorcentajeDescuento(Float.parseFloat(UtilityCommon.onlyNumbersAndPoint(tabla_detalle.getValueAt(i, 4).toString())));
+
+                detalleRentas.add(detalle);
+
+            }
+            
+            renta.setDetalleRenta(detalleRentas);
+
+            // ABONOS
+            List<Abono> abonos = new ArrayList<>();
+            
+            for (int i = 0; i <= tabla_abonos.getRowCount() - 1; i++) {
+                Abono abono = new Abono();
+                abono.setAbono(Float.parseFloat(UtilityCommon.onlyNumbersAndPoint(tabla_abonos.getValueAt(i, 1).toString())));
+                abono.setComentario(tabla_abonos.getValueAt(i, 2).toString());     
+                abono.setTipoAbono(new TipoAbono(Integer.parseInt(tabla_abonos.getValueAt(i, 3).toString())));
+                abono.setFechaPago(tabla_abonos.getValueAt(i, 5).toString());
+                abonos.add(abono);
+            }
+            
+            renta.setAbonos(abonos);
+            
+            return renta;
+            
+        } catch (Exception exception) {
+            log.error(exception.getMessage(),exception);
+            throw new BusinessException("Ocurrio un error al obtener los datos desde el formmulario.\n"
+                    + "Detalle del error:"+exception.getMessage(),exception);
         }
     }
-    
 
-    public void agregar_renta() throws Exception {       
+    public void agregar_renta() {
         
-        subTotal = 0;
-        cant_abono = 0;
-        String stock = "0";
-        
-        int aux = 1;
-        hora_entrega = txtInitDeliveryHour.getText() +" a "+this.txtEndDeliveryHour.getText();
-        hora_devolucion = this.txtInitReturnHour.getText()+" a "+txtEndReturnHour.getText();
-        
-        fecha_entrega = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_entrega.getDate());
-        fecha_devolucion = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_devolucion.getDate());
-        fecha_evento = new SimpleDateFormat("dd/MM/yyyy").format(cmb_fecha_evento.getDate());
-        
-        EstadoEvento estadoEventoSelected =(EstadoEvento) cmb_estado.getModel().getSelectedItem();
-        Usuario choferSelected = (Usuario) cmb_chofer.getModel().getSelectedItem();
-        Tipo tipoSelected = (Tipo) cmb_tipo.getModel().getSelectedItem();
-
-        String id_estado = estadoEventoSelected.getEstadoId().toString();
-        String id_chofer = choferSelected.getUsuarioId().toString();
-        String id_tipo = tipoSelected.getTipoId().toString();
-        System.out.println("ID TIPO: " + id_tipo);
-        
-
         try {
-            Utility.validateStatusAndTypeEvent(estadoEventoSelected,tipoSelected);
-        } catch (BusinessException e) {
-            log.error(e);
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+            
+            Renta renta = getRentaFromForm();
+            
+            rentaService.saveOrUpdate(renta,IndexForm.listNotifications,IndexForm.txtAreaNotifications);
 
-        String folio = funcion.GetData("folio", "Select folio from datos_generales");
-        String folio_cambio = funcion.GetData("folio_cambio", "Select folio_cambio from datos_generales");
-        chofer = cmb_chofer.getSelectedItem().toString();
+            id_ultima_renta = renta.getRentaId()+"";
 
-        fecha_sistema();
-        String porcentajeDescuentoRenta;
-        if (!txt_descuento.getText().equals("") && !txtPorcentajeDescuento.getText().equals("")) {
-            descuento = UtilityCommon.onlyNumbers(txt_descuento.getText());            
-            porcentajeDescuentoRenta = UtilityCommon.onlyNumbers(this.txtPorcentajeDescuento.getText());
-        } else {
-            porcentajeDescuentoRenta = "0";
-            descuento = "0";
-        }
-        if (!txtIva.getText().equals("")) {
-            iva = EliminaCaracteres(txtIva.getText(), "$");
-            iva = iva.replace(",", ".");
-        } else {
-            iva = "0";
-        }
-        
-        String mostrarPrecios = check_mostrar_precios.isSelected() ? "1" : "0";
-        String envioRecoleccion = this.txt_envioRecoleccion.getText().equals("") ? "0" : this.txt_envioRecoleccion.getText()+"";
-        String depositoGarantia = this.txt_depositoGarantia.getText().equals("") ? "0" : this.txt_depositoGarantia.getText()+""; 
-        
-        if (folio_cambio.equals("1")) { //cambio el folio
-
-            if (id_estado.equals("2")) {
-                stock = "1";
+            if (check_generar_reporte.isSelected()) {
+                generateReporteWithImagesFromRenta();
             }
 
-            String datos[] = {id_estado, id_cliente, iniciar_sesion.id_usuario_global, fecha_sistema, fecha_entrega, hora_entrega, fecha_devolucion, txt_descripcion.getText(),porcentajeDescuentoRenta, descuento, iva, txt_comentarios.getText(), id_chofer, folio, stock, id_tipo,hora_devolucion,fecha_evento,envioRecoleccion,depositoGarantia,mostrarPrecios};
-            funcion.InsertarRegistro(datos, "insert into renta (id_estado,id_clientes,id_usuarios,fecha_pedido,fecha_entrega,hora_entrega,fecha_devolucion,descripcion,descuento,cantidad_descuento,iva,comentario,id_usuario_chofer,folio,stock,id_tipo,hora_devolucion,fecha_evento,envio_recoleccion,deposito_garantia,mostrar_precios_pdf) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-            id_ultima_renta = funcion.ultimoid_renta();
-            
-            System.out.println("FOLIO: " + folio);
-            aux = Integer.parseInt(folio) + 1;
-            System.out.println("aux: " + aux);
-            globalFolio = aux;
-            String[] datos_2 = {String.valueOf(aux)};
-            funcion.UpdateRegistro(datos_2, "UPDATE datos_generales SET folio=?");
-            
-            
+            seleccion = JOptionPane.showOptionDialog(this, 
+                    "¿Deseas agregar otro evento?", 
+                    "Evento nuevo ", 
+                    JOptionPane.YES_NO_CANCEL_OPTION, 
+                    JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "No");
 
-        } else {//No cambio el folio
-           
-            if (id_estado.equals("2")) {
-                stock = "1";
+
+            if (seleccion == 0) {//presiono que si
+                nuevo_evento();
+                limpiar();
+                jTabbedPane1.setEnabledAt(1, false);
+                jTabbedPane1.setSelectedIndex(0);
+                jbtn_disponible.setEnabled(false);
+                jbtn_nuevo_evento.setEnabled(false);
+                panel_articulos.setVisible(true);
+                panel_conceptos.setVisible(false);
+            } else { //presiono que no
+                this.dispose();
             }
-            String datos_4[] = {id_estado, id_cliente, iniciar_sesion.id_usuario_global, fecha_sistema, fecha_entrega, hora_entrega, fecha_devolucion, txt_descripcion.getText(), porcentajeDescuentoRenta,descuento, iva, txt_comentarios.getText(), id_chofer, folio, stock, id_tipo,hora_devolucion,fecha_evento,envioRecoleccion,depositoGarantia,mostrarPrecios};
-            funcion.InsertarRegistro(datos_4, "insert into renta (id_estado,id_clientes,id_usuarios,fecha_pedido,fecha_entrega,hora_entrega,fecha_devolucion,descripcion,descuento,cantidad_descuento,iva,comentario,id_usuario_chofer,folio,stock,id_tipo,hora_devolucion,fecha_evento,envio_recoleccion,deposito_garantia,mostrar_precios_pdf) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-            id_ultima_renta = funcion.ultimoid_renta();
-            
-            System.out.println("FOLIO: " + folio);
-            aux = Integer.parseInt(folio) + 1;
-            System.out.println("aux: " + aux);
-            globalFolio = aux;
-            String[] datos_3 = {String.valueOf(aux)};
-            funcion.UpdateRegistro(datos_3, "update datos_generales set folio=?");
-
-        }
-        String porcentajeDescuento = null;
-        for (int i = 0; i <= tabla_detalle.getRowCount() - 1; i++) {
-            subTotal = subTotal + Float.parseFloat(EliminaCaracteres(tabla_detalle.getValueAt(i, 6).toString(), "$,"));
-            porcentajeDescuento = EliminaCaracteres(tabla_detalle.getValueAt(i, 4).toString(), "$,");
-            String p_unitario = EliminaCaracteres(tabla_detalle.getValueAt(i, 3).toString(), "$,");
-            String datos_detalle[] = {id_ultima_renta, tabla_detalle.getValueAt(i, 0).toString(), tabla_detalle.getValueAt(i, 1).toString(), p_unitario, "0",porcentajeDescuento};
-            funcion.InsertarRegistro(datos_detalle, "INSERT INTO detalle_renta (id_renta,cantidad,id_articulo,p_unitario,se_desconto,porcentaje_descuento) VALUES (?,?,?,?,?,?)");
-
-        }
-        // ABONOS
-        if (tabla_abonos.getRowCount() != 0) {
-            String abono;
-            for (int i = 0; i <= tabla_abonos.getRowCount() - 1; i++) {
-                cant_abono = cant_abono + Float.parseFloat(EliminaCaracteres(tabla_abonos.getValueAt(i, 1).toString(), "$,"));
-                abono = EliminaCaracteres(tabla_abonos.getValueAt(i, 1).toString(), "$,");
-                String tipoAbonoId = tabla_abonos.getValueAt(i, 3).toString();
-                
-                String datos_abonos[] = {id_ultima_renta, 
-                    iniciar_sesion.id_usuario_global, 
-                    fecha_sistema, abono, 
-                    tabla_abonos.getValueAt(i, 2).toString(),tipoAbonoId,
-                    tabla_abonos.getValueAt(i, 5).toString()
-                };
-                funcion.InsertarRegistro(datos_abonos, "INSERT INTO abonos "
-                        + "(id_renta,id_usuario,fecha,abono,comentario,id_tipo_abono,fecha_pago) "
-                        + "VALUES(?,?,?,?,?,?,?) ");
-
-            }
-        }
-        
-        if (check_generar_reporte.isSelected()){
-            generateReporteWithImagesFromRenta();
-            //reporte();
-        }
-
-        if (check_enviar_email.isSelected()){
-            enviar_email();               
-        }
-        
-        String messageSuccess = iniciar_sesion.usuarioGlobal.getNombre()+ " registró un evento de tipo "+cmb_tipo.getSelectedItem().toString()
-                +" con status ["+cmb_estado.getSelectedItem().toString()+ "], FOLIO: ["+folio+"]";
-        Utility.pushNotification(messageSuccess);
-        log.info(messageSuccess);
-        
-        if (id_tipo.equals(ApplicationConstants.TIPO_PEDIDO) || id_tipo.equals(ApplicationConstants.TIPO_FABRICACION)) {
-            new Thread(() -> {
-                
-                String message;
-                
-               
-                try {
-                    taskAlmacenUpdateService = TaskAlmacenUpdateService.getInstance();
-                    message = taskAlmacenUpdateService.saveWhenIsNewEvent(
-                            Long.parseLong(id_ultima_renta), 
-                            folio, 
-                            iniciar_sesion.usuarioGlobal.getUsuarioId().toString()
-                    );
-                    log.info(message);
-                } catch (NoDataFoundException e) {
-                    message = e.getMessage();
-                    log.error(message);
-                } catch (DataOriginException e) {
-                    message = "Ocurrió un error al generar la tarea a almacén, id: "+id_ultima_renta +", DETALLE: "+e.getMessage();
-                    log.error(e.getMessage(),e);
-                }
-                
-                Utility.pushNotification(message);
-            }).start();
-            
-            new Thread(() -> {       
-                
-                String message;                
-
-                try {
-                    taskDeliveryChoferUpdateService = TaskDeliveryChoferUpdateService.getInstance();
-                    taskDeliveryChoferUpdateService.saveWhenIsNewEvent(
-                            Long.parseLong(id_ultima_renta), 
-                            folio,id_chofer, 
-                            iniciar_sesion.usuarioGlobal.getUsuarioId().toString()
-                    );
-                    message = String.format("Tarea 'entrega chofer' generada. Folio: %s, chofer: %s",folio,cmb_chofer.getSelectedItem());
-                } catch (DataOriginException | NoDataFoundException e) {
-                    message = e.getMessage();
-                    log.error(message);
-                }
-                
-                Utility.pushNotification(message);
-            }).start();
-        }
-
-        seleccion = JOptionPane.showOptionDialog(this, "¿Deseas agregar otro evento?", "Evento nuevo ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Si", "No"}, "No");
-        
-        
-        if (seleccion == 0) {//presiono que si
-            nuevo_evento();
-            limpiar();
-            jTabbedPane1.setEnabledAt(1, false);
-            jTabbedPane1.setSelectedIndex(0);
-            jbtn_disponible.setEnabled(false);
-            jbtn_nuevo_evento.setEnabled(false);
-            panel_articulos.setVisible(true);
-            panel_conceptos.setVisible(false);
-        } else { //presiono que no
-            this.dispose();
+        } catch (BusinessException be) {
+            JOptionPane.showMessageDialog(this, be.getMessage(), 
+                    ApplicationConstants.MESSAGE_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
         }
 
     }
@@ -1776,9 +1374,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         jLabel32 = new javax.swing.JLabel();
         jLabel33 = new javax.swing.JLabel();
         check_generar_reporte = new javax.swing.JCheckBox();
-        check_enviar_email = new javax.swing.JCheckBox();
         check_mostrar_precios = new javax.swing.JCheckBox();
-        txtEmailToSend = new javax.swing.JTextField();
         txtInitReturnHour = new javax.swing.JFormattedTextField();
         txtInitDeliveryHour = new javax.swing.JFormattedTextField();
         txtEndDeliveryHour = new javax.swing.JFormattedTextField();
@@ -2179,26 +1775,9 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
             }
         });
 
-        check_enviar_email.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        check_enviar_email.setText("Enviar email confirmación");
-        check_enviar_email.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        check_enviar_email.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                check_enviar_emailActionPerformed(evt);
-            }
-        });
-
         check_mostrar_precios.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         check_mostrar_precios.setText("Mostrar precios en PDF");
         check_mostrar_precios.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-
-        txtEmailToSend.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
-        txtEmailToSend.setToolTipText("Para enviar multiples correos deberas separarlos por punto y coma [;]");
-        txtEmailToSend.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtEmailToSendActionPerformed(evt);
-            }
-        });
 
         try {
             txtInitReturnHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
@@ -3097,11 +2676,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(check_mostrar_precios, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(check_enviar_email, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(check_generar_reporte, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 4, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(txtEmailToSend, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(lbl_atiende, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(lbl_cliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -3177,16 +2752,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
                                 .addComponent(lbl_cliente, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lbl_atiende, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addGroup(panel_datos_generalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(check_enviar_email)
-                                    .addGroup(panel_datos_generalesLayout.createSequentialGroup()
-                                        .addGap(23, 23, 23)
-                                        .addComponent(check_mostrar_precios, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(check_generar_reporte, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtEmailToSend, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                                .addGap(41, 41, 41)
+                                .addComponent(check_mostrar_precios, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(check_generar_reporte, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addComponent(panelTotales, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -3330,7 +2899,7 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
 
     private void jbtn_agregar_eventoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtn_agregar_eventoActionPerformed
         // TODO add your handling code here:
-        renta();
+        agregar_renta();
 
     }//GEN-LAST:event_jbtn_agregar_eventoActionPerformed
 
@@ -3416,10 +2985,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jbtn_nuevo_eventoKeyPressed
 
-    private void check_generar_reporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_check_generar_reporteActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_check_generar_reporteActionPerformed
-
     private void lblTipoAbonoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblTipoAbonoMouseClicked
         // TODO add your handling code here:
         if(!iniciar_sesion.usuarioGlobal.getAdministrador().equals("1")){
@@ -3438,14 +3003,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     private void lblTipoAbonoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lblTipoAbonoKeyPressed
         // TODO add your handling code here:
     }//GEN-LAST:event_lblTipoAbonoKeyPressed
-
-    private void check_enviar_emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_check_enviar_emailActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_check_enviar_emailActionPerformed
-
-    private void txtEmailToSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEmailToSendActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtEmailToSendActionPerformed
 
     private void txt_porcentaje_descuentoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_porcentaje_descuentoKeyPressed
         if (evt.getKeyCode() == 10) {
@@ -3716,6 +3273,10 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
         generateReporteWithImagesFromRenta();
     }//GEN-LAST:event_btnReportWithImgsActionPerformed
 
+    private void check_generar_reporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_check_generar_reporteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_check_generar_reporteActionPerformed
+
     private void fillTableFromItemsFolio (Renta renta) {
         DefaultTableModel tableModel = (DefaultTableModel) tabla_detalle.getModel();
         
@@ -3761,7 +3322,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGetItemsFromFolio;
     private javax.swing.JButton btnReportWithImgs;
-    private javax.swing.JCheckBox check_enviar_email;
     private javax.swing.JCheckBox check_generar_reporte;
     private javax.swing.JCheckBox check_mostrar_precios;
     private com.toedter.calendar.JDateChooser cmbBirthday;
@@ -3871,7 +3431,6 @@ public class AgregarRenta extends javax.swing.JInternalFrame {
     public static javax.swing.JTable tabla_detalle;
     private javax.swing.JTextField txtAmountEdit;
     private javax.swing.JTextField txtDiscountRateEdit;
-    private javax.swing.JTextField txtEmailToSend;
     private javax.swing.JFormattedTextField txtEndDeliveryHour;
     private javax.swing.JFormattedTextField txtEndReturnHour;
     private javax.swing.JFormattedTextField txtInitDeliveryHour;
